@@ -45,7 +45,8 @@ define("SITE_URI", "http://ydecloud-os.local.com/");
  */
 define("UPLOAD_SITE_URI", "http://ydecloud-os.local.com/upload/");
 define("UI_BUILDER_URI", "http://localhost:9999/");
-define("API_BUILDER_URI", "http://localhost:9998/");
+// Build SOCKET_HOST
+define("SOCKET_HOST", "ws://localhost:8888");
 
 /**
  * 开发环境true还是生产环境（false）
@@ -74,8 +75,6 @@ define("RABBITMQ_PORT", "5672");
 define("RABBITMQ_USER", "guest");
 define("RABBITMQ_PWD", "guest");
 
-// Build SOCKET_HOST
-define("SOCKET_HOST", "ws://localhost:8888");
 
 define('VERSION', '1.0.0');
 

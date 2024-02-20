@@ -9,8 +9,6 @@ export default {
   api: 'http://ydecloud-os.local.com/',
   uploadApi: 'http://ydecloud-os.local.com/upload/',
   socket: 'ws://localhost:8888',
-  // api: 'https://ydecloud.yidianhulian.com/',
-  // socket: 'wss://ydecloud.yidianhulian.com:8888',
 
   save (store: any, newVersion = false, message = '') {
     if (store.state.design.saving) return
