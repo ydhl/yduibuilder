@@ -1,0 +1,33 @@
+
+/* 背景颜色 */
+.bg-primary { background-color: var(--weui-INDIGO);}
+.bg-secondary { background-color: var(--weui-BG-4);}
+.bg-success { background-color: var(--weui-BRAND);}
+.bg-danger { background-color: var(--weui-RED);}
+.bg-warning { background-color: var(--weui-ORANGE);}
+.bg-info { background-color: var(--weui-LINK);}
+.bg-light { background-color: var(--weui-BG-0);}
+.bg-dark { background-color: var(--weui-FG-0);}
+.bg-white { background-color: #fff;}
+/*.weui-btn_outline{*/
+/*    background-color: transparent;*/
+/*}*/
+
+.flex-column{ flex-direction: column; }
+.align-items-start{ align-items: flex-start; }
+.align-items-end{ align-items: flex-end; }
+.align-items-center{ align-items: center; }
+.flex-shrink-0{flex-shrink:0}
+.d-none{display: none;}
+.d-block{display: block;}
+.pointer-events-none{pointer-events: none;}
+#ydecloud-app{
+    display: flex;
+    align-items: stretch;
+    align-content: stretch;
+    min-height: 100vh;
+}
+/**第一个元素撑满**/
+#ydecloud-app>div{
+    flex-grow: 1;
+}

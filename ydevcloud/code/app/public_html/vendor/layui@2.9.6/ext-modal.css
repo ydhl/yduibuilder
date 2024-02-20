@@ -1,0 +1,21 @@
+.layer-adapter.layui-layer{
+    border-radius: unset !important;
+    box-shadow: unset !important;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+.layer-adapter .layui-layer-title{
+    background-color: #fff;
+}
+
+.layer-adapter .layui-layer-resize{
+    background-image: url("./img/resize-bottom-right.svg");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: bottom right;
+}
+/*显示出modal的阴影*/
+.layer-adapter.layui-layer-page .layui-layer-content {
+    overflow: unset !important;
+}

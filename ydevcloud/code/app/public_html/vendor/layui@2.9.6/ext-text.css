@@ -1,0 +1,44 @@
+.layui-align-top{
+  vertical-align: top;
+}
+.layui-align-middle{
+  vertical-align: middle;
+}
+.layui-align-bottom{
+  vertical-align: bottom;
+}
+.layui-text-left{
+  text-align: left !important;
+}
+.layui-text-right{
+  text-align: right !important;
+}
+.layui-text-center{
+  text-align: center !important;
+}
+.layui-text-justify{
+  text-align: justify !important;
+}
+
+
+.layui-font-italic{
+  font-style: italic !important;
+}
+.layui-font-weight-bold{
+  font-weight:700!important;
+}
+.layui-font-weight-bolder{
+  font-weight:bolder!important;
+}
+.layui-font-weight-normal{
+  font-weight:400!important;
+}
+.layui-font-weight-light{
+  font-weight:300!important;
+}
+.layui-font-weight-lighter{
+  font-weight:lighter!important;
+}
+.layui-font-success{
+  color:#5FB878 !important;
+}

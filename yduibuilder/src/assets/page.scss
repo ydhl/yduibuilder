@@ -1,0 +1,67 @@
+
+.page-container {
+  margin: 15px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+
+  .page-action{
+    display: flex;
+    align-content: center;
+    align-items: center;
+  }
+  .page {
+    background-color: #fff;
+    border: 1px solid $gray-300;
+    transform-origin: left top;
+  }
+
+  .page-action .item{
+    padding: 2px 5px;
+    color: $gray-600;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  .page-action .item:hover{
+    color: $gray-800;
+  }
+
+  /*模拟器*/
+  .simulate-border:before{
+    content: '';
+    position: absolute;
+    top: 23px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 68px;
+    height: 10px;
+    border: 1px solid #EAEAEA;
+    background-color: #ffffff;
+    border-radius: 10px;
+  }
+  .simulate-border{
+    border: 1px solid #EAEAEA;
+    padding: 57px 16px 80px 16px;
+    border-radius: 30px;
+    position: relative;
+    background: #efefef;
+  }
+  .simulate-border iframe{
+    border: 1px solid #EAEAEA;
+  }
+  .simulate-border:after{
+    content: '';
+    position: absolute;
+    background-color: #ffffff;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 47px;
+    height: 47px;
+    border: 1px solid #EAEAEA;
+    border-radius: 50%;
+  }
+}

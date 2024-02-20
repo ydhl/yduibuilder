@@ -1,0 +1,10 @@
+
+.border-0{border-width: 0px;}
+.border-primary{border-color: var(--weui-INDIGO);}
+.border-secondary{border-color: var(--weui-BG-4);}
+.border-success{border-color: var(--weui-BRAND);}
+.border-danger{border-color: var(--weui-RED);}
+.border-warning{border-color: var(--weui-ORANGE);}
+.border-info{border-color: var(--weui-LINK);}
+.border-light{border-color: var(--weui-WHITE);}
+.border-dark{border-color: var(--weui-BG-4);}

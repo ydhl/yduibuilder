@@ -1,0 +1,25 @@
+::-webkit-scrollbar{
+  //滚动条整体部分
+  width: $scrollbarSize;
+  height: $scrollbarSize;
+}
+
+//滚动条里面的小方块，能向上向下移动（或向左向右移动）
+::-webkit-scrollbar-thumb{
+  border-radius: 10px;
+  background: $gray-400;
+}
+//
+//滚动条的轨道（里面装有Thumb）
+::-webkit-scrollbar-track{
+  background-color: transparent !important;
+}
+//
+//4. ::-webkit-scrollbar-button 滚动条的轨道的两端按钮，由于通过点击微调小方块的位置。
+//
+//5. ::-webkit-scrollbar-track-piece 内层轨道，滚动条中间部分
+//
+::-webkit-scrollbar-corner{
+  //边角，即垂直滚动条和水平滚动条相交的地方
+  background-color: transparent;
+}

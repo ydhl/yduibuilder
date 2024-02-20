@@ -1,0 +1,117 @@
+
+.api-method{
+  font-weight: bolder;
+  min-width: 40px;
+  display: inline-block;
+}
+.param-string{
+  color: #0c63e4;
+}
+.param-number{
+  color: #22a100;
+}
+.param-integer{
+  color: #8b00d4;
+}
+.param-array{
+  color: #ef0487;
+}
+.param-map{
+  color: #f50808;
+}
+.param-object{
+  color: #8a0d0d;
+}
+.param-boolean{
+  color: #e1bd0c;
+}
+.param-null{
+  color: #a9a9a9;
+}
+.param-any{
+  color: #dd8efd;
+}
+.api-method-get{
+  color: #22a100;
+}
+.api-method-post{
+  color: #f1456d;
+}
+.api-method-put{
+  color: #0083a1;
+}
+.api-method-delete{
+  color: #f8020a;
+}
+.api-method-head{
+  color: #76936d;
+}
+.api-method-options{
+  color: #7e7e7e;
+}
+.api-status{
+  display: inline-block;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+.api-status-develop{
+  background-color: var(--bs-primary)
+}
+.api-status-test{
+  background-color: var(--bs-gray-600)
+}
+.api-status-released{
+  background-color: var(--bs-success)
+}
+.api-status-deprecated{
+  background-color: var(--bs-danger)
+}
+.model-item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .treeicon:hover{
+    color: $blue;
+  }
+  .model-field{
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+  }
+  .model-action{
+    display: flex;
+    align-content: flex-end;
+    justify-items: center;
+  }
+}
+.model-item:hover{
+  background-color: #efefef;
+}
+.bind-icon.bound{
+  background-color: var(--bs-primary);
+  color: #fff;
+}
+.bind-icon{
+  height: 16px;
+  width: 16px;
+  font-size: 12px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--bs-gray-600);
+}
+.bind-icon:hover{
+  color: var(--bs-primary) !important;
+  background-color: transparent;
+}
+
+.iconfont.hover-primary:hover{
+  color: var(--bs-primary) !important;
+}
+.iconfont.hover-danger:hover{
+  color: var(--bs-danger) !important;;
+}

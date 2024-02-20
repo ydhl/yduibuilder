@@ -1,0 +1,118 @@
+.weui-btn{ width: auto; display: inline-block; }
+.weui-btn_xs{ padding: 0 6px; line-height: 2; font-size: 12px; border-radius: 3px;}
+.weui-btn_lg{ padding: 10px 32px; width: auto; line-height: 2; font-size: 28px; border-radius: 12px;}
+.weui-btn_link{ color: #000; background-color: transparent; border-radius: 0px;}
+.weui-btn_link::after{
+    border-width: 0px;
+    border-radius: 0px;
+}
+
+.weui-btn view{ color: unset !important;}
+/* 按钮样式 */
+.weui-btn_primary {
+    background-color: var(--weui-INDIGO);
+    color: var(--weui-WHITE);
+}
+.weui-btn_secondary {
+    background-color: var(--weui-BG-4);
+    color: var(--weui-WHITE);
+}
+.weui-btn_success {
+    background-color: var(--weui-BRAND);
+    color: var(--weui-WHITE);
+}
+.weui-btn_danger {
+    background-color: var(--weui-RED);
+    color: var(--weui-WHITE);
+}
+.weui-btn_warning {
+    background-color: var(--weui-ORANGE);
+    color: var(--weui-WHITE);
+}
+.weui-btn_info {
+    background-color: var(--weui-LINK);
+    color: var(--weui-WHITE);
+}
+.weui-btn_light {
+    background-color: var(--weui-BG-0);
+    color: var(--weui-FG-1);
+}
+.weui-btn_dark {
+    background-color: var(--weui-FG-0);
+    color: var(--weui-WHITE);
+}
+/* 轮廓按钮*/
+.weui-btn_outline_primary {
+    border: 1px solid var(--weui-INDIGO) !important;
+    color: var(--weui-INDIGO);
+    background-color: transparent;
+}
+.weui-btn_outline_secondary {
+    border: 1px solid var(--weui-BG-4) !important;
+    color: var(--weui-BG-4);
+    background-color: transparent;
+}
+.weui-btn_outline_success {
+    border: 1px solid var(--weui-BRAND) !important;
+    color: var(--weui-BRAND);
+    background-color: transparent;
+}
+.weui-btn_outline_danger {
+    border: 1px solid var(--weui-RED) !important;
+    color: var(--weui-RED);
+    background-color: transparent;
+}
+.weui-btn_outline_warning {
+    border: 1px solid var(--weui-ORANGE) !important;
+    color: var(--weui-ORANGE);
+    background-color: transparent;
+}
+.weui-btn_outline_info {
+    border: 1px solid var(--weui-LINK) !important;
+    color: var(--weui-LINK);
+    background-color: transparent;
+}
+.weui-btn_outline_light {
+    border: 1px solid var(--weui-BG-0) !important;
+    color: var(--weui-BG-0);
+    background-color: transparent;
+}
+.weui-btn_outline_dark {
+    border: 1px solid var(--weui-FG-0) !important;
+    color: var(--weui-FG-0);
+    background-color: transparent;
+}
+
+/* 按钮组 */
+.weui-btn_group {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+}
+.weui-btn_group>.weui-btn{
+    position: relative;
+    flex: 1 1 auto;
+    margin-top: 0px !important;
+}
+.weui-btn_group>.weui-btn:not(:last-child){
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+.weui-btn_group>.weui-btn_group:not(:first-child),.weui-btn_group>.weui-btn:not(:first-child){margin-left:-1px}
+.weui-btn_group>.weui-btn_group:not(:first-child)>.weui-btn,.weui-btn_group>.weui-btn:not(:first-child){border-top-left-radius:0;border-bottom-left-radius:0}
+.weui-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+.weui-btn+.weui-btn {
+    margin-top: 16px;
+}
+.weui-btn_group>.weui-btn::after{
+     border-width: 0px;
+     border-radius: 0px;
+ }
+ .weui-btn_icon::after{
+    border-width: 0px;
+    border-radius: 0px;
+}

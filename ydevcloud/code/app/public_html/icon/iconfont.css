@@ -1,0 +1,163 @@
+@font-face {
+  font-family: "iconfont"; /* Project id 2577834 */
+  src: url('/icon/iconfont.woff2?t=1700969307440') format('woff2'),
+       url('/icon/iconfont.woff?t=1700969307440') format('woff'),
+       url('/icon/iconfont.ttf?t=1700969307440') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-arrowleft:before {
+  content: "\e693";
+}
+
+.icon-input:before {
+  content: "\eb0a";
+}
+
+.icon-output:before {
+  content: "\eb0b";
+}
+
+.icon-ui:before {
+  content: "\e6ca";
+}
+
+.icon-carousel:before {
+  content: "\e601";
+}
+
+.icon-collapse:before {
+  content: "\ecbc";
+}
+
+.icon-resize-bottom-right:before {
+  content: "\e87b";
+}
+
+.icon-moveto:before {
+  content: "\e607";
+}
+
+.icon-plus:before {
+  content: "\e6f8";
+}
+
+.icon-homepage:before {
+  content: "\e702";
+}
+
+.icon-recycle:before {
+  content: "\e9d1";
+}
+
+.icon-versions:before {
+  content: "\e62f";
+}
+
+.icon-mobile:before {
+  content: "\e62b";
+}
+
+.icon-tablet:before {
+  content: "\e72e";
+}
+
+.icon-pc:before {
+  content: "\e671";
+}
+
+.icon-check:before {
+  content: "\e646";
+}
+
+.icon-tips:before {
+  content: "\e7a3";
+}
+
+.icon-arrowdown:before {
+  content: "\ecbd";
+}
+
+.icon-arrowright:before {
+  content: "\e677";
+}
+
+.icon-page:before {
+  content: "\e640";
+}
+
+.icon-detail:before {
+  content: "\e793";
+}
+
+.icon-library:before {
+  content: "\e69e";
+}
+
+.icon-image:before {
+  content: "\e92e";
+}
+
+.icon-blank:before {
+  content: "\e615";
+}
+
+.icon-download:before {
+  content: "\e868";
+}
+
+.icon-database:before {
+  content: "\e6ac";
+}
+
+.icon-module:before {
+  content: "\e623";
+}
+
+.icon-activity:before {
+  content: "\e614";
+}
+
+.icon-members:before {
+  content: "\e613";
+}
+
+.icon-setting:before {
+  content: "\e9cb";
+}
+
+.icon-folder:before {
+  content: "\e62e";
+}
+
+.icon-function:before {
+  content: "\e81b";
+}
+
+.icon-run:before {
+  content: "\e7de";
+}
+
+.icon-more:before {
+  content: "\e600";
+}
+
+.icon-remove:before {
+  content: "\e622";
+}
+
+.icon-api:before {
+  content: "\ea4b";
+}
+
+.icon-edit:before {
+  content: "\e61f";
+}
+

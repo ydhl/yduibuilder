@@ -1,0 +1,2540 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: yangzie\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-02-07 14:11+0800\n"
+"PO-Revision-Date: \n"
+"Last-Translator: leeboo <leeboo@yidianhulian.com>\n"
+"Language-Team: liizii\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: ..\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-SearchPath-0: app\n"
+"X-Poedit-SearchPath-1: yangzie\n"
+"X-Poedit-SearchPath-2: cli\n"
+
+#: app/hooks/acl.php:57
+msgid "individual can not invite other user join your project"
+msgstr "个人账户无法邀请别人参与项目"
+
+#: app/hooks/acl.php:94
+msgid "can invite other user join your project"
+msgstr "可邀请别人参与项目"
+
+#: app/hooks/acl.php:150 app/vendor/layouts/admin.layout.php:56
+msgid "Your account has expired. Please renew it"
+msgstr "账号已过期，请续费"
+
+#: app/hooks/acl.php:160 app/hooks/acl.php:169
+msgid "Cannot add new project. The limit has been exceeded"
+msgstr "不能添加项目，超过数量限制，请升级账号"
+
+#: app/hooks/acl.php:172 app/hooks/acl.php:181
+msgid "Cannot invite project member. The limit has been exceeded"
+msgstr "不能邀请成员，超过数量限制，请升级账号"
+
+#: app/hooks/auth.php:36 app/hooks/auth.php:38
+msgid "Please Signin"
+msgstr "请登录"
+
+#: app/lang.php:8
+msgid "admin"
+msgstr "管理员"
+
+#: app/lang.php:9
+msgid "developer"
+msgstr "开发者"
+
+#: app/lang.php:10
+msgid "reporter"
+msgstr "报告者"
+
+#: app/lang.php:11
+msgid "guest"
+msgstr "访客"
+
+#: app/lang.php:12
+msgid "individual"
+msgstr "个人"
+
+#: app/lang.php:13
+msgid "base"
+msgstr "基础版"
+
+#: app/lang.php:14
+msgid "Free"
+msgstr "免费"
+
+#: app/lang.php:15
+msgid "team"
+msgstr "团队"
+
+#: app/lang.php:16
+msgid "Coming Soon"
+msgstr "敬请期待"
+
+#: app/lang.php:17
+msgid "premium"
+msgstr "付费版"
+
+#: app/lang.php:18
+msgid "Project Limit"
+msgstr "项目列表"
+
+#: app/lang.php:19
+msgid "Page History"
+msgstr "页面版本"
+
+#: app/lang.php:20
+msgid "advance"
+msgstr "高级"
+
+#: app/lang.php:21
+msgid "professional"
+msgstr "专业版"
+
+#: app/lang.php:22
+msgid ""
+"just can add one project and can not invite other user to join your project"
+msgstr "只能有一个项目并且不能邀请别人参与项目"
+
+#: app/lang.php:23
+msgid "no project limit but can not invite other user to join your project"
+msgstr "项目数量无限制，但也不能邀请别人参与项目"
+
+#: app/lang.php:24
+msgid "small team"
+msgstr "小团队"
+
+#: app/lang.php:25
+msgid "company"
+msgstr "公司"
+
+#: app/lang.php:26
+msgid "no project limit, no member limit"
+msgstr "项目数无限制，成员数无限制"
+
+#: app/lang.php:27
+msgid "pc"
+msgstr "pc"
+
+#: app/lang.php:28
+msgid "mobile"
+msgstr "移动端"
+
+#: app/modules/api/controllers/deletepage_controller.class.php:51
+#: app/modules/api/controllers/save_controller.class.php:56
+msgid "you can not edit in this project"
+msgstr "您不能编辑此项目"
+
+#: app/modules/api/controllers/deletepage_controller.class.php:56
+msgid "Deleted Page"
+msgstr "删除了页面"
+
+#: app/modules/api/controllers/file_controller.class.php:38
+#: app/modules/api/controllers/file_controller.class.php:39
+#: app/modules/api/controllers/icon_controller.class.php:38
+#: app/modules/api/controllers/parseexcel_controller.class.php:41
+#: app/modules/api/controllers/parseexcel_controller.class.php:42
+#: app/modules/api/controllers/update_controller.class.php:33
+#: app/modules/project/controllers/tech_controller.class.php:61
+#: app/modules/project/controllers/transfer_controller.class.php:48
+msgid "project not found"
+msgstr "项目不存在"
+
+#: app/modules/api/controllers/load_controller.class.php:38
+#: app/modules/api/controllers/save_controller.class.php:45
+#: app/modules/api/controllers/update_controller.class.php:34
+#: app/modules/build/controllers/code_controller.class.php:48
+#: app/modules/build/controllers/preview_controller.class.php:40
+#: app/modules/parallax/controllers/load_controller.class.php:35
+#: app/modules/project/controllers/reverse_controller.class.php:23
+#: app/modules/project/controllers/reverse_controller.class.php:31
+msgid "Page Not Found"
+msgstr "页面未找到"
+
+#: app/modules/api/controllers/load_controller.class.php:41
+msgid "Function Not Found"
+msgstr "功能未找到"
+
+#: app/modules/api/controllers/load_controller.class.php:43
+#: app/modules/api/controllers/load_controller.class.php:54
+#: app/modules/parallax/controllers/load_controller.class.php:49
+msgid "Page Or Function Not Found"
+msgstr "未找到页面或功能"
+
+#: app/modules/api/controllers/load_controller.class.php:44
+#: app/modules/parallax/controllers/load_controller.class.php:39
+msgid "Page has been deleted"
+msgstr "页面已被删除"
+
+#: app/modules/api/controllers/module_controller.class.php:39
+#: app/modules/project/controllers/member_controller.class.php:65
+#: app/modules/project/controllers/member_controller.class.php:69
+#: app/modules/project/controllers/member_controller.class.php:85
+#: app/modules/project/controllers/member_controller.class.php:89
+msgid "Project Not Found"
+msgstr "项目不存在"
+
+#: app/modules/api/controllers/parseexcel_controller.class.php:44
+msgid "file not found"
+msgstr "文件未找到"
+
+#: app/modules/api/controllers/save_controller.class.php:51
+msgid "function not found"
+msgstr "功能未找到"
+
+#: app/modules/api/controllers/save_controller.class.php:95
+#, php-format
+msgid "page has been saved by %s at %s (%s)"
+msgstr "页面已经被%s在%s（%s）保存了，你已不是最新版本"
+
+#: app/modules/api/controllers/save_controller.class.php:98
+msgid "page has been saved by other"
+msgstr "别人已经保存了页面，你的版本不是最新的"
+
+#: app/modules/api/controllers/save_controller.class.php:121
+msgid "Save UI"
+msgstr "保存设计"
+
+#: app/modules/api/controllers/upload_controller.class.php:39
+#: app/modules/api/controllers/upload_controller.class.php:40
+#: app/modules/project/controllers/delete_controller.class.php:36
+#: app/modules/project/controllers/upload_controller.class.php:39
+#: app/modules/project/controllers/upload_controller.class.php:40
+#: app/modules/project/hooks/check_member.php:15
+msgid "Project not found"
+msgstr "项目不存在"
+
+#: app/modules/api/controllers/upload_controller.class.php:51
+#: app/modules/api/controllers/upload_controller.class.php:58
+#: app/modules/common/controllers/upload_controller.class.php:38
+#: app/modules/common/controllers/upload_controller.class.php:45
+#: app/modules/project/controllers/upload_controller.class.php:54
+#: app/modules/project/controllers/upload_controller.class.php:61
+msgid "Upload Failed"
+msgstr "上传失败"
+
+#: app/modules/api/views/icon-index.tpl.php:30
+#, php-format
+msgid "The %s has no icons, you can upload iconfont from here"
+msgstr "%s无图标，请上传iconfont.cn下载的zip文件"
+
+#: app/modules/api/views/icon-index.tpl.php:40
+msgid "search icons..."
+msgstr "查询图标…"
+
+#: app/modules/api/views/icon-index.tpl.php:41
+msgid "Search"
+msgstr "查询"
+
+#: app/modules/build/controllers/code_controller.class.php:36
+#: app/modules/build/controllers/preview_controller.class.php:28
+msgid "Module Not Found..."
+msgstr "模块未找到…"
+
+#: app/modules/build/controllers/code_controller.class.php:40
+#: app/modules/build/views/master/preview.tpl.php:34
+#: app/modules/common/views/bind-index.tpl.php:29
+#: app/modules/common/views/index-index.tpl.php:31
+#: app/modules/user/views/profile-cellphone.tpl.php:32
+#: app/modules/user/views/profile-email.tpl.php:26
+msgid "Code"
+msgstr "Code"
+
+#: app/modules/build/controllers/code_controller.class.php:63
+#, php-format
+msgid "not found target %s"
+msgstr "未找到目标 %s"
+
+#: app/modules/build/controllers/preview_controller.class.php:32
+#: app/modules/build/views/master/preview.tpl.php:20
+#: app/modules/build/views/master/preview.tpl.php:25
+#: app/modules/dashboard/views/index-index.tpl.php:45
+#: app/modules/project/views/homepage-index.tpl.php:47
+#: app/modules/project/views/master/structure.tpl.php:53
+#: app/modules/project/views/recycle-index.tpl.php:46
+#: app/modules/project/views/structure-index.tpl.php:60
+msgid "Preview"
+msgstr "预览"
+
+#: app/modules/build/views/code/web/bootstrap_vue/vue.trait.php:226
+#: app/modules/build/views/code/wxmp/wxmp_event_binding.trait.php:49
+#: app/modules/build/views/preview/html_event_binding.trait.php:57
+#: app/modules/build/views/preview/weui/weui_event_binding.trait.php:58
+msgid "You not setting popup page, you can open event panel to setting"
+msgstr "还未设置弹窗页面，请打开事件面板设置"
+
+#: app/modules/build/views/master/preview.tpl.php:28
+#: app/modules/project/views/add-index.tpl.php:30
+msgid "PC"
+msgstr "PC"
+
+#: app/modules/build/views/master/preview.tpl.php:29
+msgid "Tablet"
+msgstr "平板设备"
+
+#: app/modules/build/views/master/preview.tpl.php:30
+msgid "Portrait"
+msgstr "手持设备"
+
+#: app/modules/build/views/master/preview.tpl.php:41
+msgid "Back"
+msgstr "后退"
+
+#: app/modules/build/views/master/preview.tpl.php:42
+msgid "Build Project"
+msgstr "构建项目"
+
+#: app/modules/build/views/preview/preview.view.php:392
+#, php-format
+msgid "%s not found"
+msgstr "%s 未找到"
+
+#: app/modules/common/controllers/bind_controller.class.php:66
+msgid "Cellphone is not correct"
+msgstr "手机号不正确"
+
+#: app/modules/common/controllers/bind_controller.class.php:69
+msgid "Code is not correct"
+msgstr "Code不正确"
+
+#: app/modules/common/controllers/index_controller.class.php:32
+#: app/modules/common/controllers/index_controller.class.php:39
+msgid "Please Sign In"
+msgstr "请先登录"
+
+#: app/modules/common/controllers/index_controller.class.php:69
+msgid ""
+"login failed, please check your password and email/cellphone, cellphone need "
+"select region"
+msgstr "登录失败，请检查你的密码和邮箱/手机号, 手机号需要选择区域"
+
+#: app/modules/common/controllers/index_controller.class.php:76
+#: app/modules/user/controllers/profile_controller.class.php:81
+#: app/modules/user/controllers/profile_controller.class.php:103
+msgid "Invalid Code, Please reSend again"
+msgstr "无效的验证码，请重试"
+
+#: app/modules/common/controllers/index_controller.class.php:79
+msgid "New user registration is not supported for the time being"
+msgstr "新用户注册暂时关闭"
+
+#: app/modules/common/controllers/index_controller.class.php:103
+#: app/modules/project/controllers/member_controller.class.php:161
+msgid "Please Input Email Or Cellphone"
+msgstr "请输入邮箱或者手机号"
+
+#: app/modules/common/controllers/index_controller.class.php:108
+msgid "please input new email"
+msgstr "请输入新邮箱"
+
+#: app/modules/common/controllers/index_controller.class.php:112
+#: app/modules/common/controllers/index_controller.class.php:122
+#: app/modules/user/controllers/profile_controller.class.php:77
+#: app/modules/user/controllers/profile_controller.class.php:99
+msgid " has been used"
+msgstr " 已被使用"
+
+#: app/modules/common/controllers/index_controller.class.php:118
+msgid "please input new cellphone"
+msgstr "请输入新手机号"
+
+#: app/modules/common/controllers/index_controller.class.php:141
+msgid "YDECloud Sign In Code"
+msgstr "YDECloud登录码"
+
+#: app/modules/common/controllers/index_controller.class.php:142
+#, php-format
+msgid "Your current sign in code is: %s, expire in 5 minutes"
+msgstr "你的登陆码是%s，5分钟后过期"
+
+#: app/modules/common/controllers/index_controller.class.php:157
+#: app/modules/project/controllers/member_controller.class.php:228
+msgid "Send Email Fail, Please Check Your Email"
+msgstr "邮件发送失败，请检查你的邮箱地址"
+
+#: app/modules/common/controllers/index_controller.class.php:165
+msgid "Can not send sms, check your cellphone and region"
+msgstr "验证码短信发送失败，请检查你的手机号和区号"
+
+#: app/modules/common/views/bind-index.tpl.php:15
+#: app/modules/user/views/master/profile-master.tpl.php:26
+#: app/modules/user/views/profile-cellphone.tpl.php:16
+msgid "Cellphone"
+msgstr "手机号码"
+
+#: app/modules/common/views/bind-index.tpl.php:20
+#, php-format
+msgid "Hi %s, Please input your cellphone"
+msgstr "你好 %s，请输入新手机号"
+
+#: app/modules/common/views/bind-index.tpl.php:23
+msgid "中国 +86"
+msgstr "中国 +86"
+
+#: app/modules/common/views/bind-index.tpl.php:25
+msgid "Please input your cellphone"
+msgstr "请输入你的手机号"
+
+#: app/modules/common/views/bind-index.tpl.php:26
+msgid "Send code"
+msgstr "发送"
+
+#: app/modules/common/views/bind-index.tpl.php:30
+msgid "Please input you received code"
+msgstr "请输入你收到的验证码"
+
+#: app/modules/common/views/bind-index.tpl.php:32
+msgid "Submit"
+msgstr "提交"
+
+#: app/modules/common/views/bind-index.tpl.php:43
+msgid "Sms code send success"
+msgstr "验证码发送成功"
+
+#: app/modules/common/views/bind-index.tpl.php:45
+msgid "Sms code send failed"
+msgstr "验证码发送失败"
+
+#: app/modules/common/views/bind-index.tpl.php:55
+msgid "Bind failed"
+msgstr "绑定失败"
+
+#: app/modules/common/views/index-index.tpl.php:15
+#: app/modules/common/views/index-signin.tpl.php:15
+msgid "Sign in YDE Cloud"
+msgstr "登录YDECloud"
+
+#: app/modules/common/views/index-index.tpl.php:18
+#: app/modules/common/views/index-signin.tpl.php:18
+#: app/modules/project/views/member-invite.tpl.php:19
+msgid "Email Or Cellphone(+Region)"
+msgstr "邮箱地址或手机号(+区号)"
+
+#: app/modules/common/views/index-index.tpl.php:22
+#: app/modules/common/views/index-signin.tpl.php:22
+#: app/modules/project/views/member-invite.tpl.php:23
+#: app/modules/user/views/profile-cellphone.tpl.php:23
+msgid "region:"
+msgstr "区域:"
+
+#: app/modules/common/views/index-index.tpl.php:27
+#: app/modules/user/views/profile-cellphone.tpl.php:28
+#: app/modules/user/views/profile-email.tpl.php:22
+msgid "Send Code"
+msgstr "发送验证码"
+
+#: app/modules/common/views/index-index.tpl.php:35
+#: app/modules/common/views/index-signin.tpl.php:34
+msgid "Sign In"
+msgstr "登录"
+
+#: app/modules/common/views/index-index.tpl.php:37
+msgid "If you not have account, will auto create account for you"
+msgstr "如果没有账号，将自动创建"
+
+#: app/modules/common/views/index-index.tpl.php:40
+msgid "Sign In By Password"
+msgstr "密码登录"
+
+#: app/modules/common/views/index-signin.tpl.php:30
+msgid "Password"
+msgstr "密码"
+
+#: app/modules/common/views/index-signin.tpl.php:36
+msgid "If you not have account, please sign in by code"
+msgstr "如果你没有账号，请通过验证码方式登录"
+
+#: app/modules/common/views/index-signin.tpl.php:39
+msgid "Sign In By Code"
+msgstr "验证码登录"
+
+#: app/modules/dashboard/controllers/index_controller.class.php:71
+#: app/vendor/layouts/admin.layout.php:31
+msgid "Dashboard"
+msgstr "控制台"
+
+#: app/modules/dashboard/views/index-index.tpl.php:18
+msgid "Recently Projects"
+msgstr "最近的项目"
+
+#: app/modules/dashboard/views/index-index.tpl.php:23
+#, php-format
+msgid "You Have %s Project Invitation"
+msgstr "你有%s个项目邀请"
+
+#: app/modules/dashboard/views/index-index.tpl.php:26
+msgid "Detail"
+msgstr "详情"
+
+#: app/modules/dashboard/views/index-index.tpl.php:46
+#: app/modules/project/views/homepage-index.tpl.php:48
+#: app/modules/project/views/structure-index.tpl.php:61
+msgid "Build UI"
+msgstr "UI 设计"
+
+#: app/modules/dashboard/views/index-index.tpl.php:56
+#: app/modules/project/controllers/add_controller.class.php:35
+#: app/modules/project/controllers/tech_controller.class.php:47
+#: app/modules/project/views/index-index.tpl.php:68
+msgid "Add Project"
+msgstr "新增项目"
+
+#: app/modules/front/views/index-index.tpl.php:16
+msgid ""
+"Cross Platform, Cross Framework, Cross Language and Cross Terminal online "
+"development tools"
+msgstr "跨平台、跨框架、跨语言、跨终端的开发工具"
+
+#: app/modules/front/views/index-index.tpl.php:18
+#: app/modules/front/views/index-index.tpl.php:37
+msgid "Try it now"
+msgstr "试用"
+
+#: app/modules/front/views/index-index.tpl.php:35
+msgid "YDECloud = Prototype design + front-end development"
+msgstr "原型设计 + 前端开发合二为一"
+
+#: app/modules/front/views/index-index.tpl.php:36
+msgid ""
+"The biggest pain point of software development is the communication cost.For "
+"the functional interaction development of conventional application systems,"
+"YDECloud does the \"UI prototype design\" and \"front-end functions "
+"development\" at one time and export the real project code.The functional "
+"interface designed and expressed by the designer is the final experience "
+"interface,allowing developers to focus more on the back-end logic."
+msgstr ""
+"软件开发最大的痛点是沟通成本，对于常规应用系统的功能交互开发,使用YDECloud可"
+"将”UI原型设计”和”前端功能开发”合二为一，设计师设计表达的功能界面就是最终的体"
+"验界面，让开发者更专注于后端逻辑。在线预览实际前端效果，导出完整的前端代码并"
+"可多人同时协作、讨论。"
+
+#: app/modules/front/views/index-index.tpl.php:46
+msgid "Guizhou YiDianHuLian Information Technology Co., Ltd"
+msgstr "贵州省易点互联信息技术有限公司"
+
+#: app/modules/front/views/index-index.tpl.php:47
+msgid ""
+"Since 2010, it has focused on providing software development technical "
+"services"
+msgstr "从2010年至今，专注于提供软件开发技术服务"
+
+#: app/modules/front/views/index-index.tpl.php:48
+msgid "To hire us, please contact leeboo # yidianhulian.com"
+msgstr "雇佣我们，请联系：leeboo # yidianhulian.com"
+
+#: app/modules/project/controllers/add_controller.class.php:35
+#: app/modules/project/controllers/tech_controller.class.php:47
+#, php-format
+msgid "Edit %s"
+msgstr "编辑 %s"
+
+#: app/modules/project/controllers/add_controller.class.php:93
+msgid "please input project name"
+msgstr "请输入项目名称"
+
+#: app/modules/project/controllers/add_controller.class.php:108
+msgid "you can not edit project"
+msgstr "你不能编辑该项目"
+
+#: app/modules/project/controllers/add_controller.class.php:121
+#, php-format
+msgid "Create Project %s"
+msgstr "创建项目 %s"
+
+#: app/modules/project/controllers/add_controller.class.php:127
+msgid "Project Name Is Empty"
+msgstr "项目名是空的"
+
+#: app/modules/project/controllers/api_controller.class.php:34
+#: app/modules/project/views/master/project.tpl.php:90
+msgid "API"
+msgstr "API"
+
+#: app/modules/project/controllers/build_controller.class.php:45
+#: app/modules/project/views/master/project.tpl.php:119
+msgid "Build"
+msgstr "构建"
+
+#: app/modules/project/controllers/database_controller.class.php:34
+#: app/modules/project/views/master/project.tpl.php:95
+msgid "Database"
+msgstr "数据库"
+
+#: app/modules/project/controllers/delete_controller.class.php:39
+msgid "Just Admin Can Delete Project"
+msgstr "只有管理员才能删除项目"
+
+#: app/modules/project/controllers/delete_controller.class.php:42
+msgid "Please input project name"
+msgstr "请输入项目名称"
+
+#: app/modules/project/controllers/function_controller.class.php:50
+#: app/modules/project/views/master/structure.tpl.php:58
+#: app/modules/project/views/structure-index.tpl.php:47
+msgid "Add Function"
+msgstr "添加功能"
+
+#: app/modules/project/controllers/function_controller.class.php:65
+msgid "you can not edit function"
+msgstr "你不能编辑功能"
+
+#: app/modules/project/controllers/function_controller.class.php:74
+msgid "Function Name Is Empty"
+msgstr "功能名称是空的"
+
+#: app/modules/project/controllers/function_controller.class.php:83
+#, php-format
+msgid "Add Function %s"
+msgstr "添加功能 %s"
+
+#: app/modules/project/controllers/function_controller.class.php:99
+msgid "Function not exist"
+msgstr "功能未找到"
+
+#: app/modules/project/controllers/function_controller.class.php:100
+msgid "Function name is not correct"
+msgstr "功能名称不正确"
+
+#: app/modules/project/controllers/function_controller.class.php:104
+msgid "you can not delete function"
+msgstr "你不能删除功能"
+
+#: app/modules/project/controllers/function_controller.class.php:109
+#, php-format
+msgid "Delete Function %s"
+msgstr "删除功能 %s"
+
+#: app/modules/project/controllers/homepage_controller.class.php:45
+#: app/modules/project/views/homepage-index.tpl.php:31
+#: app/modules/project/views/master/structure.tpl.php:34
+msgid "Home Page"
+msgstr "主页"
+
+#: app/modules/project/controllers/icon_controller.class.php:34
+msgid "Icons"
+msgstr "图标"
+
+#: app/modules/project/controllers/index_controller.class.php:31
+#: app/modules/project/views/index-index.tpl.php:67
+msgid "My Projects"
+msgstr "我的项目"
+
+#: app/modules/project/controllers/lib_controller.class.php:34
+#: app/modules/project/views/lib-index.tpl.php:18
+msgid "External Libraries"
+msgstr "扩展库"
+
+#: app/modules/project/controllers/member_controller.class.php:39
+#: app/modules/project/controllers/member_controller.class.php:52
+#: app/modules/project/models/activity_model_method.trait.php:20
+#: app/modules/project/views/master/project.tpl.php:108
+msgid "Member"
+msgstr "成员"
+
+#: app/modules/project/controllers/member_controller.class.php:106
+msgid "Please Contact Admin To Remove"
+msgstr "请联系管理员删除"
+
+#: app/modules/project/controllers/member_controller.class.php:110
+msgid "Member not exist"
+msgstr "成员不存在"
+
+#: app/modules/project/controllers/member_controller.class.php:118
+msgid "There must be at least one admin member for the project"
+msgstr "项目必须至少有一个管理员"
+
+#: app/modules/project/controllers/member_controller.class.php:140
+msgid "Please Contact Admin To Invite"
+msgstr "请联系管理员邀请"
+
+#: app/modules/project/controllers/member_controller.class.php:153
+msgid "member not exist"
+msgstr "成员不存在"
+
+#: app/modules/project/controllers/member_controller.class.php:198
+#, php-format
+msgid "%s is a member already"
+msgstr "%s 已经是成员了"
+
+#: app/modules/project/controllers/member_controller.class.php:204
+msgid "Can not send sms, please check your cellphone or contact admin"
+msgstr "不能发生验证码，请检查你的手机号或联系管理员"
+
+#: app/modules/project/controllers/member_controller.class.php:208
+#, php-format
+msgid "%s Invite you join YDECloud project %s"
+msgstr "%s邀请你参与项目%s"
+
+#: app/modules/project/controllers/member_controller.class.php:209
+#, php-format
+msgid ""
+"Hi %s:<br/><br/> %s Invite you join YDECloud project %s, In YDECloud you can "
+"develop and cooperation online. you can click this link to see detail: <a "
+"href='%s'>%s</a><br/><br/><br/><br/>YDECloud by YDHL Team"
+msgstr ""
+"你好 %s:<br/><br/> %s 邀请你加入他的YDECloud项目 %s, 在YDECloud 你们可以协同"
+"开发软件. 点击该链接查看详情: <a href=‘%s’>%s</a><br/><br/><br/><br/"
+">YDECloud by YDHL Team"
+
+#: app/modules/project/controllers/member_controller.class.php:244
+#, php-format
+msgid "Invite User %s"
+msgstr "邀请用户 %s"
+
+#: app/modules/project/controllers/module_controller.class.php:50
+#: app/modules/project/views/master/structure.tpl.php:21
+#: app/modules/project/views/master/structure.tpl.php:22
+#: app/modules/project/views/master/structure.tpl.php:31
+#: app/modules/project/views/master/structure.tpl.php:32
+msgid "Add Module"
+msgstr "添加模块"
+
+#: app/modules/project/controllers/module_controller.class.php:69
+#: app/modules/project/controllers/module_controller.class.php:72
+msgid "you can not edit module"
+msgstr "你不能编辑模块"
+
+#: app/modules/project/controllers/module_controller.class.php:82
+msgid "Module Name Is Empty"
+msgstr "模块名是空的"
+
+#: app/modules/project/controllers/module_controller.class.php:92
+#, php-format
+msgid "Folder %s has exist"
+msgstr "目录 %s 已存在"
+
+#: app/modules/project/controllers/module_controller.class.php:101
+#, php-format
+msgid "Add Module %s"
+msgstr "添加模块 %s"
+
+#: app/modules/project/controllers/module_controller.class.php:116
+msgid "Module not exist"
+msgstr "模块未找到"
+
+#: app/modules/project/controllers/module_controller.class.php:117
+msgid "Module name is not correct"
+msgstr "模块名称不正确"
+
+#: app/modules/project/controllers/module_controller.class.php:120
+msgid "you can not delete module"
+msgstr "你不能删除模块"
+
+#: app/modules/project/controllers/module_controller.class.php:125
+#, php-format
+msgid "Delete Module %s"
+msgstr "删除模块 %s"
+
+#: app/modules/project/controllers/pageversion_controller.class.php:53
+#: app/modules/project/views/homepage-index.tpl.php:52
+#: app/modules/project/views/pageversion-index.tpl.php:15
+#: app/modules/project/views/recycle-index.tpl.php:31
+#: app/modules/project/views/structure-index.tpl.php:65
+msgid "Version"
+msgstr "版本"
+
+#: app/modules/project/controllers/recycle_controller.class.php:53
+msgid "Recycle"
+msgstr "回收站"
+
+#: app/modules/project/controllers/setting_controller.class.php:34
+#: app/modules/project/views/master/project.tpl.php:113
+msgid "Setting"
+msgstr "设置"
+
+#: app/modules/project/controllers/structure_controller.class.php:77
+msgid "Structure"
+msgstr "项目结构"
+
+#: app/modules/project/controllers/tech_controller.class.php:45
+#: app/modules/project/controllers/tech_controller.class.php:67
+msgid "just project admin can change project tech setting"
+msgstr "只有项目管理员能修改技术集"
+
+#: app/modules/project/controllers/tech_controller.class.php:76
+msgid "please select UI"
+msgstr "请先选择UI"
+
+#: app/modules/project/controllers/tech_controller.class.php:94
+#, php-format
+msgid "Change Tech. from %s to %s"
+msgstr "%s换成了%s"
+
+#: app/modules/project/controllers/transfer_controller.class.php:49
+msgid "member not found, please invite first"
+msgstr "未找打该成员，请先邀请他"
+
+#: app/modules/project/controllers/transfer_controller.class.php:64
+#, php-format
+msgid "Transfer Project from %s to %s"
+msgstr "转移项目 %s换成了%s"
+
+#: app/modules/project/controllers/upload_controller.class.php:49
+msgid "unknown action"
+msgstr "未知的行为"
+
+#: app/modules/project/controllers/upload_controller.class.php:67
+msgid "can not rend zip file"
+msgstr "不能读取zip文件"
+
+#: app/modules/project/hooks/check_member.php:16
+msgid "you are not member"
+msgstr "你不是项目成员"
+
+#: app/modules/project/models/activity_model_method.trait.php:18
+#: app/modules/project/views/master/project.tpl.php:39
+msgid "UI"
+msgstr "UI"
+
+#: app/modules/project/models/activity_model_method.trait.php:19
+msgid "Dev"
+msgstr "开发"
+
+#: app/modules/project/models/project_member_model_method.trait.php:34
+msgid "Admin"
+msgstr "管理员"
+
+#: app/modules/project/models/project_member_model_method.trait.php:35
+msgid "Developer"
+msgstr "开发者"
+
+#: app/modules/project/models/project_member_model_method.trait.php:36
+msgid "Reporter"
+msgstr "报告者"
+
+#: app/modules/project/models/project_member_model_method.trait.php:37
+msgid "Guest"
+msgstr "访客"
+
+#: app/modules/project/models/project_model_method.trait.php:128
+msgid "Project Manage System (Demo)"
+msgstr "项目管理（演示）"
+
+#: app/modules/project/models/project_model_method.trait.php:130
+msgid "You can edit this demo as you want"
+msgstr "这是演示项目，可任意编辑"
+
+#: app/modules/project/models/project_model_method.trait.php:160
+msgid "Project Manage"
+msgstr "项目管理"
+
+#: app/modules/project/models/project_model_method.trait.php:162
+msgid "Project manage such as add, edit..."
+msgstr "包含新增，编辑项目等功能…"
+
+#: app/modules/project/models/project_model_method.trait.php:168
+msgid "Project Profile"
+msgstr "项目台账"
+
+#: app/modules/project/models/project_model_method.trait.php:170
+msgid "such as query export ...."
+msgstr "比如查询，导出等…"
+
+#: app/modules/project/models/project_model_method.trait.php:181
+#: app/modules/project/models/project_model_method.trait.php:183
+msgid "Project List Page"
+msgstr "项目列表页面"
+
+#: app/modules/project/models/project_model_method.trait.php:193
+#: app/modules/project/models/project_model_method.trait.php:195
+msgid "Add Project Page"
+msgstr "新增项目页面"
+
+#: app/modules/project/models/project_model_method.trait.php:211
+msgid "Customer Manage"
+msgstr "客户管理"
+
+#: app/modules/project/models/project_model_method.trait.php:213
+msgid "Customer info manage, such as add, edit"
+msgstr "比如客户信息等添加，修改"
+
+#: app/modules/project/models/project_model_method.trait.php:218
+msgid "Customer Profile"
+msgstr "客户台账"
+
+#: app/modules/project/models/project_model_method.trait.php:220
+msgid "List, Search, Export...."
+msgstr "列表，查询，导出等。。。"
+
+#: app/modules/project/models/project_model_method.trait.php:226
+#: app/modules/project/models/project_model_method.trait.php:228
+msgid "Customer List Page"
+msgstr "客户列表页面"
+
+#: app/modules/project/models/project_model_method.trait.php:238
+#: app/modules/project/models/project_model_method.trait.php:240
+msgid "Add Customer Page"
+msgstr "添加客户页面"
+
+#: app/modules/project/views/add-index.tpl.php:18
+msgid "Project Name:"
+msgstr "项目名称:"
+
+#: app/modules/project/views/add-index.tpl.php:27
+msgid "Type:"
+msgstr "类型："
+
+#: app/modules/project/views/add-index.tpl.php:31
+msgid "Mobile"
+msgstr "移动端"
+
+#: app/modules/project/views/add-index.tpl.php:34
+msgid "Cannot be modified after setting"
+msgstr "设置后将不能更改"
+
+#: app/modules/project/views/add-index.tpl.php:38
+msgid "Brief:"
+msgstr "备注："
+
+#: app/modules/project/views/add-index.tpl.php:48
+#: app/modules/user/views/profile-cellphone.tpl.php:36
+#: app/modules/user/views/profile-email.tpl.php:30
+#: app/modules/user/views/profile-index.tpl.php:31
+#: app/modules/user/views/profile-signinpwd.tpl.php:33
+msgid "Save"
+msgstr "保存"
+
+#: app/modules/project/views/add-index.tpl.php:48
+#: app/modules/project/views/function-add.tpl.php:34
+#: app/modules/project/views/module-add.tpl.php:45
+msgid "Add"
+msgstr "新增"
+
+#: app/modules/project/views/build-index.dlg.php:18
+#: app/modules/project/views/build-index.tpl.php:15
+msgid "please dont refresh or close page when building"
+msgstr "构建时请勿刷新或者关闭浏览器"
+
+#: app/modules/project/views/build-index.dlg.php:20
+#: app/modules/project/views/build-index.tpl.php:17
+msgid "Build Now"
+msgstr "立即构建"
+
+#: app/modules/project/views/function-add.tpl.php:18
+msgid "Function Name:"
+msgstr "功能名："
+
+#: app/modules/project/views/function-add.tpl.php:25
+#: app/modules/project/views/module-add.tpl.php:30
+msgid "Desc:"
+msgstr "描述："
+
+#: app/modules/project/views/homepage-index.tpl.php:19
+msgid "Reset home page to"
+msgstr "重置主页"
+
+#: app/modules/project/views/homepage-index.tpl.php:21
+#: app/modules/project/views/homepage-index.tpl.php:72
+msgid "Not set home page"
+msgstr "未设置主页"
+
+#: app/modules/project/views/homepage-index.tpl.php:40
+#: app/modules/project/views/tech-index.tpl.php:20
+msgid "Update"
+msgstr "更新"
+
+#: app/modules/project/views/homepage-index.tpl.php:55
+#: app/modules/project/views/homepage-index.tpl.php:61
+#: app/modules/project/views/structure-index.tpl.php:72
+#: app/modules/project/views/structure-index.tpl.php:78
+msgid "Move to trash"
+msgstr "移到回收站"
+
+#: app/modules/project/views/homepage-index.tpl.php:56
+#: app/modules/project/views/structure-index.tpl.php:73
+msgid "This action cannot be undone.  are you sure?"
+msgstr "该行为不能撤销，确定吗？"
+
+#: app/modules/project/views/homepage-index.tpl.php:82
+msgid "Update Failed"
+msgstr "更新失败"
+
+#: app/modules/project/views/icon-index.frame.php:39
+msgid "No icons, you can upload now"
+msgstr "无图标，请上传iconfont.cn下载的zip文件"
+
+#: app/modules/project/views/icon-index.tpl.php:16
+msgid "Custom Icon"
+msgstr "自定义图标"
+
+#: app/modules/project/views/icon-index.tpl.php:22
+#, php-format
+msgid "currently just support %s, you can upload iconfont zip and use it."
+msgstr "目前只支持 %s，你可以上传新的字体zip文件。"
+
+#: app/modules/project/views/icon-index.tpl.php:24
+#: app/modules/user/views/profile-index.tpl.php:25
+msgid "Upload"
+msgstr "上传"
+
+#: app/modules/project/views/index-index.tpl.php:18
+msgid "Invite Projects"
+msgstr "邀请的项目"
+
+#: app/modules/project/views/index-index.tpl.php:22
+#: app/modules/project/views/index-index.tpl.php:73
+msgid "Project Name"
+msgstr "项目名"
+
+#: app/modules/project/views/index-index.tpl.php:23
+#: app/modules/project/views/index-index.tpl.php:75
+msgid "Technology"
+msgstr "技术"
+
+#: app/modules/project/views/index-index.tpl.php:24
+#: app/modules/project/views/index-index.tpl.php:76
+msgid "Role"
+msgstr "角色"
+
+#: app/modules/project/views/index-index.tpl.php:46
+#: app/modules/project/views/index-index.tpl.php:99
+#: app/modules/project/views/master/project.tpl.php:71
+#: app/modules/project/views/member-index.tpl.php:46
+msgid "Creater"
+msgstr "创建者"
+
+#: app/modules/project/views/index-index.tpl.php:51
+msgid "Join Project"
+msgstr "加入项目"
+
+#: app/modules/project/views/index-index.tpl.php:56
+msgid "Disagree"
+msgstr "不同意"
+
+#: app/modules/project/views/index-index.tpl.php:74
+#: app/modules/project/views/master/project.tpl.php:22
+msgid "Type"
+msgstr "类型"
+
+#: app/modules/project/views/lib-index.tpl.php:19
+msgid "Search Libraries"
+msgstr "查询库"
+
+#: app/modules/project/views/lib-index.tpl.php:24
+msgid "Installed Libraries"
+msgstr "已安装的库"
+
+#: app/modules/project/views/lib-index.tpl.php:44
+#: app/modules/project/views/member-index.tpl.php:38
+msgid "Remove"
+msgstr "移除"
+
+#: app/modules/project/views/master/project.tpl.php:27
+msgid "Front"
+msgstr "前端"
+
+#: app/modules/project/views/master/project.tpl.php:33
+msgid "Front Framework"
+msgstr "前端框架"
+
+#: app/modules/project/views/master/project.tpl.php:45
+msgid "Frontend Language"
+msgstr "前端语言"
+
+#: app/modules/project/views/master/project.tpl.php:51
+msgid "Backend Tech."
+msgstr "后端技术。"
+
+#: app/modules/project/views/master/project.tpl.php:57
+msgid "Framework"
+msgstr "框架"
+
+#: app/modules/project/views/master/project.tpl.php:63
+msgid "Backend Language"
+msgstr "后端语言"
+
+#: app/modules/project/views/master/project.tpl.php:68
+#: app/modules/project/views/member-invite.tpl.php:32
+msgid "Role:"
+msgstr "角色："
+
+#: app/modules/project/views/master/project.tpl.php:81
+msgid "Activity"
+msgstr "动态"
+
+#: app/modules/project/views/master/project.tpl.php:86
+#: app/modules/project/views/recovery-index.tpl.php:26
+#: app/modules/project/views/recycle-index.tpl.php:26
+msgid "Function"
+msgstr "功能"
+
+#: app/modules/project/views/master/project.tpl.php:99
+msgid "Icon"
+msgstr "图标"
+
+#: app/modules/project/views/master/project.tpl.php:103
+msgid "Libraries"
+msgstr "扩展库"
+
+#: app/modules/project/views/master/structure.tpl.php:20
+msgid "please add module and function first"
+msgstr "请先添加模块和功能"
+
+#: app/modules/project/views/master/structure.tpl.php:36
+#, php-format
+msgid "Recycle %s"
+msgstr "回收站 %s"
+
+#: app/modules/project/views/master/structure.tpl.php:54
+#: app/modules/project/views/setting-index.tpl.php:23
+msgid "Edit"
+msgstr "编辑"
+
+#: app/modules/project/views/master/structure.tpl.php:56
+#, php-format
+msgid ""
+"This action cannot be undone. You will lose this module's funciton, page, ui "
+"and api, please input the module name %s to delete"
+msgstr ""
+"该行为不能撤销，模块下的功能，ui等内容都将删除，请输入模块名 %s 确认删除"
+
+#: app/modules/project/views/master/structure.tpl.php:57
+msgid "Delete Module"
+msgstr "删除模块"
+
+#: app/modules/project/views/master/structure.tpl.php:75
+msgid "Edit Function"
+msgstr "编辑功能"
+
+#: app/modules/project/views/master/structure.tpl.php:77
+#, php-format
+msgid ""
+"This action cannot be undone.  please input the function name %s to delete"
+msgstr "该行为不能撤销，请输入功能名%s确认删除"
+
+#: app/modules/project/views/master/structure.tpl.php:78
+msgid "Delete Function"
+msgstr "删除功能"
+
+#: app/modules/project/views/member-index.tpl.php:33
+#: app/modules/project/views/member-index.tpl.php:34
+msgid "Change Role"
+msgstr "修改角色"
+
+#: app/modules/project/views/member-index.tpl.php:37
+msgid ""
+"Remove is safely, all member's content is still there, and you can always "
+"invite back"
+msgstr "移除后，成员的内容仍然保留，可随时再邀请回来"
+
+#: app/modules/project/views/member-index.tpl.php:49
+msgid "Inviting"
+msgstr "邀请中"
+
+#: app/modules/project/views/member-index.tpl.php:61
+msgid "Invite Member"
+msgstr "邀请成员"
+
+#: app/modules/project/views/member-invite.tpl.php:46
+msgid "are you sure invite this user?"
+msgstr "确定邀请该用户吗？"
+
+#: app/modules/project/views/member-invite.tpl.php:49
+msgid "Invite"
+msgstr "邀请"
+
+#: app/modules/project/views/module-add.tpl.php:22
+msgid "Module Name:"
+msgstr "模块名："
+
+#: app/modules/project/views/module-add.tpl.php:36
+msgid "Folder:"
+msgstr "目录："
+
+#: app/modules/project/views/module-add.tpl.php:39
+msgid ""
+"Folder is the module saved folder name, when build all module content will "
+"saved in this folder"
+msgstr "目录是模块的保存目录，所有模块下的内容都将保存在该目录中"
+
+#: app/modules/project/views/pageversion-index.tpl.php:24
+msgid "Version Index"
+msgstr "版本号"
+
+#: app/modules/project/views/pageversion-index.tpl.php:28
+msgid "Saved Time"
+msgstr "保存时间"
+
+#: app/modules/project/views/pageversion-index.tpl.php:32
+msgid "Saved By"
+msgstr "保存者"
+
+#: app/modules/project/views/pageversion-index.tpl.php:40
+msgid "Are you sure you want to reverse the selected version?"
+msgstr "确定要恢复到该版本吗？"
+
+#: app/modules/project/views/pageversion-index.tpl.php:41
+#: app/modules/project/views/pageversion-index.tpl.php:43
+msgid "Reverse to this"
+msgstr "恢复"
+
+#: app/modules/project/views/pageversion-index.tpl.php:47
+msgid "Current Version"
+msgstr "当前版本"
+
+#: app/modules/project/views/project-index.part.php:36
+msgid "No More"
+msgstr "没有了"
+
+#: app/modules/project/views/project-index.tpl.php:17
+msgid "All"
+msgstr "所有"
+
+#: app/modules/project/views/project-index.tpl.php:48
+msgid "Empty"
+msgstr "空的"
+
+#: app/modules/project/views/recovery-index.tpl.php:23
+msgid "Module"
+msgstr "模块"
+
+#: app/modules/project/views/recovery-index.tpl.php:48
+msgid "Confirm"
+msgstr "确定"
+
+#: app/modules/project/views/recycle-index.tpl.php:18
+msgid "empty"
+msgstr "空的"
+
+#: app/modules/project/views/recycle-index.tpl.php:28
+msgid "Page"
+msgstr "页面"
+
+#: app/modules/project/views/recycle-index.tpl.php:49
+#: app/modules/project/views/recycle-index.tpl.php:53
+msgid "Delete Page"
+msgstr "删除页面"
+
+#: app/modules/project/views/recycle-index.tpl.php:50
+msgid ""
+"This action cannot be undone, all content in page will be lost.  are you "
+"sure?"
+msgstr "该行为不能撤销，所有内容将丢失，确定吗？"
+
+#: app/modules/project/views/recycle-index.tpl.php:56
+#: app/modules/project/views/recycle-index.tpl.php:57
+msgid "Recovery"
+msgstr "恢复"
+
+#: app/modules/project/views/setting-index.tpl.php:19
+#: app/modules/project/views/setting-index.tpl.php:23
+msgid "Edit Project"
+msgstr "编辑项目"
+
+#: app/modules/project/views/setting-index.tpl.php:21
+msgid "Change base project info, such as name, brief and so on"
+msgstr "修改项目的基础信息，如名字，描述等"
+
+#: app/modules/project/views/setting-index.tpl.php:27
+#: app/modules/project/views/setting-index.tpl.php:32
+msgid "Change Tech."
+msgstr "更改技术集"
+
+#: app/modules/project/views/setting-index.tpl.php:30
+msgid ""
+"Change Frontend, backend tech. such as framework, language, ui and so on"
+msgstr "修改前后端技术，如框架、语言、ui等"
+
+#: app/modules/project/views/setting-index.tpl.php:32
+msgid "Change"
+msgstr "更改"
+
+#: app/modules/project/views/setting-index.tpl.php:38
+msgid "Transfer Project"
+msgstr "转移项目"
+
+#: app/modules/project/views/setting-index.tpl.php:41
+#: app/modules/project/views/setting-index.tpl.php:46
+msgid "Transfer the project to others"
+msgstr "把项目转移给别人"
+
+#: app/modules/project/views/setting-index.tpl.php:44
+#: app/modules/project/views/setting-index.tpl.php:48
+msgid "Transfer"
+msgstr "转移"
+
+#: app/modules/project/views/setting-index.tpl.php:53
+#: app/modules/project/views/setting-index.tpl.php:59
+msgid "Delete Project"
+msgstr "删除项目"
+
+#: app/modules/project/views/setting-index.tpl.php:55
+msgid ""
+"Deleting the project will delete all related resources including ui pages, "
+"databases etc.Deleted projects cannot be restored!"
+msgstr "删除项目将删除该项目的所有内容，包含ui设计，数据库；删除不可恢复！"
+
+#: app/modules/project/views/setting-index.tpl.php:59
+#, php-format
+msgid ""
+"Deleted projects cannot be restored.  please input the project name %s to "
+"delete"
+msgstr "删除不可恢复，请输入项目的名称 %s 确认删除"
+
+#: app/modules/project/views/setting-index.tpl.php:72
+msgid "Transfer success"
+msgstr "转移成功"
+
+#: app/modules/project/views/structure-choosepage.tpl.php:71
+msgid "Cancel"
+msgstr "取消"
+
+#: app/modules/project/views/structure-choosepage.tpl.php:72
+msgid "OK"
+msgstr "确定"
+
+#: app/modules/project/views/structure-index.tpl.php:31
+msgid "Add Page"
+msgstr "新增页面"
+
+#: app/modules/project/views/structure-index.tpl.php:39
+msgid "you have no page, please use uibuilder add page and design it"
+msgstr "还没有页面，请用uibuilder添加并设计页面"
+
+#: app/modules/project/views/structure-index.tpl.php:42
+msgid "Open UIBuild Add Page"
+msgstr "打开UIBuilder添加页面"
+
+#: app/modules/project/views/structure-index.tpl.php:45
+msgid "please add function first"
+msgstr "请先添加功能"
+
+#: app/modules/project/views/structure-index.tpl.php:50
+msgid "please select function first"
+msgstr "请先选择功能"
+
+#: app/modules/project/views/structure-index.tpl.php:69
+msgid "Move page to"
+msgstr "移动页面"
+
+#: app/modules/project/views/structure-index.tpl.php:70
+msgid "Move to"
+msgstr "移动到"
+
+#: app/modules/project/views/tech.inc.php:78
+msgid "Frontend:"
+msgstr "前端："
+
+#: app/modules/project/views/tech.inc.php:81
+#: app/modules/project/views/tech.inc.php:134
+msgid "Choose..."
+msgstr "选择…"
+
+#: app/modules/project/views/tech.inc.php:91
+#: app/modules/project/views/tech.inc.php:142
+msgid "Framework:"
+msgstr "框架："
+
+#: app/modules/project/views/tech.inc.php:104
+msgid "UI:"
+msgstr "UI："
+
+#: app/modules/project/views/tech.inc.php:118
+msgid "Frontend Language:"
+msgstr "前端语言："
+
+#: app/modules/project/views/tech.inc.php:131
+msgid "Backend:"
+msgstr "后端："
+
+#: app/modules/project/views/tech.inc.php:156
+msgid "Backend Language:"
+msgstr "后端语言："
+
+#: app/modules/project/views/transfer-index.tpl.php:40
+msgid "has no member, please invite member first"
+msgstr "没有成员，请先邀请成员"
+
+#: app/modules/user/controllers/account_controller.class.php:24
+#: app/modules/user/views/account-index.tpl.php:21
+#: app/modules/user/views/master/profile-master.tpl.php:30
+msgid "Account"
+msgstr "账户"
+
+#: app/modules/user/controllers/profile_controller.class.php:51
+msgid "Old Password Is Incorrect"
+msgstr "旧密码不正确"
+
+#: app/modules/user/controllers/profile_controller.class.php:54
+msgid "New password at least 8 characters"
+msgstr "密码至少8位"
+
+#: app/modules/user/controllers/profile_controller.class.php:57
+msgid "New Password Is Not Match"
+msgstr "密码不匹配"
+
+#: app/modules/user/views/account-index.tpl.php:24
+msgid "User type"
+msgstr "用户类型"
+
+#: app/modules/user/views/account-index.tpl.php:28
+msgid "Account type"
+msgstr "账号类型"
+
+#: app/modules/user/views/account-index.tpl.php:32
+msgid "Account Due time"
+msgstr "到期时间"
+
+#: app/modules/user/views/account-index.tpl.php:33
+msgid "Infinite"
+msgstr "不限"
+
+#: app/modules/user/views/account-index.tpl.php:35
+msgid "If overdue, you can not edit any project"
+msgstr "过期后将不能编辑任何项目"
+
+#: app/modules/user/views/account-index.tpl.php:41
+msgid "Individual"
+msgstr "个人"
+
+#: app/modules/user/views/account-index.tpl.php:42
+msgid "Team"
+msgstr "团队"
+
+#: app/modules/user/views/account-index.tpl.php:57
+msgid "Product"
+msgstr "产品"
+
+#: app/modules/user/views/account-index.tpl.php:72
+msgid "Limit"
+msgstr "用量"
+
+#: app/modules/user/views/account-index.tpl.php:78
+msgid "Unlimited"
+msgstr "无限"
+
+#: app/modules/user/views/master/profile-master.tpl.php:17
+#: app/modules/user/views/profile-index.tpl.php:14
+#: app/vendor/layouts/admin.layout.php:45
+msgid "Profile"
+msgstr "用户资料"
+
+#: app/modules/user/views/master/profile-master.tpl.php:20
+#: app/modules/user/views/profile-signinpwd.tpl.php:15
+msgid "Sign In Password"
+msgstr "登录密码"
+
+#: app/modules/user/views/master/profile-master.tpl.php:23
+#: app/modules/user/views/profile-email.tpl.php:16
+msgid "Email"
+msgstr "邮箱地址"
+
+#: app/modules/user/views/profile-cellphone.tpl.php:19
+msgid "New Cellphone"
+msgstr "新手机号码"
+
+#: app/modules/user/views/profile-email.tpl.php:19
+msgid "New Email"
+msgstr "新邮箱地址"
+
+#: app/modules/user/views/profile-index.tpl.php:16
+msgid "nickname"
+msgstr "昵称"
+
+#: app/modules/user/views/profile-index.tpl.php:21
+msgid "avatar"
+msgstr "头像"
+
+#: app/modules/user/views/profile-signinpwd.tpl.php:16
+msgid ""
+"If you want sign in by password, you need set sign in password and email/"
+"cellphone"
+msgstr "如果想通过密码登录，你需要设置登录密码和邮箱地址/手机号"
+
+#: app/modules/user/views/profile-signinpwd.tpl.php:19
+msgid "Old Password"
+msgstr "旧密码"
+
+#: app/modules/user/views/profile-signinpwd.tpl.php:25
+msgid "New Password"
+msgstr "新密码"
+
+#: app/modules/user/views/profile-signinpwd.tpl.php:27
+msgid "at least 8 characters"
+msgstr "至少8个字符"
+
+#: app/modules/user/views/profile-signinpwd.tpl.php:30
+msgid "Confirm New Password"
+msgstr "确认新密码"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:99
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:216
+msgid "Select files"
+msgstr "选择文件"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:100
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:217
+msgid "Add files to the upload queue and click the start button."
+msgstr "添加文件到上传队列并点击开始按钮。"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:106
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:227
+msgid "Filename"
+msgstr "文件名"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:108
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:228
+msgid "Status"
+msgstr "状态"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:109
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:229
+msgid "Size"
+msgstr "大小"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:118
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:248
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:244
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:901
+msgid "Add Files"
+msgstr "添加文件"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:119
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:245
+msgid "Start Upload"
+msgstr "开始上传"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:201
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:869
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:986
+#, javascript-format
+msgid "Uploaded %d/%d files"
+msgstr "上传文件 %d/%d"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:250
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:903
+#, javascript-format
+msgid "%d files queued"
+msgstr "%d 文件队列"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:262
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:361
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:235
+msgid "Drag files here."
+msgstr "拖动文件到这里。"
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:340
+msgid "Error: File too large:"
+msgstr "错误：文件太大："
+
+#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:344
+msgid "Error: Invalid file extension:"
+msgstr "错误：无效的文件扩展："
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:219
+msgid "List"
+msgstr "列表"
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:220
+msgid "Thumbnails"
+msgstr "缩略图"
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:246
+msgid "Stop Upload"
+msgstr "停止上传"
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:442
+msgid "File count error."
+msgstr "文件数量错误。"
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:459
+#, javascript-format
+msgid "File: %s"
+msgstr "文件：%s"
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:463
+#, javascript-format
+msgid "File: %s, size: %d, max file size: %d"
+msgstr ""
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:467
+#, javascript-format
+msgid "%s already present in the queue."
+msgstr ""
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:471
+#, javascript-format
+msgid ""
+"Upload element accepts only %d file(s) at a time. Extra files were stripped."
+msgstr ""
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:475
+msgid "Image format either wrong or not supported."
+msgstr ""
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:479
+msgid "Runtime ran out of available memory."
+msgstr ""
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:488
+msgid "Upload URL might be wrong or doesn't exist."
+msgstr ""
+
+#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:792
+msgid "Close"
+msgstr ""
+
+#: app/vendor/css/css_factory.class.php:25
+#: app/vendor/css/css_factory.class.php:26
+#: app/vendor/css/css_factory.class.php:27
+#: app/vendor/css/css_factory.class.php:28
+msgid "Large"
+msgstr "大"
+
+#: app/vendor/css/css_factory.class.php:25
+#: app/vendor/css/css_factory.class.php:26
+#: app/vendor/css/css_factory.class.php:27
+#: app/vendor/css/css_factory.class.php:28
+#: app/vendor/css/css_factory.class.php:30
+msgid "Default"
+msgstr "默认"
+
+#: app/vendor/css/css_factory.class.php:25
+#: app/vendor/css/css_factory.class.php:26
+#: app/vendor/css/css_factory.class.php:27
+#: app/vendor/css/css_factory.class.php:28
+msgid "Small"
+msgstr "小"
+
+#: app/vendor/css/css_factory.class.php:25
+#: app/vendor/css/css_factory.class.php:27
+msgid "X-Small"
+msgstr "特小"
+
+#: app/vendor/css/css_factory.class.php:30
+msgid "Fluid"
+msgstr "撑满(Fluid)"
+
+#: app/vendor/css/css_factory.class.php:30
+msgid "Container"
+msgstr "固定宽度(Container)"
+
+#: app/vendor/css/css_factory.class.php:32
+#: app/vendor/css/css_factory.class.php:33
+#: app/vendor/css/css_factory.class.php:34
+#: app/vendor/css/css_factory.class.php:36
+#: app/vendor/css/css_factory.class.php:37
+#: app/vendor/css/css_factory.class.php:38
+#: app/vendor/css/css_factory.class.php:39
+#: app/vendor/css/css_factory.class.php:40
+#: app/vendor/css/css_factory.class.php:42
+#: app/vendor/css/css_factory.class.php:43
+#: app/vendor/css/css_factory.class.php:44
+#: app/vendor/css/css_factory.class.php:45
+#: app/vendor/css/css_factory.class.php:46
+#: app/vendor/css/css_factory.class.php:54
+msgid "None"
+msgstr "无"
+
+#: app/vendor/css/css_factory.class.php:32
+msgid "Row"
+msgstr "行容器(Row)"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "1/12 col"
+msgstr "1/12 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "1/6 col"
+msgstr "1/6 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "1/4 col"
+msgstr "1/4 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "1/3 col"
+msgstr "1/3 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "5/12 col"
+msgstr "5/12 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "1/2 col"
+msgstr "1/2 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "7/12 col"
+msgstr "7/12 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "2/3 col"
+msgstr "2/3 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "3/4 col"
+msgstr "3/4 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "5/6 col"
+msgstr "5/6 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "11/12 col"
+msgstr "11/12 列宽"
+
+#: app/vendor/css/css_factory.class.php:33
+msgid "full col"
+msgstr "撑满"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "1/12 offset"
+msgstr "1/12 偏移"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "1/6 offset"
+msgstr "1/6 偏移"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "1/4 offset"
+msgstr "1/4 偏移"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "1/3 offset"
+msgstr "1/3 偏移"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "5/12 offset"
+msgstr "5/12 偏移"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "1/2 offset"
+msgstr "1/2 偏移"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "7/12 offset"
+msgstr "7/12 偏移"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "2/3 offset"
+msgstr "2/3 偏移"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "3/4 offset"
+msgstr "3/4 偏移"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "5/6 offset"
+msgstr "5/6 偏移"
+
+#: app/vendor/css/css_factory.class.php:34
+msgid "11/12 offset"
+msgstr "11/12 偏移"
+
+#: app/vendor/css/css_factory.class.php:36
+#: app/vendor/css/css_factory.class.php:37
+#: app/vendor/css/css_factory.class.php:38
+#: app/vendor/css/css_factory.class.php:39
+#: app/vendor/css/css_factory.class.php:40
+#: app/vendor/css/css_factory.class.php:42
+#: app/vendor/css/css_factory.class.php:43
+#: app/vendor/css/css_factory.class.php:44
+#: app/vendor/css/css_factory.class.php:45
+#: app/vendor/css/css_factory.class.php:46
+#: app/vendor/css/css_factory.class.php:50
+#: app/vendor/css/css_factory.class.php:51
+#: app/vendor/css/css_factory.class.php:54
+msgid "Inherit"
+msgstr "默认(Inherit)"
+
+#: app/vendor/css/css_factory.class.php:36
+#: app/vendor/css/css_factory.class.php:37
+#: app/vendor/css/css_factory.class.php:38
+#: app/vendor/css/css_factory.class.php:39
+#: app/vendor/css/css_factory.class.php:40
+#: app/vendor/css/css_factory.class.php:42
+#: app/vendor/css/css_factory.class.php:43
+#: app/vendor/css/css_factory.class.php:44
+#: app/vendor/css/css_factory.class.php:45
+#: app/vendor/css/css_factory.class.php:46
+msgid "spacer * .25"
+msgstr "0.25倍"
+
+#: app/vendor/css/css_factory.class.php:36
+#: app/vendor/css/css_factory.class.php:37
+#: app/vendor/css/css_factory.class.php:38
+#: app/vendor/css/css_factory.class.php:39
+#: app/vendor/css/css_factory.class.php:40
+#: app/vendor/css/css_factory.class.php:42
+#: app/vendor/css/css_factory.class.php:43
+#: app/vendor/css/css_factory.class.php:44
+#: app/vendor/css/css_factory.class.php:45
+#: app/vendor/css/css_factory.class.php:46
+msgid "spacer * .5"
+msgstr "0.5倍"
+
+#: app/vendor/css/css_factory.class.php:36
+#: app/vendor/css/css_factory.class.php:37
+#: app/vendor/css/css_factory.class.php:38
+#: app/vendor/css/css_factory.class.php:39
+#: app/vendor/css/css_factory.class.php:40
+#: app/vendor/css/css_factory.class.php:42
+#: app/vendor/css/css_factory.class.php:43
+#: app/vendor/css/css_factory.class.php:44
+#: app/vendor/css/css_factory.class.php:45
+#: app/vendor/css/css_factory.class.php:46
+msgid "spacer"
+msgstr "1倍"
+
+#: app/vendor/css/css_factory.class.php:36
+#: app/vendor/css/css_factory.class.php:37
+#: app/vendor/css/css_factory.class.php:38
+#: app/vendor/css/css_factory.class.php:39
+#: app/vendor/css/css_factory.class.php:40
+#: app/vendor/css/css_factory.class.php:42
+#: app/vendor/css/css_factory.class.php:43
+#: app/vendor/css/css_factory.class.php:44
+#: app/vendor/css/css_factory.class.php:45
+#: app/vendor/css/css_factory.class.php:46
+msgid "spacer * 1.5"
+msgstr "1.5倍"
+
+#: app/vendor/css/css_factory.class.php:36
+#: app/vendor/css/css_factory.class.php:37
+#: app/vendor/css/css_factory.class.php:38
+#: app/vendor/css/css_factory.class.php:39
+#: app/vendor/css/css_factory.class.php:40
+#: app/vendor/css/css_factory.class.php:42
+#: app/vendor/css/css_factory.class.php:43
+#: app/vendor/css/css_factory.class.php:44
+#: app/vendor/css/css_factory.class.php:45
+#: app/vendor/css/css_factory.class.php:46
+msgid "spacer * 3"
+msgstr "3倍"
+
+#: app/vendor/css/css_factory.class.php:36
+#: app/vendor/css/css_factory.class.php:37
+#: app/vendor/css/css_factory.class.php:38
+#: app/vendor/css/css_factory.class.php:39
+#: app/vendor/css/css_factory.class.php:40
+#: app/vendor/css/css_factory.class.php:54
+msgid "Auto"
+msgstr "自动(Auto)"
+
+#: app/vendor/css/css_factory.class.php:50
+msgid "Top"
+msgstr "顶"
+
+#: app/vendor/css/css_factory.class.php:50
+msgid "Middle"
+msgstr "中"
+
+#: app/vendor/css/css_factory.class.php:50
+msgid "Bottom"
+msgstr "下"
+
+#: app/vendor/css/css_factory.class.php:51
+msgid "Left"
+msgstr "左"
+
+#: app/vendor/css/css_factory.class.php:51
+msgid "Center"
+msgstr "中"
+
+#: app/vendor/css/css_factory.class.php:51
+msgid "Right"
+msgstr "右"
+
+#: app/vendor/css/css_factory.class.php:53
+msgid "Extra small (<576px)"
+msgstr "特小(<576px,手机)"
+
+#: app/vendor/css/css_factory.class.php:53
+msgid "Small (≥576px)"
+msgstr "小 (≥576px)"
+
+#: app/vendor/css/css_factory.class.php:53
+msgid "Medium (≥768px)"
+msgstr "中 (≥768px,平板设备)"
+
+#: app/vendor/css/css_factory.class.php:53
+msgid "Large (≥992px)"
+msgstr "大 (≥992px)"
+
+#: app/vendor/css/css_factory.class.php:53
+msgid "Extra large (≥1200px)"
+msgstr "特大 (≥1200px)"
+
+#: app/vendor/css/css_factory.class.php:54
+msgid "Dotted"
+msgstr "Dotted"
+
+#: app/vendor/css/css_factory.class.php:54
+msgid "Dashed"
+msgstr "Dashed"
+
+#: app/vendor/css/css_factory.class.php:54
+msgid "Solid"
+msgstr "Solid"
+
+#: app/vendor/css/css_factory.class.php:54
+msgid "Double"
+msgstr "Double"
+
+#: app/vendor/css/css_factory.class.php:54
+msgid "Ridge"
+msgstr "Ridge"
+
+#: app/vendor/css/css_factory.class.php:54
+msgid "Groove"
+msgstr "Groove"
+
+#: app/vendor/css/css_factory.class.php:54
+msgid "Inset"
+msgstr "Inset"
+
+#: app/vendor/css/css_factory.class.php:54
+msgid "Outset"
+msgstr "Outset"
+
+#: app/vendor/env.class.php:94
+msgid "jQuery is a fast, small, and feature-rich JavaScript library"
+msgstr ""
+
+#: app/vendor/env.class.php:102
+msgid "Quickly design and customize responsive mobile-first sites"
+msgstr ""
+
+#: app/vendor/env.class.php:112
+msgid "https://www.layuiweb.com/layer/index.htm"
+msgstr ""
+
+#: app/vendor/env.class.php:120
+msgid ""
+"Zepto is a minimalist JavaScript library for modern browsers with a largely "
+"jQuery-compatible API, https://zeptojs.com/"
+msgstr ""
+
+#: app/vendor/env.class.php:128
+msgid ""
+"由职业前端倾情打造，面向全层次的前后端开发者，易上手开箱即用的 Web UI 组件"
+"库, https://www.layuiweb.com/index.htm"
+msgstr ""
+
+#: app/vendor/env.class.php:136
+msgid "WEUI(微信官方UI库)"
+msgstr ""
+
+#: app/vendor/env.class.php:146
+msgid "Android Native UI Theme"
+msgstr "Android原生主题"
+
+#: app/vendor/env.class.php:152
+msgid "iOS Native UI Theme"
+msgstr "iOS原生主题"
+
+#: app/vendor/env.class.php:158
+msgid "Yangzie Framework By YDHL Team"
+msgstr ""
+
+#: app/vendor/env.class.php:189
+msgid "PHP Language"
+msgstr ""
+
+#: app/vendor/env.class.php:195
+msgid "petite-vue"
+msgstr ""
+
+#: app/vendor/env.class.php:201
+msgid "VUE"
+msgstr ""
+
+#: app/vendor/env.class.php:209
+msgid "HTML"
+msgstr ""
+
+#: app/vendor/env.class.php:219
+msgid "微信小程序"
+msgstr ""
+
+#: app/vendor/env.class.php:228
+msgid "Android Native"
+msgstr "Android 原生"
+
+#: app/vendor/env.class.php:236
+msgid "iOS Native"
+msgstr "iOS 原生"
+
+#: app/vendor/env.class.php:253
+msgid "Web Application"
+msgstr "Web应用"
+
+#: app/vendor/env.class.php:259
+msgid "WeiXin Mini Program"
+msgstr "微信小程序"
+
+#: app/vendor/layouts/admin.layout.php:12 app/vendor/layouts/front.layout.php:8
+#: app/vendor/layouts/tpl.layout.php:8
+msgid "cross platform, cross framework, cross language, cross terminal"
+msgstr "跨平台、跨框架、跨语言、跨终端"
+
+#: app/vendor/layouts/admin.layout.php:34
+msgid "Projects"
+msgstr "项目"
+
+#: app/vendor/layouts/admin.layout.php:46
+msgid "Quit"
+msgstr "退出"
+
+#: app/vendor/layouts/admin.layout.php:54
+msgid "Please open by pc browser for best best experience"
+msgstr "PC浏览器打开体验最佳"
+
+#: app/vendor/uploader.class.php:236
+msgid "No file was uploaded."
+msgstr "没有文件上传."
+
+#: app/vendor/uploader.class.php:241
+msgid "文件大小超过了系统设置允许的文件大小(upload_max_filesize)"
+msgstr ""
+
+#: app/vendor/uploader.class.php:244
+msgid "文件大小超过了表单中设置的最大文件大小(MAX_FILE_SIZE)"
+msgstr ""
+
+#: app/vendor/uploader.class.php:247
+msgid "上传文件不完整, 有丢失"
+msgstr ""
+
+#: app/vendor/uploader.class.php:251
+msgid "没有选择文件上传"
+msgstr ""
+
+#: app/vendor/uploader.class.php:255
+msgid "临时目录不存在"
+msgstr ""
+
+#: app/vendor/uploader.class.php:259
+msgid "上传目录中无法写入"
+msgstr ""
+
+#: app/vendor/uploader.class.php:263
+msgid "文件上传终止"
+msgstr ""
+
+#: app/vendor/util.php:126
+msgid "一"
+msgstr ""
+
+#: app/vendor/util.php:126
+msgid "二"
+msgstr ""
+
+#: app/vendor/util.php:126
+msgid "三"
+msgstr ""
+
+#: app/vendor/util.php:126
+msgid "四"
+msgstr ""
+
+#: app/vendor/util.php:126
+msgid "五"
+msgstr ""
+
+#: app/vendor/util.php:126
+msgid "六"
+msgstr ""
+
+#: app/vendor/util.php:126
+msgid "日"
+msgstr ""
+
+#: app/vendor/util.php:132
+msgid "今天（ W 周） H:i"
+msgstr ""
+
+#: app/vendor/util.php:136
+msgid "昨天（ W 周） H:i"
+msgstr ""
+
+#: app/vendor/util.php:139
+msgid "前天（ W 周） H:i"
+msgstr ""
+
+#: app/vendor/util.php:141
+#, php-format
+msgid "Y-m-d 周 %s（ W 周） H:i"
+msgstr ""
+
+#: cli/build.php:44 cli/build.php:106
+msgid "project not exist"
+msgstr "项目未找到"
+
+#: cli/build.php:55
+#, php-format
+msgid "compile finished please: <a href=\"%s\">download</a>"
+msgstr "编译完成，请<a href=%s>下载</a>"
+
+#: cli/build.php:99
+msgid "page not exist"
+msgstr "页面未找到"
+
+#: cli/build.php:114
+msgid "you have opened this page in another browser"
+msgstr "你已经在其他浏览器中打开了该页面，未来避免保存冲突，页面只能被打开一次"
+
+#: cli/build.php:190
+msgid "user auth fail, no token param"
+msgstr "认证失败，没有token"
+
+#: cli/build.php:195
+msgid "user auth fail, token is invalid"
+msgstr "认证失败，token无效"
+
+#: cli/build.php:200
+msgid "user auth fail"
+msgstr "认证失败"
+
+#: cli/factory.php:29
+#, php-format
+msgid "factory %s not found"
+msgstr "factory %s 未找到"
+
+#: cli/factory.php:43 cli/wxmp/wxmp2.php:16
+#, php-format
+msgid "can not read directory: %s"
+msgstr "无法读取目录：%s"
+
+#: cli/factory.php:50 cli/web/vue3.php:65 cli/web/vue3.php:71
+#: cli/web/vue3.php:79 cli/wxmp/wxmp2.php:23
+#, php-format
+msgid "Add %s"
+msgstr "添加%s"
+
+#: cli/factory.php:70 cli/factory.php:76
+#, php-format
+msgid "download image: %s"
+msgstr "下载图片：%s"
+
+#: cli/factory.php:93
+msgid "can not create zip file"
+msgstr "不能创建zip文件"
+
+#: cli/factory.php:96
+msgid ""
+"\n"
+"\n"
+"start compile..."
+msgstr ""
+"\n"
+"\n"
+"开始编译…"
+
+#: cli/web/html5.php:12 cli/web/vue3.php:124 cli/wxmp/wxmp2.php:81
+msgid "exporting iconfont"
+msgstr "导出iconfont"
+
+#: cli/web/html5.php:55
+#, php-format
+msgid "add %s"
+msgstr "添加 %s"
+
+#: cli/web/html5.php:65
+#, php-format
+msgid "generate folder for modlue %s"
+msgstr "生成模块%s的目录"
+
+#: cli/web/html5.php:69
+#, php-format
+msgid "compile page %s => %s"
+msgstr "编译文件 %s => %s"
+
+#: cli/web/html5.php:84 cli/web/vue3.php:194
+msgid "generating index page"
+msgstr "生成索引页"
+
+#: cli/web/vue3.php:46
+#, php-format
+msgid " can not found install_vue3 method in %s, ignore"
+msgstr " %s中未找到 install_vue3 方法 ，忽略"
+
+#: cli/web/vue3.php:85 cli/web/vue3.php:98 cli/wxmp/wxmp2.php:72
+#: cli/wxmp/wxmp2.php:117 cli/wxmp/wxmp2.php:128
+#, php-format
+msgid "generating %s"
+msgstr "生成 %s"
+
+#: cli/web/vue3.php:179
+#, php-format
+msgid "compile page %s to %s, url: %s"
+msgstr "编译文件 %s 到 %s, url: %s"
+
+#: cli/web/vue3.php:196
+msgid "Index page"
+msgstr "索引页"
+
+#: cli/web/vue3.php:199
+msgid "generating router"
+msgstr "生成路由"
+
+#: cli/web/vue3.php:202
+#, php-format
+msgid ""
+"compiled use : %s, you can <ol><li>npm install: install all need node "
+"modules</li><li>npm run serve: start the vue serve</li><li>npm run build: "
+"build the dist files</li></ol>"
+msgstr ""
+"采用 %s 编译, 你可以<ol><li>npm install: 安装所有到依赖</li><li>npm run "
+"serve: 启动vue服务</li><li>npm run build: 编译</li></ol>"
+
+#: cli/web/vue3.php:229
+msgid "generating package.json"
+msgstr "生成package.json"
+
+#: cli/wxmp/wxmp2.php:54
+#, php-format
+msgid " can not found install2wxmp2 method in %s, ignore"
+msgstr " %s中未找到 install2wxmp2 方法 ，忽略"
+
+#: cli/wxmp/wxmp2.php:98
+#, php-format
+msgid "compile page %s to %s"
+msgstr "编译文件 %s => %s"
+
+#: yangzie/controller.php:215
+msgid "Yangzie Framework"
+msgstr ""
+
+#: yangzie/dba.php:291
+#, php-format
+msgid "Field '%s' cannot be null"
+msgstr "字段 ‘%s’ 未设置"
+
+#: yangzie/dba.php:295
+#, php-format
+msgid "Field '%s' doesn't have a default value"
+msgstr "字段 ‘%s’ 未设置值"
+
+#: yangzie/dba.php:302
+#, php-format
+msgid "Field '%s' length exceeds limit %s"
+msgstr "字段 ‘%s’ 内容长度超过了 %s"
+
+#: yangzie/dba.php:305
+#, php-format
+msgid "Field '%s' value %s is not in the accepted enum list"
+msgstr "字段 ‘%s’ 的值 %s 不在允许的范围内"
+
+#: yangzie/dba.php:309
+#, php-format
+msgid "Field '%s' value %s is not the date value"
+msgstr "字段 ‘%s’ 的值 %s 不是有效的日期类型"
+
+#: yangzie/request.php:273
+msgid "Please signin"
+msgstr "请登录"
+
+#: yangzie/request.php:283
+#, php-format
+msgid "You do not have permission(%s:%s)"
+msgstr "无权访问(%s:%s)"
+
+#: yangzie/startup.php:61
+msgid "app/__config__.php not found"
+msgstr "文件app/__config__.php 丢失"
+
+#~ msgid "Change Tech"
+#~ msgstr "修改角色"
+
+#~ msgid ""
+#~ "UIBuilder beta only supports exporting bootstrap code, but we will "
+#~ "support more"
+#~ msgstr "UIBuilder Beta 版本仅支持导出Bootstrap前端代码，但我们会支持更多"
+
+#~ msgid ""
+#~ "We will support the export of complete project code of various front-end "
+#~ "UI frameworks (bootstrap, layui, amazeui...) and various front-end "
+#~ "development frameworks (Vue, react, angular, emberjs...)."
+#~ msgstr ""
+#~ "我们将支持导出各种前端UI框架（Bootstrap,Layui,AmazeUI…），和各种前端开发框"
+#~ "架（Vue,React,Angular,emberJS…）的完整项目代码。"
+
+#~ msgid "A set of design, arbitrary switching front-end platform"
+#~ msgstr "一套设计，任意切换前端平台"
+
+#~ msgid ""
+#~ "A set of design uibuilder can switch freely between supported front-end "
+#~ "frameworks."
+#~ msgstr "一套设计 UIBuilder 可在支持的前端框架之间任意切换。"
+
+#~ msgid "Not just the web, but also MINI-Program, Apps"
+#~ msgstr "不止于Web，还有小程序，App"
+
+#~ msgid ""
+#~ "Whether it is web or mobile, the interface display and interaction "
+#~ "behavior are consistent. Our goal is to make the user's design easy to "
+#~ "export various object codes. In the future, we will support various "
+#~ "platform Mini-Program, light applications, Android, iOS and Harmonyos."
+#~ msgstr ""
+#~ "不管是Web还是Mobile，界面展示、交互行为是一致的，我们的目标就是让用户的设"
+#~ "计，可以轻松导出各种目标代码，未来我们将支持各种平台小程序，轻应用，"
+#~ "Android，iOS，HarmonyOS。"
+
+#~ msgid "Android App"
+#~ msgstr "Android App"
+
+#~ msgid "iOS App"
+#~ msgstr "iOS App"
+
+#~ msgid "generating src/assets/index.scss"
+#~ msgstr "生成src/assets/index.scss"
+
+#, php-format
+#~ msgid "generate folder for module %s to %s"
+#~ msgstr "生成模块 %s 的目录 %s"
+
+#~ msgid "generating project.config.json"
+#~ msgstr "生成project.config.json"
+
+#~ msgid "generating app.json"
+#~ msgstr "生成app.json"
+
+#~ msgid "Build Your Project"
+#~ msgstr "构建项目"
+
+#~ msgid "Extra Large"
+#~ msgstr "特大"
+
+#~ msgid "Medium"
+#~ msgstr "中等"
+
+#~ msgid "Normal"
+#~ msgstr "常规"
+
+#~ msgid "Border"
+#~ msgstr "边框"
+
+#~ msgid "No Rounded"
+#~ msgstr "无圆角"
+
+#~ msgid "Rounded"
+#~ msgstr "圆角"
+
+#~ msgid "Rounded Top"
+#~ msgstr "上圆角"
+
+#~ msgid "Rounded Right"
+#~ msgstr "右圆角"
+
+#~ msgid "Rounded Bottom"
+#~ msgstr "下圆角"
+
+#~ msgid "Rounded Left"
+#~ msgstr "左圆角"
+
+#~ msgid "Rounded Circle"
+#~ msgstr "圆形"
+
+#~ msgid "Rounded Pill"
+#~ msgstr "药丸形"
+
+#~ msgid "Small Shadow"
+#~ msgstr "小阴影"
+
+#~ msgid "Shadow"
+#~ msgstr "阴影"
+
+#~ msgid "Large Shadow"
+#~ msgstr "大阴影"
+
+#~ msgid "Striped Rows"
+#~ msgstr "斑马纹"
+
+#~ msgid "Hoverable Rows"
+#~ msgstr "悬浮提示"
+
+#~ msgid "Hidden"
+#~ msgstr "Hidden"
+
+#~ msgid "Scroll"
+#~ msgstr "Scroll"
+
+#~ msgid "Visible"
+#~ msgstr "Visible"
+
+#, php-format
+#~ msgid "no project limit, every project can invite %s member"
+#~ msgstr "项目数量无限制，每个项目只能邀请%s人参与"
+
+#~ msgid "Base"
+#~ msgstr "基础版"
+
+#~ msgid "Organization"
+#~ msgstr "组织"
+
+#, php-format
+#~ msgid "compile page %s"
+#~ msgstr "编译页面%s"
+
+#~ msgid "Frontend (Has UI)"
+#~ msgstr "前端(有UI)"
+
+#~ msgid "Backend (No UI)"
+#~ msgstr "后端(无UI)"
+
+#~ msgid "Mix (Has UI)"
+#~ msgstr "混合(有UI)"
+
+#~ msgid "Kind:"
+#~ msgstr "类型："
+
+#~ msgid "Kind"
+#~ msgstr "类型"
+
+#~ msgid "frontend"
+#~ msgstr "前端"
+
+#~ msgid "My Workspace"
+#~ msgstr "我的工作台"
+
+#, php-format
+#~ msgid "create %s"
+#~ msgstr "创建%s"
+
+#~ msgid "View"
+#~ msgstr "视图"
+
+#~ msgid "are you sure send sms to this cellphone for invite?"
+#~ msgstr "你确定要邀请该手机号吗？"
+
+#~ msgid "Please Input Cellphone"
+#~ msgstr "请输入新手机号"
+
+#~ msgid "Cellphone:"
+#~ msgstr "手机号："
+
+#~ msgid "no content"
+#~ msgstr "无内容"
+
+#~ msgid "请输入收到验证码的手机号码"
+#~ msgstr "请输入收到验证码的手机号码"
+
+#~ msgid "验证码不正确"
+#~ msgstr "验证码不正确"
+
+#~ msgid "验证手机号"
+#~ msgstr "验证手机号"
+
+#, php-format
+#~ msgid "你好%s, 请验证你的手机号"
+#~ msgstr "你好%s, 请验证你的手机号"
+
+#~ msgid "请输入你的手机号"
+#~ msgstr "请输入你的手机号"
+
+#~ msgid "发送验证码"
+#~ msgstr "发送验证码"
+
+#~ msgid "验证码"
+#~ msgstr "验证码"
+
+#~ msgid "请输入你的验证码"
+#~ msgstr "请输入你的验证码"
+
+#~ msgid "提交"
+#~ msgstr "提交"
+
+#~ msgid "短信发送成功, 请注意查收"
+#~ msgstr "短信发送成功, 请注意查收"
+
+#~ msgid "短信发送失败"
+#~ msgstr "短信发送失败"
+
+#~ msgid "验证失败"
+#~ msgstr "验证失败"
+
+#~ msgid "工程管理系统(演示)"
+#~ msgstr "工程管理系统(演示)"
+
+#~ msgid "演示项目，可任意修改"
+#~ msgstr "演示项目，可任意修改"
+
+#~ msgid "update __config__ file :\t"
+#~ msgstr "更新 __config__ file :\t"
+
+#~ msgid "hate"
+#~ msgstr "讨厌"
+
+#~ msgid "interest"
+#~ msgstr "兴趣"
+
+#~ msgid "speciality"
+#~ msgstr "在行"
+
+#~ msgid "want"
+#~ msgstr "想"
+
+#~ msgid "dream"
+#~ msgstr "梦"
+
+#~ msgid "attention"
+#~ msgstr "关注"
+
+#~ msgid "discussion"
+#~ msgstr "讨论"
+
+#~ msgid "blog"
+#~ msgstr "文章"
+
+#~ msgid "wiki"
+#~ msgstr "知识"
+
+#~ msgid "talk"
+#~ msgstr "对话"
+
+#~ msgid "link"
+#~ msgstr "链接"
+
+#~ msgid "miniarticle"
+#~ msgstr "言论"
+
+#~ msgid "HATE"
+#~ msgstr "讨厌"
+
+#~ msgid "INTEREST"
+#~ msgstr "兴趣"
+
+#~ msgid "SPECIALITY"
+#~ msgstr "在行"
+
+#~ msgid "WANT"
+#~ msgstr "想"
+
+#~ msgid "DREAM"
+#~ msgstr "梦"
+
+#~ msgid "ATTENTION"
+#~ msgstr "关注"
+
+#~ msgid "QUESTION"
+#~ msgstr "问题"
+
+#~ msgid "DISCUSSION"
+#~ msgstr "讨论"
+
+#~ msgid "ACTIVITIE"
+#~ msgstr "活动"
+
+#~ msgid "BLOG"
+#~ msgstr "文章"
+
+#~ msgid "WIKI"
+#~ msgstr "知识"
+
+#~ msgid "TALK"
+#~ msgstr "对话"
+
+#~ msgid "LINK"
+#~ msgstr "链接"
+
+#~ msgid "MINIARTICLE"
+#~ msgstr "言论"

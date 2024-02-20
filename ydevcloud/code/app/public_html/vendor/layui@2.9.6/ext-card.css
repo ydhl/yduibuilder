@@ -1,0 +1,10 @@
+
+.layui-card-footer{
+    height:42px;
+    line-height:42px;
+    padding:0 15px;
+    border-top:1px solid #f6f6f6;
+    color:#333;
+    border-radius:0 0 2px 2px;
+    font-size:14px
+}

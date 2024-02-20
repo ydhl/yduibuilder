@@ -1,0 +1,6 @@
+/**
+ * uibuilder frame 中也会包含uibuilder使用的bootstrap，这可能会导致一些样式冲突，这里对冲突对部分进行重写
+ */
+.table>:not(caption)>*>*{
+  background-color: unset;
+}

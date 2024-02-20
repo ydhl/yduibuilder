@@ -1,0 +1,2 @@
+bootstrap html的代码导出和其preview一摸一样，
+直接采用preview中的bootstrap类

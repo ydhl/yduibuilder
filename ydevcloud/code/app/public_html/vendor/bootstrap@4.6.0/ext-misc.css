@@ -1,0 +1,40 @@
+.btn-xs{padding: .125rem .25rem;font-size: .475rem;line-height: 1.5;border-radius: .1rem;}
+.cursor{cursor: pointer;}
+.overflow-scroll{overflow: scroll;}
+.overflow-visible{overflow: visible;}
+.table-rounded{
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+.transparent{
+    background-color: transparent !important;
+}
+input:focus-visible,textarea:focus-visible{
+    outline: none !important;
+}
+body {
+    font-family: var(--font-family-sans-serif), "PingFang SC";
+}
+#ydecloud-app{
+    display: flex;
+    align-items: stretch;
+    align-content: stretch;
+    min-height: 100vh;
+}
+/**第一个元素撑满**/
+#ydecloud-app>div{
+    flex-grow: 1;
+}
+/*.table td, .table th, .table tr{*/
+/*    border-color: inherit !important;*/
+/*}*/
+.table td, .table th, .table tr{
+    border-color: inherit !important;
+}
+.dropdown-hidden .dropdown-toggle::after{
+    display: none;
+}
+/*iconfont字体跟随父级设置*/
+.iconfont {
+    font-size: inherit !important;
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <script>var ports = {}; var globalEditor = null;</script>
+    <link data-use="uibuilder" href="/bootstrap.min.css" rel="stylesheet">
+    <script src="jquery-3.6.0.min.js"></script>
+    <script data-use="uibuilder" src="/bootstrap.bundle.min.js"></script>
+    <script data-use="uibuilder" src="/plupload/plupload.full.min.js"></script>
+    <script data-use="uibuilder" src="/ydjs/yd_upload.js"></script>
+    <script data-use="uibuilder" src="/ydjs/yze_ajax.js"></script>
+    <script data-use="uibuilder" src="/ydjs/ydhl-bootstrap-5.0.1.js"></script>
+    <script src="/select2/js/select2.full.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="/select2/css/select2.min.css" media="all">
+    <link rel="stylesheet" href="/select2/css/select2-bootstrap-5-theme.min.css" media="all">
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>

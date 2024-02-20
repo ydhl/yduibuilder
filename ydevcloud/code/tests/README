@@ -1,0 +1,18 @@
+准备：
+需要在命令行中能运行php命令，对于windows则需要把php.exe配置在环境变量中
+修改config.php 中的TEST_PHP_EXECUTABLE，指向php的路径
+
+运行单元测试：
+命令行进入到test目录
+
+非windows：
+执行全部单元测试：
+    在命令行上运行 php autorun.php
+执行指定的单元测试文件
+    在命令行上运行 php autorun.php 指定的文件；例如 php autorun.php yangzie/sql.phpt
+
+windows：
+执行全部单元测试：
+    在命令行上运行 autorun.bat
+执行指定的单元测试文件
+    在命令行上运行 autorun.bat 指定的文件；例如 autorun.bat yangzie/sql.phpt

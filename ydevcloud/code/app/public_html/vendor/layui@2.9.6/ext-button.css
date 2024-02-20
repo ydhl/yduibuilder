@@ -1,0 +1,3 @@
+.layui-btn+.layui-btn{
+    margin-left: unset !important;
+}

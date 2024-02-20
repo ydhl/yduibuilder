@@ -1,0 +1,1 @@
+<?php echo $this->content_of_view()?>

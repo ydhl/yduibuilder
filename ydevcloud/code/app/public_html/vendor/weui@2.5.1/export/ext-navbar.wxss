@@ -1,0 +1,6 @@
+.weui-tabbar_icon{
+    display: inline-block; position: relative;
+}
+.weui-tabbar_icon .weui-badge{
+    position: absolute; top: -2px; right: -13px;
+}

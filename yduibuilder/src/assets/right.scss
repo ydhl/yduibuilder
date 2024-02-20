@@ -1,0 +1,216 @@
+#right-sidebar{
+  font-size: $font-size-sm;
+
+  .header{
+    height: 38px;
+    background-color: $gray-200;
+    position: fixed;
+    right: 0px;
+    top: $topPanelHeight;
+    border-left: 1px solid $gray-300;
+    user-select: none;
+    font-size: $font-size-sm;
+    overflow: hidden;
+
+    .header-scrollbar{
+      position: absolute;
+      z-index: 0;
+      width: 100%;
+      overflow-y: hidden;
+      overflow-x: scroll;
+      margin-top: 6px;
+      height: 76px;/*大于header+滚动条的高度即可*/
+    }
+    .nav-tabs{
+      border-bottom: none !important;
+      flex-wrap: nowrap !important;
+    }
+    .nav-link:hover{
+      background-color: $gray-100;
+      border-color: $gray-300;
+    }
+    .nav-item:not(.active){
+      flex-shrink: 0;
+    }
+
+    .nav-link:not(.active){
+      border-bottom: 1px solid $gray-300;
+    }
+    .nav-link{
+      padding: 0.2rem 0.6rem !important;
+    }
+    .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link{
+      border: 1px solid $gray-300;
+      background-color: $white;
+      color: $gray-800;
+      border-bottom-color: transparent !important;
+    }
+    a.nav-link{
+      color: $gray-600;
+    }
+
+  }
+
+  .panel{
+    position: fixed;
+    right: 0px;
+    top: $topPanelHeight + 38px;
+    width: $rightSidebarWidth;
+    bottom: 0px;
+    border-left: 1px solid $gray-200;
+    background-color: $white;
+    box-shadow: -0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    z-index: 10;
+    display: flex;
+    overflow: hidden;
+
+    .split{
+      flex: 0 0 5px;
+      height: 100%;
+      cursor: col-resize;
+    }
+    .split:hover{
+      background-color: $light;
+    }
+    .right-panel-scroll{
+      overflow-x: hidden;
+      overflow-y: scroll;
+      height: 100%;
+      flex: 1;
+    }
+  }
+  .close-button{
+    cursor: pointer;
+    position: absolute;
+    top: calc(50% - 56px);
+    transform: rotate(180deg);
+    z-index: 10;
+  }
+  .close-button path {
+    fill: $white !important;
+    stroke: $gray-200;
+  }
+}
+
+
+.right-backdrop{
+  opacity: 0.5;
+  position: absolute;
+  top: 0;
+  left: 5px;
+  z-index: 1040;
+  right: 0;
+  bottom: 0;
+  background-color: #000;
+}
+/**
+ * UI 树
+ */
+
+.uitree-item{
+  font-size: $font-size-sm;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  color: $gray-600;
+  user-select: none;
+  cursor: pointer;
+}
+.uitree-item.even{
+  background-color: $gray-100;
+}
+.uitree-item.active{
+  background-color: $gray-200;
+  color: $gray-800;
+}
+.uitree {
+  .iconfont{
+    font-size: $font-size-sm;
+  }
+  .iconfont:nth-child(2){
+    margin-right: 5px;
+  }
+}
+.uitree-placement{
+  height: 26px;
+  background-color: $gray-400;
+}
+
+/**
+ * 参数输出树
+ */
+.arg-tree{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  list-style-image: none;
+}
+.arg-tree-icon{
+  background-image: url(32px.png);
+}
+.arg-tree-icon:empty{
+  width: 24px;
+  height: 24px;
+  max-width: 24px;
+  min-width:24px;
+  line-height: 24px;
+  display: inline-block;
+  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  vertical-align: top;
+  text-align: center;
+}
+.arg-tree-node {
+  min-height: 24px;
+  line-height: 24px;
+  margin-left: 24px;
+  background-image: url(32px.png);
+  background-position: -292px -4px;
+  background-repeat: repeat-y;
+}
+.arg-tree-leaf .arg-tree-icon {
+  background-position: -68px -4px !important;
+}
+.arg-tree-disable{
+  background-position: -168px -35px !important;
+}
+.arg-tree-open .arg-tree-icon {
+  background-position: -132px -4px;
+}
+.arg-tree-close .arg-tree-icon {
+   background-position: -100px -4px;
+}
+.arg-tree .arg-tree-leaf:last-child, .arg-tree .arg-tree-open:last-child, .arg-tree .arg-tree-close:last-child{
+  background: 0 0 !important;
+}
+
+/**
+ * 菜单树
+ */
+.tree{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  list-style-image: none;
+  .iconfont{
+    width: 20px;
+  }
+}
+.tree-item{
+}
+.tree-node {
+  font-size: 0.875em;
+  min-height: 40px;
+  line-height: 40px;
+}
+.tree-node:hover{
+  background-color: #e2e6ea;
+  border-radius: 4px;
+}
+.api-method{
+  font-weight: bolder;
+  min-width: 40px;
+  display: inline-block;
+}
+

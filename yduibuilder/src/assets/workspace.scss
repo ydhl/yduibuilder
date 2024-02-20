@@ -1,0 +1,209 @@
+html{
+  background-color: $light;
+}
+.left-tip{
+  width: 0px !important;
+  box-shadow: 0px 0px 14px 2px #333;
+  height: 100%;
+  z-index: 1;
+  position: absolute;
+}
+.right-tip{
+  width: 0px !important;
+  box-shadow: 0px 0px 14px 2px #333;
+  height: 100%;
+  z-index: 1;
+  position: absolute;
+  right: 0;
+}
+.bgtransparent{
+  background-image: url(/transparent.svg);
+  background-size: 30px;
+  background-color: #ccc!important;
+}
+.workspace{
+  .workspace-header{
+    height: 38px;
+    background-color: $gray-200;
+    border-bottom: 1px solid $gray-300;
+    position: fixed;
+    top: $topPanelHeight;
+    left: $leftPanelWidth;
+    user-select: none;
+    overflow: hidden;
+
+    .header-scrollbar{
+      position: absolute;
+      z-index: 0;
+      width: 100%;
+      overflow-y: hidden;
+      overflow-x: scroll;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      height: 38px + $scrollbarSize;/*大于header+滚动条的高度即可*/
+    }
+
+    .divider{
+      width: 1px;
+      height: 40%;
+      background-color: $gray-500;
+    }
+    word-break: keep-all;
+  }
+
+  .cooperation{
+    position: fixed;
+    height: 32px;
+    top: $topPanelHeight + 38px;
+    right:0px;
+    left: $leftPanelWidth;
+    overflow: hidden;
+    z-index: 1;/*在 workspace-body上面*/
+  }
+  .cooperation-body{
+    height: 40px;
+    width: 100%;
+    background-color: #fff;
+    padding-top: 5px;
+    display: flex;
+    justify-content: center;
+    align-content: flex-start;
+    align-items: center;
+    overflow: scroll;
+  }
+  .cooperation-avatar{
+    height: 20px;
+    width: 20px;
+    background-size:cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .workspace-body{
+    position: fixed;
+    top: $topPanelHeight + 38px;
+    right:0px;
+    bottom:0px;
+    left: $leftPanelWidth;
+    overflow: hidden;
+    .opened-pages{
+      padding-top: 6px;
+      background-color: $gray-100;
+      height: 38px;
+      overflow: hidden;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      z-index: 1;
+
+      .opened-pages-scrollbar{
+        width: 100%;
+        overflow-y: hidden;
+        overflow-x: scroll;
+        height: 58px;/*大于header+滚动条的高度即可*/
+      }
+
+      .left-tip{
+        top: 0;
+      }
+      .right-tip{
+        top: 0;
+      }
+      .nav-tabs{
+        flex-wrap: nowrap !important;
+        border-bottom: 0px;
+      }
+      .nav-link.active{
+        border-bottom: 1px solid #fff;
+      }
+      .nav-link{
+        word-break: keep-all;
+        user-select: none;
+        color: #444;
+        display: flex;
+        align-items: center;
+        padding: 0.2rem 1.5rem !important;
+        border-bottom: 1px solid $gray-400;
+      }
+    }
+  }
+  .breadcrumb-bar{
+    height: 28px;
+    border-top: 1px solid $gray-200;
+    background-color: $gray-100;
+    max-width: 100%;
+    display: flex;
+    overflow: hidden;
+  }
+  .breadcrumb-body{
+    background-color: $gray-100;
+    user-select: none;
+    color: $gray-700;
+
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row-reverse;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    .path {
+      fill: $gray-100;
+    }
+    div.item:hover {
+      background: #fff;
+      z-index: 2;
+    }
+    .item {
+      display: flex;
+      height: 100%;
+      padding: 0px;
+      position: relative;
+      margin-right: -7px;
+      background: $gray-100;
+      user-select: none;
+      line-height: 28px;
+      cursor: pointer;
+      white-space: nowrap;
+      outline: none;
+    }
+    .iconfont{
+      margin-left: 10px;
+    }
+    .label {
+      padding: 0px 15px 0px 5px;
+    }
+  }
+  .workspace-scrollbar{
+    //display: flex;
+    //flex-direction: column;
+    //align-items: center;
+    //justify-content: flex-start;
+    transform-origin: left top;
+    padding: 50px;
+    overflow: scroll;
+    height: calc(100% - 28px);
+    background-color: #ffffff;
+  }
+  .btn-light{
+    border-color: $gray-200 !important;
+    background-color: $gray-200 !important;
+  }
+}
+.full-backdrop{
+  opacity: 0.5;
+  position: absolute;
+  top: 0;
+  left: 0px;
+  z-index: 1040;
+  right: 0;
+  bottom: 0;
+  background-color: #000;
+}
+.cursor{
+  cursor: pointer;
+}
+.clean-focus-visible:focus-visible{
+  outline: none !important;
+}

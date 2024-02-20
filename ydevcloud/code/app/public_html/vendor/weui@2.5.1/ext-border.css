@@ -1,0 +1,10 @@
+
+.border-0{border-width: 0px !important;}
+.border-primary{border-color: var(--weui-INDIGO) !important;}
+.border-secondary{border-color: var(--weui-BG-4) !important;}
+.border-success{border-color: var(--weui-BRAND) !important;}
+.border-danger{border-color: var(--weui-RED) !important;}
+.border-warning{border-color: var(--weui-ORANGE) !important;}
+.border-info{border-color: var(--weui-LINK) !important;}
+.border-light{border-color: var(--weui-WHITE) !important;}
+.border-dark{border-color: var(--weui-BG-4) !important;}

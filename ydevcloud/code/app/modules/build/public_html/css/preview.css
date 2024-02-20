@@ -1,0 +1,27 @@
+.preview{
+    position: fixed;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.preview-menu{
+    position: fixed;
+    top:15px;
+    bottom: 15px;
+    left: 15px;
+    width: 200px;
+    background: #efefef;
+    overflow: auto;
+}
+.preview-body{
+    position: fixed;
+    top:15px;
+    bottom: 15px;
+    right: 15px;
+    left: 230px;
+}
+.preview-page{
+    width: 100%;
+    height: 100%;
+}

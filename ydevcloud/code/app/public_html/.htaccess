@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+   RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+#Header set X-Frame-Options "ALLOW-FROM https://uibuilder.yidianhulian.com/,https://ydecloud.yidianhulian.com/"
+#Content-Security-Policy: default-src https://uibuilder.yidianhulian.com 'self';
+#                         connect-src https://uibuilder.yidianhulian.com https://ydecloud.yidianhulian.com;
+#                         script-src https://uibuilder.yidianhulian.com https://ydecloud.yidianhulian.com;
+#                         child-src https://uibuilder.yidianhulian.com https://ydecloud.yidianhulian.com

@@ -1,0 +1,20 @@
+.top-panel{
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  height: $topPanelHeight;
+  user-select: none;
+  z-index: 11;
+  border-bottom: 1px solid $gray-300;
+  background-color: #fff;
+}
+.top-panel {
+  .navbar{
+    padding: 0.2rem 1rem;
+  }
+  .ydui-active{
+    border-bottom: var(--bs-primary) 2px solid;
+    color: var(--bs-primary) !important;
+  }
+}

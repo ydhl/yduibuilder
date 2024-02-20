@@ -1,0 +1,31 @@
+.layui-border-0{
+    border: 1px solid transparent !important;
+}
+/**
+ * layui border 颜色和影响其内容的color，这里单独定义
+ */
+
+.layui-border-primary {
+    border-color: #009688 !important;
+}
+.layui-border-secondary{
+    border-color: #1E9FFF !important;;
+}
+.layui-border-success-ext{
+    border-color: #5FB878 !important;;
+}
+.layui-border-info-ext{
+    border-color: #2F4056 !important;;
+}
+.layui-border-light-ext {
+    border-color: #FAFAFA !important;;
+}
+.layui-border-danger{
+    border-color: #FF5722 !important;;
+}
+.layui-border-warning{
+    border-color: #FFB800 !important;;
+}
+.layui-border-dark{
+    border-color: #393D49 !important;;
+}

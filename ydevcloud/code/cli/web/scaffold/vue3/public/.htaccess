@@ -1,0 +1,17 @@
+<IfModule mod_rewrite.c>
+   RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.html?url=$1 [QSA,L]
+    # Header add Access-Control-Allow-Origin: *
+    # Header add Access-Control-Allow-Headers: "Origin, X-Requested-With, Content-Type, Accept, Authorization, token, Redirect"
+    # Header add Access-Control-Allow-Methods: "GET, POST, PUT,DELETE,OPTIONS,PATCH"
+</IfModule>
+#<FilesMatch "\.(jpg|png|jpeg|gif|ppt|doc)$">
+#    <IfModule mod_headers.c>
+ #      SetEnvIf Origin ":" IS_CORS afda fda fda fd a
+       Header add Access-Control-Allow-Origin: *
+       Header add Access-Control-Allow-Headers: "Origin, X-Requested-With, Content-Type, Accept, Authorization, token, Redirect"
+       Header add Access-Control-Allow-Methods: "GET, POST, PUT,DELETE,OPTIONS,PATCH"
+#    </IfModule>
+#</FilesMatch>

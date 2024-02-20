@@ -1,0 +1,62 @@
+.layui-table-rounded{
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+.layui-table tr{
+    background-color: unset !important;
+}
+.layui-table-hover tbody tr:hover{background-color:rgba(0,0,0,.075) !important;}
+.layui-table td, .layui-table th, .layui-table tr {
+    border-color: inherit !important;
+}
+.layui-table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0,0,0,.05) !important;
+}
+.layui-table-primary {
+    color:#fff;
+}
+.layui-table-primary, .layui-table-primary>td, .layui-table-primary>th{
+    background-color: #009688 !important;;
+}
+.layui-table-secondary{
+    color:#fff;
+}
+.layui-table-secondary,.layui-table-secondary > td,.layui-table-secondary > th{
+    background-color: #1E9FFF !important;;
+}
+.layui-table-success{
+    color:#fff;
+}
+.layui-table-success,.layui-table-success > td,.layui-table-success > th{
+    background-color: #5FB878 !important;;
+}
+.layui-table-info{
+    color:#fff;
+}
+.layui-table-info,.layui-table-info > td,.layui-table-info > th{
+    background-color: #2F4056 !important;;
+}
+.layui-table-light {
+    color:#000;
+}
+.layui-table-light,.layui-table-light > td,.layui-table-light > th{
+    background-color: #FAFAFA !important;;
+}
+.layui-table-danger{
+    color:#fff;
+}
+.layui-table-danger,.layui-table-danger > td,.layui-table-danger > th{
+    background-color: #FF5722 !important;;
+}
+.layui-table-warning{
+    color:#fff;
+}
+.layui-table-warning,.layui-table-warning > td,.layui-table-warning > th{
+    background-color: #FFB800 !important;;
+}
+.layui-table-dark{
+    color:#fff;
+}
+.layui-table-dark,.layui-table-dark > td,.layui-table-dark > th{
+    background-color: #393D49 !important;
+}

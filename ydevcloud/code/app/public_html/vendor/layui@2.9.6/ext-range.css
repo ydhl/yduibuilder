@@ -1,0 +1,95 @@
+.layui-form-control-range{
+    -webkit-appearance: none;
+    background: -webkit-linear-gradient(#767676, #767676) no-repeat, #efefef;
+    background-size: 50% 100%;
+    outline: none;
+    height: 10px;
+    border: 1px solid #767676;
+}
+
+.layui-form-control-range-sm{
+    height: 5px;
+}
+.layui-form-control-range-lg{
+    height: 20px;
+}
+
+.layui-range-primary{
+    background: -webkit-linear-gradient(#009688, #009688) no-repeat, #efefef;
+    border: 1px solid #009688;
+}
+.layui-range-secondary{
+    background: -webkit-linear-gradient(#1E9FFF, #1E9FFF) no-repeat, #efefef;
+    border: 1px solid #1E9FFF;
+}
+.layui-range-success{
+    background: -webkit-linear-gradient(#5FB878, #5FB878) no-repeat, #efefef;
+    border: 1px solid #5FB878;
+}
+.layui-range-danger{
+    background: -webkit-linear-gradient(#FF5722, #FF5722) no-repeat, #efefef;
+    border: 1px solid #FF5722;
+}
+.layui-range-warning{
+    background: -webkit-linear-gradient(#FFB800, #FFB800) no-repeat, #efefef;
+    border: 1px solid #FFB800;
+}
+.layui-range-info{
+    background: -webkit-linear-gradient(#2F4056, #2F4056) no-repeat, #efefef;
+    border: 1px solid #2F4056 ;
+}
+.layui-range-light{
+    background: -webkit-linear-gradient(#FAFAFA, #FAFAFA) no-repeat, #efefef;
+    border: 1px solid #FAFAFA;
+}
+.layui-range-dark{
+    background: -webkit-linear-gradient(#393D49, #393D49) no-repeat, #efefef;
+    border: 1px solid #393D49 ;
+}
+
+
+
+.layui-form-control-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    background: #767676;
+    border-radius: 50%;
+}
+.layui-form-control-range:hover::-webkit-slider-thumb {
+    box-shadow:0 0 0 1px #fff
+}
+
+.layui-form-control-range-sm::-webkit-slider-thumb {
+    height: 15px;
+    width: 15px;
+}
+.layui-form-control-range-lg::-webkit-slider-thumb {
+    height: 30px;
+    width: 30px;
+}
+
+.layui-range-primary::-webkit-slider-thumb{
+    background: #009688;
+}
+.layui-range-secondary::-webkit-slider-thumb{
+    background: #1E9FFF;
+}
+.layui-range-success::-webkit-slider-thumb{
+    background: #5FB878;
+}
+.layui-range-danger::-webkit-slider-thumb{
+    background:  #FF5722;
+}
+.layui-range-warning::-webkit-slider-thumb{
+    background: #FFB800;
+}
+.layui-range-info::-webkit-slider-thumb{
+    background: #2F4056;
+}
+.layui-range-light::-webkit-slider-thumb{
+    background: #FAFAFA;
+}
+.layui-range-dark::-webkit-slider-thumb{
+    background: #393D49;
+}

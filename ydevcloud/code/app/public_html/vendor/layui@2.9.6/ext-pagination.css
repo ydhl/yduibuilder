@@ -1,0 +1,11 @@
+
+.layui-pagination-lg > *{
+    height: 48px !important;
+    line-height: 48px !important;
+    padding: 0 30px !important;
+    font-size: 18px !important;
+}
+.layui-pagination-sm > *{
+    height: 18px !important;
+    line-height: 18px !important;
+}

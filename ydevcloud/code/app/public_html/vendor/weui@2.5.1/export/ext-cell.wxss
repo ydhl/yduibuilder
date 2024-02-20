@@ -1,0 +1,18 @@
+.weui-cell:before{
+    right:16px;
+}
+.weui-cells_radio .weui-check__label{
+    padding-left: 0px;
+}
+
+.weui-cells_radio .weui-check__label:before{
+    left: 0px;
+}
+
+
+.weui-cells_checkbox .weui-check__label{
+    padding-left: 0px;
+}
+.weui-cells_checkbox .weui-check__label:before{
+    left: 0px;
+}

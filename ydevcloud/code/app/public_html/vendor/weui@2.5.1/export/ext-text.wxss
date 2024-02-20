@@ -1,0 +1,34 @@
+
+/* 文字颜色 */
+.text-primary { color: var(--weui-INDIGO);}
+.text-secondary { color: var(--weui-BG-4);}
+.text-success { color: var(--weui-BRAND);}
+.text-danger { color: var(--weui-RED);}
+.text-warning { color: var(--weui-ORANGE);}
+.text-info { color: var(--weui-LINK);}
+.text-light { color: var(--weui-WHITE);}
+.text-dark { color: var(--weui-BG-4);}
+.text-muted{ color: var(--weui-FG-2);}
+.font-weight-light{font-weight:300!important}
+.font-weight-lighter{font-weight:lighter!important}
+.font-weight-normal{font-weight:400!important}
+.font-weight-bold{font-weight:700!important}
+.font-weight-bolder{font-weight:bolder!important}
+.font-italic{font-style:italic!important}
+
+/*文字对齐*/
+.text-justify{text-align:justify!important}
+.text-wrap{white-space:normal!important}
+.text-nowrap{white-space:nowrap!important}
+.text-truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.text-left{text-align:left!important}
+.text-right{text-align:right!important}
+.text-center{text-align:center!important}
+
+.H1{display:block;font-size:2em;line-height: 1.6;}
+.H2{display:block;font-size:1.5em;}
+.H3{display:block;font-size:1.17em;}
+.H4{display:block;}
+.H5{display:block;font-size:0.83em;}
+.H6{display:block;font-size:0.67em;}
+.H7{display:block;}

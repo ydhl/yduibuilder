@@ -1,0 +1,24 @@
+{
+    "name": "ydhl/ydevcloud",
+    "type": "library",
+    "description": "YDEV Cloud",
+    "keywords": ["framework","ydhl"],
+    "homepage": "https://github.com/ydhl/yangzie",
+    "license": "PHP-3.01",
+    "authors": [
+        {
+            "name": "YDHL",
+            "email": "leeboo@yidianhulian.com",
+            "homepage": "http://yidianhulian.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "php-amqplib/php-amqplib": "^2.11",
+        "phpoffice/phpspreadsheet": "^1.18",
+        "overtrue/pinyin": "^4.1"
+    },
+    "autoload": {
+    }
+}
