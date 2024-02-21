@@ -50,12 +50,12 @@
 5. 点击使用则直接使用，无需登录
 6. 访问你的域名，剩下的自己探索吧
 
-## 安装socket服务
+### 安装socket服务
 
 socket服务是用swoole写的，请先确保安装了对应的swoole扩展；进入到ydevcloud/code/cli中
 运行 php build.php即可
 
-## 安装截图服务（可选）
+### 安装截图服务（可选）
 
 截图服务是snapshot，是nodejs开发
 1. 用你的开发工具打开snapshot

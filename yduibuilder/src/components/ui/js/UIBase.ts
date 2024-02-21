@@ -136,7 +136,7 @@ export default class UIBase {
         if (!cssInfo[cssKey]) continue
         let css = store.getters.translate(cssKey, cssInfo[cssKey])// 翻译成对应的ui库 css
         if (css === undefined) { // leeboo 如果不是预定义的（没有翻译结果），则直接用他，常见于某些地方自己硬性定义的css，比如modal的move-handler
-          css = css[cssKey]
+          css = cssInfo[cssKey]
         }
         if (_css[cssKey]) {
           _css[cssKey] += ` ${css}`
