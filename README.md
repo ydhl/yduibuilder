@@ -6,12 +6,13 @@
 
 ## 项目组成
 
-1. ydevcloud 管理后端：
-   2. 项目管理
-   3. 编译生成UI代码
-2. yduibuilder 开发前端，拖拽市生成界面和设置属性
-3. snapshot 页面截屏工具 （可选）
-4. socket服务，用与编译打包生成代码 （可选）
+1. 下载的代码包含三个项目目录：ydevcloud，yduibuilder，snapshot
+2. ydevcloud： 管理后端：
+   1. 项目管理
+   2. 编译生成UI代码
+3. yduibuilder： 开发前端，拖拽市生成界面和设置属性
+4. snapshot： 页面截屏工具 （可选）
+5. ydevcloud/code/cli：socket服务，用与编译打包生成代码 （可选）
 
 ## 安装
 
@@ -23,13 +24,13 @@
 
 
 ### 安装yduibuilder
-1.  这是一个vue3项目，用你的开发工具打开项目`yduibuilder`
+1. 这是一个vue3项目，用你的开发工具打开项目`yduibuilder`
 2. 打开 src/lib/ydhl.ts，配置如下信息
    1. `api` 就是ydecloud管理后端的访问域名，也就是《安装ydecloud 管理后端》中的SITE_URI
    2. `uploadApi`就是《安装ydecloud 管理后端》中的UPLOAD_SITE_URI
    3. `socket`就是《安装ydecloud 管理后端》中的SOCKET_HOST
-3. `npm i`
-4. `npm run serve`
+3. 进入到yduibuilder/yduibuilder目录后：`npm i`
+4. 进入到yduibuilder/yduibuilder目录后：`npm run serve`
 5. 默认情况 yduibuilder运行在9999端口上，如果有冲突，就修改package.json文件中scripts的对应设置，并修改《安装ydecloud 管理后端》中的UI_BUILDER_URI
 
 ### 安装ydecloud 管理后端
@@ -48,6 +49,7 @@
 3. 配置管理后端的访问域名；管理后端基于yangzie php开发框架开发，单入口模式，需要配置一个虚拟域名，指向工作目录`ydevcloud/code/app/public_html`
 4. 访问你配置的虚拟域名，如果能看到如下界面，则说明配置成功![ydecloud](doc/ydeclouod.png)
 5. 点击使用则直接使用，无需登录
+6. 安装composer包：`composer install`
 6. 访问你的域名，剩下的自己探索吧
 
 ### 安装socket服务
