@@ -17,7 +17,7 @@
 ## 安装
 
 ### 准备
-1. 本地需要安装php 7.4+环境并安装swoole、openssl、zip、xml、gd2扩展，
+1. 本地需要安装php 7.4+环境并安装swoole、openssl、zip、xml、gd2，json，iconv扩展，
 2. 安装mysql或者mariadb数据库
 3. windows上php需要配置系统环境，以便在命令行能访问php.exe
 4. 安装rabbitmq（可选，如果要生成页面截屏则安装）
@@ -64,3 +64,9 @@ socket服务是用swoole写的，请先确保安装了对应的swoole扩展；�
 2. `npm i`
 3. 启动rabbitmq /usr/local/sbin/rabbitmq-server
 4. 启动snapshot node --experimental-modules server.mjs
+
+## 效果截图
+![新增项目](doc/newproject.gif)
+![移动端](doc/uibuilder-mobile.gif)
+![PC端](doc/uibuilder-pc.gif)
+![构建代码](doc/build.gif)
