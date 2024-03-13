@@ -18,6 +18,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ydhl from '@/lib/ydhl'
+import _ from 'lodash'
 
 export default {
   props: {
@@ -33,9 +34,9 @@ export default {
       get () {
         return props.modelValue
       },
-      set (v) {
+      set: _.debounce((v) => {
         context.emit('update:modelValue', v || undefined)
-      }
+      }, 500)
     })
     const colorStyle = computed(() => {
       if (myColor.value) {
