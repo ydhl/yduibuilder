@@ -15,6 +15,7 @@
 <script lang="ts">
 import Textarea from '@/components/ui/js/Textarea'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Textarea',
@@ -27,7 +28,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const textarea = new Textarea(props, context)
+    const textarea = new Textarea(props, context, useStore())
     const bodyCss = computed(() => {
       const arr = ['form-control d-flex justify-content-between align-items-end h-auto']
       if (props.uiconfig.meta?.css?.formSizing && props.uiconfig.meta?.css?.formSizing !== 'normal') {

@@ -39,8 +39,8 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const button = new Button(props, context)
     const store = useStore()
+    const button = new Button(props, context, store)
 
     const myButtonSetup = button.setup()
     // 如果上层是按钮，那么继承他的outline，size属性
@@ -69,8 +69,8 @@ export default {
     const btnCss = computed(() => {
       const css = button.getUICss()
       // 如果按钮有背景和前景则用按钮的，否则用上层的，如buttongroup
-      let myBackgruondTheme = css.backgroundTheme ? props.uiconfig.meta?.css?.backgroundTheme : ''
-      let myForegroundTheme = css.foregroundTheme ? props.uiconfig.meta?.css?.foregroundTheme : ''
+      let myBackgruondTheme = css.backgroundTheme ? button.getMeta('backgroundTheme', 'css') : ''
+      let myForegroundTheme = css.foregroundTheme ? button.getMeta('foregroundTheme', 'css') : ''
       delete css.backgroundTheme
       delete css.foregroundTheme
       myBackgruondTheme = myBackgruondTheme || buttonMeta.value?.css?.backgroundTheme

@@ -1,0 +1,2 @@
+weui wxmp的代码导出和其preview类似，其css，style处理一样，只是界面是wxml，
+直接采用preview中的bootstrap类

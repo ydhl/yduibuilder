@@ -23,6 +23,7 @@
 import Pagination from '@/components/ui/js/Pagination'
 import { computed } from 'vue'
 import store from '@/store'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Pagination',
@@ -35,7 +36,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const pagination = new Pagination(props, context)
+    const pagination = new Pagination(props, context, useStore())
     const uiStyle = computed(() => {
       const style = pagination.getUIStyle()
       delete style['background-color']

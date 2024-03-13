@@ -29,9 +29,9 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const progress = new Progress(props, context)
-    const setup = progress.setup()
     const store = useStore()
+    const progress = new Progress(props, context, store)
+    const setup = progress.setup()
     const uiCss = computed(() => {
       const cssMap = progress.getUICss()
       delete cssMap.foregroundTheme

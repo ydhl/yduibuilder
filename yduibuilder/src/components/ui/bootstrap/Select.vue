@@ -15,6 +15,7 @@
 <script lang="ts">
 import Select from '@/components/ui/js/Select'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Select',
@@ -27,7 +28,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const select = new Select(props, context)
+    const select = new Select(props, context, useStore())
     const myCss = computed(() => {
       const css = select.getUICss()
       delete css.formSizing

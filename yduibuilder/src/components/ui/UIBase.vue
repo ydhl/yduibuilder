@@ -9,6 +9,7 @@
 <script lang="ts">
 import { computed, defineAsyncComponent } from 'vue'
 import UIBase from '@/components/ui/js/UIBase'
+import { useStore } from 'vuex'
 
 export default {
   name: 'UIBase',
@@ -19,7 +20,7 @@ export default {
     pageid: String
   },
   setup (props: any, context: any) {
-    const uibase = new UIBase(props, context)
+    const uibase = new UIBase(props, context, useStore())
     const setup = uibase.setup()
 
     const uiComponentWrap = computed(() => {

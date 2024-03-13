@@ -42,6 +42,7 @@
 import Carousel from '@/components/ui/js/Carousel'
 import UIBase from '@/components/ui/UIBase.vue'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Carousel',
@@ -55,7 +56,8 @@ export default {
   },
   components: { UIBase },
   setup (props: any, context: any) {
-    const carousel = new Carousel(props, context)
+    const store = useStore()
+    const carousel = new Carousel(props, context, store)
     const setup = carousel.setup()
 
     const myCss = computed(() => {

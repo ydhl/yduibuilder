@@ -11,6 +11,7 @@
 <script lang="ts">
 import Hr from '@/components/ui/js/Hr'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Hr',
@@ -23,7 +24,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const hr = new Hr(props, context)
+    const hr = new Hr(props, context, useStore())
     const setup = hr.setup()
     const uiStyle = computed(() => {
       const myStyle = hr.getUIStyle()

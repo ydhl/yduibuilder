@@ -14,6 +14,7 @@
 <script lang="ts">
 import Icon from '@/components/ui/js/Icon'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 export default {
   name: 'Bootstrap_Icon',
   props: {
@@ -25,7 +26,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const icon = new Icon(props, context)
+    const icon = new Icon(props, context, useStore())
     const iconClass = computed(() => props.uiconfig.meta?.custom?.icon)
     return {
       ...icon.setup(),

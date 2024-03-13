@@ -316,7 +316,7 @@ CREATE TABLE `project_setting` (
 --
 
 INSERT INTO `project_setting` (`id`, `created_on`, `modified_on`, `is_deleted`, `uuid`, `project_id`, `name`, `value`) VALUES
-(1, '2024-02-19 11:40:29', '2024-02-19 03:40:29', 0, 'a091bda0-ced8-11ee-bbac-d114ec673f04', 1, 'logo', 'user/017ccd5e-f9ba-11eb-9d8c-1ff87f946644/2421965d2cd796116e.png'),
+(1, '2024-02-19 11:40:29', '2024-02-19 03:40:29', 0, 'a091bda0-ced8-11ee-bbac-d114ec673f04', 1, 'logo', 'favicon.png'),
 (38, '2024-02-20 11:09:28', '2024-02-20 03:09:28', 0, '759f5de4-cf9d-11ee-89a9-2776dbe5ebe9', 1, 'ui', 'bootstrap'),
 (39, '2024-02-20 11:09:28', '2024-02-20 03:09:28', 0, '759f6ec4-cf9d-11ee-89a9-2776dbe5ebe9', 1, 'ui_version', '4.6.0'),
 (40, '2024-02-20 11:09:28', '2024-02-20 03:09:28', 0, '759f7a9a-cf9d-11ee-89a9-2776dbe5ebe9', 1, 'frontend', 'web'),
@@ -404,7 +404,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `created_on`, `modified_on`, `is_deleted`, `uuid`, `openid`, `fromsite`, `avatar`, `nickname`, `cellphone`, `sso_token`, `sso_token_expire`, `phone_region`, `email`, `login_pwd`, `user_type`, `account_duedate`, `account_setting`, `account_type`) VALUES
-(1, '2021-08-10 17:04:44', '2024-02-19 02:33:17', 0, '017ccd5e-f9ba-11eb-9d8c-1ff87f946644', '', '', 'http://ydecloud-os.local.com/upload/user/017ccd5e-f9ba-11eb-9d8c-1ff87f946644/2421965d303a44c986.png', 'YDUIBuilder.', '0851-83832371', NULL, NULL, '86', 'leeboo@yidianhulian.com', '25d55ad283aa400af464c76d713c07ad', 'team', NULL, NULL, 'base');
+(1, '2021-08-10 17:04:44', '2024-02-19 02:33:17', 0, '017ccd5e-f9ba-11eb-9d8c-1ff87f946644', '', '', '', 'YDUIBuilder.', '0851-83832371', NULL, NULL, '86', 'leeboo@yidianhulian.com', '25d55ad283aa400af464c76d713c07ad', 'team', NULL, NULL, 'base');
 
 --
 -- 转储表的索引

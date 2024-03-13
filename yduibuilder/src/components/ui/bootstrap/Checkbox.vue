@@ -19,6 +19,7 @@
 <script lang="ts">
 import Checkbox from '@/components/ui/js/Checkbox'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Checkbox',
@@ -31,7 +32,8 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const checkbox = new Checkbox(props, context)
+    const store = useStore()
+    const checkbox = new Checkbox(props, context, store)
     const bodyCss = computed(() => {
       const arr: any = []
       arr.push('h-auto')

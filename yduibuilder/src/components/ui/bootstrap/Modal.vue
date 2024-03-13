@@ -33,6 +33,7 @@
 import UIBase from '@/components/ui/UIBase.vue'
 import Modal from '../js/Modal'
 import { computed, ref } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Model',
@@ -46,7 +47,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const modal = new Modal(props, context)
+    const modal = new Modal(props, context, useStore())
     const setup = modal.setup()
     const mainItems = ref<Array<any>>([])
     const hasMainItems = computed(() => setup.myItems.value.main.length > 0)

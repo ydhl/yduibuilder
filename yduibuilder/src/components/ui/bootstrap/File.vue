@@ -15,6 +15,7 @@
 <script lang="ts">
 import File from '@/components/ui/js/File'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_File',
@@ -27,7 +28,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const file = new File(props, context)
+    const file = new File(props, context, useStore())
     const bodyCss = computed(() => {
       const arr: any = ['d-flex align-items-center']
       if (props.uiconfig.meta?.css?.formSizing && props.uiconfig.meta?.css?.formSizing !== 'normal') {

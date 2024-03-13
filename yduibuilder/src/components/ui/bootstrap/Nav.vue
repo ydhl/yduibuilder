@@ -33,7 +33,7 @@ export default {
   },
   setup (props: any, context: any) {
     const store = useStore()
-    const nav = new Nav(props, context)
+    const nav = new Nav(props, context, store)
     const navTypeCss = computed(() => {
       if (props.uiconfig.meta.custom?.type === 'tab') return 'nav-tabs'
       if (props.uiconfig.meta.custom?.type === 'pill') return 'nav-pills'

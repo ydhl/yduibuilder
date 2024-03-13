@@ -1,16 +1,17 @@
 import { useI18n } from 'vue-i18n'
 import { computed, nextTick, onMounted, watch } from 'vue'
-import { useStore } from 'vuex'
 import ydhl from '@/lib/ydhl'
 declare const ports: any
 
 export default class UIBase {
   protected props: any
   protected context: any
+  protected store: any
 
-  constructor (props: any, context: any) {
+  constructor (props: any, context: any, store) {
     this.props = props
     this.context = context
+    this.store = store
   }
 
   /**
@@ -27,6 +28,17 @@ export default class UIBase {
       }
     }
     return arr.join(';')
+  }
+
+  /**
+   * 当前选中的item是否激活了非普通状态
+   */
+  public hasActiveState () {
+    const store = this.store
+    if (!store) return false
+    return store.state.page?.selectedUIItemActiveState &&
+      store.state.page.selectedUIItemActiveState !== 'normal' &&
+      store.state.page.selectedUIItemId === this.props.uiconfig?.meta?.id
   }
 
   /**
@@ -89,21 +101,12 @@ export default class UIBase {
   }
 
   /**
-   * 获取ui元素的style集合，其中的key是style name，value是其样式字符串。
-   * 先取selector中的内容，在取自己的内容
-   *
-   * @return Record<string, string>
+   * 公共字体属性
+   * @param custom
+   * @param style
+   * @private
    */
-  public getUIStyle (uiconfig: any = undefined) {
-    if (!uiconfig) uiconfig = this.props.uiconfig
-    if (!uiconfig || !uiconfig.meta) return {}
-    // console.log('getUIStyle')
-    const selector = this.getStyle(uiconfig.meta.selector?.style ? JSON.parse(JSON.stringify(uiconfig.meta.selector?.style)) : {})
-    const style = this.getStyle(uiconfig.meta.style ? JSON.parse(JSON.stringify(uiconfig.meta.style)) : {})
-
-    // 公共字体属性
-    const custom = uiconfig.meta.selector?.custom ? ydhl.deepMerge(uiconfig.meta.selector.custom, uiconfig.meta?.custom) : uiconfig.meta?.custom
-
+  private getCustomStyle (custom: any, style: any) {
     const decoration: any = []
     if (custom?.underline) {
       decoration.push('underline')
@@ -126,11 +129,38 @@ export default class UIBase {
     if (style['text-stroke']) {
       style['-webkit-text-stroke'] = style['text-stroke']
     }
-    return ydhl.deepMerge(selector, style)
+    return style
   }
 
-  public fetchCss (cssInfo: any, _css: Object) {
-    const store = useStore()
+  /**
+   * 获取ui元素的style集合，其中的key是style name，value是其样式字符串。
+   * 先取selector中的内容，在取自己的内容
+   * @param uiconfig UIBase 如果没有传入，则用props.uiconfig或previewStyleItem
+   * @return Record<string, string>
+   */
+  public getUIStyle (uiconfig: any = undefined) {
+    const store = this.store
+    if (!uiconfig) {
+      uiconfig = this.props.uiconfig
+    }
+    const state = this.hasActiveState() ? store.state.page.previewStyleItem : null
+    if (!uiconfig?.meta && !state) return {}
+    // console.log('getUIStyle')
+    const selector = uiconfig?.meta?.selector?.style ? this.getStyle(JSON.parse(JSON.stringify(uiconfig.meta.selector?.style))) : {}
+    let style = uiconfig?.meta?.style ? this.getStyle(JSON.parse(JSON.stringify(uiconfig.meta.style))) : {}
+    let stateStyle = state?.meta?.style ? this.getStyle(JSON.parse(JSON.stringify(state.meta.style))) : {}
+
+    // 公共字体属性
+    const custom = uiconfig.meta.selector?.custom ? ydhl.deepMerge(uiconfig.meta.selector.custom, uiconfig.meta?.custom) : uiconfig.meta?.custom
+    style = this.getCustomStyle(custom, style)
+    if (state?.meta?.custom) {
+      stateStyle = this.getCustomStyle(state.meta.custom, stateStyle)
+    }
+    return ydhl.deepMerge(selector, style, stateStyle)
+  }
+
+  private fetchCss (cssInfo: any, _css: Object) {
+    const store = this.store
     if (cssInfo) {
       for (const cssKey in cssInfo) {
         if (!cssInfo[cssKey]) continue
@@ -150,44 +180,38 @@ export default class UIBase {
   /**
    * 根据uiconfig.meta.css的内容生成class，返回Record<string, string> key是css名称，value是对应ui中的样式名，如backgroudTheme: bg-primary
    *
+   * @param uiconfig UIBase 如果没有传入，则用props.uiconfig或previewStyleItem
    * @return Record<string, string>
    */
   public getUICss (uiconfig: any = undefined) {
-    if (!uiconfig) uiconfig = this.props.uiconfig
-    if (!uiconfig || !uiconfig.meta) return {}
-
+    const store = this.store
+    if (!uiconfig) {
+      uiconfig = this.props.uiconfig
+    }
     const _css: any = {}
-    this.fetchCss(uiconfig.meta?.selector?.css, _css)
-    this.fetchCss(uiconfig.meta.css, _css)
+    const state = this.hasActiveState() ? store.state.page.previewStyleItem : null
+
+    if (!uiconfig.meta && !state) return {}
+
+    this.fetchCss(uiconfig?.meta?.selector?.css, _css)
+    this.fetchCss(uiconfig?.meta?.css, _css)
+    this.fetchCss(state?.meta?.css, _css)
     return _css
   }
 
   /**
-   * 设置一个ui元素的meta指，如果是meta中的普通元素，直接传入name，value，如果meta中的符合元素，需要传入complexTypeName，比如custom，css等
-   * @param name
-   * @param value
-   * @param complexTypeName
-   * @param isMerge 默认情况下，都是进行覆盖赋值设置，对于符合元素，如果要合并新旧值，需要设置true
-   */
-  public setMeta (name, value, complexTypeName: string = '', isMerge:boolean = false) {
-    const store = useStore()
-    const props = {}
-    props[name] = value
-    store.commit('updateItemMeta', {
-      itemid: this.props.uiconfig.meta.id,
-      type: complexTypeName || null,
-      isMerge: isMerge,
-      pageId: this.props.pageid,
-      props
-    })
-  }
-
-  /**
-   * 获取指定的meta值，找不到返回undefined
+   * UI获取指定的meta值，找不到返回undefined
    * @param name
    * @param complexTypeName
    */
   public getMeta (name, complexTypeName: string = '') {
+    const store = this.store
+    if (this.hasActiveState()) {
+      const state = store.state.page.previewStyleItem
+      if (!state) return undefined
+      if (complexTypeName && !state.meta[complexTypeName]) return undefined
+      return complexTypeName ? state.meta[complexTypeName][name] : state.meta[name]
+    }
     if (!this.props.uiconfig) return undefined
     if (complexTypeName && !this.props.uiconfig.meta[complexTypeName]) return undefined
     return complexTypeName ? this.props.uiconfig.meta[complexTypeName][name] : this.props.uiconfig.meta[name]
@@ -201,7 +225,7 @@ export default class UIBase {
     const props = this.props
     // const context = this.context
     const { t } = useI18n()
-    const store = useStore()
+    const store = this.store
     const isContainer = computed(() => props.uiconfig.meta.isContainer)
     const selectedUIItemId = computed(() => store.state.page.selectedUIItemId)
     const highlightUIItemIds = computed(() => store.state.page.highlightUIItemIds)

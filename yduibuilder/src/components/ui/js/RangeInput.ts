@@ -1,11 +1,8 @@
 
 import UIBase from '@/components/ui/js/UIBase'
 export default class RangeInput extends UIBase {
-  public getUICss (uiconfig: any = undefined) {
-    const css = super.getUICss(uiconfig)
-    if (!uiconfig) uiconfig = this.props.uiconfig
+  private getMyCss (uiconfig, css) {
     const range: any = []
-    range.push('form-control-range')
     if (uiconfig.meta?.css?.formSizing && uiconfig.meta?.css?.formSizing !== 'normal') {
       range.push('form-control-range-' + uiconfig.meta.css.formSizing)
     }
@@ -13,15 +10,27 @@ export default class RangeInput extends UIBase {
     if (uiconfig.meta?.css?.foregroundTheme && uiconfig.meta?.css?.foregroundTheme !== 'default' && !color) {
       range.push('range-' + uiconfig.meta.css.foregroundTheme)
     }
-    css.range = range.join(' ')
+    if (range.length) css.my = range.join(' ')
     return css
   }
 
-  public getUIStyle (uiconfig: any = undefined) {
-    const style = super.getUIStyle(uiconfig)
+  // 重载
+  public getUICss (uiconfig: any = undefined) {
+    let css = super.getUICss(uiconfig)
+    const store = this.store
+    if (!uiconfig) {
+      uiconfig = this.props.uiconfig
+    }
+    const previewItem = this.hasActiveState() ? store.state.page.previewStyleItem : null
+    css.range = 'form-control-range'
+    css = this.getMyCss(uiconfig, css)
+    if (previewItem) {
+      css = this.getMyCss(previewItem, css)
+    }
+    return css
+  }
 
-    if (!uiconfig) uiconfig = this.props.uiconfig
-
+  private getMyStyle (uiconfig, style) {
     const background:any = []
     const backgroundSize:any = ['50%', '100%']
     const color = uiconfig.meta?.style?.color
@@ -37,6 +46,22 @@ export default class RangeInput extends UIBase {
     backgroundSize[0] = defaultValue === 0 ? '0%' : ((defaultValue - minValue) / (maxValue - minValue) * 100) + '%'
     style['background-size'] = backgroundSize.join(' ')
     // console.log(style)
+    return style
+  }
+
+  // 重载
+  public getUIStyle (uiconfig: any = undefined) {
+    let style = super.getUIStyle(uiconfig)
+    const store = this.store
+
+    if (!uiconfig) {
+      uiconfig = this.props.uiconfig
+    }
+    style = this.getMyStyle(uiconfig, style)
+    const previewItem = this.hasActiveState() ? store.state.page.previewStyleItem : null
+    if (previewItem) {
+      style = this.getMyStyle(previewItem, style)
+    }
     return style
   }
 

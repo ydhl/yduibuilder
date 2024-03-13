@@ -5,6 +5,7 @@
 
 <script lang="ts">
 import Image from '@/components/ui/js/Image'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Image',
@@ -17,7 +18,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const image = new Image(props, context)
+    const image = new Image(props, context, useStore())
     return {
       ...image.setup()
     }

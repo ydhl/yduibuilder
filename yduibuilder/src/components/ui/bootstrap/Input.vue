@@ -19,6 +19,7 @@
 import Input from '@/components/ui/js/Input'
 import { computed } from 'vue'
 import IconWrapper from '@/components/ui/bootstrap/IconWrapper.vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Input',
@@ -32,7 +33,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const input = new Input(props, context)
+    const input = new Input(props, context, useStore())
     const bodyCss = computed(() => {
       const arr: any = ['form-control d-flex justify-content-between align-items-center bg-transparent']
       if (props.uiconfig.meta?.custom?.borderless) {

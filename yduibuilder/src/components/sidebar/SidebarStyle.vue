@@ -223,11 +223,11 @@ export default {
       })
     }
     const previewStyle = computed(() => {
-      const uibase = new UIBase(props, context)
+      const uibase = new UIBase(props, context, store)
       return uibase.getUIStyle(info.previewStyleItem.value)
     })
     const previewClass = computed(() => {
-      const uibase = new UIBase(props, context)
+      const uibase = new UIBase(props, context, store)
       return Object.values(uibase.getUICss(info.previewStyleItem.value))
     })
 

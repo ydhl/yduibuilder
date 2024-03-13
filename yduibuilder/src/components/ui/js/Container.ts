@@ -1,11 +1,10 @@
 import UIBase from '@/components/ui/js/UIBase'
 import { computed, toRaw } from 'vue'
-import { useStore } from 'vuex'
 
 export default class Container extends UIBase {
   setup () {
     const superSetup = super.setup()
-    const store = useStore()
+    const store = this.store
     /**
      * 是否是Row 容器:PC 端上层容器是container或则移动端的最上层的container都是row
      */

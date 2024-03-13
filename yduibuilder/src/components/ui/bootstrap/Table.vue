@@ -42,8 +42,8 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const table = new Table(props, context)
     const store = useStore()
+    const table = new Table(props, context, store)
     const { t } = useI18n()
     const tableSetup = table.setup()
     const header = computed(() => {

@@ -29,6 +29,7 @@
 import UIBase from '@/components/ui/UIBase.vue'
 import Card from '../js/Card'
 import { computed, ref } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Card',
@@ -42,7 +43,8 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const card = new Card(props, context)
+    const store = useStore()
+    const card = new Card(props, context, store)
     const setup = card.setup()
     const mainItems = ref<Array<any>>([])
     const otherMainItems = ref<Array<any>>([])

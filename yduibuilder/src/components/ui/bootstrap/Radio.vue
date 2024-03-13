@@ -19,6 +19,7 @@
 <script lang="ts">
 import Radio from '@/components/ui/js/Radio'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Radio',
@@ -31,7 +32,8 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const radio = new Radio(props, context)
+    const store = useStore()
+    const radio = new Radio(props, context, store)
 
     const bodyCss = computed(() => {
       const arr: any = []

@@ -14,6 +14,7 @@ import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import RichText from '@/components/ui/js/RichText'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import { onBeforeUnmount, computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_RichText',
@@ -27,7 +28,8 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const richText = new RichText(props, context)
+    const store = useStore()
+    const richText = new RichText(props, context, store)
     const setup = richText.setup()
 
     const { beforeUnmount } = setup

@@ -1,11 +1,10 @@
 
 import { computed } from 'vue'
-import { useStore } from 'vuex'
 import UIBase from '@/components/ui/js/UIBase'
 
 export default class Nav extends UIBase {
   setup () {
-    const store = useStore()
+    const store = this.store
     const setup = super.setup()
     const props = this.props
 

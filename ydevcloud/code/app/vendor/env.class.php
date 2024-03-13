@@ -113,6 +113,14 @@ class Env {
                     '4.6.0'=>['require'=>['jquery@3.5.1']]
                 ]
             ],
+            'weui'=>[
+                'name'=>__('WEUI(微信官方UI库)'),
+                'desc'=>'',
+                'type'=>'ui',
+                'version'=>[
+                    '2.5.1'=>['require'=>['zepto@1.2.0']]
+                ]
+            ],
             'zepto'=>[
                 'name'=>'zepto',
                 'type'=>'lib',
@@ -169,6 +177,16 @@ class Env {
                 'version'=>[ '5.0'=>[
                     'require'=>['petitevue@0.4.0','axios@1.1.2','layui@2.9.6','ydecloud@0.0.1'] // 用petitevue做逻辑，这里固定了就不能改动，因为编译器按照这个思路去编译代码
                 ] ]
+            ],
+            'wxmp' => [
+                'name'=>__('微信小程序'),
+                'desc'=>'',
+                'rewrite'=>true,
+                'type'=>'framework',
+                'ui'=>['weui'],
+                'codeType'=>['wxml'=>'xml','wxss'=>'css','json'=>'json','js'=>'javascript'],
+                'language'=>['javascript'],
+                'version'=>[ '2.x'=>[] ]
             ]
         ];
     }
@@ -183,7 +201,13 @@ class Env {
                 'name'=>__('Web Application'),
                 'endKind'=>['mobile','pc'],
                 'framework'=>['html']
-            ]
+            ],
+            // wxmp， android， ios前端环境本身也是框架
+            'wxmp' => [
+                'name'=>__('WeiXin Mini Program'),
+                'endKind'=>['mobile'],
+                'framework'=>['wxmp'],
+            ],
         ];
     }
 

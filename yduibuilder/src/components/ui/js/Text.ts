@@ -5,11 +5,6 @@ import UIBase from '@/components/ui/js/UIBase'
 declare const ports: any
 
 export default class Text extends UIBase {
-  public getUIStyle (uiconfig: any = undefined) {
-    const style = super.getUIStyle(uiconfig)
-    return style
-  }
-
   setup () {
     const props = this.props
     const setup = super.setup()

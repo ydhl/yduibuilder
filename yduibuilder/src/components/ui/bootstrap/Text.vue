@@ -54,6 +54,7 @@
 <script lang="ts">
 import Text from '@/components/ui/js/Text'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Text',
@@ -66,7 +67,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const text = new Text(props, context)
+    const text = new Text(props, context, useStore())
     const setup = text.setup()
     const myCss = computed(() => {
       const arr: any = Object.values(text.getUICss())

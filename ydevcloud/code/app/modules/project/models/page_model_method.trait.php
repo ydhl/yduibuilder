@@ -220,14 +220,14 @@ trait Page_Model_Method{
         }
         if (strtolower($target) == "vue"){
             $module = $this->get_module();
-            $moduleName = $module->folder ?: $module->name;
+            $moduleName = $module->folder ?: 'module'.$module->id;
             $folder = 'views/'.$moduleName;
             $pageName = $this->file ?: ($this->get_export_file_name($target).".vue");
             return $folder . '/' . $pageName;
         }
         if (strtolower($target) == "wxmp"){
             $module = $this->get_module();
-            $moduleName = $module->folder ?: $module->name;
+            $moduleName = $module->folder ?: 'module'.$module->id;
             $folder = 'pages/'.$moduleName;
             $pageName = ($this->file ?: $this->get_export_file_name($target));
             return  $folder . '/' . $pageName;

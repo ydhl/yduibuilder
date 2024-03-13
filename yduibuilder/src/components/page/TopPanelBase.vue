@@ -17,7 +17,7 @@
             <li class="nav-item">
               <a class="nav-link" href="#" >
                 <div class='rounded-circle'
-                     :style="`width: 28px;height: 28px; background-size:cover; background-position:center;background-image: url(${userAvatar||'/programer.jpg'})`" ></div>
+                     :style="`width: 28px;height: 28px; background-size:cover; background-position:center;background-image: url(${userAvatar||'/favicon.png'})`" ></div>
               </a>
             </li>
           </ul>

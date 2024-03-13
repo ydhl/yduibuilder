@@ -14,6 +14,7 @@
 <script lang="ts">
 import Breadcrumb from '../js/Breadcrumb'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Breadcrumb',
@@ -26,7 +27,8 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const breadcrumb = new Breadcrumb(props, context)
+    const store = useStore()
+    const breadcrumb = new Breadcrumb(props, context, store)
     const foregroundCss = computed(() => {
       const css: any = []
       const cssMap = breadcrumb.getUICss()

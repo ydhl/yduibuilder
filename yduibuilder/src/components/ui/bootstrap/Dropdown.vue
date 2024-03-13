@@ -37,10 +37,10 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const dropdown = new Dropdown(props, context)
+    const store = useStore()
+    const dropdown = new Dropdown(props, context, store)
     const setup = dropdown.setup()
     const { parentUi, parentIsNavbar, parentIsButtonGroup } = setup
-    const store = useStore()
 
     // 如果上层是按钮，那么继承他的outline，size属性
     const dropdownMeta = computed(() => parentIsButtonGroup.value || parentIsNavbar.value ? parentUi.value.meta : props.uiconfig.meta)

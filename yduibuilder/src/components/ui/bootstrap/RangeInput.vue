@@ -15,6 +15,7 @@
 
 <script lang="ts">
 import RangeInput from '@/components/ui/js/RangeInput'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_RangeInput',
@@ -27,7 +28,8 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const rangeinput = new RangeInput(props, context)
+    const store = useStore()
+    const rangeinput = new RangeInput(props, context, store)
 
     return {
       ...rangeinput.setup()

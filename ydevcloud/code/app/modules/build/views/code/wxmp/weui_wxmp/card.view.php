@@ -1,0 +1,66 @@
+<?php
+namespace app\modules\build\views\code\wxmp\weui_wxmp;
+use app\modules\build\views\code\wxmp\Wxmp;
+use app\modules\build\views\preview\weui\Card_View as Preview_Card_View;
+
+class Card_View extends Preview_Card_View {
+    use Wxmp;
+    public function build_ui()
+    {
+        $myItems = ['head'=>[], 'inBody'=>[], 'outBody'=>[], 'foot'=>[]];
+        foreach ((array)@$this->childViews as $view){
+            if (@$view->data['placeInParent'] == 'head'){
+                $myItems['head'][] = $view;
+            }else if (@$view->data['placeInParent'] == 'foot') {
+                $myItems['foot'][] = $view;
+            }else{
+                if (strtolower($view->data['type']) == 'list' || strtolower($view->data['type']) == 'table'){
+                    $myItems['outBody'][] = $view;
+                }else{
+                    $myItems['inBody'][] = $view;
+                }
+            }
+        }
+
+        $space =  $this->indent();
+        echo "{$space}<view";
+        echo $this->build_main_attrs();
+        echo ">\r\n";
+
+        if (!@$this->data['meta']['custom']['headless']){
+            echo $this->indent(1) . "<view class='weui-panel__hd'>\r\n";
+            foreach ($myItems['head'] as $view){
+                $view->increase_indent(2);
+                $view->output();
+            }
+            echo $this->indent(1) . "</view>\r\n";
+        }
+
+        if ($myItems['inBody']){
+            echo $this->indent(1) . "<view class='weui-panel__bd'>\r\n";
+
+            foreach ($myItems['inBody'] as $view){
+                $view->increase_indent(2);
+                $view->output();
+            }
+            echo $this->indent(1) . "</view>\r\n";
+        }
+        if ($myItems['outBody']){
+            foreach ($myItems['outBody'] as $view){
+                $view->increase_indent(1);
+                $view->output();
+            }
+        }
+
+        if (!@$this->data['meta']['custom']['footless']){
+            echo $this->indent(1) . "<view class='weui-panel__ft'>\r\n";
+            foreach ($myItems['foot'] as $view){
+                $view->increase_indent(2);
+                $view->output();
+            }
+            echo $this->indent(1) . "</view>\r\n";
+        }
+
+        echo "{$space}</view>\r\n";
+    }
+}

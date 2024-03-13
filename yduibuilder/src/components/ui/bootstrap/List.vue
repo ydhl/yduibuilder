@@ -24,8 +24,8 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const list = new List(props, context)
     const store = useStore()
+    const list = new List(props, context, store)
     const uiCss = computed(() => {
       const css = list.getUICss()
       delete css.backgroundTheme

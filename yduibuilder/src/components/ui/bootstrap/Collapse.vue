@@ -48,6 +48,7 @@
 import Collapse from '@/components/ui/js/Collapse'
 import { computed } from 'vue'
 import UIBase from '@/components/ui/UIBase.vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Collapse',
@@ -61,7 +62,8 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const collapse = new Collapse(props, context)
+    const store = useStore()
+    const collapse = new Collapse(props, context, store)
     const setup = collapse.setup()
     const myCss = computed(() => {
       const uicss = collapse.getUICss()

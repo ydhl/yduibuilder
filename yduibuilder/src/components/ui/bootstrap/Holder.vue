@@ -6,6 +6,7 @@
 
 <script lang="ts">
 import Holder from '@/components/ui/js/Holder'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Holder',
@@ -18,7 +19,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const container = new Holder(props, context)
+    const container = new Holder(props, context, useStore())
     return {
       ...container.setup()
     }

@@ -10,6 +10,7 @@
 import Page from '@/components/ui/js/Page'
 import UIBase from '@/components/ui/UIBase.vue'
 import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_Page',
@@ -23,7 +24,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const page = new Page(props, context)
+    const page = new Page(props, context, useStore())
     const uiStyle = computed(() => {
       const style = page.getUIStyle()
       if (props.uiconfig.pageType === 'popup') {

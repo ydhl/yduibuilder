@@ -12,6 +12,7 @@
 <script lang="ts">
 import UIBase from '@/components/ui/UIBase.vue'
 import UIComponent from '@/components/ui/js/UIComponent'
+import { useStore } from 'vuex'
 
 export default {
   name: 'Bootstrap_UIComponent',
@@ -25,7 +26,7 @@ export default {
     dragableCss: Object
   },
   setup (props: any, context: any) {
-    const component = new UIComponent(props, context)
+    const component = new UIComponent(props, context, useStore())
     return {
       ...component.setup()
     }
