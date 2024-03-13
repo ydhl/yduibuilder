@@ -46,46 +46,46 @@ function find_by_uuids($class, array $uuid=null, $fetch_all=false){
  * @throws Exception
  */
 function post_snapshot_message($isFullPage, $pageid, $preview_url, $file_path,  $width, $height) {
-    try{
-        $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_USER, RABBITMQ_PWD);
-        $channel = $connection->channel();
-        $channel->queue_declare('ydevcloud_snapshot', false, true, false, false);
-    }catch (Exception $exception){
-//        throw new \yangzie\YZE_FatalException($exception->getMessage());
-        return;
-    }
-    //生成jwt_token
-    $loginUser = \yangzie\YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
-    $payload=array(
-        'iss'=>'ydevcloud',
-        'iat'=>time(),
-        'nbf'=>time(),
-        'sub'=>$loginUser->uuid,
-        'jti'=>md5(uniqid('JWT').time()));
-    $token = \app\vendor\Jwt::getToken($payload);
-    $data = [
-        "mysql_user"=> YZE_DB_USER,
-        "mysql_host"=> YZE_DB_HOST_M,
-        "mysql_db"  => YZE_DB_DATABASE,
-        "mysql_port"=> YZE_DB_PORT,
-        "mysql_pass"=> YZE_DB_PASS,
-        "save_path" => $file_path,
-        "preview_url" => $preview_url,
-        "pageid"    => $pageid,
-        "isFullPage" => $isFullPage ? 1 : 0,
-        "width"     => floatval($width),
-        "height"    => floatval($height),
-        "token"     => $token
-    ];
-    try {
-        $msg = new \PhpAmqpLib\Message\AMQPMessage(json_encode($data));
-        $channel->basic_publish($msg, '', 'ydevcloud_snapshot');
-        $channel->close();
-        $connection->close();
-    } catch (Exception $exception) {
-//        throw new \yangzie\YZE_FatalException($exception->getMessage());
-        return;
-    }
+//     try{
+//         $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_USER, RABBITMQ_PWD);
+//         $channel = $connection->channel();
+//         $channel->queue_declare('ydevcloud_snapshot', false, true, false, false);
+//     }catch (Exception $exception){
+// //        throw new \yangzie\YZE_FatalException($exception->getMessage());
+//         return;
+//     }
+//     //生成jwt_token
+//     $loginUser = \yangzie\YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
+//     $payload=array(
+//         'iss'=>'ydevcloud',
+//         'iat'=>time(),
+//         'nbf'=>time(),
+//         'sub'=>$loginUser->uuid,
+//         'jti'=>md5(uniqid('JWT').time()));
+//     $token = \app\vendor\Jwt::getToken($payload);
+//     $data = [
+//         "mysql_user"=> YZE_DB_USER,
+//         "mysql_host"=> YZE_DB_HOST_M,
+//         "mysql_db"  => YZE_DB_DATABASE,
+//         "mysql_port"=> YZE_DB_PORT,
+//         "mysql_pass"=> YZE_DB_PASS,
+//         "save_path" => $file_path,
+//         "preview_url" => $preview_url,
+//         "pageid"    => $pageid,
+//         "isFullPage" => $isFullPage ? 1 : 0,
+//         "width"     => floatval($width),
+//         "height"    => floatval($height),
+//         "token"     => $token
+//     ];
+//     try {
+//         $msg = new \PhpAmqpLib\Message\AMQPMessage(json_encode($data));
+//         $channel->basic_publish($msg, '', 'ydevcloud_snapshot');
+//         $channel->close();
+//         $connection->close();
+//     } catch (Exception $exception) {
+// //        throw new \yangzie\YZE_FatalException($exception->getMessage());
+//         return;
+//     }
 }
 
 /**
