@@ -61,7 +61,7 @@ export default {
       }
     }
 
-    const matches: any = str.match(/(?<r>[\d]+)\s*,\s*(?<g>[\d]+)\s*,\s*(?<b>[\d]+)\s*(,\s*(?<a>.+))?\)/)
+    const matches: any = str.match(/(?<r>[\d]+)\s*,\s*(?<g>[\d]+)\s*,\s*(?<b>[\d]+)\s*(,\s*(?<a>.*))?\)/)
 
     return {
       r: matches?.groups?.r,
