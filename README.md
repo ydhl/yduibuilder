@@ -4,6 +4,9 @@
 目前能基于bootstrap生成web界面，并能编译生成最终前端代码。
 ![](doc/uibuilder.png)![](doc/code.png)
 
+## 更新日志
+1. 20240314 增加微信小程序的支持
+
 ## 项目组成
 
 1. 下载的代码包含三个项目目录：ydevcloud，yduibuilder，snapshot
@@ -32,6 +35,7 @@
 3. 进入到yduibuilder/yduibuilder目录后：`npm i`
 4. 进入到yduibuilder/yduibuilder目录后：`npm run serve`
 5. 默认情况 yduibuilder运行在9999端口上，如果有冲突，就修改package.json文件中scripts的对应设置，并修改《安装ydecloud 管理后端》中的UI_BUILDER_URI
+6. yduibuilder不要直接访问，他是通过后端ydecloud进入
 
 ### 安装ydecloud 管理后端
 1. 初始化数据库: 导入`db_init.sql`创建数据库
@@ -55,7 +59,7 @@
 ### 安装socket服务
 
 socket服务是用swoole写的，请先确保安装了对应的swoole扩展；进入到ydevcloud/code/cli中
-运行 php build.php即可
+运行 php build.php即可；如没有安装则不能打包下载项目代码
 
 ### 安装截图服务（可选）
 
@@ -70,3 +74,7 @@ socket服务是用swoole写的，请先确保安装了对应的swoole扩展；�
 ![移动端](doc/uibuilder-mobile.gif)
 ![PC端](doc/uibuilder-pc.gif)
 ![构建代码](doc/build.gif)
+
+## 问题汇总
+1. 目前暂不支持php8，如果要使用php8，可根据提示修改相关保存代码
+2. 需要修改mysql的sql_mode，把only_full_group_by去掉，修改方法请自行咨询AI
