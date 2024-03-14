@@ -58,7 +58,6 @@ export default {
     })
     const hasLayout = computed(() => {
       if (info.selectedUIItem?.value?.type === 'Hr') return false
-      if (info.selectedUIItem?.value?.type === 'Page') return false
       if (info.selectedUIItem?.value?.type === 'Modal') return false
       return true
     })

@@ -13,7 +13,6 @@ class Textarea_View extends Preview_Textarea_View {
     }
     public function build_code():Base_Code_Fragment
     {
-        parent::build_code();
         ob_start();
 ?>
 this.setData({

@@ -2,7 +2,7 @@
 namespace yangzie;
 define("YZE_SCRIPT_LOGO", "
 ================================================================
-		YANGZIE(V3.0.0) Generate Script
+		YANGZIE(V2.0.0) Generate Script
 		易点互联®
 ================================================================");
 
