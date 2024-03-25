@@ -166,6 +166,17 @@ class Env {
                 'type'=>'lib',
                 'version'=>['0.4.0'=>[] ]
             ],
+            'vue' => [
+                'name'=>__('VUE'),
+                'desc'=>'',
+                'type'=>'framework',
+                'rewrite'=>true,
+                'ui'=>['bootstrap'],
+                'language'=>['typescript'],
+                'version'=>['3.x'=>[
+                    'require'=>['axios@1.1.2', 'ydecloud@0.0.1']
+                ] ]
+            ],
             'html' => [
                 'name'=>__('HTML'),
                 'desc'=>'',
@@ -200,7 +211,7 @@ class Env {
             'web' => [
                 'name'=>__('Web Application'),
                 'endKind'=>['mobile','pc'],
-                'framework'=>['html']
+                'framework'=>['html', 'vue']
             ],
             // wxmp， android， ios前端环境本身也是框架
             'wxmp' => [

@@ -111,9 +111,8 @@ class web_vue3 extends Base_Factory{
                 }
             }
         }
-        $path = dirname(__FILE__).'/scaffold/vue3/public/index.html';
         $indexHtml = preg_replace("/{{globalFiles}}/", "    ".join("\r\n    ", $globalFiles), $this->index);
-        $this->zip->addFromString('public/index.html', $indexHtml, ZipArchive::OVERWRITE);
+        $this->zip->addFromString('public/index.html', $indexHtml);
 
     }
     private function exportIcon(){
@@ -232,7 +231,7 @@ export default router
         $package['description'] = $this->project->name." ".$this->project->desc;
         if ($this->packageJson['dependencies']) $package['dependencies'] += $this->packageJson['dependencies'];
         if ($this->packageJson['devDependencies']) $package['devDependencies'] += $this->packageJson['devDependencies'];
-        $this->zip->addFromString('package.json', json_encode($package, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES), ZipArchive::OVERWRITE);
+        $this->zip->addFromString('package.json', json_encode($package, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         $this->exportIcon();
         $this->_create_views();
     }
