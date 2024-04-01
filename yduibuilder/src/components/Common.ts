@@ -48,7 +48,7 @@ export default function (uiconfig: any = null) {
    * @param isMerge 默认情况下，都是进行覆盖赋值设置，对于复合元素，如果要合并新旧值，需要设置true
    * @param previewMode true为预览模式，这是设置对是store中对previewStyleItem；false为设置选择对ui item
    */
-  const setMeta = (name, value, complexTypeName: string = '', isMerge:boolean = false, previewMode = false) => {
+  const setMeta = (name, value, complexTypeName: string = '', isMerge:boolean = false, previewMode: any = undefined) => {
     const props = {}
     props[name] = value
     if (previewMode) {
@@ -74,7 +74,7 @@ export default function (uiconfig: any = null) {
    * @param complexTypeName
    * @param previewMode true为预览模式，这是设置对是store中对previewStyleItem；false为设置选择对ui item
    */
-  const getMeta = (name, complexTypeName: string = '', previewMode = false) => {
+  const getMeta = (name, complexTypeName: string = '', previewMode: any = undefined) => {
     if (previewMode) {
       if (!previewStyleItem.value.meta) return undefined
       if (complexTypeName && !previewStyleItem.value.meta[complexTypeName]) return undefined
@@ -106,7 +106,7 @@ export default function (uiconfig: any = null) {
    * @param isMerge set时是否merge
    * @param previewMode true为预览模式，这是设置对是store中对previewStyleItem；false为设置选择对ui item
    */
-  const computedWrap = (name, complexTypeName = '', defalutValue: any = undefined, isMerge = false, previewMode = false) => {
+  const computedWrap = (name, complexTypeName = '', defalutValue: any = undefined, isMerge = false, previewMode: any = undefined) => {
     return computed({
       get: () => {
         return getMeta(name, complexTypeName, previewMode) || defalutValue
