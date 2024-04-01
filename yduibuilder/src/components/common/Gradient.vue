@@ -355,17 +355,15 @@ export default {
     }
     const drag = (ev) => {
       if (ev.screenX === 0 && ev.screenY === 0) return false // 拖放结束时，X Y会被设置0，这里排除掉
-      getDragPointXY(ev.screenX, ev.screenY, 10)
+      getDragPointXY(ev.clientX, ev.clientY, 10)
       getDragDeg()
       return false
     }
     const dragStart = (ev) => {
-      const img = new Image()
-      img.style.display = 'none'
-      img.src = require('@/assets/image/transparent.png') // 透明图片
-      ev.dataTransfer.setDragImage(img, 0, 0)
+      ev.target.style.opacity = 0
     }
     const dragEnd = (ev) => {
+      ev.target.style.opacity = 1
     }
     const removeColor = (index: number) => {
       let _ = colors.value
