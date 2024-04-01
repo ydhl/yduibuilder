@@ -8,48 +8,64 @@
     <div class="row">
       <label class="col-sm-3 col-form-label text-end">{{ t('style.layout.display') }}</label>
       <div class="col-sm-9">
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group-sm flex-nowrap">
           <select class="form-select form-select-sm" v-model="currDisplay">
             <option :value="display" v-for="display in displays" :key="display" :selected="display===currDisplay">{{display}}</option>
           </select>
-          <span class="input-group-text">{{ t('style.layout.xOverflow') }}</span>
+          <span class="input-group-text text-truncate">{{ t('style.layout.visibility') }}</span>
+          <select class="form-select form-select-sm" v-model="currVisibility">
+            <option value="inherit" :selected="'inherit'===currVisibility">inherit</option>
+            <option value="visible" :selected="'visible'===currVisibility">visible</option>
+            <option value="hidden" :selected="'display'===currVisibility">hidden</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <label class="col-sm-3 col-form-label text-end">{{ t('style.layout.overflow') }}</label>
+      <div class="col-sm-9">
+        <div class="input-group input-group-sm flex-nowrap">
+          <span class="input-group-text text-truncate">{{ t('style.layout.xOverflow') }}</span>
           <select class="form-select form-select-sm" v-model="xOverflow">
             <option :value="name" v-for="(name) in overflows" :key="name">{{name}}</option>
           </select>
-          <span class="input-group-text">{{ t('style.layout.yOverflow') }}</span>
+          <span class="input-group-text text-truncate">{{ t('style.layout.yOverflow') }}</span>
           <select class="form-select form-select-sm" v-model="yOverflow">
             <option :value="name" v-for="(name) in overflows" :key="name">{{name}}</option>
           </select>
         </div>
       </div>
     </div>
-    <div class="row" v-if="!isParentFlex">
-      <label class="col-sm-3 col-form-label text-end">{{ t('style.layout.float') }}</label>
-      <div class="col-sm-9 d-flex flex-row align-items-center">
-        <div class="input-group input-group-sm">
-          <select class="form-select form-select-sm" v-model="currFloat">
-            <option :value="float" v-for="float in floats" :key="float" :selected="float===currFloat">{{float}}</option>
-          </select>
-          <span class="input-group-text">{{ t('style.layout.clearFloat') }}</span>
-          <select class="form-select form-select-sm" v-model="currClear">
-            <option :value="clear" v-for="clear in clears" :key="clear" :selected="clear===currClear">{{clear}}</option>
-          </select>
+    <template v-if="isNotTop">
+      <div class="row" v-if="!isParentFlex">
+        <label class="col-sm-3 col-form-label text-end">{{ t('style.layout.float') }}</label>
+        <div class="col-sm-9 d-flex flex-row align-items-center">
+          <div class="input-group input-group-sm">
+            <select class="form-select form-select-sm" v-model="currFloat">
+              <option :value="float" v-for="float in floats" :key="float" :selected="float===currFloat">{{float}}</option>
+            </select>
+            <span class="input-group-text">{{ t('style.layout.clearFloat') }}</span>
+            <select class="form-select form-select-sm" v-model="currClear">
+              <option :value="clear" v-for="clear in clears" :key="clear" :selected="clear===currClear">{{clear}}</option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row">
-      <label class="col-sm-3 col-form-label text-end">{{ t('style.layout.position') }}</label>
-      <div class="col-sm-9">
-        <div class="input-group input-group-sm">
-          <select class="form-select form-select-sm" v-model="currPosition">
-            <option :value="position" v-for="position in positions" :key="position" :selected="position===currPosition">{{position}}</option>
-          </select>
-          <span class="input-group-text">{{ t('style.layout.zIndex') }}</span>
-          <input class="form-control form-control-sm" type="text" v-model="zindex">
+      <div class="row">
+        <label class="col-sm-3 col-form-label text-end">{{ t('style.layout.position') }}</label>
+        <div class="col-sm-9">
+          <div class="input-group input-group-sm">
+            <select class="form-select form-select-sm" v-model="currPosition">
+              <option :value="position" v-for="position in positions" :key="position" :selected="position===currPosition">{{position}}</option>
+            </select>
+            <template v-if="hasPosition">
+              <span class="input-group-text">{{ t('style.layout.zIndex') }}</span>
+              <input class="form-control form-control-sm" type="text" v-model="zindex">
+            </template>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row">
+      <div class="row mb-1" v-if="hasPosition">
       <div class="col-sm-9 offset-sm-3">
         <div class="input-group input-group-sm">
           <span class="input-group-text">{{ t('style.layout.top') }}</span>
@@ -63,9 +79,10 @@
         </div>
       </div>
     </div>
+    </template>
 
     <template v-if="isParentFlex">
-      <div class="row mb-1">
+      <div class="row mt-1">
         <div class="col-sm-9 offset-sm-3">
           <div class="input-group input-group-sm">
             <span class="input-group-text">{{ t('style.layout.shrink') }}</span>
@@ -79,6 +96,17 @@
       </div>
     </template>
     <template v-if="isFlex">
+      <div class="row">
+        <label class="col-sm-3 col-form-label text-end">{{ t('style.layout.gap') }}</label>
+        <div class="col-sm-9">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">{{ t('style.layout.gapRow') }}</span>
+            <input class="form-control form-control-sm" v-model="rowGap" type="text">
+            <span class="input-group-text">{{ t('style.layout.gapColumn') }}</span>
+            <input class="form-control form-control-sm" v-model="columnGap" type="text">
+          </div>
+        </div>
+      </div>
       <div class="row">
         <label class="col-sm-3 col-form-label text-end">{{ t('style.layout.direction') }}</label>
         <div class="col-sm-9">
@@ -129,7 +157,7 @@
 
 <script lang="ts">
 import initUI from '@/components/Common'
-import { computed, ref } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
 
@@ -143,8 +171,9 @@ export default {
     const selectedUIItem = info.selectedUIItem
     const { t } = useI18n()
     const store = useStore()
+    const previewMode = toRef(props, 'previewMode')
 
-    const displays = ref(['inherit', 'block', 'inline-block', 'flex', 'inline-flex'])
+    const displays = ref(['inherit', 'block', 'inline-block', 'flex', 'inline-flex', 'none'])
     const positions = ref(['static', 'absolute', 'relative', 'inherit', 'fixed'])
     const directions = ref(['row', 'row-reverse', 'column', 'column-reverse'])
     const floats = ref(['left', 'right', 'none'])
@@ -163,25 +192,28 @@ export default {
       const { parentConfig } = store.getters.getUIItemInPage(info.selectedUIItemId.value, info.selectedPageId.value)
       return parentConfig
     })
-    const currDisplay = info.computedWrap('display', 'style', 'inherit', false, props.previewMode)
-    const currPosition = info.computedWrap('position', 'style', 'static', false, props.previewMode)
-    const positionTop = info.computedWrap('top', 'style', '', false, props.previewMode)
-    const positionRight = info.computedWrap('right', 'style', '', false, props.previewMode)
-    const positionBottom = info.computedWrap('bottom', 'style', '', false, props.previewMode)
-    const positionLeft = info.computedWrap('left', 'style', '', false, props.previewMode)
-    const zindex = info.computedWrap('z-index', 'style', '', false, props.previewMode)
-    const currDirection = info.computedWrap('flex-direction', 'style', '', false, props.previewMode)
-    const currFloat = info.computedWrap('float', 'style', 'none', false, props.previewMode)
-    const currClear = info.computedWrap('clear', 'style', 'none', false, props.previewMode)
-    const currJustify = info.computedWrap('justify-content', 'style', 'flex-start', false, props.previewMode)
-    const currShrink = info.computedWrap('flex-shrink', 'style', '', false, props.previewMode)
-    const currGrow = info.computedWrap('flex-grow', 'style', '0', false, props.previewMode)
-    const currBasis = info.computedWrap('flex-basis', 'style', '', false, props.previewMode)
-    const currAlignItem = info.computedWrap('align-items', 'style', 'stretch', false, props.previewMode)
-    const currAlignContent = info.computedWrap('align-content', 'style', 'stretch', false, props.previewMode)
-    const currWrap = info.computedWrap('flex-wrap', 'style', 'nowrap', false, props.previewMode)
-    const xOverflow = info.computedWrap('overflow-x', 'style', 'visible', false, props.previewMode)
-    const yOverflow = info.computedWrap('overflow-y', 'style', 'visible', false, props.previewMode)
+    const currDisplay = info.computedWrap('display', 'style', 'inherit', false, previewMode)
+    const currVisibility = info.computedWrap('visibility', 'style', 'inherit', false, previewMode)
+    const currPosition = info.computedWrap('position', 'style', 'static', false, previewMode)
+    const positionTop = info.computedWrap('top', 'style', '', false, previewMode)
+    const positionRight = info.computedWrap('right', 'style', '', false, previewMode)
+    const positionBottom = info.computedWrap('bottom', 'style', '', false, previewMode)
+    const positionLeft = info.computedWrap('left', 'style', '', false, previewMode)
+    const zindex = info.computedWrap('z-index', 'style', '', false, previewMode)
+    const currDirection = info.computedWrap('flex-direction', 'style', '', false, previewMode)
+    const currFloat = info.computedWrap('float', 'style', 'none', false, previewMode)
+    const currClear = info.computedWrap('clear', 'style', 'none', false, previewMode)
+    const currJustify = info.computedWrap('justify-content', 'style', 'flex-start', false, previewMode)
+    const currShrink = info.computedWrap('flex-shrink', 'style', '', false, previewMode)
+    const currGrow = info.computedWrap('flex-grow', 'style', '0', false, previewMode)
+    const currBasis = info.computedWrap('flex-basis', 'style', '', false, previewMode)
+    const currAlignItem = info.computedWrap('align-items', 'style', 'stretch', false, previewMode)
+    const currAlignContent = info.computedWrap('align-content', 'style', 'stretch', false, previewMode)
+    const currWrap = info.computedWrap('flex-wrap', 'style', 'nowrap', false, previewMode)
+    const xOverflow = info.computedWrap('overflow-x', 'style', 'visible', false, previewMode)
+    const yOverflow = info.computedWrap('overflow-y', 'style', 'visible', false, previewMode)
+    const rowGap = info.computedWrap('row-gap', 'style', '', false, previewMode)
+    const columnGap = info.computedWrap('column-gap', 'style', '', false, previewMode)
     const isFlex = computed(() => {
       return currDisplay.value !== undefined ? currDisplay.value.match(/flex|inline-flex/) : false
     })
@@ -198,14 +230,22 @@ export default {
       return info.hasInheritStyle(
         'style',
         ['display', 'position', 'top', 'right', 'bottom', 'left', 'z-index', 'flex-direction', 'float', 'clear', 'justify-content', 'flex-shrink', 'flex-grow', 'flex-basis', 'align-items', 'align-content', 'flex-wrap', 'overflow-x', 'overflow-y']
+        , previewMode
       )
     })
 
     const hasSet = computed(() => {
       return info.hasSetStyle(
         'style',
-        ['display', 'position', 'top', 'right', 'bottom', 'left', 'z-index', 'flex-direction', 'float', 'clear', 'justify-content', 'flex-shrink', 'flex-grow', 'flex-basis', 'align-items', 'align-content', 'flex-wrap', 'overflow-x', 'overflow-y']
+        ['display', 'position', 'top', 'right', 'bottom', 'left', 'z-index', 'flex-direction', 'float', 'clear', 'justify-content', 'flex-shrink', 'flex-grow', 'flex-basis', 'align-items', 'align-content', 'flex-wrap', 'overflow-x', 'overflow-y'], previewMode
       )
+    })
+    const hasPosition = computed(() => {
+      return ['absolute', 'relative', 'fixed'].indexOf(currPosition.value) !== -1
+    })
+    const isNotTop = computed(() => {
+      // 最顶层组件没有浮动和位置等属性
+      return info.selectedUIItemId.value !== info.selectedPageId.value
     })
     return {
       ...info,
@@ -221,6 +261,7 @@ export default {
       alignContents,
       wraps,
       currDisplay,
+      currVisibility,
       currPosition,
       positionTop,
       positionRight,
@@ -236,6 +277,7 @@ export default {
       currWrap,
       currShrink,
       currGrow,
+      hasPosition,
       currBasis,
       t,
       isFlex,
@@ -244,7 +286,10 @@ export default {
       xOverflow,
       yOverflow,
       overflows,
-      endKind
+      endKind,
+      isNotTop,
+      columnGap,
+      rowGap
     }
   }
 }

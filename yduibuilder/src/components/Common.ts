@@ -116,28 +116,41 @@ export default function (uiconfig: any = null) {
       }
     })
   }
-  const hasInheritStyle = (complexTypeName: string, names: Array<string>) => {
+  const hasInheritStyle = (complexTypeName: string, names: Array<string>, previewMode: any = undefined) => {
     if (!selectedUIItem.value) return false
+
+    let ui = selectedUIItem.value?.meta
+    if (previewMode && previewMode.value) {
+      if (!previewStyleItem.value.meta) return false
+      ui = previewStyleItem.value.meta
+    }
+
     for (const name of names) {
       let rst
       if (complexTypeName) {
-        rst = selectedUIItem.value.meta?.selector?.[complexTypeName]?.[name]
+        rst = ui?.selector?.[complexTypeName]?.[name]
       } else {
-        rst = selectedUIItem.value.meta?.selector?.[name]
+        rst = ui?.selector?.[name]
       }
       if (rst) return true
     }
     return false
   }
-  const hasSetStyle = (complexTypeName: string, names: Array<string>) => {
+  const hasSetStyle = (complexTypeName: string, names: Array<string>, previewMode: any = undefined) => {
     if (!selectedUIItem.value) return false
+
+    let ui = selectedUIItem.value?.meta
+    if (previewMode && previewMode.value) {
+      if (!previewStyleItem.value.meta) return false
+      ui = previewStyleItem.value.meta
+    }
 
     for (const name of names) {
       let rst
       if (complexTypeName) {
-        rst = selectedUIItem.value.meta?.[complexTypeName]?.[name]
+        rst = ui?.[complexTypeName]?.[name]
       } else {
-        rst = selectedUIItem.value.meta[name]
+        rst = ui?.[name]
       }
       if (rst) return true
     }

@@ -5,6 +5,7 @@
     <i class="iconfont icon-point text-success" v-if="hasInherit"></i>
   </div>
   <div class="style-body d-none">
+    <template v-if="hasMargin">
       <div class="text-muted text-center">{{t("style.margin")}}</div>
       <!--[margin-->
       <table class="_margin">
@@ -12,18 +13,19 @@
         <td></td>
         <td :class="{'_margin-top': true, '_hover': hoverOnSide=='margin-top'}" @click="openSetting('margin-top')" @mouseover="hoverOnSide='margin-top'" @mouseleave="hoverOnSide=''">MT</td>
         <td></td>
-      </tr>
-      <tr>
-        <td :class="{'_margin-left': true, '_hover': hoverOnSide=='margin-left'}" @click="openSetting('margin-left')" @mouseover="hoverOnSide='margin-left'" @mouseleave="hoverOnSide=''">ML</td>
-        <td :class="{'_content w-100 text-start': true, '_hover': hoverOnSide=='margin'}" @click="openSetting('margin')" @mouseover="hoverOnSide='margin'" @mouseleave="hoverOnSide=''"> <small v-html="marginAttrs"></small></td>
-        <td :class="{'_margin-right': true, '_hover': hoverOnSide=='margin-right'}" @click="openSetting('margin-right')" @mouseover="hoverOnSide='margin-right'" @mouseleave="hoverOnSide=''">MR</td>
-      </tr>
-      <tr>
-        <td></td>
-        <td :class="{'_margin-bottom': true, '_hover': hoverOnSide=='margin-bottom'}" @click="openSetting('margin-bottom')" @mouseover="hoverOnSide='margin-bottom'" @mouseleave="hoverOnSide=''">MB</td>
-        <td></td>
-      </tr>
-    </table>
+        </tr>
+        <tr>
+          <td :class="{'_margin-left': true, '_hover': hoverOnSide=='margin-left'}" @click="openSetting('margin-left')" @mouseover="hoverOnSide='margin-left'" @mouseleave="hoverOnSide=''">ML</td>
+          <td :class="{'_content w-100 text-start': true, '_hover': hoverOnSide=='margin'}" @click="openSetting('margin')" @mouseover="hoverOnSide='margin'" @mouseleave="hoverOnSide=''"> <small v-html="marginAttrs"></small></td>
+          <td :class="{'_margin-right': true, '_hover': hoverOnSide=='margin-right'}" @click="openSetting('margin-right')" @mouseover="hoverOnSide='margin-right'" @mouseleave="hoverOnSide=''">MR</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td :class="{'_margin-bottom': true, '_hover': hoverOnSide=='margin-bottom'}" @click="openSetting('margin-bottom')" @mouseover="hoverOnSide='margin-bottom'" @mouseleave="hoverOnSide=''">MB</td>
+          <td></td>
+        </tr>
+      </table>
+    </template>
 
     <div class="text-center text-muted mt-2">{{t("style.padding")}}</div>
     <table class="_padding">
@@ -72,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import initUI from '@/components/Common'
 
@@ -88,6 +90,7 @@ export default {
     const hoverOnSide = ref('')
     const settingSide = ref('')
     const isOpenSetting = ref(false)
+    const previewMode = toRef(props, 'previewMode')
 
     const pickCssStyle = (meta: any, _css: any, _style: any) => {
       if (meta.css) {
@@ -151,18 +154,18 @@ export default {
     }, { immediate: true })
     const sizeClass = computed<string>({
       get () {
-        return info.getMeta(settingSide.value, 'css', props.previewMode)
+        return info.getMeta(settingSide.value, 'css', previewMode)
       },
       set (v) {
-        info.setMeta(settingSide.value, v === 'inherit' ? undefined : v, 'css', false, props.previewMode)
+        info.setMeta(settingSide.value, v === 'inherit' ? undefined : v, 'css', false, previewMode)
       }
     })
     const size = computed<string>({
       get () {
-        return info.getMeta(settingSide.value, 'style', props.previewMode)
+        return info.getMeta(settingSide.value, 'style', previewMode)
       },
       set (v) {
-        info.setMeta(settingSide.value, v || undefined, 'style', false, props.previewMode)
+        info.setMeta(settingSide.value, v || undefined, 'style', false, previewMode)
       }
     })
 
@@ -183,23 +186,27 @@ export default {
     const hasInherit = computed(() => {
       return info.hasInheritStyle(
         'style',
-        ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left']
+        ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'], previewMode
       ) ||
         info.hasInheritStyle(
           'css',
-          ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left']
+          ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'], previewMode
         )
     })
 
     const hasSet = computed(() => {
       return info.hasSetStyle(
         'style',
-        ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left']
+        ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'], previewMode
       ) ||
         info.hasSetStyle(
           'css',
-          ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left']
+          ['margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'], previewMode
         )
+    })
+    const hasMargin = computed(() => {
+      // 最顶层组件没有外边距
+      return info.selectedUIItemId.value !== info.selectedPageId.value
     })
     return {
       ...info,
@@ -207,6 +214,7 @@ export default {
       hasInherit,
       hasSet,
       hoverOnSide,
+      hasMargin,
       isOpenSetting,
       settingSide,
       sizeClass,

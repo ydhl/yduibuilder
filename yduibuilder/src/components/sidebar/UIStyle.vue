@@ -11,12 +11,12 @@
     </div>
     <StyleSelector></StyleSelector>
     <Typography></Typography>
-    <StyleBackground v-if="hasBackground"></StyleBackground>
-    <StyleLyout v-if="hasLayout"></StyleLyout>
+    <StyleBackground></StyleBackground>
+    <StyleLyout></StyleLyout>
     <StyleSize></StyleSize>
     <MarginPadding></MarginPadding>
     <StyleBorder v-if="hasBorder"></StyleBorder>
-    <StyleUtilities v-if="isNotPage"></StyleUtilities>
+    <StyleUtilities></StyleUtilities>
 <!--    <StyleFont></StyleFont>-->
   </div>
 </template>
@@ -56,24 +56,13 @@ export default {
     const hasBorder = computed(() => {
       return isNotPage.value && info.selectedUIItem?.value?.type !== 'Hr'
     })
-    const hasLayout = computed(() => {
-      if (info.selectedUIItem?.value?.type === 'Hr') return false
-      if (info.selectedUIItem?.value?.type === 'Modal') return false
-      return true
-    })
-    const hasBackground = computed(() => {
-      if (info.selectedUIItem?.value?.pageType === 'popup') return false
-      return true
-    })
     return {
       ...info,
       t,
       tempId,
       uiID,
       isNotPage,
-      hasBorder,
-      hasLayout,
-      hasBackground
+      hasBorder
     }
   }
 }
