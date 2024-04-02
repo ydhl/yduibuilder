@@ -51,7 +51,7 @@ export default function (uiconfig: any = null) {
   const setMeta = (name, value, complexTypeName: string = '', isMerge:boolean = false, previewMode: any = undefined) => {
     const props = {}
     props[name] = value
-    if (previewMode) {
+    if (previewMode && previewMode.value) {
       store.commit('updatePreviewStyle', {
         type: complexTypeName || null,
         isMerge: isMerge,
@@ -75,7 +75,7 @@ export default function (uiconfig: any = null) {
    * @param previewMode true为预览模式，这是设置对是store中对previewStyleItem；false为设置选择对ui item
    */
   const getMeta = (name, complexTypeName: string = '', previewMode: any = undefined) => {
-    if (previewMode) {
+    if (previewMode && previewMode.value) {
       if (!previewStyleItem.value.meta) return undefined
       if (complexTypeName && !previewStyleItem.value.meta[complexTypeName]) return undefined
       return complexTypeName ? previewStyleItem.value.meta[complexTypeName][name] : previewStyleItem.value.meta[name]
