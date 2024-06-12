@@ -111,7 +111,7 @@ socket服务是用swoole写的，请先确保安装了对应的swoole扩展；�
 4. 启动snapshot node --experimental-modules server.mjs
 
 ## 效果截图
-![新增项目](doc/newproject.gif)
+![数据绑定](doc/1.gif)
 ![移动端](doc/uibuilder-mobile.gif)
 ![PC端](doc/uibuilder-pc.gif)
 ![构建代码](doc/build.gif)
