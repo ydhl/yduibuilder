@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 2577834 */
-  src: url('/icon/iconfont.woff2?t=1700969307440') format('woff2'),
-       url('/icon/iconfont.woff?t=1700969307440') format('woff'),
-       url('/icon/iconfont.ttf?t=1700969307440') format('truetype');
+  src: url('/icon/iconfont.woff2?t=1713338764797') format('woff2'),
+       url('/icon/iconfont.woff?t=1713338764797') format('woff'),
+       url('/icon/iconfont.ttf?t=1713338764797') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,30 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-subpage:before {
+  content: "\e60f";
+}
+
+.icon-popup:before {
+  content: "\e6a8";
+}
+
+.icon-component:before {
+  content: "\ecbf";
+}
+
+.icon-page:before {
+  content: "\e618";
+}
+
+.icon-folder-open:before {
+  content: "\e61d";
+}
+
+.icon-folder:before {
+  content: "\e61e";
 }
 
 .icon-arrowleft:before {
@@ -89,10 +113,6 @@
   content: "\e677";
 }
 
-.icon-page:before {
-  content: "\e640";
-}
-
 .icon-detail:before {
   content: "\e793";
 }
@@ -131,10 +151,6 @@
 
 .icon-setting:before {
   content: "\e9cb";
-}
-
-.icon-folder:before {
-  content: "\e62e";
 }
 
 .icon-function:before {

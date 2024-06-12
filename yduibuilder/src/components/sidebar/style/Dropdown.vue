@@ -33,7 +33,7 @@
         </select>
       </div>
     </div>
-    <template v-if="!parentIsButtonGroupOrNav">
+    <template v-if="!parentIsNav">
       <div class="row">
         <label for="dropdown-title" class="col-sm-3 col-form-label text-truncate text-end">{{ t('style.sizing') }}</label>
         <div class="col-sm-9">
@@ -122,9 +122,9 @@ export default {
         info.setMeta('isSplit', v, 'custom')
       }
     })
-    const parentIsButtonGroupOrNav = computed(() => {
+    const parentIsNav = computed(() => {
       const { parentConfig } = store.getters.getUIItemInPage(info.selectedUIItemId.value, info.selectedPageId.value)
-      return parentConfig.type.toLowerCase() === 'buttongroup' || parentConfig.type.toLowerCase() === 'navbar' || parentConfig.type.toLowerCase() === 'nav'
+      return parentConfig.type.toLowerCase() === 'navbar' || parentConfig.type.toLowerCase() === 'nav'
     })
 
     return {
@@ -135,7 +135,7 @@ export default {
       size,
       title,
       isOutline,
-      parentIsButtonGroupOrNav,
+      parentIsNav,
       isSplitBtn
     }
   }

@@ -46,6 +46,19 @@
   pointer-events: none;
   z-index: 1;
  }
+.ui-rect{
+  top:0px;left:0px;z-index:1;
+}
+.ui-action{
+  display:flex;top:0px;left:0px;font-size:12px;gap:10px;z-index:3;
+  align-items: center;
+  border: 2px solid #97c8fb;
+  border-top-width: 1px !important;
+  position: fixed;
+  background-color: #fff;
+  padding: 0px 5px;
+  color: #444;
+}
 .ui-selected{
   outline: 2px solid $primary !important;
   box-shadow: 0 0 0 0.2rem #268fff80;
@@ -98,6 +111,7 @@
 }
 #ui-events{
   position: fixed;
+  background-color: #f1f1f169;
   left: 0;
   right: 0;
   bottom: 0;

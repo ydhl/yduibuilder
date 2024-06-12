@@ -37,7 +37,7 @@ trait Wxmp {
         return '';
     }
 
-    protected function build_main_attrs() {
+    protected function build_main_attrs($includeEvent = true) {
         $this->add_attr('style', $this->background_image_style(), ';');
         parent::build_main_attrs();
         // 小程序的事件绑定
@@ -47,10 +47,7 @@ trait Wxmp {
             echo ' bind'.$sortEventName.'="'.$this->myId().ucfirst($sortEventName).'"';
         }
     }
-    protected function build_form_attrs ($noid=false) {
-        if (!$noid) {
-            echo ' id="'.$this->myId().'Control"';
-        }
+    protected function build_form_attrs ($includeName = true, $includeBind=true) {
         if (@$this->data['meta']['form']['inputName']){
             echo ' name="'.$this->data['meta']['form']['inputName'].'"';
         }

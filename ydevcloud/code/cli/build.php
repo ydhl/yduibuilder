@@ -51,7 +51,7 @@ function buildProject($server, $frame, $loginUser, $data) {
         $server->push($frame->fd, $e->getMessage());
         return;
     }
-    $server->push($frame->fd, sprintf(__('compile finished please: <a target="_blank" href="%s">download</a>'), $url));
+    $server->push($frame->fd, sprintf(__('compile finished please: <a href="%s">download</a>'), getOssLink($url)));
     $server->push($frame->fd, "done");
 }
 
@@ -168,12 +168,6 @@ function broadcastModifiedPage($server, $frame, $loginUser, $data) {
     }
 }
 // 服务器
-//$config = array(
-//    'ssl_key_file'  => '/yde/ssl/ydecloud.yidianhulian.com.key',
-//    'ssl_cert_file' => '/yde/ssl/ydecloud.yidianhulian.com.pem',
-//);
-//$server = new Swoole\Websocket\Server('0.0.0.0', 8888, SWOOLE_PROCESS, SWOOLE_SOCK_TCP | SWOOLE_SSL);
-//$server->set($config);
 // 本地
 $server = new Swoole\Websocket\Server('0.0.0.0', 8888);
 
@@ -183,7 +177,7 @@ $server->on('open', function($server, $req) {
 
 $server->on('message', function($server, $frame){
     try {
-        \yangzie\YZE_DBAImpl::get_instance()->reset();// 每次都重启mysql连接，解决MySQL server has gone away
+        \yangzie\YZE_DBAImpl::get_instance()->auto_Commit(true);
         $data = json_decode($frame->data, true);
 //        echo $frame->data."\n";
         // 验证token
@@ -234,7 +228,10 @@ echo "waiting for client\r\n";
 
 
 // 重启server后，重置页面用户在线记录
+$dba = \yangzie\YZE_DBAImpl::get_instance();
+$dba->auto_Commit(true);
 $sql = 'delete from`page_user` where id > 0';
-\yangzie\YZE_DBAImpl::get_instance(true)->exec($sql);
+$dba->exec($sql);
+$dba = null;
 $server->start();
 

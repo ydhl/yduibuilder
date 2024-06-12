@@ -1,9 +1,9 @@
 
 .api-method{
   font-weight: bolder;
-  min-width: 40px;
   display: inline-block;
 }
+
 .param-string{
   color: #0c63e4;
 }
@@ -17,13 +17,13 @@
   color: #ef0487;
 }
 .param-map{
-  color: #f50808;
+  color: #f58e08;
 }
 .param-object{
   color: #8a0d0d;
 }
 .param-boolean{
-  color: #e1bd0c;
+  color: #81efce;
 }
 .param-null{
   color: #a9a9a9;
@@ -93,6 +93,10 @@
   background-color: var(--bs-primary);
   color: #fff;
 }
+.bind-icon.bound-out{
+  background-color: var(--bs-success);
+  color: #fff;
+}
 .bind-icon{
   height: 16px;
   width: 16px;
@@ -114,4 +118,63 @@
 }
 .iconfont.hover-danger:hover{
   color: var(--bs-danger) !important;;
+}
+.expression-hover{
+  background-color: #fcf4f4 !important;
+}
+.expression{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding: 6px;
+  border-radius: 6px;
+}
+.expression-1{
+  background-color: #f7fafd;
+}
+.expression-1{
+  background-color: #ebf1fa;
+}
+.expression-2{
+  background-color: #cedef6;
+}
+.expression-3{
+  background-color: #b5cef5;
+}
+.expression-4{
+  background-color: #8eb6f5;
+}
+.expression-group{
+  display: flex;
+  align-items: center;
+}
+.expression-group:before{
+  content: '(';
+  width: 16px;
+  text-align: center;
+  color: #0233fa;
+}
+.expression-group:after{
+  content: ')';
+  width: 16px;
+  text-align: center;
+  color: #0233fa;
+}
+.expression-literal{
+  color: #780085;
+}
+.expression-data{
+  border-radius: 3px;
+  padding: 0px 3px;
+  color: #854700;
+}
+.expression-modifier-not:before{
+  content: '!';
+  width: 16px;
+  text-align: center;
+  color: #c00000;
+}
+.expression-op{
+  margin: 0px 3px;
+  color: #c00000;
 }

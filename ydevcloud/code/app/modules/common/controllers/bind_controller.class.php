@@ -38,10 +38,14 @@ class Bind_Controller extends YZE_Resource_Controller {
         $cellphone = trim($request->get_from_post("cellphone"));
         $region = trim($request->get_from_post("region"));
         $cellphone = '+'.$region.$cellphone;
+//        if (@$_SESSION["expire"] && time() < $_SESSION["expire"]) return YZE_JSON_View::success($this, __('code has been send'));
 
+        $ydsms = new Ydsms();
+        $code  = $ydsms->generateVerifyCode(6);
+        $ydsms->sendSms($cellphone, SMS_TEMPLATE_ID, [$code]);
         $_SESSION["auth_cellphone"] = $cellphone;
         $_SESSION["expire"] = strtotime("+ 5 min");
-        $_SESSION["sms"] = 123456;
+        $_SESSION["sms"] = $code;
         return YZE_JSON_View::success($this);
     }
 

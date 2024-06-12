@@ -95,7 +95,13 @@ class Add_Controller extends YZE_Resource_Controller {
                     if (!trim($model->name)){
                         throw new YZE_FatalException(__('please input project name'));
                     }
-
+                    if (!$model->id){
+                        $loginUser = YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
+                        $permission = new \Check_User_Permission();
+                        $permission->check_type = \Check_User_Permission::LIMIT_ADD_PROJECT;
+                        $permission->user = $loginUser;
+                        YZE_Hook::do_hook(CHECK_USER_PERMISSION, $permission);
+                    }
                 }
                 return $model;
             }

@@ -3,6 +3,8 @@ namespace app\modules\build\views\code\web\bootstrap_html;
 
 
 use app\build\Build_Model;
+use app\modules\build\views\code\Io_Data_Fetch;
+
 /**
  * 由于bootstrap 生成的代码和在线预览一样，所以web前端不同框架代码生成Class都继承之Preview
  * 这里通过trait都方式统一重载相关的实现
@@ -16,7 +18,13 @@ trait Bootstrap {
     protected function get_Img_Src($imgSrc){
         return rtrim($this->build->get_img_Asset_Path(), '/').'/'.basename(urldecode($imgSrc), PATHINFO_BASENAME);
     }
+
+    /**
+     * html 框架下页面都是放到【模块】下面，所以相对其他页面都是通过../跳转到根目录后定位
+     * @param $page
+     * @return string
+     */
     protected function get_popup_page_url($page) {
-        return $page->get_save_path('html');
+        return '../'.$page->get_save_path('html');
     }
 }

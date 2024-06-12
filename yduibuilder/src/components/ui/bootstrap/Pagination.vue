@@ -1,20 +1,8 @@
 <template>
     <ul :draggable='!inlineEditItemId' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
         :data-pageid="pageid" :class="['pagination', dragableCss, uiCss]">
-      <li class="page-item disabled">
-        <a :class="['page-link']" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-      </li>
-      <li class="page-item">
-        <a :class="[linkCss, 'page-link']" :style="linkStyle" href="#">1</a>
-      </li>
-      <li :class="['page-item', activeItemCss]">
-        <a :class="[activeLinkCss, 'page-link']" :style="activeLinkStyle" href="#">2</a>
-      </li>
-      <li class="page-item">
-        <a :class="[linkCss, 'page-link']" :style="linkStyle" href="#">3</a>
-      </li>
-      <li class="page-item">
-        <a :class="[linkCss, 'page-link']" :style="linkStyle" href="#">Next</a>
+      <li :class="{'page-item': true, [activeItemCss]: page===1}" v-for="page in totalPage" :key="page">
+        <a :class="{[activeLinkCss]: page===1, [linkCss]: page!==1, 'page-link': true}" :style="linkStyle" href="javascript:;">{{page}}</a>
       </li>
     </ul>
 </template>
@@ -72,8 +60,14 @@ export default {
       if (!cssMap.backgroundTheme) return 'active'
       return ''
     })
+    const totalPage = computed(() => {
+      const total = Math.max(parseInt(props.uiconfig.meta?.custom?.total || 100), 1)
+      const size = Math.max(parseInt(props.uiconfig.meta?.custom?.pageSize || 10), 1)
+      return Math.ceil(total / size)
+    })
     return {
       ...pagination.setup(),
+      totalPage,
       uiCss,
       uiStyle,
       linkCss,

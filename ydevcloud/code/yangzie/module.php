@@ -52,12 +52,12 @@ abstract class YZE_Base_Module extends YZE_Object {
 	 * @param $controller
 	 * @return array
 	 */
-	public function get_uris_of_controller($controller){
+	public function get_uris_of_controller($controller, $action='index'){
 		$controller = rtrim(strtolower($controller), "_controller");
 		$config = $this->config();
 		$_ = array();
 		foreach ($config['routers'] as $uri => $mapping){
-			if(strtolower($mapping['controller']) == $controller){
+			if(strtolower($mapping['controller']) == $controller && $action==strtolower(@$mapping['action'])){
 				$_[] = $uri;
 			}
 		}

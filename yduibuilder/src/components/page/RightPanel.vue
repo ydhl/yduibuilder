@@ -15,6 +15,26 @@
               <i class="iconfont icon-style"></i>
               {{ t("common.style") }}</a>
           </li>
+          <li class="nav-item">
+            <a :class="{'nav-link': true, 'active': currSidebar.tab=='BindEvent' && rightSidebarIsOpen}" href="javascript:void(0)" @click="openSidebar('BindEvent')">
+              <i class="iconfont icon-event"></i>
+              {{ t("common.event") }}</a>
+          </li>
+          <li class="nav-item">
+            <a :class="{'nav-link': true, 'active': currSidebar.tab=='PageData' && rightSidebarIsOpen}" href="javascript:void(0)" @click="openSidebar('PageData')">
+              <i class="iconfont icon-data"></i>
+              {{ t("common.dataSource") }}</a>
+          </li>
+          <li class="nav-item">
+            <a :class="{'nav-link': true, 'active': currSidebar.tab=='API' && rightSidebarIsOpen}" href="javascript:void(0)" @click="openSidebar('API')">
+              <i class="iconfont icon-api"></i>
+              {{ t("common.api") }}</a>
+          </li>
+          <li class="nav-item" v-if="selectedUIItem && selectedUIItem.type === 'UIComponent'">
+            <a :class="{'nav-link': true, 'active': currSidebar.tab=='ComponentInputData' && rightSidebarIsOpen}" href="javascript:void(0)" @click="openSidebar('ComponentInputData')">
+              <i class="iconfont icon-data-input"></i>
+              {{ t("common.uicomponent") }}</a>
+          </li>
           <li class="nav-item flex-grow-1"><a class="nav-link disabled" disabled><i class="iconfont icon-placeholder"></i></a></li>
         </ul>
       </div>
@@ -42,6 +62,10 @@
 </template>
 
 <script lang="ts">
+import BindEvent from '@/components/sidebar/BindEvent.vue'
+import PageData from '@/components/sidebar/PageData.vue'
+import ComponentInputData from '@/components/sidebar/ComponentInputData.vue'
+import API from '@/components/sidebar/API.vue'
 import UIStyle from '@/components/sidebar/UIStyle.vue'
 import UIInfo from '@/components/sidebar/UIInfo.vue'
 import UIExport from '@/components/sidebar/UIExport.vue'
@@ -55,6 +79,10 @@ import { useI18n } from 'vue-i18n'
 export default {
   name: 'RightPanel',
   components: {
+    BindEvent,
+    API,
+    PageData,
+    ComponentInputData,
     UIInfo,
     UIStyle,
     UIExport

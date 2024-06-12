@@ -41,7 +41,7 @@
 
   <lay-layer v-model="detailDialogVisible" :title="t('api.apiDetail')" :shade="true" :area="['80vw', '80vh']">
     <div class="p-2">
-      1
+      TODO 展示API的信息
     </div>
   </lay-layer>
 </template>

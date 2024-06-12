@@ -9,9 +9,6 @@ export default class Button extends UIBase {
     const superSetup = super.setup()
     const { inlineEditItemId, parentUi, hasItems } = superSetup
 
-    const parentIsButtonGroup = computed(() => {
-      return parentUi.value.type.toLowerCase() === 'buttongroup'
-    })
     const parentIsNavbar = computed(() => {
       return parentUi.value.type.toLowerCase() === 'navbar' || parentUi.value.type.toLowerCase() === 'nav'
     })
@@ -26,7 +23,7 @@ export default class Button extends UIBase {
           data: {
             itemid: props.uiconfig.meta.id,
             pageId: props.pageid,
-            props: { title: el.text() }
+            props: { title: el.text().trim() }
           }
         })
       }
@@ -35,7 +32,6 @@ export default class Button extends UIBase {
     return {
       ...superSetup,
       inlineEditItemId,
-      parentIsButtonGroup,
       parentIsNavbar,
       parentUi,
       hasItems

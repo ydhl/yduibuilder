@@ -49,6 +49,10 @@ class Preview_Controller extends YZE_Resource_Controller {
         $this->set_View_Data('page', $page);
     }
 
+    public function popup() {
+        $this->page();
+    }
+
     public function exception(\Exception $e){
         $request = $this->request;
         $this->layout = 'error';

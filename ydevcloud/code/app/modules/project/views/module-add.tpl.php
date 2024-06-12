@@ -41,7 +41,7 @@ $this->layout = '';
         </div>
         <div class="mb-3">
             <button type="submit" class="btn btn-primary yd-form-submit yd-spin-btn"
-                    data-redirect="/project/<?= $project->uuid?>/structure"
+                    data-redirect="/project/<?= $project->uuid?>/page"
                     data-url="<?= $module ? "/module/".$module->uuid."/edit" : SITE_URI."project/".$project->uuid."/addmodule"?>"><?= __("Add")?></button>
         </div>
     </form>

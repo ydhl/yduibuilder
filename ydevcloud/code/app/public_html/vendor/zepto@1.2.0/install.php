@@ -4,7 +4,7 @@ class zepto_install{
         return [
         ];
     }
-    public static function install_vue3() {
+    public static function installInVue3() {
         /**
          * 定于基于node，bootstrap的包名和对应的css如何包含
          */
@@ -16,7 +16,7 @@ class zepto_install{
      * wxss中的内容是在app.wxss中通过@import导入
      * @return ['wxss'=>[需要导入的样式表及顺序], 'export'=>[要导出的文件列表]]
      */
-    public static function install2wxmp2(){
+    public static function installInWxmp2(){
         return [
             'wxss'=>[],
             'export'=>['./'=>['zepto.min.js']]
@@ -25,11 +25,11 @@ class zepto_install{
 
     /**
      * 预览时要包含的js
-     * @return string[]
+     * @return ['iife'=>[],'es'=>[],''vendor'=>[]]
      */
     public static function jsForPreview() {
         return [
-            'zepto.min.js'=>'iife'
+            'iife'=>['zepto.min.js']
         ];
     }
 }

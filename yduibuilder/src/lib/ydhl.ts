@@ -7,8 +7,11 @@ declare const YDJS: YDJSStatic
 export default {
   version: '1.0.16-220207',
   api: 'http://ydecloud-os.local.com/',
-  uploadApi: 'http://ydecloud-os.local.com/upload/',
+  apiBuilder: 'http://localhost:9998',
+  modelDesign: 'http://localhost:9997',
   socket: 'ws://localhost:8888',
+  // api: 'https://ydecloud.yidianhulian.com/',
+  // socket: 'wss://ydecloud.yidianhulian.com:8888',
 
   save (store: any, newVersion = false, message = '') {
     if (store.state.design.saving) return
@@ -262,7 +265,7 @@ export default {
    * @param offset
    */
   openPopper: function (openWhere: Element | VirtualElement, el: any, placement: Placement = 'bottom-end', offset = [0, 10]) {
-    nextTick(function () {
+    nextTick(() => {
       createPopper(openWhere, el.value, {
         placement,
         modifiers: [
@@ -280,6 +283,7 @@ export default {
     return str === null || str === ''
   },
   isEmptyObject: function (e: any) {
+    if (!e) return true
     // eslint-disable-next-line no-unreachable-loop
     for (const t in e) {
       return !1
@@ -290,6 +294,7 @@ export default {
     return new Promise((resolve, reject) => {
       layer.confirm(msg, {
         title: '',
+        closeBtn: 0,
         btn: [
           {
             text: okLabel,

@@ -1,5 +1,6 @@
 <?php
 namespace app\user;
+use app\common\Code_Model;
 use yangzie\YZE_Hook;
 use \yangzie\YZE_Resource_Controller;
 use \yangzie\YZE_Request;
@@ -69,11 +70,15 @@ class Profile_Controller extends YZE_Resource_Controller {
         $this->layout = "";
         $cellphone = trim($request->get_from_post('cellphone'));
         $region = trim($request->get_from_post('region'));
+        $code= trim($request->get_from_post('code'));
         $user = YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
         $checkUser = User_Model::from()->where('cellphone=:cellphone and phone_region=:region and is_deleted=0')
             ->get_Single([':cellphone'=>$cellphone,':region'=>$region]);
         if ($checkUser) return YZE_JSON_View::error($this, __($cellphone.' has been used'));
 
+        $codeModel = Code_Model::from()
+            ->where('code=:code and target=:target and current_timestamp() <= expirein')->get_Single([':code'=>$code, ':target'=>'+'.$region.$cellphone]);
+        if (!$codeModel) return YZE_JSON_View::error($this, __('Invalid Code, Please reSend again'));
         $user->set(User_Model::F_CELLPHONE, $cellphone)->save();
         YZE_Hook::do_hook(YZE_HOOK_SET_LOGIN_USER, $user);
         return YZE_JSON_View::success($this);
@@ -88,10 +93,14 @@ class Profile_Controller extends YZE_Resource_Controller {
         $request = $this->request;
         $this->layout = "";
         $email = trim($request->get_from_post('email'));
+        $code= trim($request->get_from_post('code'));
         $user = YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
         $checkUser = User_Model::from()->where('email=:email and is_deleted=0')->get_Single([':email'=>$email]);
         if ($checkUser) return YZE_JSON_View::error($this, __($email.' has been used'));
 
+        $codeModel = Code_Model::from()
+            ->where('code=:code and target=:target and current_timestamp() <= expirein')->get_Single([':code'=>$code, ':target'=>$email]);
+        if (!$codeModel) return YZE_JSON_View::error($this, __('Invalid Code, Please reSend again'));
         $user->set(User_Model::F_EMAIL, $email)->save();
         YZE_Hook::do_hook(YZE_HOOK_SET_LOGIN_USER, $user);
         return YZE_JSON_View::success($this);

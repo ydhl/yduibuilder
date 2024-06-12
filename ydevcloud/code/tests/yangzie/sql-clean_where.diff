@@ -1,0 +1,19 @@
+001+ SELECT u.id AS u_id,u.name AS u_name,u.register_time AS u_register_time,u.email AS u_email,u.created_on AS u_created_on,u.modified_on AS u_modified_on,o.id AS o_id,o.name AS o_name,o.register_time AS o_register_time,o.email AS o_email,o.created_on AS o_created_on,o.modified_on AS o_modified_on FROM `testusers3` AS u LEFT JOIN `ordermodel` AS o ON o.id=u.id WHERE u.name = 'user' AND o.name = 'order' AND u.email = 'user' AND o.email = 'order'
+002+ 
+003+ SELECT u.id AS u_id,u.name AS u_name,u.register_time AS u_register_time,u.email AS u_email,u.created_on AS u_created_on,u.modified_on AS u_modified_on,o.id AS o_id,o.name AS o_name,o.register_time AS o_register_time,o.email AS o_email,o.created_on AS o_created_on,o.modified_on AS o_modified_on FROM `testusers3` AS u LEFT JOIN `ordermodel` AS o ON o.id=u.id WHERE o.name = 'order' AND u.email = 'user' AND o.email = 'order'
+004+ 
+005+ SELECT u.id AS u_id,u.name AS u_name,u.register_time AS u_register_time,u.email AS u_email,u.created_on AS u_created_on,u.modified_on AS u_modified_on,o.id AS o_id,o.name AS o_name,o.register_time AS o_register_time,o.email AS o_email,o.created_on AS o_created_on,o.modified_on AS o_modified_on FROM `testusers3` AS u LEFT JOIN `ordermodel` AS o ON o.id=u.id WHERE u.email = 'user'
+001- SELECT u.id AS u_id,u.name AS u_name,u.register_time AS u_register_time,u.email AS u_email,u.created_on AS u_created_on,u.modified_on AS u_modified_on,o.id AS o_id,o.name AS o_name,o.register_time AS o_register_time,o.email AS o_email,o.created_on AS o_created_on,o.modified_on AS o_modified_on 
+002- FROM testusers3 AS u  LEFT JOIN ordermodel AS o ON o.id=u.id 
+003- WHERE u.name = 'user' AND o.name = 'order' AND u.email = 'user' AND o.email = 'order'
+005- SELECT u.id AS u_id,u.name AS u_name,u.register_time AS u_register_time,u.email AS u_email,u.created_on AS u_created_on,u.modified_on AS u_modified_on,o.id AS o_id,o.name AS o_name,o.register_time AS o_register_time,o.email AS o_email,o.created_on AS o_created_on,o.modified_on AS o_modified_on 
+007+ SELECT u.id AS u_id,u.name AS u_name,u.register_time AS u_register_time,u.email AS u_email,u.created_on AS u_created_on,u.modified_on AS u_modified_on,o.id AS o_id,o.name AS o_name,o.register_time AS o_register_time,o.email AS o_email,o.created_on AS o_created_on,o.modified_on AS o_modified_on FROM `testusers3` AS u LEFT JOIN `ordermodel` AS o ON o.id=u.id
+006- FROM testusers3 AS u  LEFT JOIN ordermodel AS o ON o.id=u.id 
+007- WHERE o.name = 'order' AND u.email = 'user' AND o.email = 'order'
+008- 
+009- SELECT u.id AS u_id,u.name AS u_name,u.register_time AS u_register_time,u.email AS u_email,u.created_on AS u_created_on,u.modified_on AS u_modified_on,o.id AS o_id,o.name AS o_name,o.register_time AS o_register_time,o.email AS o_email,o.created_on AS o_created_on,o.modified_on AS o_modified_on 
+010- FROM testusers3 AS u  LEFT JOIN ordermodel AS o ON o.id=u.id 
+011- WHERE u.email = 'user'
+012- 
+013- SELECT u.id AS u_id,u.name AS u_name,u.register_time AS u_register_time,u.email AS u_email,u.created_on AS u_created_on,u.modified_on AS u_modified_on,o.id AS o_id,o.name AS o_name,o.register_time AS o_register_time,o.email AS o_email,o.created_on AS o_created_on,o.modified_on AS o_modified_on 
+014- FROM testusers3 AS u  LEFT JOIN ordermodel AS o ON o.id=u.id

@@ -284,11 +284,11 @@ trait Project_Model_Method{
         $project_setting = $this->get_setting();
         $return = ['system'=>[], 'user'=>[]];
 
-        if ($project_setting['ui']) $return['system'] = array_merge($return['system'], Env::pickDependencyPackage($project_setting['ui']."@".$project_setting['ui_version']));
         if ($project_setting['framework']) $return['system'] = array_merge($return['system'], Env::pickDependencyPackage($project_setting['framework']."@".$project_setting['framework_version']));
         if ($project_setting['frontend_framework']) $return['system'] = array_merge($return['system'], Env::pickDependencyPackage($project_setting['frontend_framework']."@".$project_setting['frontend_framework_version']));
         if ($project_setting['backend_language']) $return['system'] = array_merge($return['system'], Env::pickDependencyPackage($project_setting['backend_language']."@".$project_setting['backend_language_version']));
         if ($project_setting['frontend_language']) $return['system'] = array_merge($return['system'], Env::pickDependencyPackage($project_setting['frontend_language']."@".$project_setting['frontend_language_version']));
+        if ($project_setting['ui']) $return['system'] = array_merge($return['system'], Env::pickDependencyPackage($project_setting['ui']."@".$project_setting['ui_version']));
 
         // 数据库中查找用户添加的其他依赖
         // 用户添加的依赖，编译器并不知道怎么生成使用代码，所以去掉用户添加依赖的功能
@@ -313,5 +313,55 @@ trait Project_Model_Method{
         return Page_Model::from('p')
             ->left_join(Module_Model::CLASS_NAME, 'm', 'm.id = p.module_id')
             ->where('p.is_deleted=1 and m.project_id=:pid and p.page_type="page"')->count('id', [':pid'=>$this->id]);
+    }
+    private function get_package_libs($relativePath, $package, &$cssLib=[], &$jsLib=[], &$jsModule=[]){
+        if (! file_exists(YZE_PUBLIC_HTML."vendor/{$package}/install.php")) return;
+
+        include_once YZE_PUBLIC_HTML."vendor/{$package}/install.php";
+        list ($packageName) = explode('@', trim($package));
+        $packageClass = "{$packageName}_install";
+        if (file_exists(YZE_PUBLIC_HTML."vendor/{$package}/index.css")){
+            $cssLib[] = "<link rel='stylesheet' href='{$relativePath}vendor/{$package}/index.css'>";
+        }
+
+        $jsForPreview = $packageClass::jsForPreview();
+        foreach ((array)$jsForPreview['es'] as $js=>$import) {
+            $jsModule["{$relativePath}vendor/{$package}/{$js}"] = $import;
+        }
+        foreach ((array)$jsForPreview['iife'] as $js) {
+            $jsLib[] = "<script defer src='{$relativePath}vendor/{$package}/{$js}'></script>";
+        }
+        foreach ((array)$jsForPreview['vendor'] as $vendor) {
+            $this->get_package_libs($relativePath, $vendor, $cssLib, $jsLib, $jsModule);
+        }
+    }
+    public function fetch_css_js_libs($relativePath, &$cssLib=[], &$jsLib=[], &$jsModule=[]) {
+        $packages = $this->get_front_project_packages();
+        $packages = array_merge($packages['system'], $packages['user']);
+
+        foreach ($packages as $package){
+            $this->get_package_libs($relativePath, $package, $cssLib, $jsLib, $jsModule);
+        }
+    }
+    public function module_count(){
+        return Module_Model::from()->where('project_id=:id and is_deleted=0')->count('id', [':id'=>$this->id]);
+    }
+    public function api_count(){
+        return Web_Api_Model::from()->where('project_id=:id and is_deleted=0')->count('id', [':id'=>$this->id]);
+    }
+    public function page_count(){
+        return Page_Model::from()->where('project_id=:id and is_deleted=0 and page_type="page"')->count('id', [':id'=>$this->id]);
+    }
+    public function popup_count(){
+        return Page_Model::from()->where('project_id=:id and is_deleted=0 and page_type="popup"')->count('id', [':id'=>$this->id]);
+    }
+    public function component_count(){
+        return Page_Model::from()->where('project_id=:id and is_deleted=0 and page_type="component"')->count('id', [':id'=>$this->id]);
+    }
+    public function subpage_count(){
+        return Page_Model::from()->where('project_id=:id and is_deleted=0 and page_type="subpage"')->count('id', [':id'=>$this->id]);
+    }
+    public function recycle_count(){
+        return Page_Model::from()->where('project_id=:id and is_deleted=1')->count('id', [':id'=>$this->id]);
     }
 }?>

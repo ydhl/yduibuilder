@@ -1,10 +1,11 @@
 <?php
 namespace app\modules\build\views\preview\weui;
+
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 
 class Navbar_View extends Preview_View {
-    use Weui_Event_Binding, Weui_Popup,Html_Code_Helper;
+    use Weui_Popup,Html_Code_Helper;
     protected function css_map()
     {
         $css = parent::css_map();
@@ -13,9 +14,9 @@ class Navbar_View extends Preview_View {
         return $css;
     }
 
-    protected function style_map()
+    protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map();
+        $map = parent::style_map($meta);
         unset($map['color']);
         return $map;
     }

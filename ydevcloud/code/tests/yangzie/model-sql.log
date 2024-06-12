@@ -1,0 +1,28 @@
+
+---- EXPECTED OUTPUT
+单表查询:
+NULL
+test title
+test title
+test user
+1
+test user
+1
+test user
+1
+test user
+1
+test user
+1
+112233
+1
+3
+112233
+test user
+test title
+---- ACTUAL OUTPUT
+Fatal error: Uncaught Error: Call to undefined method yangzie\YZE_DBAImpl::migration() in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/model-sql.php:79
+Stack trace:
+#0 {main}
+  thrown in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/model-sql.php on line 79
+---- FAILED

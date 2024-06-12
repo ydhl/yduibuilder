@@ -14,10 +14,6 @@ export default class Dropdown extends UIBase {
       return parentUi.value.type.toLowerCase() === 'navbar' || parentUi.value.type.toLowerCase() === 'nav'
     })
 
-    const parentIsButtonGroup = computed(() => {
-      return parentUi.value.type.toLowerCase() === 'buttongroup'
-    })
-
     /**
      * 退出内部编辑时，更新value
      */
@@ -29,7 +25,7 @@ export default class Dropdown extends UIBase {
           data: {
             itemid: props.uiconfig.meta.id,
             pageId: props.pageid,
-            props: { title: el.text() }
+            props: { title: el.text().trim() }
           }
         })
       }
@@ -48,8 +44,7 @@ export default class Dropdown extends UIBase {
       ...superSetup,
       uiStyle,
       uiCss,
-      parentIsNavbar,
-      parentIsButtonGroup
+      parentIsNavbar
     }
   }
 }

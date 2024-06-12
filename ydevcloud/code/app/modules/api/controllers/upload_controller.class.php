@@ -61,20 +61,21 @@ class Upload_Controller extends YZE_Resource_Controller {
             $filepath = \yangzie\yze_remove_path($res, YZE_UPLOAD_PATH);
         }
         if (!$filepath) return YZE_JSON_View::error($this,  __("Upload Failed"));
-
+        $url = upload2oss($res, ltrim($filepath, '/'));
         $ext = strtoupper(pathinfo($_FILES[$upload_file_name]['name'], PATHINFO_EXTENSION));
         $file = new File_Model();
         $file->set(File_Model::F_CREATED_ON, date('Y-m-d H:i:s'))
             ->set(File_Model::F_FILE_NAME, $name ?: $_FILES[$upload_file_name]['name'])
             ->set(File_Model::F_FILE_SIZE, $_FILES[$upload_file_name]['size'])
             ->set(File_Model::F_UUID, File_Model::uuid())
-            ->set(File_Model::F_URL, $filepath)
+            ->set(File_Model::F_URL, $url)
             ->set(File_Model::F_PROJECT_ID, $project->id)
             ->set(File_Model::F_UPLOAD_DATE, date('Y-m-d H:i:s'))
             ->set(File_Model::F_TYPE, file_type($ext))
             ->save();
 
-        return YZE_JSON_View::success($this, ['url'=>UPLOAD_SITE_URI.$filepath, 'ext'=>strtolower($ext), 'id'=>$file->uuid, 'name'=>$file->file_name]);
+        $image = yze_isimage($_FILES[$upload_file_name]['name']);
+        return YZE_JSON_View::success($this, ['url'=>SITE_URI.($image ? "image" : 'download')."?file=".urlencode($url), 'ext'=>strtolower($ext), 'id'=>$file->uuid, 'name'=>$file->file_name]);
     }
 
     public function exception(\Exception $e) {

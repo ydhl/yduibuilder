@@ -34,16 +34,7 @@ function idHasExists (uiitems: Array<UIBase>, id) {
   }
   return false
 }
-function regenerateId (uiconfig: UIBase, prefix) {
-  const newId = ydhl.uuid(5, 0, prefix)
-  uiconfig.meta.id = newId
-  if (uiconfig.items !== undefined) {
-    for (let index = 0; index < uiconfig.items.length; index++) {
-      uiconfig.items[index] = regenerateId(uiconfig.items[index], prefix)
-    }
-  }
-  return uiconfig
-}
+
 /**
  * 在页面中查找item的信息：序号和其ui配置 { index, uiConfig, parentConfig }
  * @param state
@@ -176,7 +167,7 @@ function updateMeta (state, type, props, item, isMerge) {
       }
       return
     }
-    if (newValue === 'object') { // Object
+    if (typeof newValue === 'object') { // Object
       if (isMerge && oldValue) {
         node[name] = ydhl.deepMerge(oldValue, newValue)
       } else {
@@ -218,11 +209,11 @@ function switchPage (state, targetPage) {
   // 如果当前页面没有被关闭，先把当前页面的状态缓存起来，如果关闭了会先删除state.openedPages中的数据
   if (state.openedPages[currPage.meta.id]) state.openedPages[currPage.meta.id] = currPage
 
+  cleanWorkspaceState(state)
+
   state.module = state.pageModule[targetPage.meta.id] || {}
   state.function = state.pageFunction[targetPage.meta.id] || {}
   state.page = targetPage
-
-  cleanWorkspaceState(state)
 }
 function closePage (state, pageUuid) {
   const ids = Object.keys(state.openedPages)
@@ -315,8 +306,10 @@ export default {
      */
     socket: null,
     mouseXYInIframe: {}, // 鼠标在iframe中移动的坐标
-    mouseupInFrame: '', // 在iframe 中点击的事件通知
-    previewStyleItem: {} // 设置style selector时用于预览，uibase结构体, 但只用到其中到meta部分内容
+    mouseupInFrame: '', // 在iframe 中点击的事件通知,格式x_y
+    selectedUIItemActiveState: { type: 'normal', state: 'normal' }, // ui style中当前选中的ui 切换的状态名
+    previewStyleItem: {}, // 设置style selector时用于预览，也是uibase结构体, 但只用到其中到meta.style部分内容
+    declaredEvents: [] // 缓存当前组件页面的自定义事件
   },
   mutations: {
     updateSavedState (state: any, { pageUuid, saved, versionId, saving }) {
@@ -587,7 +580,7 @@ export default {
      * @param pageId
      * @param type
      */
-    updatePreviewStyle (state: any, { type, props, isMerge }) {
+    updatePreviewStyleMeta (state: any, { type, props, isMerge }) {
       if (!state.previewStyleItem.meta) {
         state.previewStyleItem.meta = {}
       }
@@ -611,24 +604,48 @@ export default {
       state.pageSaved[state.page.meta.id] = 0
     },
     /**
+     * 更新组件的属性, 非meta总的，如果meta中的信息请使用updateItemMeta
+     * @param state
+     * @param itemid
+     * @param pageId
+     * @param props
+     */
+    updateUIInfo (state: any, { itemid, pageId, props }) {
+      let item: UIBase | null = null
+
+      const obj = findUIItemInfo(state, itemid)
+      if (obj.index !== -1) {
+        item = obj.uiConfig
+      }
+      if (!item) return
+      // console.log(item, props)
+      for (const name in props) {
+        // eslint-disable-next-line no-eval
+        item[name] = props[name]
+      }
+      state.pageSaved[pageId] = 0
+    },
+    /**
      * 添加事件绑定
      * @param state
      * @param itemid
+     * @param pageId
      * @param eventId
      */
-    addEventBind (state: any, { itemid, eventId }) {
+    addUIEventBind (state: any, { itemid, pageId, eventId }) {
       const { index, uiConfig } = findUIItemInfo(state, itemid)
       if (index === -1) return
       if (!uiConfig?.events) uiConfig.events = []
       uiConfig.events.push(eventId)
     },
     /**
-     * 删除事件绑定
+     * 删除UI的事件绑定
      * @param state
      * @param itemid
+     * @param pageId
      * @param bindId
      */
-    removeEventBind (state: any, { itemid, bindId }) {
+    removeUIEventBind (state: any, { itemid, pageId, bindId }) {
       const { index, uiConfig } = findUIItemInfo(state, itemid)
       if (index === -1) return
       if (!uiConfig.events) return
@@ -637,57 +654,20 @@ export default {
       uiConfig.events.splice(i, 1)
     },
     /**
-     * 初始创建弹窗事件绑定
-     * @param state
-     * @param newPageId
-     */
-    createPopupBind (state: any, { newPageId }) {
-      const oldPageId = state.page.meta.id
-
-      // 新页面，跳转到新页面设计
-      cleanWorkspaceState(state)
-      const page = {
-        type: 'Page',
-        pageType: 'popup',
-        meta: {
-          id: newPageId,
-          isContainer: true,
-          title: 'unnamed popup'
-        },
-        items: []
-      }
-
-      ydhl.savePage(state.function.id, page, -1, (rst) => {
-        if (!rst || !rst.success) {
-          ydhl.alert(rst.msg || 'Oops')
-          return
-        }
-        router.push({
-          path: '/',
-          query: {
-            uuid: newPageId,
-            fromPageId: oldPageId
-          }
-        })
-      })
-    },
-    /**
      * 创建子页面, 子页面作为itemid原始的内容，比如幻灯片的一张幻灯片
      *
      * @param state
      * @param itemid
-     * @param newPageId 当修改子页面时传入
-     * @param copyFromPageId copy子页面，如果传入，忽略newPageId
+     * @param pageId
      * @param includeUI 子页面只能包含的元素，传入时忽略excludeUI
      * @param excludeUI 子页面不能包含的元素
      * @param rootUI 新建页面的根元素
      */
-    createSubpage (state: any, { itemid, newPageId, copyFromPageId, includeUI, excludeUI, rootUI }) {
-      const isNewPage = copyFromPageId || !newPageId
-      newPageId = isNewPage ? ydhl.uuid(5, 0, 'Page' + state.project.keyId) : newPageId
+    createSubpage (state: any, { itemid, pageId, includeUI, excludeUI, rootUI }) {
+      const newPageId = ydhl.uuid(5, 0, 'Page' + state.project.keyId)
       const targetItem = findUIItemInfo(state, itemid)
       if (targetItem.index === -1) return
-      let newItemInfo: any = {
+      const newItemInfo: any = {
         type: 'Page',
         pageType: 'subpage',
         subPageId: newPageId,
@@ -698,35 +678,12 @@ export default {
         },
         items: []
       }
-      if (copyFromPageId) {
-        for (const item of targetItem.uiConfig.items) {
-          if (item.subPageId === copyFromPageId) {
-            newItemInfo = regenerateId(JSON.parse(JSON.stringify(item)), newPageId)
-            newItemInfo.subPageId = newPageId
-            break
-          }
-        }
-      }
-      if (isNewPage) {
-        newItemInfo.meta.id = newPageId
-        addItemInfo('in', newItemInfo, targetItem)
-      }
-
+      addItemInfo('in', newItemInfo, targetItem)
       const oldPageId = state.page.meta.id
 
       // 保存现有页面数据，并打开子页面进行设计
       cleanWorkspaceState(state)
-      // 页面已经存在
-      if (!isNewPage) {
-        router.push({
-          path: '/',
-          query: {
-            uuid: newPageId,
-            fromPageId: oldPageId
-          }
-        })
-        return
-      }
+
       const page: any = {
         type: 'Page',
         pageType: 'subpage',
@@ -739,6 +696,8 @@ export default {
       if (rootUI) {
         page.items = [rootUI]
       }
+
+      state.pageSaved[pageId] = 0
 
       ydhl.savePage(state.function.id, page, -1, (rst) => {
         if (!rst || !rst.success) {
@@ -760,25 +719,14 @@ export default {
      * @param state
      * @param itemid
      * @param index
+     * @param pageId
      */
-    deleteSubpage (state: any, { itemid, index }) {
+    deleteSubpage (state: any, { itemid, index, pageId }) {
       const { uiConfig } = findUIItemInfo(state, itemid)
       if (!uiConfig) return
-      const deleteItem = uiConfig.items[index]
       if (uiConfig.meta.custom?.activeSlide === index) uiConfig.meta.custom.activeSlide = 0
       uiConfig.items.splice(index, 1)
       state.pageSaved[state.page.meta.id] = 0
-      ydhl.deletePage(deleteItem.subPageId, (rst) => {
-        if (!rst || !rst.success) return
-        if (state.socket) {
-          state.socket.send(JSON.stringify({
-            action: 'deletedPage',
-            id: rst.data?.deletedPageId,
-            pageid: deleteItem.subPageId,
-            token: ydhl.getJwt()
-          }))
-        }
-      })
     }
   },
   actions: {

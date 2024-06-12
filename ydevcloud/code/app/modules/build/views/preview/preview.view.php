@@ -2,16 +2,13 @@
 namespace app\modules\build\views\preview;
 use app\build\Build_Model;
 use app\modules\build\views\code\Base_Code_Fragment;
-use app\modules\build\views\code\wxmp\Wxmp_Code_Fragment;
-use app\project\Page_Bind_Style_Model;
+use app\modules\build\views\code\Io_Data_Fetch;
+use app\modules\build\views\preview\bootstrap\ValueList_View;
+use app\project\Action_Model;
+use app\project\Page_Bind_Data_Model;
+use app\project\Page_Bind_Event_Model;
 use app\project\Page_Model;
-use app\project\Style_Model;
-use app\vendor\css\Css_Factory;
 use yangzie\YZE_FatalException;
-use yangzie\YZE_JSON_View;
-use yangzie\YZE_Notpl_View;
-use yangzie\YZE_Simple_View;
-use yangzie\YZE_View_Component;
 use function yangzie\__;
 
 /**
@@ -33,7 +30,12 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     protected $build;
     private $parentUI;
     private $parentIndex;
+    /**
+     * 组件包含的子页的子页对象 subPageId
+     * @var Page_Model
+     */
     private $subPage;
+
     /**
      * @var 组件的样式数组，格式[selector=>[styleName=>styleValue]]
      */
@@ -43,11 +45,22 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      */
     protected $childViews = [];
     /**
+     * 在具体某个事件中使用到到变量名称，格式[事件名=>[变量]]
+     * @var array
+     */
+    protected $usedVariableInEvent = [];
+    /**
      * 元素上的属性数组 [属性名=>属性值1]
      * @var array
      */
-    private $_attrs = [];
+    protected $_attrs = [];
     private $_pages;
+    private $_outputData;
+    private $_outputDataName;
+    private $_inputData;
+    private $_inputDataName;
+    private $_boundData;
+    private $_boundDataName;
 
     public function __construct($data, $controller, Build_Model $build)
     {
@@ -58,14 +71,16 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         foreach ((array)@$this->data['items'] as $index => $item){
             $build = $this->build->clone();
             $build->set_ui_config($item);
+            $build->set_is_subpage(false);
             $subPageId = @$item['subPageId'];
             // 如果该组件的内容是引用一个组件页面; 因为顶层的build已经把该页面所有的uibase拉取出来了
-            // 这里只需要init data重新拉取子页关联的数据即可
+            // 这里只需要init_data重新拉取子页关联的数据即可
+            // 组件页面的关联内容在宿主页面是不提现出来的
             if ($subPageId){
                 $subPage = $this->get_page($subPageId);
                 if ($subPage){
                     $build->set_page($subPage);
-                    //$this->myid() 这是this 是ui component他的id是唯一的
+                    $build->set_is_subpage(true);
                     $build->set_id_suffix("_".$this->myid()."_{$index}");
                     $build->init_data();
                 }
@@ -145,10 +160,10 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     /**
      * style字符串, key是style的属性名，值是完整的style属性设置，
      * 比如['color'=>'color:#fff']
-     *
+     *  这里会加上!important
      * @return array
      */
-    public function get_style($meta){
+    public function translate_style($meta){
         if (!$meta) return [];
         $styles = [];
         $metaStyle = (array)@$meta['style'];
@@ -164,7 +179,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
 
         foreach ($metaStyle as $name => $value){
             if (is_array($value)){
-                $styles[$name] = $value;
+                $styles[$name] = $name.': '.trim(join(' ', $value));
                 continue;
             }
             $value = trim($value);
@@ -206,20 +221,19 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             $styles['background-attachment'],$styles['background-position'],
             $styles['background-size']);
         $styles = array_merge($styles, $this->background_style($metaStyle));
-        $styles = array_map(function ($item){
-            return $item." !important";
-        }, $styles);
+//        $styles = array_map(function ($item){
+//            return $item;
+//        }, $styles);
         return $styles;
     }
 
     /**
-     * 元素上自定义style字符串, key是style的属性名，值是完整的style属性设置，
+     * 调用translate_style获取元素上自定义style字符串, key是style的属性名，值是完整的style属性设置，
      * 比如['color'=>'color:#fff']
-     *
      * @return array
      */
-    protected function style_map() {
-        return $this->get_style($this->data['meta']);
+    protected function style_map($meta=null, $state='normal') {
+        return $this->translate_style($meta ?? $this->data['meta']);
     }
     /**
      * 元素引用的selector包含的style字符串, key是style的属性名，值是完整的style属性设置，
@@ -228,7 +242,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @return array
      */
     protected function common_style_map() {
-        return $this->get_style($this->data['meta']['selector']);
+        return $this->translate_style($this->data['meta']['selector']);
     }
 
     private function get_gradient_style($gradientInfo){
@@ -297,6 +311,99 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     }
 
     /**
+     * 构建伪类样式
+     * @return void
+     */
+    protected function style_of_pseudo(){
+        $pseudoStates = [];
+        foreach ($this->build->get_uiid_bind_state($this->myid()) as $state){
+            if ($state->state_type != 'pseudo')continue;
+            $pseudoStates[] = $state;
+        }
+
+        $key = '[data-uiid='.$this->myId().']';
+        foreach ($pseudoStates as $pseudoState){
+            // 里面包含css，style和selector，custom，同uimeta结构体
+            $styles = $this->build->get_uiid_bind_state_styles($this->myId(), $pseudoState->uuid);
+            if (!$styles) continue;
+//            print_r($styles);
+//            $cssInfo = [];
+//            伪类暂时不支持预定义css样式
+//            $this->fetch_css($styles['css'], $cssInfo);
+//            print_r($cssInfo);
+//            print_r($styles);
+            ;
+            $this->styles[$key.$pseudoState->state_name] = join(';'.PHP_EOL, $this->style_map($styles, $pseudoState->state_name)).';';
+        }
+    }
+
+    /**
+     * 构建自定义状态中使用的css，并根据前端框架构建条件输出，由具体的
+     * @return array [css: variable expression]
+     */
+    protected function css_of_state(){
+        $states = [];
+        foreach ($this->build->get_uiid_bind_state($this->myid()) as $state){
+            if ($state->state_type == 'pseudo' || $state->state_type == 'hidden')continue;
+            $states[] = $state;
+        }
+
+        $cssVariable = [];
+        foreach ($states as $state){
+            $state_name = $state->state_type == 'custom' ? $state->state_name : $state->state_type;
+            $styles = $this->build->get_uiid_bind_state_styles($this->myId(), $state->uuid);
+            if (!$styles) continue;
+            $expression = $state->get_expression() ? $state->get_expression()->get_expression_code(true) : null;
+            if (!$expression) continue;
+
+            $css = [];
+            if ($styles['css']){// 使用的预定义css
+                $this->fetch_css($styles['css'], $css);
+                if ($css) $css = array_values($css);
+            }
+            $cssVariable[] = "'{$state_name}".($css ? ' '.join(' ', $css) : '')."': {$expression}";
+        }
+        return $cssVariable;
+    }
+
+    /**
+     * 返回配置的hidden的表达式
+     * @return array|void
+     */
+    protected function show_state_expression(){
+        $hiddenState = null;
+
+        foreach ($this->build->get_uiid_bind_state($this->myid()) as $state){
+            if ($state->state_type == 'hidden'){
+                $hiddenState = $state;
+                break;
+            }
+        }
+        return $hiddenState && $hiddenState->get_expression() ? $hiddenState->get_expression()->get_expression_code(true) : null;
+    }
+
+    /**
+     * 构建自定义状态样式，如果state_type=custom表示用户自定义，其他表示系统预定义的
+     * @return void
+     */
+    protected function style_of_state(){
+        $states = [];
+        foreach ($this->build->get_uiid_bind_state($this->myid()) as $state){
+            if ($state->state_type == 'pseudo' || $state->state_type == 'hidden')continue;
+            $states[] = $state;
+        }
+
+        $key = '[data-uiid='.$this->myId().']';
+        foreach ($states as $state){
+            $state_name = $state->state_type == 'custom' ? $state->state_name : $state->state_type;
+            $styles = $this->build->get_uiid_bind_state_styles($this->myId(), $state->uuid);
+            if (!$styles) continue;
+//            print_r($styles);
+            $this->styles[$key.'.'.$state_name] = join(';'.PHP_EOL, array_values($this->style_map($styles, $state_name))).';';
+        }
+    }
+
+    /**
      * 元素上的style字符串, 每个组件由其style_map返回该元素的样式字符串，但这些样式字符串应用到ui元素的那个部分，子类可以重载该方法来指定
      * 默认情况下，ui元素的所有样式字符串都应用到元素本身，并且以id作为selector
      * @param  $justSelf true 只返回自己的样式字符串， false 返回自己并递归旗下所有元素的样式字符串
@@ -313,9 +420,13 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         }
         $this->styles = [];
         $styleArray = $this->style_map();
+
         if ($styleArray) {
             $this->styles[$key] =  join(';'.PHP_EOL, array_values($styleArray)).';';
         }
+
+        $this->style_of_state();
+        $this->style_of_pseudo();
 
         if ($this->check_master()){
             $master = $this->master_view;
@@ -328,7 +439,12 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         foreach ($this->styles as $key => $styles){
             $this->styles[$key] = is_array($this->styles[$key]) ? array_unique($this->styles[$key]) : $this->styles[$key];
         }
+
         return $justSelf ? [$key =>  $this->styles[$key]] : $this->styles;
+    }
+    protected function add_style($name, $style){
+        $this->styles[$name] = $style;
+        return $this;
     }
 
     /**
@@ -338,18 +454,17 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     public function build_common_style(){
         $styles = [];
         foreach ($this->build->get_styles() as $styleModel){
-            $styleValues = $this->get_style(json_decode(html_entity_decode($styleModel->meta), true));
+            $styleValues = $this->translate_style(json_decode(html_entity_decode($styleModel->meta), true));
             $styles[".".$styleModel->class_name] =  join(';'.PHP_EOL, $styleValues).';';
         }
         return $styles;
     }
-    public abstract function build_ui();
-
-    public abstract function get_code_fragment(): Base_Code_Fragment;
 
     /**
      * 返回组件的逻辑代码
      * 默认情况下，如果是容器，则需要输出所包含的组件
+     *
+     * @param $in_page_id int
      * @return Base_Code_Fragment
      */
     public function build_code(): Base_Code_Fragment{
@@ -360,27 +475,358 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         $this->build_event_binding_code();
         foreach ((array)@$this->childViews as $view){
             $view->build_code();
-            if ($fragment) $fragment->merge($view->get_code_fragment());
+            $fragment->merge($view->get_code_fragment());
         }
         return $fragment;
     }
 
+    protected function data_default($data){
+        switch ($data['type']){
+            case 'array':
+                // 数组是动态的，非mock时返回控空数组
+                if (!$this->build->need_mock() || !$data["mock"]){
+                    if ($data["initLength"]){
+                        if ($this->is_iteration($data['item'])){
+                            $default = $this->data_default($data['item']);
+                        }else{
+                            $default = $this->get_default_value($data["item"]);
+                        }
+                        return '['.join(',',array_fill(0, $data["initLength"], $default)).']';
+                    }else{
+                        return $data['defaultValue']?:'[]';
+                    }
+                }
+                if ($this->is_iteration($data['item'])){
+                    $mock = $this->data_default($data['item']);
+                }else{
+                    $mock = $this->get_default_value($data["item"]);
+                }
+                return '['.join(',',array_fill(0, rand(3,10), $mock)).']';
+            case 'object':{
+                $propDefault = [];
+                foreach ($data['props'] as $prop){
+                    $default = $this->data_default($prop);
+                    if ($default) $propDefault[] = '"'.$prop['name'].'": '.$default;
+                }
+                if ($propDefault){
+                    return "{".join(",", $propDefault)."}";
+                }else{
+                    return $data['defaultValue']?:"{}";
+                }
+            }
+            case 'map':{
+                if (!$this->build->need_mock() || !$data["mock"]){
+                    return $data['defaultValue']?:"{}";
+                }else{
+                    $propDefault = [];
+                    foreach (range(1,10) as $item){
+                        $propDefault[] = "item{$item}: \"@string\"";
+                    }
+                    return "{".join(",", $propDefault)."}";
+                }
+            }
+            default:
+                return $this->get_default_value($data);
+        }
+    }
+
+    private function mock_scale_value($data){
+        if ($data['type'] === 'float'){
+            return '@float';
+        }else if ($data['type'] === 'integer'){
+            return '@integer';
+        }else if ($data['type'] === 'number'){
+            return '@natural';
+        }else if ($data['type'] === 'boolean'){
+            return '@boolean';
+        }else if ($data['type'] === 'string'){
+            return '@string';
+        }else{
+            return '@csentence';
+        }
+    }
+    private function get_default_value($data){
+        if ($this->build->need_mock() && $data['mock']){
+            return !strcasecmp($data['mock'],'1') ? '"'.$this->mock_scale_value($data).'"' : '"'.$data['mock'].'"';
+        }
+        if ($data['defaultValue']) {
+            if ($data['type']=='string'){
+                return '"'.$data['defaultValue'].'"';
+            }else{
+                return $data['defaultValue'];
+            }
+        }
+        if ($data['nullable']) return 'null';
+        switch ($data['type']){
+            case 'array': return '[]';
+            case 'object':
+            case 'map': return '{}';
+            case 'string': return '""';
+            case 'number':
+            case 'float':
+            case 'integer': return 0;
+            default: return 'undefined';
+        }
+    }
+
+    /**
+     * 每个组件构建并输出组件的ui代码
+     * @return mixed
+     */
+    public abstract function build_ui();
+
+    /**
+     * 获取代码片段对象
+     * @return Base_Code_Fragment
+     */
+    public abstract function get_code_fragment(): Base_Code_Fragment;
+
+    /**
+     * ydecloud事件在各终端上的对应名称
+     * @param $eventName
+     * @return mixed
+     */
+    protected abstract function eventMap($eventName);
+
+    /**
+     * 构建弹窗事件代码
+     * @param Action_Model $action
+     * @param $actionCodeLines
+     * @return mixed
+     */
+    protected abstract function build_popup_event_code(Action_Model $action, &$actionCodeLines);
+
+    /**
+     * 构建内部调用事件代码
+     * @param Action_Model $action
+     * @param $actionCodeLines
+     * @return mixed
+     */
+    protected abstract function build_call_event_code(Action_Model $action, &$actionCodeLines);
+
+    /**
+     * 构建web api调用事件代码
+     * @param Action_Model $action
+     * @param $codeLines array
+     * @return mixed
+     */
+    protected abstract function build_webapi_code(Action_Model $action, &$codeLines);
+
+    /**
+     * 构建重定向事件代码
+     * @param Action_Model $action
+     * @param $actionCodeLines
+     * @return mixed
+     */
+    protected abstract function build_redirect_code(Action_Model $action, &$actionCodeLines);
+
+    /**
+     * 构建触发内部事件的代码
+     * @param Action_Model $action
+     * @param $actionCodeLines
+     * @return mixed
+     */
+    protected abstract function build_emit_code(Action_Model $action, &$actionCodeLines);
+
+    /**
+     * 构建内部数据赋值代码
+     * @param Action_Model $action
+     * @param $actionCodeLines
+     * @return mixed
+     */
+    protected abstract function build_mutation_code(Action_Model $action, &$actionCodeLines);
+    protected abstract function build_closepopup_code(Action_Model $action, &$actionCodeLines);
+    /**
+     * 弹窗模版输出，各终端根据自己的框架进行输出
+     */
+    public abstract function build_popup_ui(&$outputPopupIds=[]);
+
+    private function build_select_prepare_event_code($html_event_name, &$actionCodeLines){
+        if ($this->data['meta']['custom']['multiple']) {
+            if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const boundData = []";
+            if (in_array('value', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const value = []";
+
+            $actionCodeLines[] = "for(var opt of event.target.selectedOptions) {";
+//                $actionCodeLines[] = $this->indent(1, true)."console.log(opt,opt.innerText,opt.dataset?.bound)";
+            if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])){
+                $actionCodeLines[] = $this->indent(1, true) . "const boundName = opt.dataset?.bound;";
+                $actionCodeLines[] = $this->indent(1, true) . "if(boundName) boundData.push(eval('page.' + boundName));";
+            }
+            if (in_array('value', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = $this->indent(1, true) . "value.push(opt.value);";
+            $actionCodeLines[] = "}";
+        } else {
+            $actionCodeLines[] = "const opt = event.target.selectedOptions?.[0]";
+            if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])){
+                $actionCodeLines[] = "const boundName = opt?.dataset?.bound;";
+                $actionCodeLines[] = "const boundData = boundName ? eval('page.' + boundName) : null;";
+            }
+            if (in_array('value', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const value = opt ? opt?.value : null;";
+        }
+    }
+    private function build_other_prepare_event_code($html_event_name, &$actionCodeLines){
+        $actionCodeLines[] = "const eventTarget = event.target.dataset?.value ? event.target : event.target.closest('[data-value]');";
+        if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const boundName = eventTarget?.dataset?.bound;";
+        // x-for 的数据直接可以通过page.boundName访问
+        if (strtolower($this->data['type']) == 'checkbox'){
+            $actionCodeLines[] = 'const checked = eventTarget.querySelector("[type=\'checkbox\']")?.checked';
+            if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])){
+                $actionCodeLines[] = "const boundData = checked ? eval('page.' + boundName) : undefined;";
+            }
+            if (in_array('value', $this->usedVariableInEvent[$html_event_name])) {
+                $actionCodeLines[] = 'const value = checked ? eventTarget.dataset?.value : null';
+            }
+        }else{
+            if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const boundData = boundName ? eval('page.' + boundName) : undefined;";
+            if (in_array('value', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const value = eventTarget?.dataset?.value;";
+        }
+//            $actionCodeLines[] = "console.log('page.' + boundName)";
+    }
+    private function build_input_prepare_event_code($html_event_name, &$actionCodeLines){
+        $tagName = strtoupper($this->data['type']);
+        $tagName = $tagName=='RANGEINPUT'?'INPUT':$tagName;
+
+        if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])) {
+            $actionCodeLines[] = "const eventTarget = event.target.dataset?.bound ? event.target : event.target.closest('[data-bound]');";
+            $actionCodeLines[] = "const boundName = eventTarget?.dataset?.bound;";
+            $actionCodeLines[] = "const boundData = boundName ? eval('page.' + boundName) : null;";
+        }
+
+        if (in_array('value', $this->usedVariableInEvent[$html_event_name])) {
+            $actionCodeLines[] = "const target = event.target.tagName=='{$tagName}' ? event.target : event.target.querySelector('.input') || undefined";
+            $actionCodeLines[] = "const value = target?.value";
+        }
+    }
+    private function build_notiterate_prepare_event_code($html_event_name, &$actionCodeLines){
+        $actionCodeLines[] = "const eventTarget = (event.target.dataset?.bound || event.target.dataset?.value) ? event.target : (event.target.closest('[data-bound]') || event.target.closest('[data-value]'));";
+
+        if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])){
+            $actionCodeLines[] = "const boundName = eventTarget?.dataset?.bound;";
+            $actionCodeLines[] = "const boundData = boundName ? eval('page.' + boundName) : null;";
+        }
+        if (in_array('value', $this->usedVariableInEvent[$html_event_name])) {
+            $actionCodeLines[] = "const value = eventTarget?.dataset?.value;";
+        }
+    }
+    /**
+     * 构建事件代码中使用的基础数据，比如bind的value，事件参数等
+     * @param $eventModel
+     * @param $html_event_name
+     * @param $eventCodes
+     * @param $actionCodeLines
+     * @return void
+     */
+    private function build_prepare_event_code($eventModel, $html_event_name, &$eventCodes, &$actionCodeLines){
+        $eventCodes[$html_event_name]['args'] = ['event'];
+        // 提取自定义事件的自定义参数
+        if ($eventModel->uicomponent_event_id){
+            $customEvent = $eventModel->get_uicomponent_event();
+            $args = json_decode(html_entity_decode($customEvent->args), true);
+            $argNames = [];
+            foreach ($args as $arg){
+                if (!$this->usedVariableInEvent[$html_event_name] || !in_array($arg['name'], $this->usedVariableInEvent[$html_event_name])){
+                    continue;
+                }
+                $argNames[] = $arg['name'];
+            }
+            if ($argNames) $actionCodeLines[] = "const { ".join(', ', $argNames)." } = event.detail";
+            return;
+        }
+        if (!$this->is_custom_ui() && $html_event_name=='onchange'){
+            $eventCodes[$html_event_name]['args'] = ['value', 'oldValue'];
+            return;
+        }
+
+        if (!$this->usedVariableInEvent[$html_event_name] || !array_intersect(['value','boundData'], $this->usedVariableInEvent[$html_event_name])) return;
+
+        // 数据值和绑定对数据
+        if( ! $this->is_input_ui() && ! $this->is_iteration_ui()){
+            $this->build_notiterate_prepare_event_code($html_event_name, $actionCodeLines);
+        }elseif (strtolower($this->data['type']) == 'select'){
+            $this->build_select_prepare_event_code($html_event_name, $actionCodeLines);
+        }elseif (in_array(strtolower($this->data['type']), ['input', 'textarea', 'rangeinput'])){
+            $this->build_input_prepare_event_code($html_event_name, $actionCodeLines);
+        }else{
+            $this->build_other_prepare_event_code($html_event_name, $actionCodeLines);
+        }
+        $actionCodeLines[] = "";
+    }
+    /**
+     * 获取事件的action代码
+     * @return array|void [事件名=>['args'=>[], 'code'=>action codes]
+     */
+    protected function get_event_action_codes(){
+        $eventModels = @$this->build->get_events($this->myid());
+        $eventCodes = [];
+
+        if (!$eventModels) return;
+
+        foreach($eventModels as $eventModel) {
+            $actionCodeLines = [];
+            $html_event_name = strtolower($eventModel->uicomponent_event_id ? $eventModel->event : $this->eventMap($eventModel->event));
+
+            if (!$eventCodes[$html_event_name]) {
+                $eventCodes[$html_event_name] = ['code'=>[],'args'=>[],'comment'=>''];
+            }
+            if ($eventModel->desc){
+                $eventCodes[$html_event_name]['comment'] .= PHP_EOL.$eventModel->desc;
+            }
+
+            // 先编译事件体代码，并记录使用了哪些基础变量
+            foreach ($eventModel->get_actions() as $action) {
+                switch ($action->type) {
+                    case 'popup': $this->build_popup_event_code($action, $actionCodeLines);break;
+                    case 'call': $this->build_call_event_code($action, $actionCodeLines);break;
+                    case 'webapi': {
+                        // api 主体单独生成一个方法
+                        $innerMethod = "call_api_in_{$html_event_name}";
+                        $actionCodeLines[] = 'page.'.$this->myId(true)."_{$innerMethod}()";
+                        $apicCodes = [];
+                        $this->build_webapi_code($action, $apicCodes);
+                        $eventCodes[$innerMethod] = ['code'=>$apicCodes,'args'=>[],'comment'=>''];
+                        break;
+                    }
+                    case 'redirect': $this->build_redirect_code($action, $actionCodeLines);break;
+                    case 'emit': $this->build_emit_code($action, $actionCodeLines);break;
+                    case 'mutation': $this->build_mutation_code($action, $actionCodeLines);break;
+                    case 'closepopup': $this->build_closepopup_code($action, $actionCodeLines);break;
+                    default: $actionCodeLines = [];
+                }
+            }
+            if ($actionCodeLines) {
+                $this->build_prepare_event_code($eventModel, $html_event_name, $eventCodes, $actionCodeLines);
+                $eventCodes[$html_event_name]['code'] = $actionCodeLines;
+            }
+        }
+        return $eventCodes;
+    }
     /**
      * 输出组件自己的事件绑定的代码, 并放入codefragment中
      */
     protected function build_event_binding_code() {
-    }
+        $eventCodes = $this->get_event_action_codes();
 
-    /**
-     * 弹窗模版输出，各终端根据自己的框架进行输出
-     */
-    public function build_popup_ui(&$outputPopupIds=[]){
-        foreach ($this->childViews as $view){
-            $view->build_popup_ui($outputPopupIds);
+        if (!$eventCodes) return;
+
+        foreach ($eventCodes as $html_event_name => $eventInfo){
+            list('args'=>$args, 'code'=>$codeBlocks) = $eventInfo;
+            if (!$codeBlocks) continue;
+            $codeLines = [];
+            $codeLines[] = $this->myId(true)."_{$html_event_name}(".join(', ', $args).") {";
+            foreach ($codeBlocks as $codes){
+                $codeLines = array_merge($codeLines, $this->build->indent_code(1, $codes));
+            }
+            $codeLines[] = "}";
+            $this->get_code_Fragment()->add_code($codeLines);
         }
     }
-    protected final function output_component(){
+
+
+    protected function output_component(){
         $this->build_ui();
+    }
+
+    public function is_custom_ui(){
+        return $this->data['type']=='UIComponent';
     }
 
     /**
@@ -415,10 +861,12 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         return $this->subPage;
     }
     /**
-     * 查找uuid的父级
+     * 从根查找uuid的父级
      */
-    protected function find_parent($uiid, &$index=-1, $parent=null) {
-        if (!$parent) $parent = $this->build->get_ui_config();
+    protected function find_parent($uiid, &$index=-1, $parent =null) {
+        if (!$parent) {
+            $parent = json_decode(json_encode($this->build->get_page()->get_config()), true);
+        }
         foreach ((array)@$parent['items'] as $i => $item){
             if ($item['meta']['id'] == $uiid) {
                 $index = $i;
@@ -464,6 +912,9 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         return $this->build->get_project()->end_kind;
     }
 
+    public function is_input_ui() {
+        return in_array(strtolower($this->data['type']),['checkbox','input','radio','rangeinput','select','textarea','file']);
+    }
     /**
      * 添加属性, 属性是指会输出到对应ui元素的结构中的内容，比如<foo id='' style='' data-attr=''> 中的id，style data-attr
      * @param string $name 属性名
@@ -479,21 +930,133 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         $this->_attrs[$name] = trim($this->_attrs[$name], $seperate).$seperate.$value;
     }
     /**
-     * 输出css，id等基本属性和attr内容， attr内容需要在该方法前调用add_attr先设置
+     * - 输出css，id等基本属性和attr内容， attr内容需要在该方法前调用add_attr先设置
+     * - 数据输出绑定
+     * - 事件绑定
+     * - 非迭代类ui的bound和value绑定
      *
      * <strong style="color:red">注意这部分内容只能在ui元素的主体上进行调用输出，具体每个组件那个部分是主体内容，由
      * 组件自己决定。这意味着在一个ui组件及其上层master，该方法只能被调用一次</strong>
+     *
+     * @param $includeEvent boolean 是否包含事件输出绑定
+     * @return void
      */
-    protected function build_main_attrs() {
-        $css = $this->get_css();
-        echo $this->wrap_output('class', $css?:NULL);
-        echo $this->wrap_output('data-type', $this->data['type']);// 用户前端处理时知道元素的类型
-        echo $this->wrap_output('id', $this->myid(true));
+    protected function build_main_attrs($includeEvent = true) {
+        $this->build_css_attrs();
         echo $this->wrap_output('data-uiid', $this->myid());
         foreach ($this->_attrs as $name => $value){
             echo $this->wrap_output($name, $value);
         }
+        $this->build_data_output_bind();
+        if (!is_a($this, ValueList_View::class)){
+            $boundDataNames = [];
+            $boundDatas = $this->get_bound_datas($boundDataNames);
+            $outputDatas = $this->get_output_datas($outputDataNames);
+//            var_dump($outputDatas);
+            $hasIterate = $this->need_iterate_data($iterateOutputAs, $dataName, $iterateDataName);
+            if(!$boundDatas){
+                // 没有明确有绑定输出，当前是循环输出的ui把当前的循环数据绑定到bound
+                if ($hasIterate){
+                    echo $this->wrap_output('data-bound', "itemOf{$iterateDataName}");
+                }
+            }else{
+                // 明确有bound输出的
+                foreach ($boundDataNames as $boundType => $boundDataName){
+                    if ($boundType === 'BOUND'){
+                        echo $this->wrap_output("data-bound", $hasIterate && $boundDataName==$dataName ? "itemOf{$iterateDataName}" : $boundDataName);
+                    }elseif ($boundType === 'VALUE'){
+                        echo $this->wrap_output(":data-value", $hasIterate && $boundDataName==$dataName  ? "itemOf{$iterateDataName}" : $boundDataName);
+                    }
+                }
+            }
+        }
+        if($includeEvent) $this->build_event_listen();
     }
+
+    /**
+     * 获取绑定的输出数据项，该数据项可能是1级数据或者是数据下面的子数据，$dataName返回访问这个数据的访问路径。
+     * 一个ui可以绑定多个输出类型，每个输出类型只能绑定一个数据项。
+     * 返回格式：
+     *
+     * [
+     * OUTPUTAS1: DATA1,
+     * OUTPUTAS2: DATA2
+     * ]
+     *
+     * 同时通过dataNames返回每个输出格式的数据对应的访问路径 格式[OUTPUTAS1: dataname, OUTPUTAS2: dataname]
+     *
+     * @param $dataNames
+     * @return array
+     */
+    protected function get_output_datas(&$dataNames=[]){
+        if ($this->_outputData){
+            $dataNames = $this->_outputDataName;
+            return $this->_outputData;
+        }
+        $fetch = new Io_Data_Fetch($this->build);
+        $output = $fetch->fetch_output_data($this->myid(), $dataNames);
+        $this->_outputData = $output;
+        $this->_outputDataName = $dataNames;
+        return $output;
+    }
+    protected function get_bound_datas(&$dataNames=[]){
+        if ($this->_boundData){
+            $dataNames = $this->_boundDataName;
+            return $this->_boundData;
+        }
+        $fetch = new Io_Data_Fetch($this->build);
+        $output = $fetch->fetch_output_data($this->myid(), $dataNames, 'bound');
+        $this->_boundData = $output;
+        $this->_boundDataName = $dataNames;
+        return $output;
+    }
+    protected function get_input_data(&$dataName){
+        if ($this->_inputData){
+            $dataName = $this->_inputDataName;
+            return $this->_inputData;
+        }
+        $fetch = new Io_Data_Fetch($this->build);
+        $input = $fetch->fetch_input_data($this->myid(), $dataName);
+        $this->_inputData = $input;
+        $this->_inputDataName = $dataName;
+        return $input;
+    }
+
+    /**
+     * 构建class输出，其中包含有条件的class和固定的class；构建hidden条件输出
+     * @return void
+     */
+    protected function build_css_attrs(){
+        $css = trim($this->get_css());
+        $cssVariable = $this->css_of_state();
+        $xShownExpression = $this->show_state_expression();
+        if ($xShownExpression){
+            echo $this->wrap_output('x-show', $xShownExpression);
+        }
+        if ($cssVariable){
+            if ($css) $cssVariable[] = "'{$css}': true";
+            echo $this->wrap_output(':class', "{" . join(',', $cssVariable) . "}");
+        }else{
+            echo $this->wrap_output('class', $css?:NULL);
+        }
+    }
+
+    /**
+     * 前端根据绑定数据类型及输出类型输出绑定
+     * @return void
+     */
+    protected abstract function build_data_output_bind();
+    /**
+     * 构建前端数据输入绑定
+     * @return void
+     */
+    protected abstract function build_data_input_bind();
+
+    /**
+     * 前端事件绑定
+     * @return void
+     */
+    protected abstract function build_event_listen();
 
     /**
      * 对于表单元素，输出表单特有的属性，比如name，disabled，readonly required placeholder等
@@ -501,11 +1064,8 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * <strong style="color:red">注意这部分内容只能在具体的表单元素的上进行调用输出，比如input，textarea等</strong>
      * @param false $notOutputId 默认输出表单元素id
      */
-    protected function build_form_attrs ($notOutputId=false) {
-        if (!$notOutputId) {
-            echo ' id="'.$this->myId(true).$this->data['type'].'"';
-        }
-        echo $this->wrap_output('name', $this->myId(true));
+    protected function build_form_attrs ($includeName = true, $includeBind=true) {
+        if ($includeName) echo $this->wrap_output('name', $this->myId(true));
         echo $this->wrap_output('data-uiid', $this->myId().$this->data['type']);
 
         if (@$this->data['meta']['form']['state']=='disabled'){
@@ -520,50 +1080,53 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         if (@$this->data['meta']['form']['placeholder']) {
             echo $this->wrap_output('placeholder', $this->data['meta']['form']['placeholder']);
         }
+        if($includeBind) $this->build_data_input_bind();
     }
 
     protected function wrap_icon($outputInner, $indent=null, $wrapTag='div', $iconTag='i') {
         $icon = $this->data['meta']['custom']['icon'];
         if (!$icon) {
-            echo "\r\n";
+            echo PHP_EOL;
             echo $this->indent($indent ?: 1);
             $outputInner();
             return;
         }
-        echo "\r\n";
+        echo PHP_EOL;
         echo $this->indent($indent ?: 1);
         switch ($this->data['meta']['custom']['icon-position']) {
             case 'top':{
-                echo "<{$wrapTag}><{$iconTag} class='{$icon}'></{$iconTag}></{$wrapTag}>\r\n";
+                echo "<{$wrapTag}><{$iconTag} class='{$icon}'></{$iconTag}></{$wrapTag}>".PHP_EOL;
                 echo $this->indent($indent ?: 1);
                 $outputInner();
                 return;
             }
             case 'bottom':{
                 $outputInner();
-                echo "\r\n";
+                echo PHP_EOL;
                 echo $this->indent($indent ?: 1);
                 echo "<{$wrapTag}><{$iconTag} class='{$icon}'></{$iconTag}></{$wrapTag}>";
                 return;
             }
             case 'right':{
                 $outputInner();
-                echo "\r\n";
+                echo PHP_EOL;
                 echo $this->indent($indent ?: 1);
                 echo "<{$iconTag} class='{$icon}'></{$iconTag}>";
                 return;
             }
             default:{
-                echo "<{$iconTag} class='{$icon}'></{$iconTag}>\r\n";
+                echo "<{$iconTag} class='{$icon}'></{$iconTag}>".PHP_EOL;
                 echo $this->indent($indent ?: 1);
                 $outputInner();
             }
         }
     }
 
-    protected function wrap_output($attr, $data) {
+    protected function wrap_output($attr, $data, $justAttr=false) {
+        if (!$attr) return '';
+        if ($justAttr) return " {$attr}";
         if (!isset($data)) return '';
-        $data = addslashes($data);
+        $data = str_replace('"', '\"', $data);
         return " {$attr}=\"{$data}\"";
     }
     public static function get_View_Class(array $uiconfig, Build_Model $build){
@@ -624,4 +1187,238 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             "a"=> $match['a'] ?: 1,
         ];
     }
+
+    /**
+     * 从dataConfig中查找是否存在给定名称的props，找到就返回给prop配置
+     * @param $objectDataConfig array 对象数据类型
+     * @param $propName
+     * @return mixed|null
+     */
+    protected function has_props($objectDataConfig, $propName){
+        if (!$objectDataConfig['props']) return null;
+        foreach ($objectDataConfig['props'] as $prop){
+            if ($prop['name'] == $propName) return $prop;
+        }
+        return null;
+    }
+    protected function is_iteration($dataConfig){
+        return in_array($dataConfig['type'], ['array', 'map', 'object']);
+    }
+    protected function is_object($dataConfig){
+        return in_array($dataConfig['type'], ['map', 'object']);
+    }
+    protected function is_scale($dataConfig){
+        return $this->is_scale_type($dataConfig['type']);
+    }
+    protected function is_scale_type($type){
+        return in_array($type, ['string', 'integer', 'number','boolean']);
+    }
+    protected function is_array($dataConfig){
+        return $dataConfig['type'] == 'array';
+    }
+    protected function is_1d_scale_array($dataConfig){
+        return $dataConfig['type']=='array' && $this->is_scale($dataConfig['item']);
+    }
+    protected function is_1d_any_array($dataConfig){
+        return $dataConfig['type']=='array' && $dataConfig['item']['type'] == 'any';
+    }
+    protected function is_1d_object_array($dataConfig){
+        return $dataConfig['type']=='array' && $this->is_object($dataConfig['item']);
+    }
+    protected function is_1d_array($dataConfig){
+        return $dataConfig['type']=='array' && $dataConfig['item']['type'] != 'array';
+    }
+    protected function is_2d_array($dataConfig){
+        return $dataConfig['type']=='array' && $dataConfig['item']['type']=='array';
+    }
+    protected function is_2d_scale_array($dataConfig){
+        return $this->is_2d_array($dataConfig) && $this->is_scale($dataConfig['item']['item']);
+    }
+    protected function is_2d_iteration_array($dataConfig){
+        return $this->is_2d_array($dataConfig) && $this->is_iteration($dataConfig['item']['item']);
+    }
+
+    /**
+     * 根据输出的数据及输出类型，返回前端绑定的数据名
+     *
+     * - 如果是循环输出，output_component中输出了x-for循环绑定语句，根据输出类型判断是否加上itemOf前缀
+     * - 如果是对象判断是否需要JSON.stringify
+     *
+     * 如果不能输出，则返回null
+     *
+     * @param $outputData
+     * @param $dataName
+     * @return string
+     */
+    protected function get_output_data_name($outputAs, $outputData, $outputDataName){
+        if ($outputAs === 'NONE') return null;
+        $dataName = $outputData['name'];
+
+        if ($this->is_iteration_ui()){
+            switch ($outputAs){
+                case 'HTML':
+                case 'TEXT':
+                case 'ALT':return null;
+                case 'VALUELIST':
+                    if ($this->is_scale($outputData)) return null;
+                    if ($this->is_object($outputData) || $this->is_1d_array($outputData)) return "itemOf{$dataName}";
+                    if ($this->is_2d_array($outputData)) return "itemOf{$dataName}2";
+                    return null;
+                case 'STYLE':
+                    if ($this->is_scale($outputData) || $this->is_object($outputData) || $this->is_1d_scale_array($outputData)) return $outputDataName;
+                    return null;
+                case 'CSS':
+                    if ($this->is_scale($outputData) || $this->is_1d_scale_array($outputData)) return $outputDataName;
+                    return null;
+                case 'TITLE':
+                    if ($this->is_scale($outputData)) return $outputDataName;
+                    return "JSON.stringify({$outputDataName})";
+                case 'KEYVALUE':
+                    if ($this->is_object($outputData)) return $outputDataName;
+                    return null;
+            }
+        }else{
+            switch ($outputAs){
+                case 'HTML':
+                case 'TEXT':
+                    if ($this->is_scale($outputData)) return $outputDataName;
+                    if ($outputData['type'] == 'any' || $this->is_object($outputData)) return "JSON.stringify({$outputDataName})";
+                    if ($this->is_1d_scale_array($outputData)) return "itemOf{$dataName}";
+                    if ($this->is_1d_any_array($outputData)) return "JSON.stringify(itemOf{$dataName})";
+                    if ($this->is_1d_object_array($outputData) || $this->is_2d_array($outputData)) return "JSON.stringify(itemOf{$dataName})";
+                    return null;
+                case 'VALUELIST':
+                    if ($this->is_scale($outputData)) return $outputDataName;
+                    if ($this->is_object($outputData) || $this->is_1d_array($outputData)) return "itemOf{$dataName}";
+                    if ($this->is_2d_array($outputData)) return "itemOf{$dataName}2";
+                    return null;
+                case 'STYLE':
+                    if ($this->is_scale($outputData) || $this->is_object($outputData) || $this->is_1d_scale_array($outputData)) return $outputDataName;
+                    if ($this->is_1d_object_array($outputData) || $this->is_2d_scale_array($outputData)) return "itemOf{$dataName}";
+                    return null;
+                case 'CSS':
+                    if ($this->is_scale($outputData) || $this->is_1d_scale_array($outputData)) return $outputDataName;
+                    if ($this->is_2d_scale_array($outputData)) return "itemOf{$dataName}";
+                    return null;
+                case 'KEYVALUE':
+                    if ($this->is_object($outputData)) return $outputDataName;
+                    if ($this->is_1d_object_array($outputData)) return "itemOf{$dataName}";
+                    return null;
+                case 'ALT':
+                case 'TITLE':
+                    if ($this->is_scale($outputData)) return $outputDataName;
+                    return "JSON.stringify({$outputDataName})";
+            }
+        }
+        return NULL;
+    }
+
+    /**
+     * 迭代类ui指内部有循环输出元素的ui，包含：
+     * - breadcrumb
+     * - carousel
+     * - checkbox
+     * - collapse
+     * - dropdown
+     * - list
+     * - nav
+     * - pagination
+     * - radio
+     * - select
+     *
+     * @return bool
+     */
+    protected function is_iteration_ui(){
+        return in_array(strtolower($this->data['type']),['breadcrumb','carousel','checkbox','collapse','dropdown','list','nav','pagination','radio','select']);
+    }
+
+    /**
+     * 判断当前绑定的输出数据是否需要循环当前ui，并通过参数返回需要循环输出的输出类型及该数据的name
+     * @param $iterateOutputAs string 循环输出类型
+     * @param $dataName string 循环输出的数据名
+     * @param $iterateDataName string 在循环时用的item name，比如 for($iterateDataName in $dataName)
+     * @return bool
+     */
+    protected function need_iterate_data(&$iterateOutputAs=null, &$dataName=null, &$iterateDataName=null){
+        $outputDatas = $this->get_output_datas($dataNames);
+        foreach ($outputDatas as $outputAS => $outputData){
+            if ($this->need_iterate_ui($outputAS, $outputData)){
+                $iterateOutputAs = $outputAS;
+                $dataName = $dataNames[$outputAS];
+                $iterateDataName = $outputData['name'] ?: $dataName;
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * 判断绑定dataconfig输出时，是否需要循环输出UI，
+     * 一下情况需要循环输出：
+     * - 迭代类ui
+     *      - 二维数组并绑定value： 这时一维循环输出ui，二维循环输出内部list
+     * - 非迭代类ui
+     *      - 一维标量数组并绑定html：循环输出ui并绑定x-html
+     *      - 一维标量数组并绑定text：循环输出ui并绑定x-text
+     *      - 一维标量数组并绑定value：循环输出ui并绑定value
+     *      - 一维对象数组并绑定text：1维循环输出ui，二维json后输出x-text
+     *      - 一维对象数组并绑定html：1维循环输出ui，二维json后输出x-html
+     *      - 一维对象数组并绑定keyvalue：循环输出ui，并绑定x-keyvalue
+     *      - 一维对象数组并绑定style：循环输出ui，并绑定x-style
+     *      - 二维数组并绑定html：1维循环输出ui，二维json后输出x-html
+     *      - 二维数组并绑定text：1维循环输出ui，二维json后输出x-text
+     *      - 二维标量数组并绑定style：一维循环输出ui，二维绑定x-style
+     *      - 二维标量数组并绑定css：一维循环输出ui，二维绑定x-css
+     *
+     * @param $outputData
+     * @return false
+     */
+    public function need_iterate_ui($outputas, $outputData){
+        if (!$outputData) return false;
+        $outputas = strtoupper($outputas);
+        if ($this->is_iteration_ui()){
+            return $this->is_2d_array($outputData) && $outputas == 'VALUELIST';
+        }else{
+            if ($this->is_1d_any_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'NONE'])) return true;
+            if ($this->is_1d_scale_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'VALUELIST', 'NONE'])) return true;
+            if ($this->is_1d_object_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'KEYVALUE', 'STYLE', 'NONE'])) return true;
+            if ($this->is_2d_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'NONE'])) return true;
+            if ($this->is_2d_scale_array($outputData) && in_array($outputas, ['STYLE', 'CSS', 'NONE'])) return true;
+        }
+        return false;
+    }
+
+    /**
+     * 返回输出格式在前端的绑定指令， 如果返回假值则表示不输出
+     * @param $outputAs
+     * @return string
+     */
+    protected function output_as_prop($outputAs, $outputData){
+        if ($outputAs=='HTML'){
+            return 'x-html';
+        }else if ($outputAs=='NONE'){
+            return null;
+        }else if($outputAs=='STYLE'){
+            if ($this->is_scale($outputData)) return ":style";
+            if ($this->is_2d_scale_array($outputData)) return 'x-style';
+            if ($this->is_iteration($outputData)) return "x-style";
+            return null;
+        }else if($outputAs=='CSS'){
+            if($this->is_scale($outputData)) return ':class';
+            if($this->is_1d_scale_array($outputData) || $this->is_2d_scale_array($outputData)) return 'x-class';
+            return null;
+        }else if($outputAs=='TITLE'){
+            return ':title';
+        }else if($outputAs=='ALT'){
+            return ':alt';
+        }else if($outputAs=='KEYVALUE'){
+            if($this->is_scale($outputData)) return null;
+            if($this->is_1d_scale_array($outputData)) return null;
+            if($this->is_2d_array($outputData)) return null;
+            return 'x-keyvalue';
+        }else{
+            return 'x-text';
+        }
+    }
+
+
 }

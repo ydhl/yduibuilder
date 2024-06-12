@@ -18,11 +18,9 @@ $pages[] = $page;
 // 当前页面及所有子页的公共样式
 $commonStyles = [];
 $styles = [];
-$pageViews = [];
 foreach ($pages as $page){
     $build = new Build_Model($this->controller, $page);
     $pageView = Preview_View::create_View($build);
-    $pageViews[] = $pageView;
     $commonStyles = array_merge($commonStyles, $pageView->build_common_style());
     $styles = array_merge($styles, $pageView->build_style(false));
 }

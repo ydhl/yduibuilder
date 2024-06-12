@@ -8,7 +8,7 @@
     <div class="row">
       <label class="col-sm-3 col-form-label text-end">{{ t('style.background.foreground') }}</label>
       <div class="col-sm-9 d-flex align-items-start align-content-start">
-          <select class="me-2 form-control form-control-sm" style="flex-shrink: 2" v-model="foregroundCss">
+          <select class="me-2 form-select form-select-sm" style="flex-shrink: 2" v-model="foregroundCss">
             <option :key="value" :value="value" v-for="value in cssMap['foregroundTheme']">{{value}}</option>
           </select>
         <ColorPicker css="w-100" v-model="foregroundColor"></ColorPicker>
@@ -17,7 +17,7 @@
     <div class="row">
       <label class="col-sm-3 col-form-label text-end">{{ t('style.background.background') }}</label>
       <div class="col-sm-9 d-flex align-items-start align-content-start">
-        <select class="me-2 form-control form-control-sm" style="flex-shrink: 2" v-model="backgroundCss">
+        <select class="me-2 form-select form-select-sm" style="flex-shrink: 2" v-model="backgroundCss">
           <option :key="value" :value="value" v-for="value in cssMap['backgroundTheme']">{{value}}</option>
         </select>
         <ColorPicker css="w-100" v-model="backgroundColor"></ColorPicker>
@@ -49,7 +49,7 @@
 import initUI from '@/components/Common'
 import ColorPicker from '@/components/common/ColorPicker.vue'
 import { useI18n } from 'vue-i18n'
-import { computed, ref } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import BackgroundImage from '@/components/sidebar/style/BackgroundImage.vue'
 
 export default {
@@ -73,36 +73,37 @@ export default {
       'color',
       'luminosity'
     ])
-    const foregroundColor = info.computedWrap('color', 'style', undefined, false, props.previewMode)
-    const foregroundCss = info.computedWrap('foregroundTheme', 'css', 'default', false, props.previewMode)
-    const blendMode = info.computedWrap('background-blend-mode', 'style', undefined, false, props.previewMode)
-    const backgroundCss = info.computedWrap('backgroundTheme', 'css', 'default', false, props.previewMode)
-    const backgroundColor = info.computedWrap('background-color', 'style', undefined, false, props.previewMode)
+    const previewMode = toRef(props, 'previewMode')
+
+    const foregroundColor = info.computedWrap('color', 'style', undefined, false, previewMode)
+    const foregroundCss = info.computedWrap('foregroundTheme', 'css', 'default', false, previewMode)
+    const blendMode = info.computedWrap('background-blend-mode', 'style', undefined, false, previewMode)
+    const backgroundCss = info.computedWrap('backgroundTheme', 'css', 'default', false, previewMode)
+    const backgroundColor = info.computedWrap('background-color', 'style', undefined, false, previewMode)
     const backgroundImages = computed(() => {
-      return info.getMeta('background-image', 'style', props.previewMode) || []
+      return info.getMeta('background-image', 'style', previewMode) || []
     })
 
     const addImage = (index) => {
-      info.setMeta('background-image', [{ type: 'image' }], 'style', true, props.previewMode)
+      info.setMeta('background-image', [{ type: 'image' }], 'style', true, previewMode)
       // 对应的其他Background属性也对应的生成
-      info.setMeta('background-size', ['auto'], 'style', true, props.previewMode)
-      info.setMeta('background-repeat', ['repeat'], 'style', true, props.previewMode)
-      info.setMeta('background-position', ['0% 0%'], 'style', true, props.previewMode)
-      info.setMeta('background-clip', ['border-box'], 'style', true, props.previewMode)
-      info.setMeta('background-origin', ['padding-box'], 'style', true, props.previewMode)
-      info.setMeta('background-attachment', ['scroll'], 'style', true, props.previewMode)
+      info.setMeta('background-size', ['auto'], 'style', true, previewMode)
+      info.setMeta('background-repeat', ['repeat'], 'style', true, previewMode)
+      info.setMeta('background-position', ['0% 0%'], 'style', true, previewMode)
+      info.setMeta('background-clip', ['border-box'], 'style', true, previewMode)
+      info.setMeta('background-origin', ['padding-box'], 'style', true, previewMode)
+      info.setMeta('background-attachment', ['scroll'], 'style', true, previewMode)
     }
 
     const hasInherit = computed(() => {
-      return info.hasInheritStyle('css', ['backgroundTheme', 'foregroundTheme']) ||
-        info.hasInheritStyle('style', ['background-image', 'background-color', 'background-blend-mode', 'color'])
+      return info.hasInheritStyle('css', ['backgroundTheme', 'foregroundTheme'], previewMode) ||
+        info.hasInheritStyle('style', ['background-image', 'background-color', 'background-blend-mode', 'color'], previewMode)
     })
 
     const hasSet = computed(() => {
-      return info.hasSetStyle('css', ['backgroundTheme', 'foregroundTheme']) ||
-        info.hasSetStyle('style', ['background-image', 'background-color', 'background-blend-mode', 'color'])
+      return info.hasSetStyle('css', ['backgroundTheme', 'foregroundTheme'], previewMode) ||
+        info.hasSetStyle('style', ['background-image', 'background-color', 'background-blend-mode', 'color'], previewMode)
     })
-
     return {
       t,
       ...info,

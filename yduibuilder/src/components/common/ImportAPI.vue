@@ -1,8 +1,8 @@
 <template>
-  <template v-if="loading">
+  <div v-if="loading" class="vh-100 d-flex align-items-center justify-content-center">
     <div>{{t('page.loading')}}</div>
-  </template>
-  <template v-else>
+  </div>
+  <template v-else-if="apis?.length > 0">
     <div class="justify-content-between d-flex btn btn-sm btn-white w-100 align-items-center">
       <div><i class="iconfont icon-api"></i> {{t('common.api')}}</div>
       <div class="btn-group btn-group-sm">
@@ -14,12 +14,15 @@
       <APITree :tree="tree" v-for="(tree, index) in apis" :open="openState" :indent="1" :key="index">
         <template #leaf="{data}">
           <label class="d-flex justify-content-center align-items-center pe-3">
-            <input v-if="!isSingle" type="checkbox" v-model="checked[data.id]" >
-            <input v-if="isSingle" type="radio" :value="data.id" v-model="checkOne" >
+            <input v-if="!isSingle" @click="checkedOneAPI=data" type="checkbox" v-model="checked[data.id]" >
+            <input v-if="isSingle" @click="checkedOneAPI=data" type="radio" :value="data.id" v-model="checkAPI" >
           </label>
         </template>
       </APITree>
     </ul>
+  </template>
+  <template v-else>
+    <div class="text-muted">{{t('event.bindAPIEmptyTip')}}</div>
   </template>
 </template>
 
@@ -35,21 +38,22 @@ export default {
   name: 'ImportAPI',
   components: { APITree },
   props: {
-    modelValue: Array,
+    modelValue: Object,
     isSingle: Boolean
   },
-  emits: ['update:modelValue'],
+  emits: ['checkAPI'],
   setup (props: any, context: any) {
     const { t } = useI18n()
-    const checked = computed(() => props.modelValue)
-    const checkOne = ref('')
+    const checked = computed(() => props.modelValue) // 这部分是由于modelValue就是一个对象引用，所以直接更改了，没有update事件update:modelValue
+    const checkAPI = ref('')
     const store = useStore()
     const project = computed(() => store.state.design.project)
+    const checkedOneAPI = ref({})
     const loading = ref(true)
     const openState = ref(true)
     const apis = ref<Array<APIFolder>>([])
-    watch(checkOne, () => {
-      context.emit('update:modelValue', checkOne.value)
+    watch(checkAPI, () => {
+      context.emit('checkAPI', checkedOneAPI.value)
     })
 
     const collapseAll = () => {
@@ -65,7 +69,7 @@ export default {
       }, 'json')
     }
     onMounted(() => {
-      if (props.isSingle) checkOne.value = props.modelValue
+      if (props.isSingle) checkAPI.value = props.modelValue
       loadApi()
     })
     return {
@@ -74,7 +78,8 @@ export default {
       loading,
       t,
       checked,
-      checkOne,
+      checkAPI,
+      checkedOneAPI,
       collapseAll,
       expandAll
     }

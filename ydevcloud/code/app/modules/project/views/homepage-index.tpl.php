@@ -9,7 +9,6 @@ use function yangzie\__;
 use function yangzie\yze_merge_query_string;
 
 $project = $this->get_data('project');
-$this->master_view = 'master/structure';
 $page = $project->get_home_page();
 $loginUser = YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
 $member = $project->get_member($loginUser->id);

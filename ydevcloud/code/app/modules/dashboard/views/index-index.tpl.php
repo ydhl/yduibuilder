@@ -39,11 +39,11 @@ $env = Env::package();
     <div class="card me-3 mb-3" style="width: 20rem">
         <a href="/project/<?= $project->uuid?>" class=" text-decoration-none"><div class="card-header text-truncate"><?= $project->name. '/' . $module->name . '/' . $function->name?></div></a>
         <div class="card-body overflow-hidden p-0 bgtransparent">
-            <div class="page-preview" style="background-image: url(<?= $page->screen ? UPLOAD_SITE_URI.$page->screen : '/img/transparent.svg'?>)"></div>
+            <div class="page-preview" style="background-image: url(<?= $page->screen ? SITE_URI.'image?file='.urlencode($page->screen).'&time='.time() : '/img/transparent.svg'?>)"></div>
         </div>
         <div class="card-footer p-0">
             <a href="/preview/<?= $project->uuid?>?module=<?= $module->uuid?>" class="btn btn-light btn-sm"><i class="iconfont icon-run"></i> <?= __('Preview')?></a>
-            <button type="button" data-url="<?= Project_Model::get_ui_builder_url()?>" data-uuid="<?= $page->uuid?>" class="run-ui-builder btn btn-light btn-sm"><i class="iconfont icon-ui"></i> <?= __('Build UI')?></button>
+            <button type="button" data-url="<?= Project_Model::get_ui_builder_url()?>" data-uuid="<?= $page->uuid?>" class="run-ui-builder btn btn-light btn-sm"><i class="iconfont icon-edit"></i> <?= __('Build UI')?></button>
             <?php
                 if ($frontendFramework) echo "<small class='badge bg-success me-1'>{$env[$frontendFramework]['name']}</small>";
                 if ($backendFramework) echo "<small class='badge bg-secondary'>{$backendFramework}</small>";

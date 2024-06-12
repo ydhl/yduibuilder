@@ -1,8 +1,8 @@
 <template>
   <div class="text-muted p-3 d-flex justify-content-between align-items-center ui-sidebar-fixedtop">
     <small>{{ui}} {{uiVersion}}</small>
-    <button class="btn btn-white btn-sm" type="button" v-if="!openState" @click="expandAll"><i class="iconfont icon-expandall"></i></button>
-    <button class="btn btn-white btn-sm" type="button" v-if="openState" @click="collapseAll"><i class="iconfont icon-collapseall"></i></button>
+    <div v-if="!openState" @click="expandAll"><i class="iconfont icon-expandall hover-primary"></i></div>
+    <div v-if="openState" @click="collapseAll"><i class="iconfont icon-collapseall hover-primary"></i></div>
   </div>
   <div style="margin-top: 60px">
     <div class="ui-sidebar" v-for="(type) in uiDefineTypes" :key="type">

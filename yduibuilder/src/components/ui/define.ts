@@ -6,6 +6,10 @@ export interface UIDefine{
   kind: Array<UIKind>,
   subItemType?: Array<UIType>,
   /**
+   * 是否是迭代类UI、迭代类ui指内部有需要迭代输出的元素，比如select list
+   */
+  isIterable?: boolean,
+  /**
    * 是否是表单项
    */
   isInput?: boolean,
@@ -26,179 +30,190 @@ const baseUIDefines: Record<UIType, UIDefine> = {
   Breadcrumb: {
     type: 'Breadcrumb',
     kind: ['mobile', 'pc'],
-    outputAs: ['NAME', 'VALUE', 'STYLE', 'CSS'],
+    isIterable: true,
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE'],
     name: 'ui.breadcrumb'
   },
   Button: {
     type: 'Button',
     kind: ['mobile', 'pc'],
     name: 'ui.button',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS']
+    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Card: {
     type: 'Card',
     kind: ['mobile', 'pc'],
     isContainer: true,
     name: 'ui.card',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS']
+    outputAs: ['STYLE', 'CSS', 'KEYVALUE', 'NONE']
   },
   Carousel: {
     type: 'Carousel',
     kind: ['mobile', 'pc'],
     isContainer: false,
     name: 'ui.carousel',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS']
+    isIterable: true,
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Checkbox: {
     type: 'Checkbox',
     kind: ['mobile', 'pc'],
+    isIterable: true,
     isInput: true,
     name: 'ui.checkbox',
-    outputAs: ['VALUE', 'NAME', 'STYLE', 'CSS']
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
   },
   Collapse: {
     type: 'Collapse',
-    kind: ['mobile', 'pc'],
+    kind: ['pc'],
+    isIterable: true,
     isContainer: true,
     name: 'ui.collapse',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS']
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Container: {
     type: 'Container',
     isContainer: true,
     kind: ['mobile', 'pc'],
     name: 'ui.container',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS']
+    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS', 'KEYVALUE', 'NONE']
   },
   Dropdown: {
     type: 'Dropdown',
     kind: ['pc'],
     name: 'ui.dropdown',
-    outputAs: ['VALUE', 'NAME', 'STYLE', 'CSS']
+    isIterable: true,
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
   },
   File: {
     type: 'File',
     kind: ['mobile', 'pc'],
     isInput: true,
     name: 'ui.file',
-    outputAs: ['NAME', 'STYLE', 'CSS']
+    outputAs: ['STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Hr: {
     type: 'Hr',
     kind: ['mobile', 'pc'],
     name: 'ui.hr',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS']
+    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Holder: {
     type: 'Holder',
     kind: ['mobile', 'pc'],
     name: 'ui.holder',
-    outputAs: ['STYLE', 'CSS']
+    outputAs: []
   },
   Icon: {
     type: 'Icon',
     kind: ['mobile', 'pc'],
     name: 'ui.icon',
-    outputAs: ['VALUE', 'STYLE', 'CSS']
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Image: {
     type: 'Image',
     kind: ['mobile', 'pc'],
     name: 'ui.image',
-    outputAs: ['VALUE', 'STYLE', 'CSS']
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'ALT', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Input: {
     type: 'Input',
     kind: ['mobile', 'pc'],
     isInput: true,
     name: 'ui.input',
-    outputAs: ['VALUE', 'STYLE', 'CSS']
+    outputAs: ['STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'VALUE', 'NONE']
   },
   List: {
     type: 'List',
     kind: ['mobile', 'pc'],
     name: 'ui.list',
-    outputAs: ['VALUE', 'NAME', 'STYLE', 'CSS']
+    isIterable: true,
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
   },
   Modal: {
     type: 'Modal',
     kind: ['pc'],
     isContainer: true,
     name: 'ui.modal',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS']
+    outputAs: ['STYLE', 'CSS', 'KEYVALUE', 'NONE']
   },
   Nav: {
     type: 'Nav',
     isContainer: true,
     kind: ['pc', 'mobile'],
     name: 'ui.nav',
-    outputAs: ['VALUE', 'NAME', 'STYLE', 'CSS']
+    isIterable: true,
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Page: {
     type: 'Page',
     kind: ['mobile', 'pc'],
     isContainer: true,
     name: 'ui.page',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS']
+    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS', 'KEYVALUE', 'NONE']
   },
   Pagination: {
     type: 'Pagination',
     kind: ['pc'],
     name: 'ui.pagination',
-    outputAs: ['VALUE', 'NAME', 'STYLE', 'CSS']
+    isIterable: true,
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Progress: {
     type: 'Progress',
     kind: ['mobile', 'pc'],
     name: 'ui.progress',
-    outputAs: ['VALUE', 'NAME', 'STYLE', 'CSS']
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Radio: {
     type: 'Radio',
     kind: ['mobile', 'pc'],
     isInput: true,
+    isIterable: true,
     name: 'ui.radio',
-    outputAs: ['VALUE', 'STYLE', 'CSS']
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
   },
   RangeInput: {
     type: 'RangeInput',
     kind: ['mobile', 'pc'],
     isInput: true,
     name: 'ui.rangeInput',
-    outputAs: ['VALUE', 'STYLE', 'CSS']
+    outputAs: ['STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   RichText: {
     type: 'RichText',
     kind: ['mobile', 'pc'],
     isInput: false,
     name: 'ui.richText',
-    outputAs: ['VALUE', 'STYLE', 'CSS']
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE', 'NONE']
   },
   Select: {
     type: 'Select',
     kind: ['mobile', 'pc'],
     isInput: true,
     name: 'ui.select',
-    outputAs: ['NAME', 'VALUE', 'STYLE', 'CSS']
+    isIterable: true,
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
   },
   Table: {
     type: 'Table',
-    kind: ['mobile', 'pc'],
+    kind: ['pc'],
     name: 'ui.table',
-    outputAs: ['STYLE', 'CSS']
+    isIterable: true,
+    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Text: {
     type: 'Text',
     kind: ['mobile', 'pc'],
     name: 'ui.text',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS']
+    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Textarea: {
     type: 'Textarea',
     kind: ['mobile', 'pc'],
     isInput: true,
     name: 'ui.textarea',
-    outputAs: ['VALUE', 'STYLE', 'CSS']
+    outputAs: ['STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'VALUE', 'NONE']
   },
   UIComponent: {
     type: 'UIComponent',
@@ -212,7 +227,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     isContainer: true,
     kind: ['mobile', 'pc'],
     name: 'ui.container',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS']
+    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   }
 }
 

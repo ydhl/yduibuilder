@@ -104,8 +104,7 @@ abstract class Base_Factory{
 
         $this->compile();
         $this->zip->close();
-        \yangzie\yze_move_file($fullpath, YZE_UPLOAD_PATH);
-        return UPLOAD_SITE_URI.urlencode($zipFileName);
+        return upload2oss($fullpath, "build/{$this->project->uuid}/{$zipFileName}");
     }
     public abstract function compile();
 

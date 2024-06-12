@@ -9,7 +9,7 @@
       :data-isContainer="true"
       :data-pageid="pageid">
     <div :class="[{'nav-item pointer-event-none': true}]" v-for="(item, index) in values"
-        :key="index"><a :class="[{'nav-link':true}, (item.checked ? activeItemCss : itemCss)]" :style="item.checked ? activeItemStyle : itemStyle" href="#">{{item.text}}</a></div>
+        :key="index"><a :class="[{'nav-link':true,'active':item.checked}, (item.checked ? activeItemCss : itemCss)]" :style="item.checked ? activeItemStyle : itemStyle" href="#">{{item.text}}</a></div>
     <UIBase v-for="(item, index) in uiconfig.items" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
   </div>
 </template>
@@ -54,16 +54,16 @@ export default {
     const itemCss = computed(() => {
       const style = nav.getUIStyle()
       if (style?.color) return '' // 有自定义颜色，则忽略预定义样式
-      let theme = props.uiconfig?.meta?.css?.foregroundTheme
-      theme = theme && theme !== 'default' ? theme : 'primary'
+      const theme = props.uiconfig?.meta?.css?.foregroundTheme
+      if (!theme || theme === 'default') return ''
       // 转成对应都前景主题
       return store.getters.translate('foregroundTheme', theme)
     })
     const activeItemCss = computed(() => {
       const style = nav.getUIStyle()
       if (style?.color) return '' // 有自定义颜色，则忽略预定义样式
-      let theme = props.uiconfig?.meta?.css?.foregroundTheme
-      theme = theme && theme !== 'default' ? theme : 'primary'
+      const theme = props.uiconfig?.meta?.css?.foregroundTheme
+      if (!theme || theme === 'default') return ''
       return store.getters.translate('backgroundTheme', theme) + ' text-white'
     })
     const itemStyle = computed(() => {
@@ -72,6 +72,7 @@ export default {
     })
     const activeItemStyle = computed(() => {
       const style = nav.getUIStyle()
+      if (!style?.color) return ''
       return `background-color:${style.color} !important;color:#fff;`
     })
     return {

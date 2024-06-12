@@ -33,7 +33,7 @@ $offset = "0px";
 <?php if ($codeTypes){
     $offset = "42px";
 ?>
-<ul class="nav nav-tabs mb-2">
+<ul class="nav nav-tabs mt-3">
 <?php foreach (array_keys($codeTypes) as $type){?>
     <li class="nav-item">
         <a class="nav-link <?= $codeType==$type ? 'active' :''?>" href="<?= yze_merge_query_string('',['code_type'=>$type])?>"><?=$type?></a>
@@ -41,7 +41,7 @@ $offset = "0px";
 <?php }?>
 </ul>
 <?php }?>
-<div  id="exportedCodeEditor" style="height: calc(100% - <?=$offset?>)"></div>
+<div  id="exportedCodeEditor" class="border border-light pt-2" style="height: calc(100% - <?=$offset?>)"></div>
 <script>
     var editor;
     $(function () {

@@ -37,12 +37,13 @@ class Page_Controller extends YZE_Resource_Controller {
     public function index(){
         $request = $this->request;
         $pid = $request->get_var('pid');
-        $funcid_uuid = $request->get_from_get('uuid');
+        $function_uuid = $request->get_from_get('function_uuid');
+        $module_uuid = $request->get_from_get('module_uuid');
+        $type = strtolower($request->get_from_get('type'));
         $project = find_by_uuid(Project_Model::CLASS_NAME, $pid);
-        $function = find_by_uuid(Function_Model::CLASS_NAME, $funcid_uuid);
-        if (!$function) throw new YZE_FatalException(__('Function Not Found'));
-
-        $module = $function->get_module();
+        $function = find_by_uuid(Function_Model::CLASS_NAME, $function_uuid);
+        $module = find_by_uuid(Module_Model::CLASS_NAME, $module_uuid);
+        if ($function) $module = $function->get_module();
         $user = YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
 
         $payload=array(
@@ -53,21 +54,29 @@ class Page_Controller extends YZE_Resource_Controller {
             'sub'=> $user->uuid,
             'jti'=> md5(uniqid('JWT').time()));
         $token = Jwt::getToken($payload);
-        $params = [':pid'=>$project->id];
-        $where = 'm.project_id=:pid and p.is_deleted=0 and m.is_deleted=0 and p.page_type="page" and f.is_deleted=0';
-        $where .= ' and p.module_id=:mid';
-        $params[':mid'] = $module->id;
-        $where .= ' and p.function_id=:fid';
-        $params[':fid'] = $function->id;
+        $params = [':pid'=>$project->id,':is_deleted'=>0];
+        $where = 'p.project_id=:pid and p.is_deleted=:is_deleted';
+        if ($module){
+            $where .= ' and p.module_id=:mid';
+            $params[':mid'] = $module->id;
+        }
+        if ($function){
+            $where .= ' and p.function_id=:fid';
+            $params[':fid'] = $function->id;
+        }
+        if ($type=='recycle'){
+            $params[':is_deleted'] = 1;
+        }elseif ($type){
+            $where .= ' and p.page_type=:type';
+            $params[':type'] = $type;
+        }else{
+            $where .= " and p.page_type='page'";
+        }
 
         $query = Page_Model::from('p')
-            ->left_join(Module_Model::CLASS_NAME, 'm', 'm.id = p.module_id')
-            ->left_join(Function_Model::CLASS_NAME, 'f', 'f.id = p.function_id')
+            ->left_join(Module_Model::CLASS_NAME, 'm', 'm.id = p.module_id and m.is_deleted=0 ')
+            ->left_join(Function_Model::CLASS_NAME, 'f', 'f.id = p.function_id and f.is_deleted=0 ')
             ->where($where)->order_By('modified_on','desc');
-
-        $breadcrumbs = ['/project/'.$project->uuid.'/structure' => __('UI')];
-        $breadcrumbs['/project/'.$project->uuid.'/func?uuid='.$module->uuid] = $module->name;
-        $breadcrumbs['/project/'.$project->uuid.'/page?uuid='.$function->uuid] = $function->name;
 
         $pages = $query->select($params, 'p');
 
@@ -76,7 +85,6 @@ class Page_Controller extends YZE_Resource_Controller {
         $this->set_View_Data('curr_module', $module);
         $this->set_View_Data('curr_function', $function);
         $this->set_View_Data('pages', $pages);
-        $this->set_View_Data('breadcrumbs', $breadcrumbs);
         $this->set_View_Data('token', $token);
         $this->set_view_data('yze_page_title', __('UI'));
     }

@@ -4,4 +4,6 @@
 :root {
   --global-primary-color: var(--bs-primary) !important;
 }
-
+.layui-layer-content-overflow .layui-layer-content{
+  overflow: visible !important;
+}

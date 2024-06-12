@@ -66,7 +66,7 @@ export default {
       }
     })
     const socket = computed(() => store.state.design.socket)
-    const logo = computed(() => project.value.logo ? ydhl.uploadApi + project.value.logo : '/logo.svg')
+    const logo = computed(() => project.value.logo ? ydhl.api + 'image?file=' + project.value.logo : '/logo.svg')
     const api = ydhl.api + 'project/' + project.value.id
     const isOpenBuildDialog = ref(false)
     const saveWord = computed(() => {

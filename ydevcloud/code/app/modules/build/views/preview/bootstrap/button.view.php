@@ -1,11 +1,12 @@
 <?php
 namespace app\modules\build\views\preview\bootstrap;
+
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
-use app\modules\build\views\preview\Html_Event_Binding;
+
 
 class Button_View extends Preview_View {
-    use Html_Event_Binding, Bootstrap_Popup,Html_Code_Helper;
+    use Bootstrap_Popup,Html_Code_Helper;
     private function buttonMeta () {
         $parentUI = $this->get_parent_UI();
         $type = strtolower($parentUI['type']);
@@ -58,22 +59,25 @@ class Button_View extends Preview_View {
         $cssMap['-'] = join(' ', $css);
         return $cssMap;
     }
-    protected function style_map()
+    protected function style_map($meta=null, $state='normal')
     {
-        $styleArray = parent::style_map();
+        $styleArray = parent::style_map($meta);
 
         $buttonMeta = $this->buttonMeta();
-        $selfHasForeground = $this->data['meta']['css']['foregroundTheme'] && $this->data['meta']['css']['foregroundTheme'] !== 'default';
-        $selfHasBackground = $this->data['meta']['css']['backgroundTheme'] && $this->data['meta']['css']['backgroundTheme'] !== 'default';
+        $selfHasForeground = $meta['css']['foregroundTheme'] && $meta['css']['foregroundTheme'] !== 'default';
+        $selfHasBackground = $meta['css']['backgroundTheme'] && $meta['css']['backgroundTheme'] !== 'default';
         // 如果按钮有背景和前景则用按钮的，否则用上层的buttongroup
-        $color = $this->data['meta']['color'] ?: $buttonMeta['style']['color'];
-        $backgroundColor = $this->data['meta']['background-color'] ?: $buttonMeta['style']['background-color'];
+        $color = $meta['style']['color'] ?: $buttonMeta['style']['color'];
+        $backgroundColor = $meta['style']['background-color'] ?: $buttonMeta['style']['background-color'];
         if (!$selfHasForeground && $color){
             $styleArray['color'] = "color: ${color} !important";
         }
         if (!$selfHasBackground && $backgroundColor){
             $styleArray['background-color'] = "background-color: ${backgroundColor} !important";
             $styleArray['border-color'] = "border-color: ${backgroundColor} !important";
+        }
+        if (@$buttonMeta['custom']['isOutline'] && $state=='normal') {
+            unset($styleArray['background-color']);
         }
         return $styleArray;
     }
@@ -96,9 +100,9 @@ class Button_View extends Preview_View {
             $this->wrap_icon(function(){
                 echo $this->data['meta']['title'] ?: $this->data['type'];
             });
-            echo "\r\n";
+            echo PHP_EOL;
             echo $this->indent();
-            echo "</a>\r\n";
+            echo "</a>".PHP_EOL;
         }else{
             echo "<button type='{$type}' title='".addslashes($this->data['meta']['title'])."'";
             if (@$this->data['meta']['custom']['disabled']){
@@ -108,9 +112,9 @@ class Button_View extends Preview_View {
             $this->wrap_icon(function(){
                 echo $this->data['meta']['title'] ?: $this->data['type'];
             });
-            echo "\r\n";
+            echo "".PHP_EOL;
             echo $this->indent();
-            echo "</button>\r\n";
+            echo "</button>".PHP_EOL;
         }
     }
 }

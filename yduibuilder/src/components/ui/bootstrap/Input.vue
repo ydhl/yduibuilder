@@ -6,8 +6,8 @@
         <input :type="uiconfig.meta?.custom?.inputType || 'Text'" :id="uiconfig.meta.id+uiconfig.type" class="w-100 border-0 bg-transparent"
              :name="uiconfig.meta?.form?.inputName" :placeholder="uiconfig.meta?.form?.placeholder"
              :disabled="uiconfig.meta?.form?.state==='disabled'"
-             :readonly="uiconfig.meta?.form?.state==='readonly'"
-             :required="uiconfig.meta?.form?.required" style="font-style: inherit"
+             :readonly="uiconfig.meta?.form?.state==='readonly'"  style="font: inherit;color:inherit"
+             :required="uiconfig.meta?.form?.required"
              :value="uiconfig.meta.value">
       </IconWrapper>
       <div v-if="uiconfig.meta?.custom?.wordCountVisible" class="ml-3">0{{uiconfig.meta?.custom?.maxLength ? '/' + uiconfig.meta?.custom?.maxLength : ''}}</div>

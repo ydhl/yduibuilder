@@ -68,7 +68,9 @@ const store = {
     dragoverInParent: '',
     updateInlineItemValue: false,
     endKind: '',
-    backdropVisible: false
+    backdropVisible: false,
+    selectedUIItemActiveState: { type: 'normal', state: 'normal' },
+    previewStyleItem: {} // 设置style selector时用于预览，也是uibase结构体, 但只用到其中到meta.style部分内容
   },
   mutations: {
     updateExtraInfo (state: any, props: Record<any, any>) {
@@ -93,7 +95,6 @@ const store = {
      * @param props
      */
     updatePageState (state: any, props: Record<any, any>) {
-      // console.log(props)
       for (const name in props) {
         if (!Object.prototype.hasOwnProperty.call(state, name)) continue
         // eslint-disable-next-line no-eval
@@ -109,7 +110,7 @@ const store = {
       state.showEventPanel = showEventPanel
     },
     /**
-     * 和updatePageState的区别：某些组件（如Upload.vue）会同时用在workspace中和iframe的page中, 这两者是不同的store，但props名称用途一直，
+     * 和updatePageState的区别：某些组件（如Upload.vue）会同时用在workspace中和iframe的page中, 这两者是不同的store，但props名称用途一致，
      * 这里和design store中保持同名只是便于这些组件调用commit时不用区分是那个store
      * @param state
      * @param props

@@ -1,10 +1,11 @@
 <?php
 namespace app\modules\build\views\preview\weui;
+
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 
 class Button_View extends Preview_View {
-    use Weui_Event_Binding, Weui_Popup,Html_Code_Helper;
+    use Weui_Popup,Html_Code_Helper;
     private function buttonMeta () {
         $parentUI = $this->get_parent_UI();
         $type = strtolower($parentUI['type']);
@@ -68,15 +69,15 @@ class Button_View extends Preview_View {
         $cssMap['-'] = join(' ', $css);
         return $cssMap;
     }
-    protected function style_map()
+    protected function style_map($meta=null, $state = 'normal')
     {
-        $styleArray = parent::style_map();
+        $styleArray = parent::style_map($meta);
         $buttonMeta = $this->buttonMeta();
-        $selfHasForeground = $this->data['meta']['css']['foregroundTheme'] && $this->data['meta']['css']['foregroundTheme'] !== 'default';
-        $selfHasBackground = $this->data['meta']['css']['backgroundTheme'] && $this->data['meta']['css']['backgroundTheme'] !== 'default';
+        $selfHasForeground = $meta['css']['foregroundTheme'] && $meta['css']['foregroundTheme'] !== 'default';
+        $selfHasBackground = $meta['css']['backgroundTheme'] && $meta['css']['backgroundTheme'] !== 'default';
         // 如果按钮有背景和前景则用按钮的，否则用上层的buttongroup
-        $color = $this->data['meta']['color'] ?: $buttonMeta['style']['color'];
-        $backgroundColor = $this->data['meta']['background-color'] ?: $buttonMeta['style']['background-color'];
+        $color = $meta['style']['color'] ?: $buttonMeta['style']['color'];
+        $backgroundColor = $meta['style']['background-color'] ?: $buttonMeta['style']['background-color'];
         if (!$selfHasForeground && $color){
             $styleArray['color'] = "color: ${color} !important";
         }

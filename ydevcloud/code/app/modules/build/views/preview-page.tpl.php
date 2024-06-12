@@ -9,33 +9,15 @@ use function yangzie\yze_module_css_bundle;
  */
 $page = $this->get_data('page');
 $project = $page->get_project();
-$project_setting = $project->get_setting();
 
-$packages = $project->get_front_project_packages();
-$packages = array_merge($packages['system'], $packages['user']);
 $cssLib = [];
 $jsLib = [];
 $jsModule = [];
-foreach ($packages as $package){
-    if (!file_exists(YZE_PUBLIC_HTML."vendor/{$package}/install.php")) continue;
-    include_once YZE_PUBLIC_HTML."vendor/{$package}/install.php";
-    list ($packageName) = explode('@', trim($package));
-    $packageClass = "{$packageName}_install";
-    if (file_exists(YZE_PUBLIC_HTML."vendor/{$package}/index.css")){
-        $cssLib[] = "<link rel='stylesheet' href='/vendor/{$package}/index.css'>";
-    }
+$project->fetch_css_js_libs('/', $cssLib, $jsLib, $jsModule);
 
-    foreach ($packageClass::jsForPreview() as $js=>$type) {
-        if ($type!='iife') {
-            $jsModule["/vendor/{$package}/{$js}"] = $type;
-            continue;
-        }
-        $jsLib[] = "<script src='/vendor/{$package}/{$js}'></script>";
-    }
-}
-
-$build = new Build_Model($this->controller, $page);
+$build = new Build_Model($this->controller, $page, 2);
 $build->set_api_env($_GET['api_env']);
+$build->set_need_mock(intval($_GET['mock']));
 $view = Preview_View::create_View($build);
 
 ?>
@@ -52,35 +34,82 @@ $view = Preview_View::create_View($build);
     <link rel="stylesheet" type="text/css" href="/preview/page/<?= $page->uuid?>.css" />
 </head>
 <body>
-<div id="ydecloud-app">
+    <div id="ydecloud-app">
 <?php
-//单独查看弹窗
-if ($page->page_type == 'popup'){
-    echo "<style>.modal{display: block !important;}</style>";
-    $style = 'overflow: hidden;height: 100vh;width: 100vw;'
-        .'display: flex !important;align-items: center !important;'
-        .'align-content: center !important;'
-        .'justify-content: center !important;'
-        .'background: linear-gradient(315deg, #dfdfdf, transparent);';
-    echo '<div class="popup-background" style="'.$style.'">';
-}
-
 $view->output();
-
+?>
+    </div>
+<?php
+echo $view->indent(1, true).join("\n".$view->indent(1, true), $jsLib);
+echo "\n";
 if ($page->page_type == 'popup'){
-    echo '</div>';
+?>
+    <script>$("#<?= $page->uuid?>").modal('show')</script>
+<?php
 }
 ?>
-</div>
+    <script type="module">
+        <?php
+        foreach ((array)$jsModule as $file => $import) {
+            echo "{$import} from '{$file}';".PHP_EOL;
+        }
+        ?>
 
-<?php
-echo $view->indent(1, true).join("\n".$view->indent(0), $jsLib);
-echo "\n";
-?>
-<?php
-$view->build_popup_ui();
-?>
-<?= $view->indent(1, true).'<script type="module" src="/preview/page/'.$page->uuid.'.js?api_env='.$_GET['api_env'].'"></script>'?>
+        import ydecloudRun from "<?='/preview/page/'.$page->uuid.'.js?api_env='.$_GET['api_env'].'&mock='.$_GET['mock']?>";
+
+        Alpine.directive('keyvalue', (el, { expression }, { effect, evaluate }) => {
+            effect(() => {
+                const keyValue = evaluate(expression)
+                if (!keyValue || (typeof keyValue) !== 'object') return
+                for(const key in keyValue){
+                    console.log(key)
+                    el.setAttribute(key, keyValue[key])
+                }
+            });
+        });
+        Alpine.directive('style', (el, { expression }, { effect, evaluate }) => {
+            effect(() => {
+                const keyValue = evaluate(expression)
+                if (!keyValue) return
+                let style = []
+                if (Object.prototype.toString.call(keyValue) === '[object Object]'){
+                    for(const key in keyValue){
+                        style.push(`${key}: ${keyValue[key]}`)
+                    }
+                }else if (Object.prototype.toString.call(keyValue) === '[object Array]') {
+                    style = keyValue
+                }else {
+                    return
+                }
+                const old = el.getAttribute('style');
+                el.setAttribute('style', old ? old + ';' + style.join(';') : style.join(';'))
+            });
+        });
+        Alpine.directive('class', (el, { expression }, { effect, evaluate }) => {
+            effect(() => {
+                const keyValue = evaluate(expression)
+                if (!keyValue) return
+                if (Object.prototype.toString.call(keyValue) !== '[object Array]') {
+                    return
+                }
+                const old = el.getAttribute('class');
+                el.setAttribute('class', old ? old + ' ' + keyValue.join(' ') : keyValue.join(' '))
+            });
+        });
+        Alpine.directive('input', (el, { expression, modifiers }, { effect, evaluate, Alpine }) => {
+            Alpine.bind(el, { '@click'(event) {
+                const eventTarget = event.target.dataset?.value ? event.target : event.target.closest('[data-value]');
+                if (!eventTarget) return;
+                evaluate(`${expression} = "${eventTarget.dataset?.value}"`);
+            }})
+        });
+        if(document.readyState === "complete" ||(document.readyState !== "loading" && !document.documentElement.doScroll)) {
+            ydecloudRun()
+        } else {
+            document.addEventListener("DOMContentLoaded", ydecloudRun)
+        }
+    </script>
+<?= $view->indent(1, true).'<script type="text/javascript" src="/vendor/mockjs@1.0.1/mock.js"></script>'?>
 </body>
 </html>
 

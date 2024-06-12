@@ -12,11 +12,7 @@ use app\vendor\Env;
  */
 $project = $this->get_data('project');
 $api_env = $this->get_data('api_env');
-$relativePath = '../';
-$project_setting = $project->get_setting();
-
-$packages = $project->get_front_project_packages();
-$packages = array_merge($packages['system'], $packages['user']);
+$relativePath = '../../';//生成的代码css 文件放在【根目录/assets/css】下面
 
 $build = new Build_Model($this->controller, null,0,$relativePath);
 $build->set_project($project);
@@ -38,8 +34,8 @@ foreach (Page_Bind_Style_Model::from('bs')
      ->where('p.project_id=:pid and bs.is_deleted=0 and s.is_deleted=0')
     ->select([':pid'=>$project->id], 's') as $style){
 
-    $styleValues = $view->get_style(json_decode(html_entity_decode($style->meta), true));
-    $styles[".".$style->class_name] =  join(' !important;'.PHP_EOL, $styleValues).' !important;';
+    $styleValues = $view->translate_style(json_decode(html_entity_decode($style->meta), true));
+    $styles[".".$style->class_name] =  join(';'.PHP_EOL, $styleValues).';';
 }
 
 foreach ($styles as $selector=>$style){

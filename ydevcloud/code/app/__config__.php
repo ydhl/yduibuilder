@@ -9,30 +9,6 @@ use function yangzie\yze_js_bundle;
  */
 define("YZE_UPLOAD_PATH", YZE_APP_PATH. "public_html".DS."upload".DS);
 /**
- * 数据库类型
- */
-define("YZE_DB_TYPE",  "MYSQL");
-/**
- * MYSQL数据库用户名
- */
-define("YZE_DB_USER",  "root");
-/**
- * MYSQL数据库主地址
- */
-define("YZE_DB_HOST_M",  "127.0.0.1");
-/**
- * MYSQL数据库名
- */
-define("YZE_DB_DATABASE",  "ydecloud_os");
-/**
- * MYSQL端口
- */
-define("YZE_DB_PORT",  "3306");
-/**
- * MYSQL密码
- */
-define("YZE_DB_PASS",  "12345678");
-/**
  * MYSQL加解密的秘钥
  */
 define("YZE_DB_CRYPT_KEY",  "");
@@ -45,6 +21,7 @@ define("SITE_URI", "http://ydecloud-os.local.com/");
  */
 define("UPLOAD_SITE_URI", "http://ydecloud-os.local.com/upload/");
 define("UI_BUILDER_URI", "http://localhost:9999/");
+define("API_BUILDER_URI", "http://localhost:9998/");
 // Build SOCKET_HOST
 define("SOCKET_HOST", "ws://localhost:8888");
 
@@ -55,7 +32,7 @@ define("YZE_DEVELOP_MODE",  false );
 /**
  * 错误报告级别
  */
-ini_set('error_reporting', E_ALL & ~E_STRICT & ~E_DEPRECATED & ~E_NOTICE & ~E_WARNING);
+ini_set('error_reporting', E_ALL & ~E_STRICT & ~E_DEPRECATED & ~E_NOTICE);
 /**
  * 时区
  */
@@ -76,7 +53,18 @@ define("RABBITMQ_USER", "guest");
 define("RABBITMQ_PWD", "guest");
 
 
-define('VERSION', '1.0.0');
+// OSS配置
+define("OSS_ENDPOINT", "");
+define("OSS_REGIONID", "");
+define("OSS_ACCESSKEYID", "");
+define("OSS_ACCESSKEYSECRET", "");
+define("OSS_BUCKET", "");
+define("OSS_BUCKET_HOST", "");
+define("OSS_RAM_ACCESSKEYID", "");
+define("OSS_RAM_ACCESSKEYSECRET", "");
+define("OSS_RAM_ARN", "");
+
+define('VERSION', '1.0.1');
 
 /**
  * app模块配置
@@ -85,15 +73,6 @@ define('VERSION', '1.0.0');
  *
  */
 class App_Module extends \yangzie\YZE_Base_Module{
-
-	//数据库配置
-	public $db_user = YZE_DB_USER;
-	public $db_host= YZE_DB_HOST_M;
-	public $db_name= YZE_DB_DATABASE;
-	public $db_port = YZE_DB_PORT;
-	public $db_psw= YZE_DB_PASS;
-	public $db_charset= 'UTF8';
-
 	/**
 	 * App 访问时做一些检查，比如php的版本
 	 * @return bool|void
@@ -122,8 +101,20 @@ class App_Module extends \yangzie\YZE_Base_Module{
 
 	protected function config()
 	{
-		//动态返回配置
-		return array();
+		return [
+			'default_db' => 'ydecloud_os', // 默认链接的数据库名，请填写项目实际的数据库名
+			'db_connections' => [
+				'ydecloud_os' => [
+					'db_type' => 'mysql',
+					'db_host' => '127.0.0.1',
+					'db_user' => 'root',
+					'db_psw'  => '12345678',
+					'db_port' => '3306',
+					'db_params' => [\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY=>true],
+					'db_charset'=> 'utf8'
+				]
+			]
+		];
 	}
 
 	/**
@@ -142,6 +133,7 @@ class App_Module extends \yangzie\YZE_Base_Module{
 			"app/vendor/ydhttp.php",
 			"app/vendor/util.php",
 			"app/vendor/uploader.class.php",
+			"app/public_html/ydlogin/user.class.php",
 			"vendor/autoload.php",
 		];
 

@@ -37,7 +37,7 @@ export default class UIBase {
     const store = this.store
     if (!store) return false
     return store.state.page?.selectedUIItemActiveState &&
-      store.state.page.selectedUIItemActiveState !== 'normal' &&
+      store.state.page.selectedUIItemActiveState.type !== 'normal' &&
       store.state.page.selectedUIItemId === this.props.uiconfig?.meta?.id
   }
 
@@ -148,6 +148,7 @@ export default class UIBase {
     // console.log('getUIStyle')
     const selector = uiconfig?.meta?.selector?.style ? this.getStyle(JSON.parse(JSON.stringify(uiconfig.meta.selector?.style))) : {}
     let style = uiconfig?.meta?.style ? this.getStyle(JSON.parse(JSON.stringify(uiconfig.meta.style))) : {}
+    // if (uiconfig.type === 'Input') console.log(uiconfig.meta.id, style)
     let stateStyle = state?.meta?.style ? this.getStyle(JSON.parse(JSON.stringify(state.meta.style))) : {}
 
     // 公共字体属性

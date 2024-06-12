@@ -1,0 +1,5 @@
+$scrollbarSize: 11px;// 滚动条的宽度
+* {
+  scrollbar-color: $gray-400 transparent;
+  scrollbar-width: thin;
+}

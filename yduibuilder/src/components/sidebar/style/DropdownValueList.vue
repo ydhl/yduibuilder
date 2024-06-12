@@ -4,18 +4,22 @@
     <div class="col-sm-9">
       <template v-if="valueItems && valueItems.length>0">
         <div class="dropdown-menu d-block position-static float-none">
-          <div :class="{'p-1 d-flex justify-content-between align-items-center': true,'dropdown-item':item.type=='action','dropdown-header':item.type=='header'}" v-for="(item, index) in valueItems" :key="index">
-            <div><i class="iconfont icon-drag"></i></div>
-            <label class="flex-grow-1 m-0 text-truncate">
-              <template v-if="item.type=='divider'"><hr class="m-3"/></template>
-              <template v-if="item.type=='action'">{{item.text}} ({{item.value}})</template>
-              <template v-if="item.type=='header' || item.type=='text'">{{item.text}}</template>
-            </label>
-            <div>
-              <button type="button" @click="edit(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-edit"></i></button>
-              <button type="button" @click="remove(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-remove"></i></button>
-            </div>
-          </div>
+          <draggable v-model="valueItems" handle=".icon-drag" @change="sortValueItems">
+            <transition-group>
+              <div :class="{'p-1 d-flex justify-content-between align-items-center': true,'dropdown-item':item.type=='action','dropdown-header':item.type=='header'}" v-for="(item, index) in valueItems" :key="index">
+                <div><i class="iconfont icon-drag" style="cursor: move;"></i></div>
+                <label class="flex-grow-1 m-0 text-truncate">
+                  <template v-if="item.type=='divider'"><hr class="m-3"/></template>
+                  <template v-if="item.type=='action'">{{item.text}} ({{item.value}})</template>
+                  <template v-if="item.type=='header' || item.type=='text'">{{item.text}}</template>
+                </label>
+                <div>
+                  <button type="button" @click="openSetting(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-edit"></i></button>
+                  <button type="button" @click="remove(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-remove"></i></button>
+                </div>
+              </div>
+            </transition-group>
+          </draggable>
         </div>
       </template>
       <button type="button" @click="openSetting(-1)" class="btn btn-outline-primary btn-block btn-sm mt-2 mb-2">
@@ -51,7 +55,7 @@
           </div>
         </div>
         <div class="form-group row" v-if="newItem.type=='action'">
-          <label for="form-value" class="col-sm-3 col-form-label">{{ t('style.href') }}</label>
+          <label for="form-value" class="col-sm-3 col-form-label">{{ t('style.value') }}</label>
           <div class="col-sm-9">
             <input type="text" :class="{'form-control form-control-sm': true}" id="form-value" v-model="newItem.value">
           </div>
@@ -69,50 +73,37 @@
 
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
-import { computed, nextTick, ref, reactive, watch, toRaw } from 'vue'
+import { nextTick, ref, onMounted } from 'vue'
 import UIInit from '@/components/Common'
-
+import { VueDraggableNext } from 'vue-draggable-next'
 export default {
   name: 'DropdownValueList',
+  components: {
+    draggable: VueDraggableNext
+  },
   setup (props: any, context: any) {
     const initInfo = UIInit()
     const { t } = useI18n()
     const editValueIndex = ref(-1)
-    const editValue = computed(() => {
-      if (editValueIndex.value <= -1) return { text: '', value: '', checked: false, disabled: false, type: 'action' }
-      return valueItems.value[editValueIndex.value]
-    })
-    const newItem = reactive({ text: '', value: '', checked: false, disabled: false, type: 'action' })
-    watch(editValue, (newValue) => {
-      newItem.text = newValue ? newValue.text : ''
-      newItem.value = newValue ? newValue.value : ''
-      newItem.checked = newValue ? newValue.checked : false
-      newItem.disabled = newValue ? newValue.disabled : false
-      newItem.type = newValue ? newValue.type : 'action'
-    })
-
-    const valueItems = computed(() => {
-      return initInfo.getMeta('values') || []
-    })
+    const newItem = ref({ text: '', value: '', checked: false, disabled: false, type: 'action' })
+    const valueItems = ref<any>([])
 
     const remove = (index) => {
+      valueItems.value.splice(index, 1)
       const values = JSON.parse(JSON.stringify(valueItems.value))
-      values.splice(index, 1)
       initInfo.setMeta('values', values)
-    }
-
-    const edit = (index) => {
-      openSetting(index)
     }
 
     const isOpenSetting = ref(false)
     const rightBackdropVisible = ref(false)
     const openSetting = (editItemIndex) => {
       editValueIndex.value = editItemIndex
-      newItem.value = ''
-      newItem.text = ''
-      newItem.checked = false
-      newItem.disabled = false
+      if (editItemIndex > -1) {
+        newItem.value = JSON.parse(JSON.stringify(valueItems.value[editItemIndex]))
+      } else {
+        newItem.value = { text: '', value: '', checked: false, disabled: false, type: 'action' }
+      }
+
       isOpenSetting.value = true
       nextTick(() => {
         rightBackdropVisible.value = true
@@ -125,19 +116,27 @@ export default {
     }
 
     const updateValue = () => {
-      const rawItem = JSON.parse(JSON.stringify(toRaw(newItem)))
+      const rawItem = JSON.parse(JSON.stringify(newItem.value))
 
       if (editValueIndex.value > -1) {
+        valueItems.value[editValueIndex.value] = rawItem
         const values = JSON.parse(JSON.stringify(valueItems.value))
-        values[editValueIndex.value] = rawItem
         initInfo.setMeta('values', values)
       } else {
+        valueItems.value.push(rawItem)
         initInfo.setMeta('values', [rawItem], '', true)
       }
 
       closeSetting()
     }
+    onMounted(() => {
+      valueItems.value = initInfo.getMeta('values') || []
+    })
 
+    const sortValueItems = (n) => {
+      const values = JSON.parse(JSON.stringify(valueItems.value))
+      initInfo.setMeta('values', values)
+    }
     return {
       t,
       rightBackdropVisible,
@@ -147,10 +146,9 @@ export default {
       closeSetting,
       updateValue,
       valueItems,
-      editValue,
       newItem,
-      edit,
       remove,
+      sortValueItems,
       ...initInfo
     }
   }

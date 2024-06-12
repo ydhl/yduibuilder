@@ -1,5 +1,6 @@
 <template>
-  <div :class="{'uitree': true, 'uitreecontainer': isContainer}"  :id="'uitree-'+uiconfig.meta.id" :draggable="uiconfig.type!=='Page' && !isInlineEdit"
+  <div :class="{'uitree uimouseup': true, 'uitreecontainer': isContainer}"  :id="'uitree-'+uiconfig.meta.id"
+       :draggable="uiconfig.type!=='Page' && !isInlineEdit" @mouseup.stop="uiMouseUp"
        :data-type="uiconfig.type" :data-isContainer="uiconfig.meta.isContainer" :data-uiid="uiconfig.meta.id" :data-pageid="pageid">
     <!-- left top drop placement-->
     <div class="uitree-placement" v-if="dragIsUp" :data-type="uiconfig.type" :data-uiid="uiconfig.meta.id" :data-pageid="pageid"></div>
@@ -18,6 +19,7 @@ import { useStore } from 'vuex'
 import InitUITree from '@/components/Common'
 import UITreeLoader from '@/components/sidebar/uitree/Loader.vue'
 import $ from 'jquery'
+import _ from 'lodash'
 
 export default {
   name: 'UITreeWrap',
@@ -60,6 +62,9 @@ export default {
       if (props.uiconfig.pageType !== 'subpage') return true
       return props.uiconfig.meta.id === props.pageid
     })
+    const uiMouseUp = _.debounce((event) => {
+      store.commit('updateState', { mouseupInFrame: event.clientX + '_' + event.clientY })
+    }, 100)
     return {
       focusUIItem,
       selectedPageId,
@@ -70,6 +75,7 @@ export default {
       isContainer,
       containerBody,
       isOpen,
+      uiMouseUp,
       toggleContainer,
       onInlineEdit,
       isInlineEdit,

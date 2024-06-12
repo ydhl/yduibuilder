@@ -24,7 +24,7 @@ $myMember = $project->get_member($loginUser->id);
         <div class='card-body'>
             <div class="d-flex">
                 <div title="<?= $user->nick_name?>" class='border rounded-circle flex-grow-0  flex-shrink-0'
-                     style="width: 50px;height: 50px; background-size:cover; background-position:center;background-image: url(<?= $user->avatar ? UPLOAD_SITE_URI.$user->avatar : '/logo2.svg'?>)" ></div>
+                     style="width: 50px;height: 50px; background-size:cover; background-position:center;background-image: url(<?= $user->avatar ? SITE_URI.'image?file='.urlencode($user->avatar) : '/logo2.svg'?>)" ></div>
                 <div class='ps-3'>
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="text-truncate" style="width: 6rem;"><?= $user->nickname?:$user->get_escape_cellphone()?></div>

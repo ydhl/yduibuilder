@@ -45,6 +45,7 @@ class Recovery_Controller extends YZE_Resource_Controller {
         $this->set_View_Data('menu', 'structure');
     }
     /**
+     * 该接口yduibuilder也会调用
      * @actionname 移动页面
      */
     public function post_index(){

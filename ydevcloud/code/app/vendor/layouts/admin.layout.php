@@ -12,6 +12,7 @@ $language = YZE_Hook::do_hook(YZE_HOOK_GET_LOCALE)?:'en';
         <title><?php echo $this->get_data("yze_page_title")?> － <?php echo APPLICATION_NAME?> - <?= __('cross platform, cross framework, cross language, cross terminal')?></title>
         <script> var LANG='<?= YZE_Hook::do_hook(YZE_HOOK_GET_LOCALE)?>'</script>
         <link href="/layui/css/layui.css" rel="stylesheet">
+        <link rel="stylesheet" href="/js/jstree/themes/default/style.css" />
         <?php
         yze_css_bundle("all");
         yze_module_css_bundle();
@@ -19,6 +20,7 @@ $language = YZE_Hook::do_hook(YZE_HOOK_GET_LOCALE)?:'en';
         yze_module_js_bundle();
         ?>
         <script src="/layui/layui.js"></script>
+        <script src="/js/jstree/jstree.js"></script>
     </head>
     <body class="p-0 m-0">
         <nav class="navbar border-bottom navbar-expand-lg navbar-light bg-light shadow-sm sticky-top">

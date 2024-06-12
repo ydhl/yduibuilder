@@ -18,7 +18,13 @@ trait Function_Model_Method{
     public function get_pages() {
         return Page_Model::from()->where('function_id=:id and is_deleted=0 and page_type="page"')->select([':id'=>$this->id]);
     }
-
+    /**
+     * 获取页面（不包含popup，master）
+     * @return array
+     */
+    public function page_count() {
+        return Page_Model::from()->where('function_id=:id and is_deleted=0 and page_type="page"')->count('id', [':id'=>$this->id]);
+    }
     public function get_last_modified_page() {
         return Page_Model::from()->where('function_id=:id and is_deleted=0')->order_By('modified_on', 'DESC')->get_Single([':id'=>$this->id]);
     }

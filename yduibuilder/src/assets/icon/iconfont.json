@@ -6,6 +6,83 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "10294687",
+      "name": "move",
+      "font_class": "moveto",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "27425541",
+      "name": "subpage",
+      "font_class": "subpage",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
+      "icon_id": "33385423",
+      "name": "page",
+      "font_class": "page",
+      "unicode": "e618",
+      "unicode_decimal": 58904
+    },
+    {
+      "icon_id": "33385470",
+      "name": "folder-open",
+      "font_class": "folder-open",
+      "unicode": "e61d",
+      "unicode_decimal": 58909
+    },
+    {
+      "icon_id": "33385476",
+      "name": "folder",
+      "font_class": "folder",
+      "unicode": "e61e",
+      "unicode_decimal": 58910
+    },
+    {
+      "icon_id": "5317070",
+      "name": "arrow-down",
+      "font_class": "arrow-down",
+      "unicode": "e741",
+      "unicode_decimal": 59201
+    },
+    {
+      "icon_id": "7036715",
+      "name": "emit",
+      "font_class": "emit",
+      "unicode": "e638",
+      "unicode_decimal": 58936
+    },
+    {
+      "icon_id": "29393299",
+      "name": "mutation",
+      "font_class": "mutation",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
+      "icon_id": "26238536",
+      "name": "alert",
+      "font_class": "alert",
+      "unicode": "e6b9",
+      "unicode_decimal": 59065
+    },
+    {
+      "icon_id": "38768530",
+      "name": "redirect",
+      "font_class": "redirect",
+      "unicode": "e794",
+      "unicode_decimal": 59284
+    },
+    {
+      "icon_id": "33216017",
+      "name": "connect",
+      "font_class": "connect",
+      "unicode": "e655",
+      "unicode_decimal": 58965
+    },
+    {
       "icon_id": "88061",
       "name": "info",
       "font_class": "info",
@@ -104,6 +181,13 @@
       "unicode_decimal": 60606
     },
     {
+      "icon_id": "39690674",
+      "name": "output",
+      "font_class": "output",
+      "unicode": "ecc1",
+      "unicode_decimal": 60609
+    },
+    {
       "icon_id": "5797357",
       "name": "无内容",
       "font_class": "wuneirong",
@@ -132,18 +216,18 @@
       "unicode_decimal": 58937
     },
     {
+      "icon_id": "39522083",
+      "name": "webapi",
+      "font_class": "webapi",
+      "unicode": "ecc0",
+      "unicode_decimal": 60608
+    },
+    {
       "icon_id": "13303481",
       "name": "graphql",
       "font_class": "graphql",
       "unicode": "e652",
       "unicode_decimal": 58962
-    },
-    {
-      "icon_id": "16618565",
-      "name": "folder",
-      "font_class": "folder",
-      "unicode": "e6b0",
-      "unicode_decimal": 59056
     },
     {
       "icon_id": "25357684",
@@ -487,13 +571,6 @@
       "font_class": "image",
       "unicode": "e92e",
       "unicode_decimal": 59694
-    },
-    {
-      "icon_id": "1270498",
-      "name": "page",
-      "font_class": "page",
-      "unicode": "e640",
-      "unicode_decimal": 58944
     },
     {
       "icon_id": "587078",

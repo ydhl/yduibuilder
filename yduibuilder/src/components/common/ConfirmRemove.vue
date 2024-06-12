@@ -1,5 +1,8 @@
 <template>
-<i :class="{'iconfont pointer hover-danger': true, 'icon-delete': !confirm, 'icon-delete-confirm text-danger animate__bounceIn': confirm}" @click.stop="remove"></i>
+  <span @click.stop="remove">
+    <i :class="[{'iconfont pointer hover-danger': true, 'icon-delete-confirm text-danger animate__bounceIn': confirm}, !confirm ? icon : '']"></i>
+    {{title||''}}
+  </span>
 </template>
 
 <script lang="ts">
@@ -8,6 +11,13 @@ import { ref } from 'vue'
 export default {
   name: 'ConfirmRemove',
   emits: ['remove'],
+  props: {
+    icon: {
+      default: 'icon-delete',
+      type: String
+    },
+    title: String
+  },
   setup (props: any, context: any) {
     const confirm = ref(false)
 

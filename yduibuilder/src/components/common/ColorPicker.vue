@@ -4,7 +4,7 @@
       <input type="color" ref="colorInput" class="d-none" v-model="myColor">
       <div class="input-group input-group-sm">
         <span class="input-group-text text-truncate ps-1 pe-1" style="max-width: 60px">{{ t('style.alpha') }}</span>
-        <input type="number" v-model="colorOpacity" step="0.1" max="1" min="0" class="form-control form-control-sm p-1">
+        <input type="number" v-model="colorOpacity" step="1" max="100" min="0" class="form-control form-control-sm p-1">
         <div class="form-control form-control-sm p-0" style="max-width: 30px">
           <div class="h-100" @click="toggleColor" :style="colorStyle">&nbsp;</div>
         </div>
@@ -36,7 +36,7 @@ export default {
       },
       set: _.debounce((v) => {
         context.emit('update:modelValue', v || undefined)
-      }, 500)
+      }, 800)
     })
     const colorStyle = computed(() => {
       if (myColor.value) {
@@ -49,11 +49,11 @@ export default {
     const colorOpacity = computed({
       get () {
         const rgba = ydhl.getRgbaInfo(props.modelValue)
-        return rgba.a
+        return Math.ceil(rgba.a * 100)
       },
-      set (v) {
+      set (v: any) {
         const rgba = ydhl.getRgbaInfo(props.modelValue)
-        rgba.a = v
+        rgba.a = v / 100
         context.emit('update:modelValue', '#' + ydhl.rgba2hex(`rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a})`))
       }
     })

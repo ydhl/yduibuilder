@@ -36,6 +36,7 @@ import ydhl from '@/lib/ydhl'
 
 export default {
   name: 'UIComponent',
+  emits: ['contextMenu'],
   setup () {
     const store = useStore()
     const openState = ref(true)

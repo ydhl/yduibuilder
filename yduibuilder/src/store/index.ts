@@ -17,7 +17,14 @@ const postMessage = (store) => {
   store.subscribe((mutation, state) => {
     if (window.top !== window) return
 
-    if (mutation.type === 'addItem' || mutation.type === 'deleteItem' || mutation.type === 'updateItemMeta' || mutation.type === 'deleteSubpage') { // 通知目标页面
+    if (mutation.type === 'addItem' ||
+      mutation.type === 'deleteItem' ||
+      mutation.type === 'updateUIInfo' ||
+      mutation.type === 'updateItemMeta' ||
+      mutation.type === 'deleteSubpage' ||
+      mutation.type === 'addUIEventBind' ||
+      mutation.type === 'removeUIEventBind'
+    ) { // 通知目标页面
       if (!ports?.[mutation.payload.pageId]) return
       const msg = {
         type: 'updatePageState',
@@ -32,8 +39,7 @@ const postMessage = (store) => {
       // console.log(mutation.type, new Date())
       ports[mutation.payload.pageId](msg)
       return
-    }
-    if (mutation.type === 'moveItem') { // 通知源和目标页面
+    } else if (mutation.type === 'moveItem') { // 通知源和目标页面
       const sourceFrame: any = document.getElementById(mutation.payload.sourcePageId)
       const targetFrame: any = document.getElementById(mutation.payload.targetPageId)
       if (sourceFrame) {

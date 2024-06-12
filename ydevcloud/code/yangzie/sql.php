@@ -83,6 +83,11 @@ class YZE_SQL extends YZE_Object{
 	private $limit_end;
 	private $has_join = false;
 	private $has_from = false;
+	/**
+	 * 表别名及对于的表后缀
+	 * @var array
+	 */
+	private $suffix = [];
 
 	/**
 	 * array('alias'		=> $table_alias,
@@ -182,6 +187,19 @@ class YZE_SQL extends YZE_Object{
 			"andor"	=> "AND",
 		);
 		return $this;
+	}
+	/**
+	 * 设置 alias表的后缀
+	 * @param $suffix
+	 * @param $table_alias
+	 * @return $this
+	 */
+	private function suffix($suffix, $table_alias = null){
+		$this->suffix[$table_alias?: 'm'] = $suffix;
+		return $this;
+	}
+	public function get_suffixs(){
+		return $this->suffix;
 	}
 
 	/**
@@ -368,15 +386,17 @@ class YZE_SQL extends YZE_Object{
 	 * 构建查询的from段,e.g. from('LineItem','item')->from('Order','o')
 	 * @param string $class_name 对象名
 	 * @param string $alias 别名
+	 * @param string $suffix 分表的后缀
 	 * @return YZE_SQL
 	 */
-	public function from($class_name,$alias=null){
+	public function from($class_name, $alias=null, $suffix=null){
 		$entity = new $class_name();
 		$this->from[($alias ?: 'm')] = array(
 			'table'=>$entity->get_table(),
 			'join'=>array()
 		);
 		$this->has_from = true;
+		$this->suffix($suffix, $alias ?: 'm');
 		$this->classes[($alias ?: 'm')] = $class_name;
 		return $this;
 	}
@@ -385,10 +405,12 @@ class YZE_SQL extends YZE_Object{
 	 * @param string $class_name 对象名
 	 * @param string $alias 别名
 	 * @param string $join_on
+	 * @param string $suffix left join 分表的后缀
 	 * @return YZE_SQL
 	 */
-	public function left_join($class_name,$alias,$join_on){
+	public function left_join($class_name,$alias,$join_on, $suffix=null){
 		$entity = new $class_name();
+		$this->suffix($suffix, $alias);
 		$this->from[($alias ?: $class_name)]= array(
 			'table' => $entity->get_table(),
 			'join' =>array(
@@ -406,10 +428,12 @@ class YZE_SQL extends YZE_Object{
 	 * @param string $class_name 对象名
 	 * @param string $alias 别名
 	 * @param string $join_on
+	 * @param string $suffix left join 分表的后缀
 	 * @return YZE_SQL
 	 */
-	public function right_join($class_name,$alias,$join_on){
+	public function right_join($class_name, $alias, $join_on, $suffix=null){
 		$entity = new $class_name();
+		$this->suffix($suffix, $alias);
 		$this->from[($alias ?: $class_name)]= array(
 			'table' => $entity->get_table(),
 			'join' =>array(
@@ -426,10 +450,12 @@ class YZE_SQL extends YZE_Object{
 	 * @param string $class_name 对象名
 	 * @param string $alias 别名
 	 * @param string $join_on
+	 * @param string $suffix left join 分表的后缀
 	 * @return YZE_SQL
 	 */
-	public function join($class_name,$alias,$join_on){
+	public function join($class_name, $alias, $join_on, $suffix=null){
 		$entity = new $class_name();
+		$this->suffix($suffix, $alias);
 		$this->from[($alias ?: $class_name)]= array(
 			'table' => $entity->get_table(),
 			'join'=>array(
@@ -606,6 +632,7 @@ class YZE_SQL extends YZE_Object{
 		$this->limit_end= null;
 		$this->limit_start= null;
 		$this->order_by 	= array();
+		$this->suffix 	= array();
 
 		$this->and_where_group = array();
 		$this->or_where_group = array();
@@ -699,7 +726,7 @@ class YZE_SQL extends YZE_Object{
 	 */
 	public function get_select_table(){
 		foreach($this->from as $alias => $from_table){
-			$from[$alias] = $from_table['table'];
+			$from[$alias] = $from_table['table'].(@$this->suffix[$alias] ?: "");
 		}
 		return $from;
 	}
@@ -753,9 +780,10 @@ class YZE_SQL extends YZE_Object{
 		$no_alias = $this->isinsert() || $this->isdelete();//不要别名
 		$from = array();
 		foreach($this->from as $alias => $from_table){
-			array_walk($from_table,function(&$item, $key){
+			$suffix = @$this->suffix[$alias] ?: "";
+			array_walk($from_table,function(&$item, $key) use($suffix){
 				if($key == "table"){
-					$item = "`{$item}`";
+					$item = "`{$item}{$suffix}`";
 				}
 			});
 			if($from_table['join']){
@@ -887,7 +915,6 @@ class YZE_SQL extends YZE_Object{
 		}
 		$class = $this->get_select_classes(true);
 		$class = $class[$alias];
-		$obj = new $class();
 
 		switch ($this->insert_type){
 		    case self::INSERT_EXIST:

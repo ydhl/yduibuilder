@@ -5,6 +5,16 @@
     <i class="iconfont icon-point text-success" v-if="hasInherit"></i>
   </div>
   <div class="style-body d-none">
+    <div class="row mt-1">
+      <label class="col-sm-3 col-form-label text-end text-truncate">{{ t('style.text.fontSize') }}</label>
+      <div class="col-sm-9">
+        <div class="input-group input-group-sm">
+          <input type="text" class="form-control form-control-sm" placeholder="px,em,rem" v-model="fontSize">
+          <span class="input-group-text">{{ t('style.text.letterSpacing') }}</span>
+          <input type="text" placeholder="px,em,rem" class="form-control form-control-sm" v-model="letterSpacing">
+        </div>
+      </div>
+    </div>
     <div class="row">
       <label class="col-sm-3 col-form-label text-end text-truncate">{{ t('style.text.lineHeight') }}</label>
       <div class="col-sm-9 d-flex align-items-center">
@@ -79,16 +89,6 @@
         </div>
       </div>
     </div>
-    <div class="row mt-1">
-      <label class="col-sm-3 col-form-label text-end text-truncate">{{ t('style.text.fontSize') }}</label>
-      <div class="col-sm-9">
-        <div class="input-group input-group-sm">
-          <input type="text" class="form-control form-control-sm" placeholder="px,em,rem" v-model="fontSize">
-          <span class="input-group-text">{{ t('style.text.letterSpacing') }}</span>
-          <input type="text" placeholder="px,em,rem" class="form-control form-control-sm" v-model="letterSpacing">
-        </div>
-      </div>
-    </div>
     <div class="row">
       <label class="col-sm-3 col-form-label text-end text-truncate">{{ t('style.text.break') }}</label>
       <div class="col-sm-9">
@@ -148,7 +148,7 @@
 <script lang="ts">
 import initUI from '@/components/Common'
 import { useI18n } from 'vue-i18n'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
 import { useStore } from 'vuex'
 import ColorPicker from '@/components/common/ColorPicker.vue'
 
@@ -165,41 +165,42 @@ export default {
     const uploadBtn = ref()
     const store = useStore()
     const fonts = computed(() => store.state.design.page.meta?.custom?.fontFace)
+    const previewMode = toRef(props, 'previewMode')
 
-    const textAlign = info.computedWrap('align', 'custom', 'left', false, props.previewMode)
-    const bold = info.computedWrap('bold', 'custom', 'Normal', false, props.previewMode)
-    const italic = info.computedWrap('italic', 'custom', false, false, props.previewMode)
-    const underline = info.computedWrap('underline', 'custom', false, false, props.previewMode)
-    const linethrough = info.computedWrap('through', 'custom', false, false, props.previewMode)
-    const hshadow = info.computedWrap('textShadowH', 'custom', '', false, props.previewMode)
-    const vshadow = info.computedWrap('textShadowV', 'custom', '', false, props.previewMode)
-    const blur = info.computedWrap('textShadowBlur', 'custom', '', false, props.previewMode)
-    const color = info.computedWrap('textShadowColor', 'custom', '', false, props.previewMode)
-    const textStrokeLength = info.computedWrap('textStrokeLength', 'custom', '', false, props.previewMode)
-    const textStrokeColor = info.computedWrap('textStrokeColor', 'custom', '', false, props.previewMode)
-    const fontSize = info.computedWrap('font-size', 'style', '', false, props.previewMode)
-    const letterSpacing = info.computedWrap('letter-spacing', 'style', '', false, props.previewMode)
-    const fontFamily = info.computedWrap('font-family', 'style', '', false, props.previewMode)
-    const lineHeight = info.computedWrap('line-height', 'style', '', false, props.previewMode)
-    const wordWrap = info.computedWrap('word-wrap', 'style', 'normal', false, props.previewMode)
-    const wordBreak = info.computedWrap('word-break', 'style', 'normal', false, props.previewMode)
-    const whiteSpace = info.computedWrap('white-space', 'style', 'normal', false, props.previewMode)
+    const textAlign = info.computedWrap('align', 'custom', 'left', false, previewMode)
+    const bold = info.computedWrap('bold', 'custom', 'Normal', false, previewMode)
+    const italic = info.computedWrap('italic', 'custom', false, false, previewMode)
+    const underline = info.computedWrap('underline', 'custom', false, false, previewMode)
+    const linethrough = info.computedWrap('through', 'custom', false, false, previewMode)
+    const hshadow = info.computedWrap('textShadowH', 'custom', '', false, previewMode)
+    const vshadow = info.computedWrap('textShadowV', 'custom', '', false, previewMode)
+    const blur = info.computedWrap('textShadowBlur', 'custom', '', false, previewMode)
+    const color = info.computedWrap('textShadowColor', 'custom', '', false, previewMode)
+    const textStrokeLength = info.computedWrap('textStrokeLength', 'custom', '', false, previewMode)
+    const textStrokeColor = info.computedWrap('textStrokeColor', 'custom', '', false, previewMode)
+    const fontSize = info.computedWrap('font-size', 'style', '', false, previewMode)
+    const letterSpacing = info.computedWrap('letter-spacing', 'style', '', false, previewMode)
+    const fontFamily = info.computedWrap('font-family', 'style', '', false, previewMode)
+    const lineHeight = info.computedWrap('line-height', 'style', '', false, previewMode)
+    const wordWrap = info.computedWrap('word-wrap', 'style', 'normal', false, previewMode)
+    const wordBreak = info.computedWrap('word-break', 'style', 'normal', false, previewMode)
+    const whiteSpace = info.computedWrap('white-space', 'style', 'normal', false, previewMode)
 
     const hasInherit = computed(() => {
-      return info.hasInheritStyle('custom', ['align', 'bold', 'italic', 'underline', 'through', 'textShadowH', 'textShadowV', 'textShadowBlur', 'textShadowColor', 'textStrokeLength', 'textStrokeColor']) ||
-        info.hasInheritStyle('style', ['font-size', 'letter-spacing', 'font-family', 'line-height', 'word-wrap', 'word-break', 'white-space'])
+      return info.hasInheritStyle('custom', ['align', 'bold', 'italic', 'underline', 'through', 'textShadowH', 'textShadowV', 'textShadowBlur', 'textShadowColor', 'textStrokeLength', 'textStrokeColor'], previewMode) ||
+        info.hasInheritStyle('style', ['font-size', 'letter-spacing', 'font-family', 'line-height', 'word-wrap', 'word-break', 'white-space'], previewMode)
     })
 
     const hasSet = computed(() => {
-      return info.hasSetStyle('custom', ['align', 'bold', 'italic', 'underline', 'through', 'textShadowH', 'textShadowV', 'textShadowBlur', 'textShadowColor', 'textStrokeLength', 'textStrokeColor']) ||
-        info.hasSetStyle('style', ['font-size', 'letter-spacing', 'font-family', 'line-height', 'word-wrap', 'word-break', 'white-space'])
+      return info.hasSetStyle('custom', ['align', 'bold', 'italic', 'underline', 'through', 'textShadowH', 'textShadowV', 'textShadowBlur', 'textShadowColor', 'textStrokeLength', 'textStrokeColor'], previewMode) ||
+        info.hasSetStyle('style', ['font-size', 'letter-spacing', 'font-family', 'line-height', 'word-wrap', 'word-break', 'white-space'], previewMode)
     })
 
     watch([hshadow, vshadow, blur, color], (v) => {
-      info.setMeta('text-shadow', `${hshadow.value} ${vshadow.value} ${blur.value} ${color.value}`, 'style', false, props.previewMode)
+      info.setMeta('text-shadow', `${hshadow.value} ${vshadow.value} ${blur.value} ${color.value}`, 'style', false, previewMode)
     })
     watch([textStrokeLength, textStrokeColor], (v) => {
-      info.setMeta('text-stroke', `${textStrokeLength.value} ${textStrokeColor.value}`, 'style', false, props.previewMode)
+      info.setMeta('text-stroke', `${textStrokeLength.value} ${textStrokeColor.value}`, 'style', false, previewMode)
     })
     const removeFont = () => {
       fontFamily.value = undefined

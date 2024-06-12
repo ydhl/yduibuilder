@@ -32,29 +32,6 @@ class Recycle_Controller extends YZE_Resource_Controller {
         ];
     }
     /**
-     * @actionname 访问回收站
-     */
-    public function index(){
-        $request = $this->request;
-        $pid = $request->get_var('pid');
-        $project = find_by_uuid(Project_Model::CLASS_NAME, $pid);
-
-        $params = [':pid'=>$project->id];
-        $where = 'p.project_id=:pid and p.is_deleted=1';
-
-        $query = Page_Model::from('p')
-            ->where($where)->order_By('modified_on','desc','p');
-        $breadcrumbs = ['/project/'.$project->uuid.'/structure'=>__('UI')];
-        $breadcrumbs['/project/'.$project->uuid.'/recycle'] = __('Recycle');
-
-        $pages = $query->select($params, 'p');
-        $this->set_View_Data('project', $project);
-        $this->set_View_Data('menu', 'structure');
-        $this->set_View_Data('breadcrumbs', $breadcrumbs);
-        $this->set_View_Data('pages', $pages);
-        $this->set_view_data('yze_page_title', __('Recycle'));
-    }
-    /**
      * @actionname 删除页面
      */
     public function post_index(){
@@ -67,6 +44,24 @@ class Recycle_Controller extends YZE_Resource_Controller {
         if (!$member || !$member->can_edit()) throw new YZE_FatalException('you can not edit project');
         $page = find_by_uuid(Page_Model::CLASS_NAME, $request->get_from_get('page'), true);
         if ($page){
+            $page->remove();
+        }
+
+        $this->layout = '';
+        return YZE_JSON_View::success($this);
+    }
+    public function post_emptytrash(){
+        $request = $this->request;
+        $pid = $request->get_var('pid');
+        $project = find_by_uuid(Project_Model::CLASS_NAME, $pid);
+        if (!$project) throw new YZE_FatalException('Project not found');
+        $user = YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
+        $member = $project->get_member($user->id);
+        if (!$member || !$member->can_edit()) throw new YZE_FatalException('you can not edit project');
+
+        $pages = Page_Model::from('p')
+            ->where('p.project_id=:pid and p.is_deleted=1')->select([':pid'=>$project->id]);
+        foreach ($pages as $page){
             $page->remove();
         }
 

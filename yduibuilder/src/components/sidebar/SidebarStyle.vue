@@ -1,61 +1,72 @@
 <template>
-  <div class="d-flex align-items-center justify-content-between p-3">
-    <i class="iconfont icon-plus hover-primary" @click="openDefineDialog">{{t('style.addSelector')}}</i>
-    <i class="iconfont icon-cleanup hover-primary"  @click="cleanup">{{t('common.cleanup')}}</i>
+  <div class="p-2 d-flex justify-content-center">
+    <div class="btn-group btn-group-sm">
+      <button type="button" @click="styleTab='variable'" :class="{'btn': true, 'btn-primary': styleTab=='variable', 'btn-outline-primary': styleTab!='variable'}">{{t('common.variable')}}</button>
+      <button type="button" @click="styleTab='style'" :class="{'btn': true, 'btn-primary': styleTab=='style', 'btn-outline-primary': styleTab!='style'}">{{t('style.selector')}}</button>
+    </div>
   </div>
-  <template v-if="loading">
-    {{t('page.loading')}}
+  <template v-if="styleTab=='variable'">
+    <div class="text-muted fs-7 mb-2 text-center">Based on {{ui}} {{uiVersion}}</div>
+    <UITheme></UITheme>
   </template>
-  <div class="p-2" v-else>
-    <div v-for="(selector, index) in selectors" :key="index">
-      <div class="mb-2 text-muted">{{selector.text}}</div>
-      <div v-for="(item, iindex) in selector.children" :key="iindex">
-        <div class="d-flex align-items-center justify-content-between"  v-if="!renameSelectorId" @mouseover="currHoverSelectorId = item.id" @mouseout="currHoverSelectorId = ''">
-          <button type="button" @click="loadStyle(item.id)"
-                  class="btn btn-sm btn-success">{{item.text}}</button>
-          <div :class="{'btn-group btn-group-sm': true, 'invisible': currHoverSelectorId!=item.id}">
-            <button type="button" @click="loadUsedInfo(item.id)" class="btn btn-xs btn-light"><i class="iconfont icon-tips hover-primary"></i></button>
-            <button type="button" @click="renameSelectorId = item.id;className = item.text" class="btn btn-xs btn-light"><i class="iconfont icon-rename hover-primary"></i></button>
-            <button type="button" @click="openEditDialog(item.id, item.text)" class="btn btn-xs btn-light"><i class="iconfont icon-edit hover-primary"></i></button>
+  <template v-if="styleTab=='style'">
+    <div class="d-flex align-items-center justify-content-between p-3">
+      <i class="iconfont icon-plus hover-primary" @click="openDefineDialog">{{t('style.addSelector')}}</i>
+      <i class="iconfont icon-cleanup hover-primary"  @click="cleanup">{{t('common.cleanup')}}</i>
+    </div>
+    <div v-if="loading" class="vh-100 d-flex align-items-center justify-content-center">
+      {{t('page.loading')}}
+    </div>
+    <div class="p-2" v-else>
+      <div v-for="(selector, index) in selectors" :key="index">
+        <div class="mb-2 text-muted">{{selector.text}}</div>
+        <div v-for="(item, iindex) in selector.children" :key="iindex">
+          <div class="d-flex align-items-center justify-content-between"  v-if="!renameSelectorId" @mouseover="currHoverSelectorId = item.id" @mouseout="currHoverSelectorId = ''">
+            <button type="button" @click="loadStyle(item.id)"
+                    class="btn btn-sm btn-success">{{item.text}}</button>
+            <div :class="{'btn-group btn-group-sm': true, 'invisible': currHoverSelectorId!=item.id}">
+              <button type="button" @click="loadUsedInfo(item.id)" class="btn btn-xs btn-light"><i class="iconfont icon-tips hover-primary"></i></button>
+              <button type="button" @click="renameSelectorId = item.id;className = item.text" class="btn btn-xs btn-light"><i class="iconfont icon-rename hover-primary"></i></button>
+              <button type="button" @click="openEditDialog(item.id, item.text)" class="btn btn-xs btn-light"><i class="iconfont icon-edit hover-primary"></i></button>
+            </div>
+          </div>
+          <div class="d-flex align-items-center justify-content-between" v-if="renameSelectorId==item.id">
+            <input type="text" class="form-control form-control-sm" v-model="className" @keyup.enter="renameSelector(item.id)">
+            <div class="btn-group btn-group-sm">
+              <button type="button" @click="renameSelector(item.id)" class="btn btn-xs btn-light"><i class="iconfont icon-ok hover-primary"></i></button>
+              <button type="button" @click="renameSelectorId = '';className=''" class="btn btn-xs btn-light"><i class="iconfont icon-delete hover-primary"></i></button>
+            </div>
+          </div>
+          <div class="fs-7">{{currHoverSelectorId!=item.id ? '&nbsp;' : item.desc}}</div>
+        </div>
+      </div>
+    </div>
+    <lay-layer v-model="selectorDefineDialogVisible" :title="t('style.selectorDefine')" :shade="true" :area="['800px', '80vh']" :btn="buttons">
+      <div class="p-2 d-flex">
+        <div class="w-50 d-flex flex-column align-items-center" style="height: calc(80vh - 200px)">
+          <div class="border-1 border" style="width: 200px;height: 200px">
+            <div :style="previewStyle" :class="previewClass">Style Preview</div>
           </div>
         </div>
-        <div class="d-flex align-items-center justify-content-between" v-if="renameSelectorId==item.id">
-          <input type="text" class="form-control form-control-sm" v-model="className" @keyup.enter="renameSelector(item.id)">
-          <div class="btn-group btn-group-sm">
-            <button type="button" @click="renameSelector(item.id)" class="btn btn-xs btn-light"><i class="iconfont icon-ok hover-primary"></i></button>
-            <button type="button" @click="renameSelectorId = '';className=''" class="btn btn-xs btn-light"><i class="iconfont icon-delete hover-primary"></i></button>
-          </div>
-        </div>
-        <div class="fs-7">{{currHoverSelectorId!=item.id ? '&nbsp;' : item.desc}}</div>
-      </div>
-    </div>
-  </div>
-  <lay-layer v-model="selectorDefineDialogVisible" :title="t('style.selectorDefine')" :shade="true" :area="['800px', '80vh']" :btn="buttons">
-    <div class="p-2 d-flex">
-      <div class="w-50 d-flex flex-column align-items-center" style="height: calc(80vh - 200px)">
-        <div class="border-1 border" style="width: 200px;height: 200px">
-          <div :style="previewStyle" :class="previewClass">Style Preview</div>
+        <div class="style-panel w-50" style="overflow-y:auto;overflow-x:hidden;height: calc(80vh - 200px)">
+          <Typography :preview-mode="true"></Typography>
+          <StyleBackground :preview-mode="true"></StyleBackground>
+          <StyleLayout :preview-mode="true"></StyleLayout>
+          <StyleSize :preview-mode="true"></StyleSize>
+          <StyleMarginPadding :preview-mode="true"></StyleMarginPadding>
+          <StyleBorder :preview-mode="true"></StyleBorder>
+          <StyleUtilities :preview-mode="true"></StyleUtilities>
         </div>
       </div>
-      <div class="style-panel w-50" style="overflow-y:auto;overflow-x:hidden;height: calc(80vh - 200px)">
-        <Typography :preview-mode="true"></Typography>
-        <StyleBackground :preview-mode="true"></StyleBackground>
-        <StyleLayout :preview-mode="true"></StyleLayout>
-        <StyleSize :preview-mode="true"></StyleSize>
-        <StyleMarginPadding :preview-mode="true"></StyleMarginPadding>
-        <StyleBorder :preview-mode="true"></StyleBorder>
-        <StyleUtilities :preview-mode="true"></StyleUtilities>
+      <div class="ps-5 pe-5">
+        <div class="text-muted">{{t('style.selectorName')}}:</div>
+        <input class="form-control form-control-sm" type="text" v-model="className" >
       </div>
-    </div>
-    <div class="ps-5 pe-5">
-      <div class="text-muted">{{t('style.selectorName')}}:</div>
-      <input class="form-control form-control-sm" type="text" v-model="className" >
-    </div>
-  </lay-layer>
-  <lay-layer v-model="styleCodeDialogVisible" :title="t('style.selectorDefine')" :shade="true" :area="['600px', '80vh']">
-    <div id="styleEditor"  style="height: calc(80vh - 80px)"></div>
-  </lay-layer>
-  <lay-layer v-model="usedInfoDialogVisible" title="YDECloud" :shade="true" :area="['300px', '400px']" :offset="['60px', '60px']">
+    </lay-layer>
+    <lay-layer v-model="styleCodeDialogVisible" :title="t('style.selectorDefine')" :shade="true" :area="['600px', '80vh']">
+      <div id="styleEditor"  style="height: calc(80vh - 80px)"></div>
+    </lay-layer>
+    <lay-layer v-model="usedInfoDialogVisible" title="YDECloud" :shade="true" :area="['300px', '400px']" :offset="['60px', '60px']">
       <div class="p-3">
         <div class="text-muted">{{t('style.elementsAffectedOnThisPage')}}</div>
         <div class="list-group">
@@ -92,9 +103,11 @@
         </div>
       </div>
     </lay-layer>
+  </template>
 </template>
 
 <script lang="ts">
+import UITheme from '@/components/sidebar/UITheme.vue'
 import { useI18n } from 'vue-i18n'
 import initUI from '@/components/Common'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
@@ -114,7 +127,7 @@ import { useRouter } from 'vue-router'
 
 export default {
   name: 'SidebarStyle',
-  components: { Typography, StyleBackground, StyleLayout, StyleMarginPadding, StyleBorder, StyleUtilities, StyleSize },
+  components: { Typography, UITheme, StyleBackground, StyleLayout, StyleMarginPadding, StyleBorder, StyleUtilities, StyleSize },
   setup (props: any, context: any) {
     const { t } = useI18n()
     const info = initUI()
@@ -131,6 +144,7 @@ export default {
     const selectors = ref([])
     const router = useRouter()
     const types = baseUIDefines
+    const styleTab = ref('style')
     const currHoverSelectorId = ref('')
     watch(styleCodeDialogVisible, (v) => {
       if (!v) {
@@ -155,8 +169,8 @@ export default {
       })
     }
     const openDefineDialog = () => {
-      store.commit('updatePageState', { selectedUIItemId: '' })
-      store.commit('updateState', { rightSidebarIsOpen: false, previewStyleItem: {} })
+      store.commit('updatePageState', { selectedUIItemId: '', previewStyleItem: {} })
+      store.commit('updateState', { rightSidebarIsOpen: false })
       selectorDefineDialogVisible.value = true
     }
     const cleanup = () => {
@@ -267,6 +281,7 @@ export default {
     })
     return {
       t,
+      styleTab,
       loading,
       selectorDefineDialogVisible,
       styleCodeDialogVisible,

@@ -41,6 +41,7 @@ class web_html5 extends Base_Factory{
 <?php
         return ob_get_clean();
     }
+
     public function compile(){
         // 编译资源
         $project_setting = $this->project->get_setting();
@@ -60,6 +61,34 @@ class web_html5 extends Base_Factory{
         $this->zip->addEmptyDir('assets/img');
         $this->zip->addEmptyDir('assets/js');
         $this->zip->addEmptyDir('assets/css');
+        $this->zip->addEmptyDir('popup');
+
+        // 编译popup文件
+        $files = [];
+        foreach ($this->project->get_modules() as $module) {
+            foreach ($module->get_pages('popup') as $popup) {
+                $page_file = $popup->get_save_path('html');
+                $this->server->push($this->frame->fd, sprintf(__('%scompile popup page %s => %s%s'), "<strong>", $popup->name, $page_file, "</strong>"));
+
+                $this->extractImage(json_decode(html_entity_decode($popup->config), true));
+
+                $ydhttp = new YDHttp();
+                $ydhttp->request_header = ['token:' . $this->token];
+                $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $popup->uuid . '?code_type=html');
+                $this->zip->addFromString($page_file, $htmlContent);
+
+
+                $assetFileName = $popup->get_export_file_name('html');
+                foreach (['css'=>"assets/css/{$assetFileName}.css", 'js'=>"assets/js/{$assetFileName}.js"] as $code_type=>$assetFileName) {
+                    $this->server->push($this->frame->fd, sprintf(__('%scompile %s %s => %s%s'), "<strong>", $code_type, $popup->name, $assetFileName, "</strong>"));
+
+                    $ydhttp = new YDHttp();
+                    $ydhttp->request_header = ['token:' . $this->token];
+                    $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $popup->uuid . '?mode=compile&code_type='.$code_type);
+                    $this->zip->addFromString($assetFileName, $htmlContent);
+                }
+            }
+        }
 
         // 编译ui文件
         $files = [];

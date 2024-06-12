@@ -2,7 +2,7 @@
   <div class="style-header"><i class="iconfont icon-tree-close"></i> {{ t('ui.rangeInput') }}</div>
   <div class="style-body d-none">
     <div class="row mb-1">
-      <div class="col-sm-9  offset-3">
+      <div class="col-sm-12">
         <div class="input-group input-group-sm ">
           <span class="input-group-text p-1">{{ t('style.form.min') }}</span>
           <input type="number" class="form-control  p-1 form-control-sm" v-model="min">

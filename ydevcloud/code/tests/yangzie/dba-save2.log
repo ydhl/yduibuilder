@@ -1,0 +1,19 @@
+
+---- EXPECTED OUTPUT
+insert true
+23000, 1062, Duplicate entry '333333' for key 'email_UNIQUE'
+ignore true
+UPDATE true
+UPDATE true
+REPLACE true
+INSERT_EXIST true
+INSERT_NOT_EXIST true
+INSERT_NOT_EXIST_OR_UPDATE true
+INSERT_NOT_EXIST_OR_UPDATE true
+remove true
+---- ACTUAL OUTPUT
+Fatal error: Uncaught Error: Call to undefined method yangzie\YZE_DBAImpl::migration() in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/dba-save2.php:36
+Stack trace:
+#0 {main}
+  thrown in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/dba-save2.php on line 36
+---- FAILED

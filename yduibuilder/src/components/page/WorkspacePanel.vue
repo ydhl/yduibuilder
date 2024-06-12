@@ -15,7 +15,7 @@
             <span class="badge bg-light text-secondary text-truncate" data-bs-toggle="tooltip" style="width: 100px" :title=" module.name +' / ' + func.name">{{ module.name }} / {{ func.name }}</span>
           </div>
           <div class="divider ms-3 me-1" />
-          <template v-if="!isModileKind">
+          <template v-if="!isMobileKind">
             <div class="d-flex align-items-center">
               <div class="btn-group btn-group-sm" role="group">
                 <button type="button" :class="{'btn btn-light': true, 'text-primary': simulateModel=='pc'}" @click="simulateModel='pc'" data-bs-toggle="tooltip" :title="t('common.devicePC')">
@@ -47,6 +47,14 @@
             <i class="iconfont icon-run" />
             {{t('common.preview')}}
           </button>
+          <button disabled class="btn btn-light btn-sm flex-shrink-0 disabled">
+            <i class="iconfont icon-review" />
+            {{t('common.discuss')}}
+          </button>
+          <button type="button" data-bs-toggle="tooltip" :title="t('common.eventShowDesc')" class="btn btn-light btn-sm flex-shrink-0" @click="switchEventShow = !switchEventShow">
+            <i :class="{'iconfont': true, 'icon-switch-off': !switchEventShow, 'icon-switch-on text-primary': switchEventShow}" />
+            {{t('common.eventShow')}}
+          </button>
           <div class="p-1"></div>
         </div>
         <div class="right-tip" v-show="rightHasMore"></div>
@@ -70,8 +78,9 @@
             <li class="nav-item" v-for="(openedPage, index) in openedPages" :key="index">
               <a :class="{'nav-link position-relative': true, 'active': openedPage.meta.id===currPage.meta.id}" href="javascript:void(0)"
                  @mouseenter="hoverPageId=openedPage.meta.id" @mouseleave="hoverPageId=''" @click="switchPage(openedPage)">
-                <i  style="position:absolute;left: 6px" :class="' fs-7 iconfont icon-'+openedPage.pageType.toLowerCase()"></i>
-                <span :class="{'text-black fst-italic': pageSaved[openedPage.meta.id]===0, 'text-muted text-light': pageSaved[openedPage.meta.id]!==0}">{{ openedPage.meta.title }}</span>
+                <i style="position:absolute;left: 6px" :class="' fs-7 iconfont icon-'+openedPage.pageType.toLowerCase()"></i>
+                <span :class="{'text-truncate': true, 'text-black fst-italic': pageSaved[openedPage.meta.id]===0, 'text-muted text-light': pageSaved[openedPage.meta.id]!==0}"
+                      :title="openedPage.meta.title">{{ openedPage.meta.title || '&nbsp;' }}</span>
                 <div style="position:absolute;right: 6px">
                   <template v-if="Object.keys(openedPages).length > 1 && hoverPageId===openedPage.meta.id">
                     <ConfirmRemove @remove="closePage(openedPage.meta.id)"></ConfirmRemove>
@@ -205,7 +214,7 @@ export default {
     const endKind = computed(() => {
       return store.state.design.endKind
     })
-    const isModileKind = computed(() => {
+    const isMobileKind = computed(() => {
       return endKind.value === 'mobile'
     })
     const simulateModel = computed({
@@ -351,7 +360,9 @@ export default {
     const onMessage = (data) => {
       if (!data) return
       if (data.type === 'mouseup') {
-        store.commit('updateState', { mouseupInFrame: (new Date()).getTime() })
+        const rect = document.getElementById('wrapper' + selectedPageId.value)?.getBoundingClientRect()
+        const xy = data.data.split('_')
+        store.commit('updateState', { mouseupInFrame: `${xy[0] * pageScale.value + (rect?.left || 0)}_${xy[1] * pageScale.value + (rect?.top || 0)}` })
         return
       }
       if (data.type === 'updatePageContentHeight' && data.data) {
@@ -393,7 +404,10 @@ export default {
         // console.log(copyedItems)
         for (const copyId in copyedItems) {
           ydhl.postJson('api/copy/ui.json', { page_uuid: data.pageId, uiconfig: copyedItems[copyId] }).then((rst: any) => {
-            if (!rst.success) return
+            if (!rst.success) {
+              ydhl.alert(rst?.msg || t('common.operationFail'), t('common.ok'))
+              return
+            }
             const pasteItem = rst.data
             store.commit('addItem', {
               type: pasteItem.type,
@@ -401,7 +415,7 @@ export default {
               items: pasteItem.items,
               placeInParent: '',
               pageId: data.pageId,
-              placement: pasteItem.meta.isContainer ? 'in' : 'bottom',
+              placement: uiConfig.meta.isContainer ? 'in' : 'bottom',
               targetId: data.data.ids[0]
             })
           })
@@ -565,7 +579,7 @@ export default {
     })
 
     const contextMenuOnPath = (data) => {
-      context.emit('contextMenu', { x: data.x + 20, y: data.y - 100 })
+      context.emit('contextMenu', { x: data.x, y: data.y })
     }
     const switchPage = (data) => {
       if (data.meta.id === currPage.value.meta.id) return
@@ -595,7 +609,7 @@ export default {
       rightSidebarIsOpen,
       dragoverUIItemId,
       dragoverPlacement,
-      isModileKind,
+      isMobileKind,
       ui,
       uiVersion,
       simulateWidth,

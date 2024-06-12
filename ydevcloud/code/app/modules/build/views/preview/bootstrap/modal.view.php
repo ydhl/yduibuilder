@@ -1,15 +1,18 @@
 <?php
 namespace app\modules\build\views\preview\bootstrap;
+
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
-use app\modules\build\views\preview\Html_Event_Binding;
+
 
 class Modal_View extends Preview_View {
-    use Html_Event_Binding, Bootstrap_Popup,Html_Code_Helper;
+    use Bootstrap_Popup,Html_Code_Helper;
     protected function css_map()
     {
         $css_map = parent::css_map();
         unset($css_map['backgroundTheme'], $css_map['foregroundTheme']);
+        if (!$css_map['']) $css_map[''] = '';
+        $css_map[''] .= ' modal fade';
         return $css_map;
     }
 
@@ -31,20 +34,28 @@ class Modal_View extends Preview_View {
         }
         return join(';', $newMap);
     }
-    protected function style_map()
+    protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map();
+        $map = parent::style_map($meta);
         $map['width'] = 'width:100%';
-        $map['flex-grow'] = 'flex-grow:1';
-        $map['display'] = 'display:flex';
-        $map['justify-content'] = 'justify-content:center';
-        $map['align-items'] = 'align-items:stretch';
+
         foreach ($map as $name => $value){
             if (preg_match("/^border|^outline/", $name, $matches)){
                 unset($map[$name]);
             }
         }
         return $map;
+    }
+    public function build_style($justSelf = true)
+    {
+        $style = parent::build_style($justSelf);
+
+        $position = $this->data['meta']['custom']['position'];
+        $items = [ "top"=> 'flex-start', "center"=> 'center', "bottom"=> 'flex-end' ];
+        $justify = [ "left"=> 'flex-start', "center"=> 'center', "right"=> 'flex-end' ];
+        $style['.model-position'] = 'pointer-events:none;width: 100%;height: 100%;display:flex;justify-content:'.($justify[$position[0]?:'center']).'; align-items:'.($items[$position[1]?:'center']);
+
+        return $style;
     }
 
     public function build_ui()
@@ -63,60 +74,67 @@ class Modal_View extends Preview_View {
         $pageUiConfig = $this->build->get_page()->get_ui_config();
         $pageid = $pageUiConfig->meta->id;
 
-        echo $this->indent().'<div onclick="YDECloud.layerTop(\''.$pageid.'\')"';
+        echo $this->indent().'<div';
+        echo $this->wrap_output('id', $pageid);
         echo $this->build_main_attrs();
         echo ">\r\n";
 
         echo $this->indent(1);
-        echo "<div class='modal-dialog'>\r\n";
+        echo "<div class='model-position'>\r\n";
+
         echo $this->indent(2);
+        echo "<div class='modal-dialog'>\r\n";
+        echo $this->indent(3);
         echo "<div".$this->wrap_output('class', $this->body_Class()).$this->wrap_output('style', $this->body_style()).">\r\n";
 
         if (!@$this->data['meta']['custom']['headless']){
-            echo $this->indent(3);
-            echo "<div class='modal-header align-items-center'>\r\n";
             echo $this->indent(4);
+            echo "<div class='modal-header align-items-center'>\r\n";
+            echo $this->indent(5);
             echo "<div class='d-flex  move-handler'>\r\n";
             foreach ($myItems['head'] as $view){
+                $view->increase_indent(6);
+                $view->output();
+            }
+            echo $this->indent(5);
+            echo "</div>\r\n";
+            echo $this->indent(5);
+            echo '<button type="button" onclick="YDECloud.closeSelf(this)" class="close" ><span>×</span></button>'."\r\n";
+
+            echo $this->indent(4);
+            echo "</div>\r\n";
+        }
+
+
+        echo $this->indent(4);
+        echo "<div class='modal-body'>\r\n";
+        foreach ($myItems['body'] as $view){
+            $view->increase_indent(4);
+            $view->output();
+        }
+        echo $this->indent(4);
+        echo "</div>\r\n";
+
+
+        if (!@$this->data['meta']['custom']['footless']){
+            echo $this->indent(4);
+            echo "<div class='modal-footer'>\r\n";
+            foreach ($myItems['foot'] as $view){
                 $view->increase_indent(4);
                 $view->output();
             }
             echo $this->indent(4);
             echo "</div>\r\n";
-            echo $this->indent(4);
-            echo '<button type="button" onclick="YDECloud.closeModal(\''.$pageid.'\')" class="close" ><span>×</span></button>'."\r\n";
-
-            echo $this->indent(3);
-            echo "</div>\r\n";
         }
 
 
-        echo $this->indent(3);
-        echo "<div class='modal-body'>\r\n";
-        foreach ($myItems['body'] as $view){
-            $view->increase_indent(3);
-            $view->output();
-        }
         echo $this->indent(3);
         echo "</div>\r\n";
-
-
-        if (!@$this->data['meta']['custom']['footless']){
-            echo $this->indent(3);
-            echo "<div class='modal-footer'>\r\n";
-            foreach ($myItems['foot'] as $view){
-                $view->increase_indent(3);
-                $view->output();
-            }
-            echo $this->indent(3);
-            echo "</div>\r\n";
-        }
-
-
         echo $this->indent(2);
         echo "</div>\r\n";
         echo $this->indent(1);
-        echo "</div>\r\n";
+        echo $this->indent()."</div>\r\n";
+
         echo $this->indent()."</div>\r\n";
     }
 }

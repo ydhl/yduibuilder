@@ -1,6 +1,6 @@
 <?php
 class axios_install{
-    public static function install_vue3() {
+    public static function installInVue3() {
         return [
             'devDependencies'=>[],
             'dependencies'=>['axios'=>"^1.1.2"],
@@ -10,11 +10,11 @@ class axios_install{
     }
     /**
      * 预览时要包含的js
-     * @return array ['file'=>'es'|'iife']
+     * @return array ['iife'=>[],'es'=>[],''vendor'=>[]]
      */
     public static function jsForPreview() {
         return [
-            'axios.min.js'=>'iife'
+            'iife'=>['axios.min.js']
         ];
     }
 }

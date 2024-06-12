@@ -14,7 +14,7 @@ foreach ($files as $file){
     $data['id'] = $data['uuid'];
     $data['name'] = $data['file_name'];
     if (yze_isimage($data['url'])){
-        $data['url'] = UPLOAD_SITE_URI.$data['url'];
+        $data['url'] = SITE_URI.'image?file=' . urlencode($data['url']);
     }
     unset($data['uuid'],$data['project_id'],$data['file_name']);
     $datas[] = $data;

@@ -2,7 +2,7 @@
 namespace yangzie;
 
 class YZE_Object{
-	const VERSION = '2.0.0';
+	const VERSION = '3.0.1';
 	private static $loaded_modules = array();
 
 	public static function set_loaded_modules($module_name, $module_info){
@@ -48,7 +48,7 @@ class YZE_Object{
 	 * @param $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV, INPUT_SESSION, or INPUT_REQUEST.
 	 * @return unknown
 	 */
-	public static function filter_special_chars(array $array=array(),$type){
+	public static function filter_special_chars($array=array(),$type){
 		$definition = array();
 		foreach($array as $name=>$value){
 			$definition[$name]['filter'] 	= FILTER_CALLBACK;

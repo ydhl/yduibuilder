@@ -12,6 +12,8 @@ $menu = $this->get_data('menu');
 $this->master_view = 'master/project';
 $loginUser = YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
 $project_member = $project->get_member($loginUser->id);
+
+$api_env_config = Project_Setting_Model::get_setting_value($project->id, 'api_env') ?: [];
 ?>
 <h3 class="mb-3"><i class="iconfont icon-setting fs-2"></i> <?= __('Setting')?></h3>
 
@@ -34,6 +36,31 @@ $project_member = $project->get_member($loginUser->id);
         </div>
     </div>
 <?php }?>
+<form>
+<div class="card mb-3">
+    <div class="card-header"><?= __('API URL')?></div>
+    <table class="table">
+        <thead>
+        <tr><th><?= __('API Environment')?></th><th><?= __('Base URL')?></th></tr>
+        </thead>
+        <tbody id="apiurl">
+            <?php foreach ($api_env_config as $name=>$url){?>
+            <tr>
+                <td><input type="text" name="name[]" onchange="addapiurl()" value="<?= $name?>" class="form-control api-name" placeholder="<?= __('Left blank will be deleted')?>"></td>
+                <td><input type="text" name="url[]" value="<?= $url?>" class="form-control"></td>
+            </tr>
+            <?php }?>
+            <tr>
+                <td><input type="text" name="name[]" onchange="addapiurl()"  value="" class="form-control api-name" placeholder="<?= __('Left blank will be deleted')?>"></td>
+                <td><input type="text" name="url[]" value="" class="form-control"></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="card-body">
+        <button class="btn btn-secondary btn-sm yd-form-submit"  type="button" data-url="/project/<?= $project->uuid?>/apiurl"><?= __('Change')?></button>
+    </div>
+</div>
+</form>
 <?php if ($project_member->is_creater){?>
     <div class="card mb-3">
         <div class="card-header"><?= __('Transfer Project')?></div>
@@ -60,8 +87,18 @@ $project_member = $project->get_member($loginUser->id);
                     data-title="<?= sprintf(__('Deleted projects cannot be restored.  please input the project name %s to delete'), "<code>{$project->name}</code>")?>"><?= __('Delete Project')?></button>
         </div>
     </div>
-
+<script type="text/html" id="apitpl">
+    <tr>
+        <td><input type="text" name="name[]" onchange="addapiurl()"  value="" class="form-control api-name" placeholder="<?= __('Left blank will be deleted')?>"></td>
+        <td><input type="text" name="url[]" value="" class="form-control"></td>
+    </tr>
+</script>
 <script>
+    function addapiurl(event) {
+        if($('#apiurl tr:last-child .api-name').val()){
+            $('#apiurl').append($("#apitpl").html())
+        }
+    }
     function transfer(dialogid) {
         if (!transferToId){
             YDJS.hide_dialog(dialogid);

@@ -6,15 +6,15 @@
       <div class="card">
         <div class="card-header" :id="uiconfig.meta.id+'heading0'">
           <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+            <div class="btn btn-link btn-block text-left pointer-event-none" type="button" data-toggle="collapse"
                     :data-target="`#${uiconfig.meta.id}collapse0`" aria-expanded="true" :aria-controls="`${uiconfig.meta.id}collapse0`">
               According Header
-            </button>
+            </div>
           </h2>
         </div>
 
         <div :id="`${uiconfig.meta.id}collapse0`" class="collapse show" :aria-labelledby="uiconfig.meta.id+'heading0'" :data-parent="'#'+uiconfig.meta.id">
-          <div class="card-body">
+          <div class="card-body p-0">
             According body, you can add item from Style Panel
           </div>
         </div>
@@ -25,16 +25,16 @@
         <div class="card">
           <div class="card-header" :id="uiconfig.meta.id+'heading'+index">
             <h2 class="mb-0">
-              <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+              <div class="btn btn-link btn-block text-left pointer-event-none" type="button" data-toggle="collapse"
                       :data-target="`#${uiconfig.meta.id}collapse${index}`" aria-expanded="true" :aria-controls="`${uiconfig.meta.id}collapse${index}`">
                 {{subpage.meta.title}}
-              </button>
+              </div>
             </h2>
           </div>
 
           <div :id="`${subpage.meta.id}collapse${index}`"
-               :class="{'collapse': true, 'show': (!uiconfig.meta.custom?.activeItem && index ==0) || uiconfig.meta.custom?.activeItem==index}" :aria-labelledby="subpage.meta.id+'heading'+index" :data-parent="'#'+subpage.meta.id">
-            <div class="card-body">
+               :class="{'collapse': true, 'show': (!uiconfig.meta.custom?.activeIndex && index ==0) || uiconfig.meta.custom?.activeIndex==index}" :aria-labelledby="subpage.meta.id+'heading'+index" :data-parent="'#'+subpage.meta.id">
+            <div class="card-body p-0">
               <UIBase v-for="(item, index) in subpage.items" :key="index" :is-readonly="true" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
             </div>
           </div>

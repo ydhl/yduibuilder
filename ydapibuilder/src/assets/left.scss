@@ -1,0 +1,153 @@
+#left-panel{
+  width: $leftPanelWidth;
+  position: fixed;
+  left: 0px;
+  top: $topPanelHeight;
+  bottom: 0px;
+  background-color: $gray-200;
+  overflow: hidden;
+
+  .left-panel-scroll{
+    /*遮住滚动条*/
+    width: $leftPanelWidth + $scrollbarSize;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: flex-start;
+    user-select: none;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    height: 100%;
+    flex: 1;
+  }
+  .item:not(.active){
+    border-right: 1px solid $gray-300;
+  }
+  a.item i{
+    font-size: 1.6rem;
+    display: block;
+  }
+  a.item{
+    font-size: $font-size-sm;
+    text-align: center;
+    color: $gray-600;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 10px 0px;
+  }
+  .item{
+    border-top: 1px solid $gray-300;
+  }
+  a.item:hover{
+    color:$gray-800;
+    background-color: $gray-100;
+  }
+  a.item.active{
+    background-color: $white;
+    border-top: 1px solid $gray-300;
+    color:$primary;
+  }
+  a.item.active .iconfont{
+    text-shadow: 3px 0px 6px $gray-400;
+  }
+}
+#left-sidebar{
+  width: $leftSidebarWidth;
+  background-color: $white;
+  position: fixed;
+  left: $leftPanelWidth;
+  top: $topPanelHeight;
+  border-right: 1px solid $gray-200;
+  color: $black;
+  bottom: 0px;
+  user-select: none;
+  z-index: 10;
+  box-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+
+  .sidebar-body{
+    display: flex;
+    height: 100%;
+
+    .body-scroll{
+      overflow-x: hidden;
+      overflow-y: scroll;
+      width: 100%;
+      height: 100%;
+    }
+
+    .split{
+      flex: 0 0 5px;
+      height: 100%;
+      cursor: col-resize;
+    }
+    .split:hover{
+      background-color: $light;
+    }
+  }
+
+  .close-button{
+    cursor: pointer;
+    position: absolute;
+    right: -28px;
+    top: calc(50% - 56px);
+    z-index: 9;
+  }
+  .close-button path {
+    fill: $white !important;
+    stroke: $gray-200;
+  }
+
+  .ui-sidebar {
+    border-bottom: 1px solid $gray-100;
+    .ui-sidebar-header{
+      font-size: 12px;
+      padding: 0rem 1rem 0rem 1rem !important;
+      display: flex !important;
+      align-items: center;
+      align-content: center;
+      cursor: pointer;
+    }
+    .ui-sidebar-body{
+      display: flex !important;
+      flex-wrap: wrap !important;
+      padding: 0rem 1rem 1rem 1rem !important;
+      align-items: center;
+      align-content: flex-start;
+    }
+
+    .ui-item-holder{
+      width: 80px;
+      flex-basis: 80px;
+      height: 0px;
+      flex-grow: 1 !important;
+    }
+    .ui-item{
+      width: 80px;
+      flex-basis: 80px;
+      height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: $text-muted;
+      flex-grow: 1 !important;
+    }
+    .iconfont{
+      font-size: 26px !important;
+      color: $primary;
+    }
+  }
+
+  .ui-sidebar-fixedtop{
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    width: 100%;
+    background: #fff;
+  }
+}

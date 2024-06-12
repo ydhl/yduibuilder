@@ -25,6 +25,10 @@ $sidebar = $this->get_data('sidebar');
             <a href="/profile/cellphone" class="list-group-item list-group-item-action <?=$sidebar=='cellphone' ? 'active': ''?>" <?=$sidebar=='cellphone' ? 'aria-current="true"': ''?>>
                 <?= __('Cellphone')?>
             </a>
+            <div class="list-group-item list-group-item-action disabled bg-light p-1"></div>
+            <a href="/account" class="list-group-item list-group-item-action <?=$sidebar=='account' ? 'active': ''?>" <?=$sidebar=='account' ? 'aria-current="true"': ''?>>
+                <?= __('Account')?>
+            </a>
         </div>
     </div>
     <div class="flex-grow-1 ms-3">

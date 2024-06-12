@@ -1,14 +1,15 @@
 <?php
 namespace app\modules\build\views\preview\weui;
 use app\modules\build\views\code\Base_Code_Fragment;
+
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 
 class Page_View extends Preview_View {
-    use Weui_Event_Binding, Weui_Popup,Html_Code_Helper;
-    protected function style_map()
+    use Weui_Popup,Html_Code_Helper;
+    protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map();
+        $map = parent::style_map($meta);
         if (!@$map['height'] && $this->data['pageType']!='popup'){
             $map['height']= 'height:100vh';
         }

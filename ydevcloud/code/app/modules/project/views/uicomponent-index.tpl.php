@@ -15,7 +15,7 @@ $this->master_view = 'master/project';
 $pagination = new YZE_Simple_View(YZE_APP_VIEWS_INC."pagination", ['total'=>$total, 'pagesize'=>30, 'currpage'=>$currpage], $this->controller)
 
 ?>
-<h3><i class="iconfont icon-ui fs-2"></i> <?= __('Project UI Component')?></h3>
+<h3><i class="iconfont icon-edit fs-2"></i> <?= __('Project UI Component')?></h3>
 <form method="get">
     <div class="d-flex align-items-center mb-3 mt-4">
         <select name="type" class="form-control form-control-sm w-auto me-3">

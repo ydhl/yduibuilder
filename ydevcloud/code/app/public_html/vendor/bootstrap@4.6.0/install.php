@@ -1374,7 +1374,7 @@ class bootstrap_install{
           "bi-safe"
         ];
     }
-    public static function install_vue3() {
+    public static function installInVue3() {
         /**
          * 定义基于node，bootstrap的包名和对应的css如何包含
          */
@@ -1384,9 +1384,6 @@ class bootstrap_install{
             'dependencies'=>['bootstrap'=>"^4.6.0",'bootstrap-icons'=>'^1.5.0'],
             // 需要打包导出的文件, 并会导出到src/assert/[包名下面]
             'exportFiles'=>[
-                'layer/iconfont.css',
-                'layer/iconfont.ttf',
-                'img/resize-bottom-right.svg'
             ],
             // index.css代码中include包含的文件, 格式：文件 => 是否是本库里面的文件; 本库的文件会导出到src/assert/[包名下面]，非本库的文件通过npm安装
             'includeCSSFiles'=>[
@@ -1395,8 +1392,6 @@ class bootstrap_install{
                 'ext-misc.css' => true,
                 'ext-range.css' => true,
                 'ext-modal.css' => true,
-                'layer/adapter.css' => true,
-                'layer/iconfont.css' => true,
                 'wangEditor/adapter.css' => true,
             ],
             // 这部分的文件会被编译到index.js中到{{globalFiles}}部分, 并会导出到public/[包名下面]
@@ -1405,13 +1400,21 @@ class bootstrap_install{
     }
 
     /**
+     * 生成html5代码需要包含的前端文件
+     * @return array ['iife'=>[],'es'=>[],''vendor'=>[]]
+     */
+    public static function installInHtml5() {
+        return [
+            'iife'=>['bootstrap.bundle.min.js', 'ydpopup.js']
+        ];
+    }
+    /**
      * 预览时要包含的js
-     * @return array ['file'=>'iife'|'import ...'] 前者iife写法，后者module写法
+     * @return array ['iife'=>[],'es'=>[],''vendor'=>[]]
      */
     public static function jsForPreview() {
         return [
-            'bootstrap.bundle.min.js'=>'iife',
-            'layer/petite-vue-adapter.js'=>'iife'
+            'iife'=>['bootstrap.bundle.min.js', 'ydpopup.js']
         ];
     }
 }

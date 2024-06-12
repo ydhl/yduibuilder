@@ -40,32 +40,25 @@ export default {
     const store = useStore()
     const dropdown = new Dropdown(props, context, store)
     const setup = dropdown.setup()
-    const { parentUi, parentIsNavbar, parentIsButtonGroup } = setup
+    const { parentUi, parentIsNavbar } = setup
 
     // 如果上层是按钮，那么继承他的outline，size属性
-    const dropdownMeta = computed(() => parentIsButtonGroup.value || parentIsNavbar.value ? parentUi.value.meta : props.uiconfig.meta)
+    const dropdownMeta = computed(() => parentIsNavbar.value ? parentUi.value.meta : props.uiconfig.meta)
     const sizing = computed(() => {
-      let sizingContext = ''
-      let sizing = ''
-      if (parentIsButtonGroup.value) { // 如果父容器是按钮组
-        sizing = dropdownMeta.value?.css?.buttonSizing
-        sizingContext = 'buttonSizing'
-      } else {
-        sizing = dropdownMeta.value?.css?.dropdownSizing
-        sizingContext = 'dropdownSizing'
-      }
+      const sizingContext = 'dropdownSizing'
+      const sizing = dropdownMeta.value?.css?.dropdownSizing
       return store.getters.translate(sizingContext, sizing)
     })
     const selfHasForeground = computed(() => props.uiconfig.meta?.css?.foregroundTheme && props.uiconfig.meta?.css?.foregroundTheme !== 'default')
     const selfHasBackground = computed(() => props.uiconfig.meta?.css?.backgroundTheme && props.uiconfig.meta?.css?.backgroundTheme !== 'default')
     const theme = computed(() => {
-      // 如果自己有背景和前景则用自己的，否则用上层的，如buttongroup
+      // 如果自己有背景和前景则用自己的，否则用上层的
       let myBackgruondTheme = props.uiconfig.meta?.css?.backgroundTheme !== 'default' ? props.uiconfig.meta?.css?.backgroundTheme : ''
       myBackgruondTheme = myBackgruondTheme || dropdownMeta.value?.css?.backgroundTheme
       return myBackgruondTheme === 'default' ? '' : myBackgruondTheme
     })
     const forceTheme = computed(() => {
-      // 如果按钮有背景和前景则用按钮的，否则用上层的buttongroup
+      // 如果按钮有背景和前景则用按钮的，否则用上层的
       let foregroundTheme = props.uiconfig.meta?.css?.foregroundTheme !== 'default' ? props.uiconfig.meta?.css?.foregroundTheme : ''
       foregroundTheme = foregroundTheme || dropdownMeta.value?.css?.foregroundTheme
       return foregroundTheme === 'default' ? '' : foregroundTheme
@@ -98,7 +91,7 @@ export default {
     })
     const btnStyle = computed(() => {
       const style = dropdown.getUIStyle()
-      // 如果自己有背景和前景则用自己的，否则用上层的，如buttongroup
+      // 如果自己有背景和前景则用自己的，否则用上层的
       const color = style?.color || dropdownMeta.value?.style?.color
       const backgroundColor = style?.['background-color'] || dropdownMeta.value?.style?.['background-color']
       if (!selfHasForeground.value && color) { // 有css时用预定义css
@@ -129,7 +122,7 @@ export default {
       if (parentIsNavbar.value) {
         arr.push('nav-item')
       }
-      if (parentIsButtonGroup.value || dropdownMeta.value?.custom?.isSplit) {
+      if (dropdownMeta.value?.custom?.isSplit) {
         arr.push('btn-group')
       }
       return arr.join(' ')

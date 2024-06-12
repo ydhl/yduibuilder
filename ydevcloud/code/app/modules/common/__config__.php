@@ -19,6 +19,7 @@ class Common_Module extends YZE_Base_Module{
                 'sendcode'=> ['controller' => 'index', 'action'=>'sendcode'],
                 'bind'	=> ['controller' => 'bind'],
                 'download'	=> ['controller' => 'download'],
+                'font'	=> ['controller' => 'download', 'action'=>'font'],
                 'image'	=> ['controller' => 'download', 'action'=>'image'],
                 'sms'	=> ['controller' => 'bind', 'action'=>'sms'],
             ]

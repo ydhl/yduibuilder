@@ -36,35 +36,50 @@ class Module_Controller extends YZE_Resource_Controller {
         $this->layout = '';
         $uuid = $request->get_from_get('uuid');
         $curr_page_uuid = $request->get_from_get('curr_page_uuid');
+        $hide_sub_page = intval($request->get_from_get('hide_sub_page'));
+        $hide_component = intval($request->get_from_get('hide_component'));
+        $hide_popup = intval($request->get_from_get('hide_popup'));
+        $hide_page = intval($request->get_from_get('hide_page'));
         $project = find_by_uuid(Project_Model::CLASS_NAME, $uuid);
         if (!$project) return YZE_JSON_View::error($this, __('Project Not Found'));
         $data = [];
         $popups = [];
+        $subpages = [];
         $components = [];
         foreach ($project->get_modules() as $module){
             $moduleData = ['name'=>$module->name, 'id'=>$module->uuid, 'functions'=>[]];
             foreach ($module->get_functions() as $function){
                 $pages = [];
-                foreach($function->get_pages() as $page) {
-                    $pages[] = ['name'=>$page->name, 'id'=>$page->uuid, 'screen'=>$page->screen];
+                if (!$hide_page){
+                    foreach($function->get_pages() as $page) {
+                        $pages[] = ['name'=>$page->name, 'id'=>$page->uuid, 'screen'=>$page->screen];
+                    }
                 }
                 $moduleData['functions'][] = ['name'=>$function->name, 'id'=>$function->uuid, 'pages'=>$pages];
             }
             $data[] = $moduleData;
         }
-        foreach (Page_Model::from()->where("project_id=:pid and page_type in ('popup','component') and is_deleted=0")
-                     ->select([':pid'=>$project->id]) as $popup){
-            if ($popup->page_type =='popup'){
-                $popups[] = ['name'=>$popup->name, 'id'=>$popup->uuid, 'screen'=>$popup->screen];
-            }else{
-                $count = $popup->get_instance_count();
-                $components[] = ['name'=>$popup->name, 'instance_count'=>$count, 'id'=>$popup->uuid, 'end_kind'=>$popup->component_end_kind];
+        if (!$hide_component || !$hide_popup || !$hide_sub_page){
+            $page_type = [];
+            if (!$hide_component) $page_type[] ="'component'";
+            if (!$hide_popup) $page_type[] ="'popup'";
+            if (!$hide_sub_page) $page_type[] ="'subpage'";
+            foreach (Page_Model::from()->where("project_id=:pid and page_type in (".join(',', $page_type).") and is_deleted=0")
+                         ->select([':pid'=>$project->id]) as $popup){
+                if ($popup->page_type =='popup'){
+                    $popups[] = ['name'=>$popup->name, 'id'=>$popup->uuid, 'screen'=>$popup->screen];
+                }elseif ($popup->page_type =='subpage'){
+                    $subpages[] = ['name'=>$popup->name, 'id'=>$popup->uuid, 'screen'=>$popup->screen];
+                }elseif ($popup->page_type =='component'){
+                    $count = $popup->get_instance_count();
+                    $components[] = ['name'=>$popup->name, 'instance_count'=>$count, 'id'=>$popup->uuid, 'end_kind'=>$popup->component_end_kind];
+                }
             }
+            $currPage = $curr_page_uuid ? find_by_uuid(Page_Model::CLASS_NAME, $curr_page_uuid) : null;
+            $currFunction = $currPage ? $currPage->get_function() : null;
+            $currModule = $currFunction ? $currFunction->get_module() : null;
         }
-        $currPage = $curr_page_uuid ? find_by_uuid(Page_Model::CLASS_NAME, $curr_page_uuid) : null;
-        $currFunction = $currPage ? $currPage->get_function() : null;
-        $currModule = $currFunction ? $currFunction->get_module() : null;
-        return YZE_JSON_View::success($this, ['curr_module_uuid'=>$currModule->uuid,'curr_function_uuid'=>$currFunction->uuid,'modules'=>$data,'popups'=>$popups,'components'=>$components]);
+        return YZE_JSON_View::success($this, ['curr_module_uuid'=>$currModule->uuid,'curr_function_uuid'=>$currFunction->uuid,'modules'=>$data,'popups'=>$popups,'subpages'=>$subpages,'components'=>$components]);
     }
 
     public function exception(\Exception $e){

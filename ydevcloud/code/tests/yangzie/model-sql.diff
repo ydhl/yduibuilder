@@ -1,0 +1,24 @@
+001+ Fatal error: Uncaught Error: Call to undefined method yangzie\YZE_DBAImpl::migration() in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/model-sql.php:79
+002+ Stack trace:
+003+ #0 {main}
+004+   thrown in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/model-sql.php on line 79
+001- 单表查询:
+002- NULL
+003- test title
+004- test title
+005- test user
+006- 1
+007- test user
+008- 1
+009- test user
+010- 1
+011- test user
+012- 1
+013- test user
+014- 1
+015- 112233
+016- 1
+017- 3
+018- 112233
+019- test user
+020- test title

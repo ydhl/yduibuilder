@@ -50,11 +50,11 @@ class wxmp_wxmp2 extends Base_Factory{
             include_once YZE_PUBLIC_HTML."vendor/{$package}/install.php";
             list ($packageName) = explode('@', $package);
             $requireClass = $packageName . '_install';
-            if (!method_exists($requireClass, "install2wxmp2")){
-                $this->output(sprintf(__(' can not found install2wxmp2 method in %s, ignore'), $requireClass), 'error');
+            if (!method_exists($requireClass, "installInWxmp2")){
+                $this->output(sprintf(__(' can not found installInWxmp2 method in %s, ignore'), $requireClass), 'error');
                 continue;
             }
-            $install = $requireClass::install2wxmp2();
+            $install = $requireClass::installInWxmp2();
             foreach ((array)@$install['export'] as $path => $exports){
                 foreach ($exports as $file){
                     $entry = "assets/{$package}/{$path}".basename($file);

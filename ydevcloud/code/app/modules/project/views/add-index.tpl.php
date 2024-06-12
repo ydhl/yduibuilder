@@ -2,6 +2,7 @@
 namespace app\project;
 use app\common\Option_Model;
 use app\vendor\Env;
+use TencentCloud\Msp\V20180319\Models\Project;
 use \yangzie\YZE_Resource_Controller;
 use \yangzie\YZE_Request;
 use \yangzie\YZE_Redirect;
@@ -25,7 +26,7 @@ $this->layout = '';
         <div class="row mb-3">
             <label class="col-sm-4 col-form-label"><?= __('Project Logo:')?></label>
             <div class="col-sm-8">
-                <img src="<?= $logo ? UPLOAD_SITE_URI.$logo : "#"?>" class="rounded-circle project-logo <?= $logo ? '' : "d-none"?>" style="width: 50px;height: 50px;object-fit: cover"/>
+                <img src="<?= $logo ? SITE_URI."image?file=".urlencode($logo) : "#"?>" class="rounded-circle project-logo <?= $logo ? '' : "d-none"?>" style="width: 50px;height: 50px;object-fit: cover"/>
                 <input type="hidden" name="s-logo" id="project-logo" value="<?= $logo?>">
                 <button type="button" class="btn btn-secondary btn-sm yd-upload" data-uploaded-callback="logo_callback" data-upload-mime="image/*" data-url="/common/upload"><?= __('Upload')?></button>
             </div>
@@ -34,7 +35,7 @@ $this->layout = '';
         <div class="row mb-3">
             <label class="col-sm-4 col-form-label"><?= __('Type:')?></label>
             <div class="col-sm-8">
-                <select name="p-end_kind" class="form-select end_kind">
+                <select name="p-end_kind" class="form-control end_kind">
                     <option value="pc"><?= __('PC')?></option>
                     <option value="mobile"><?= __('Mobile')?></option>
                 </select>

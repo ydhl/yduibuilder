@@ -1,10 +1,11 @@
 <?php
 namespace app\modules\build\views\preview\weui;
+
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 
 class Formgroup_View extends Preview_View {
-    use Weui_Event_Binding, Weui_Popup,Html_Code_Helper;
+    use Weui_Popup,Html_Code_Helper;
     protected function has_title(){
         return trim(@$this->data['meta']['title']);
     }
@@ -50,9 +51,9 @@ class Formgroup_View extends Preview_View {
         }
         return join(' ', $css);
     }
-    protected function style_map()
+    protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map();
+        $map = parent::style_map($meta);
         // 垂直排列时阴影交给内部元素处理
         if (!$this->isHorizontal()) {
             unset($map['box-shadow']);

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: yangzie\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-07 14:11+0800\n"
+"POT-Creation-Date: 2024-06-11 21:48+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: leeboo <leeboo@yidianhulian.com>\n"
 "Language-Team: liizii\n"
@@ -13,10 +13,11 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e\n"
 "X-Poedit-Basepath: ..\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.4.4\n"
 "X-Poedit-SearchPath-0: app\n"
 "X-Poedit-SearchPath-1: yangzie\n"
 "X-Poedit-SearchPath-2: cli\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
 
 #: app/hooks/acl.php:57
 msgid "individual can not invite other user join your project"
@@ -26,7 +27,7 @@ msgstr "个人账户无法邀请别人参与项目"
 msgid "can invite other user join your project"
 msgstr "可邀请别人参与项目"
 
-#: app/hooks/acl.php:150 app/vendor/layouts/admin.layout.php:56
+#: app/hooks/acl.php:150 app/vendor/layouts/admin.layout.php:63
 msgid "Your account has expired. Please renew it"
 msgstr "账号已过期，请续费"
 
@@ -127,53 +128,258 @@ msgstr "pc"
 msgid "mobile"
 msgstr "移动端"
 
-#: app/modules/api/controllers/deletepage_controller.class.php:51
-#: app/modules/api/controllers/save_controller.class.php:56
-msgid "you can not edit in this project"
-msgstr "您不能编辑此项目"
+#: app/modules/api/controllers/action_controller.class.php:38
+#: app/modules/api/controllers/bind_controller.class.php:43
+#: app/modules/api/controllers/data_controller.class.php:35
+#: app/modules/api/controllers/deletepage_controller.class.php:46
+#: app/modules/api/controllers/event_controller.class.php:40
+#: app/modules/api/controllers/state_controller.class.php:35
+#: app/modules/api/controllers/style_controller.class.php:30
+msgid "Page not found"
+msgstr "页面未找到"
 
-#: app/modules/api/controllers/deletepage_controller.class.php:56
-msgid "Deleted Page"
-msgstr "删除了页面"
+#: app/modules/api/controllers/action_controller.class.php:41
+#: app/modules/api/controllers/api_controller.class.php:78
+#: app/modules/api/controllers/api_controller.class.php:162
+#: app/modules/api/controllers/bind_controller.class.php:46
+#: app/modules/api/controllers/data_controller.class.php:38
+#: app/modules/api/controllers/event_controller.class.php:43
+#: app/modules/api/controllers/folder_controller.class.php:44
+#: app/modules/api/controllers/folder_controller.class.php:46
+#: app/modules/api/controllers/folder_controller.class.php:97
+#: app/modules/api/controllers/folder_controller.class.php:99
+#: app/modules/api/controllers/folder_controller.class.php:112
+#: app/modules/api/controllers/label_controller.class.php:47
+#: app/modules/api/controllers/label_controller.class.php:49
+#: app/modules/api/controllers/state_controller.class.php:38
+#: app/modules/api/controllers/style_controller.class.php:33
+#: app/modules/api/controllers/upload_controller.class.php:44
+#: app/modules/api/controllers/upload_controller.class.php:45
+#: app/modules/api/controllers/url_controller.class.php:43
+#: app/modules/project/controllers/delete_controller.class.php:36
+#: app/modules/project/controllers/quit_controller.class.php:25
+#: app/modules/project/controllers/upload_controller.class.php:39
+#: app/modules/project/controllers/upload_controller.class.php:40
+#: app/modules/project/hooks/check_member.php:15
+msgid "Project not found"
+msgstr "项目不存在"
 
+#: app/modules/api/controllers/action_controller.class.php:132
+#: app/modules/api/controllers/action_controller.class.php:351
+#: app/modules/api/controllers/event_controller.class.php:194
+#: app/modules/api/controllers/event_controller.class.php:284
+#: app/modules/api/controllers/event_controller.class.php:301
+msgid "event not found"
+msgstr "事件未找到"
+
+#: app/modules/api/controllers/action_controller.class.php:146
+msgid "Invalid data"
+msgstr "无效的数据"
+
+#: app/modules/api/controllers/action_controller.class.php:169
+msgid "Please select popup type"
+msgstr "请选择弹窗类型"
+
+#: app/modules/api/controllers/action_controller.class.php:214
+#: app/modules/api/controllers/action_controller.class.php:268
+#: app/modules/api/controllers/action_controller.class.php:303
+#: app/modules/api/controllers/action_controller.class.php:326
+#: app/modules/api/controllers/action_controller.class.php:346
+msgid "action not found"
+msgstr "行为未找到"
+
+#: app/modules/api/controllers/action_controller.class.php:215
+msgid "function not found"
+msgstr "功能未找到"
+
+#: app/modules/api/controllers/action_controller.class.php:298
+msgid "unknown bind type"
+msgstr "未绑定类型"
+
+#: app/modules/api/controllers/api_controller.class.php:40
 #: app/modules/api/controllers/file_controller.class.php:38
 #: app/modules/api/controllers/file_controller.class.php:39
 #: app/modules/api/controllers/icon_controller.class.php:38
 #: app/modules/api/controllers/parseexcel_controller.class.php:41
 #: app/modules/api/controllers/parseexcel_controller.class.php:42
+#: app/modules/api/controllers/style_controller.class.php:182
+#: app/modules/api/controllers/theme_controller.class.php:34
+#: app/modules/api/controllers/uicomponent_controller.class.php:43
 #: app/modules/api/controllers/update_controller.class.php:33
+#: app/modules/project/controllers/setting_controller.class.php:45
 #: app/modules/project/controllers/tech_controller.class.php:61
 #: app/modules/project/controllers/transfer_controller.class.php:48
 msgid "project not found"
 msgstr "项目不存在"
 
-#: app/modules/api/controllers/load_controller.class.php:38
-#: app/modules/api/controllers/save_controller.class.php:45
+#: app/modules/api/controllers/api_controller.class.php:57
+#: app/modules/api/controllers/bind_controller.class.php:246
+#: app/modules/api/controllers/bind_controller.class.php:247
+msgid "Api not found"
+msgstr "API未找到"
+
+#: app/modules/api/controllers/api_controller.class.php:63
+#, php-format
+msgid "%s can not be empty"
+msgstr "%s 不能为空"
+
+#: app/modules/api/controllers/api_controller.class.php:98
+msgid "Version can only be incremented"
+msgstr "版本只能递增"
+
+#: app/modules/api/controllers/api_controller.class.php:106
+msgid "web api method"
+msgstr "Web Api 方法"
+
+#: app/modules/api/controllers/api_controller.class.php:107
+msgid "web api path"
+msgstr "Web Api 路径"
+
+#: app/modules/api/controllers/api_controller.class.php:108
+msgid "web api name"
+msgstr "Web Api名称"
+
+#: app/modules/api/controllers/api_controller.class.php:178
+#: app/modules/api/controllers/api_controller.class.php:219
+msgid "Web Api not found"
+msgstr "WEB API未找到"
+
+#: app/modules/api/controllers/api_controller.class.php:182
+#: app/modules/api/controllers/api_controller.class.php:223
+msgid "not a project member"
+msgstr "你不是项目成员"
+
+#: app/modules/api/controllers/bind_controller.class.php:59
+#: app/modules/api/controllers/bind_controller.class.php:104
+#: app/modules/api/controllers/bind_controller.class.php:144
+#: app/modules/api/controllers/copy_controller.class.php:55
+msgid "page not found"
+msgstr "页面未找到"
+
+#: app/modules/api/controllers/bind_controller.class.php:281
+#, php-format
+msgid ""
+"Cannot bind both %s and %s at the same time, because they will both loop the "
+"UI"
+msgstr "不能同时绑定 %s 和 %s , 因为他们都会迭代输出UI"
+
+#: app/modules/api/controllers/bind_controller.class.php:289
+#, php-format
+msgid "target UI has bound another %s output"
+msgstr "目标UI已经绑定%s输出"
+
+#: app/modules/api/controllers/bind_controller.class.php:298
+#: app/modules/api/controllers/bind_controller.class.php:300
+msgid "Please bind the superior data output first"
+msgstr "请先绑定上级数据的输出"
+
+#: app/modules/api/controllers/bind_controller.class.php:301
+msgid ""
+"Must be bound to the subordinate UI of the UI bound to the superior array"
+msgstr "必须绑定到上级数组所绑定UI的子级UI中"
+
+#: app/modules/api/controllers/bind_controller.class.php:310
+msgid "target UI has bound another input"
+msgstr "目标UI已经绑定了其他输入"
+
+#: app/modules/api/controllers/bind_controller.class.php:380
+msgid "Loop output and input cannot be bound to the same UI at the same time"
+msgstr "循环输出和输入不能同时绑定到同一个UI上"
+
+#: app/modules/api/controllers/bind_controller.class.php:406
+msgid "Please input name"
+msgstr "请输入名称"
+
+#: app/modules/api/controllers/bind_controller.class.php:411
+#, php-format
+msgid "Data name 「%s」 has exist"
+msgstr "数据名「%s」 已存在"
+
+#: app/modules/api/controllers/bind_controller.class.php:433
+msgid "deprecated api"
+msgstr "已废除的API"
+
+#: app/modules/api/controllers/copy_controller.class.php:114
+#: app/modules/api/controllers/load_controller.class.php:41
+#: app/modules/api/controllers/save_controller.class.php:52
+#: app/modules/api/controllers/save_controller.class.php:55
+#: app/modules/api/controllers/uicomponent_controller.class.php:97
 #: app/modules/api/controllers/update_controller.class.php:34
-#: app/modules/build/controllers/code_controller.class.php:48
-#: app/modules/build/controllers/preview_controller.class.php:40
+#: app/modules/build/controllers/code_controller.class.php:92
+#: app/modules/build/controllers/preview_controller.class.php:47
 #: app/modules/parallax/controllers/load_controller.class.php:35
-#: app/modules/project/controllers/reverse_controller.class.php:23
-#: app/modules/project/controllers/reverse_controller.class.php:31
+#: app/modules/project/controllers/reverse_controller.class.php:24
+#: app/modules/project/controllers/reverse_controller.class.php:32
 msgid "Page Not Found"
 msgstr "页面未找到"
 
-#: app/modules/api/controllers/load_controller.class.php:41
+#: app/modules/api/controllers/copy_controller.class.php:128
+#: app/modules/api/controllers/deletepage_controller.class.php:51
+#: app/modules/api/controllers/save_controller.class.php:73
+msgid "you can not edit in this project"
+msgstr "您不能编辑此项目"
+
+#: app/modules/api/controllers/copy_controller.class.php:165
+#, php-format
+msgid "copy from %s"
+msgstr "复制 %s"
+
+#: app/modules/api/controllers/copy_controller.class.php:173
+#: app/modules/api/controllers/save_controller.class.php:161
+#, php-format
+msgid "Save UI, Version: %s"
+msgstr "保存UI，版本号：%s"
+
+#: app/modules/api/controllers/deletepage_controller.class.php:56
+msgid "Deleted Page："
+msgstr "删除了页面："
+
+#: app/modules/api/controllers/event_controller.class.php:147
+msgid "custom event not found"
+msgstr "自定义事件未找到"
+
+#: app/modules/api/controllers/event_controller.class.php:151
+#: app/modules/api/controllers/event_controller.class.php:191
+msgid "invalid type"
+msgstr "无效的类型"
+
+#: app/modules/api/controllers/event_controller.class.php:152
+msgid "please select event"
+msgstr "请选择事件"
+
+#: app/modules/api/controllers/event_controller.class.php:235
+msgid "An event with the same name already exists"
+msgstr "已存在同名的事件"
+
+#: app/modules/api/controllers/folder_controller.class.php:134
+msgid "Api folder can not be empty"
+msgstr "API 目录不能为空"
+
+#: app/modules/api/controllers/folder_controller.class.php:149
+msgid "Folder not found"
+msgstr "目录未找到"
+
+#: app/modules/api/controllers/load_controller.class.php:46
 msgid "Function Not Found"
 msgstr "功能未找到"
 
-#: app/modules/api/controllers/load_controller.class.php:43
-#: app/modules/api/controllers/load_controller.class.php:54
+#: app/modules/api/controllers/load_controller.class.php:48
+#: app/modules/api/controllers/load_controller.class.php:77
+#: app/modules/api/controllers/load_controller.class.php:145
 #: app/modules/parallax/controllers/load_controller.class.php:49
 msgid "Page Or Function Not Found"
 msgstr "未找到页面或功能"
 
-#: app/modules/api/controllers/load_controller.class.php:44
+#: app/modules/api/controllers/load_controller.class.php:49
 #: app/modules/parallax/controllers/load_controller.class.php:39
 msgid "Page has been deleted"
 msgstr "页面已被删除"
 
-#: app/modules/api/controllers/module_controller.class.php:39
+#: app/modules/api/controllers/load_controller.class.php:62
+#: app/modules/api/controllers/load_controller.class.php:137
+#: app/modules/api/controllers/module_controller.class.php:44
+#: app/modules/build/controllers/code_controller.class.php:60
+#: app/modules/project/controllers/asset_controller.class.php:66
 #: app/modules/project/controllers/member_controller.class.php:65
 #: app/modules/project/controllers/member_controller.class.php:69
 #: app/modules/project/controllers/member_controller.class.php:85
@@ -185,34 +391,71 @@ msgstr "项目不存在"
 msgid "file not found"
 msgstr "文件未找到"
 
-#: app/modules/api/controllers/save_controller.class.php:51
-msgid "function not found"
-msgstr "功能未找到"
-
-#: app/modules/api/controllers/save_controller.class.php:95
+#: app/modules/api/controllers/save_controller.class.php:138
 #, php-format
 msgid "page has been saved by %s at %s (%s)"
 msgstr "页面已经被%s在%s（%s）保存了，你已不是最新版本"
 
-#: app/modules/api/controllers/save_controller.class.php:98
+#: app/modules/api/controllers/save_controller.class.php:141
 msgid "page has been saved by other"
 msgstr "别人已经保存了页面，你的版本不是最新的"
 
-#: app/modules/api/controllers/save_controller.class.php:121
-msgid "Save UI"
-msgstr "保存设计"
+#: app/modules/api/controllers/state_controller.class.php:144
+msgid "State not exist"
+msgstr "状态不存在"
 
-#: app/modules/api/controllers/upload_controller.class.php:39
-#: app/modules/api/controllers/upload_controller.class.php:40
-#: app/modules/project/controllers/delete_controller.class.php:36
-#: app/modules/project/controllers/upload_controller.class.php:39
-#: app/modules/project/controllers/upload_controller.class.php:40
-#: app/modules/project/hooks/check_member.php:15
-msgid "Project not found"
-msgstr "项目不存在"
+#: app/modules/api/controllers/style_controller.class.php:68
+#, php-format
+msgid "%s on this page, %s on other page"
+msgstr "%s 在当前页面, %s 在其他页面"
 
-#: app/modules/api/controllers/upload_controller.class.php:51
-#: app/modules/api/controllers/upload_controller.class.php:58
+#: app/modules/api/controllers/style_controller.class.php:68
+msgid "Not used"
+msgstr "未使用"
+
+#: app/modules/api/controllers/style_controller.class.php:73
+msgid "Existing Classes"
+msgstr "已存在的样式"
+
+#: app/modules/api/controllers/style_controller.class.php:83
+#: app/modules/api/controllers/style_controller.class.php:94
+#: app/modules/api/controllers/style_controller.class.php:123
+msgid "Style not found"
+msgstr "样式未找到"
+
+#: app/modules/api/controllers/style_controller.class.php:160
+msgid "Please input selector name"
+msgstr "请输入选择器名称"
+
+#: app/modules/api/controllers/style_controller.class.php:198
+msgid "style not found"
+msgstr "样式未找到"
+
+#: app/modules/api/controllers/uicomponent_controller.class.php:95
+msgid "Please type UI Name"
+msgstr "请输入UI名称"
+
+#: app/modules/api/controllers/uicomponent_controller.class.php:99
+msgid "UI Item Not Found"
+msgstr "UI项目未找到"
+
+#: app/modules/api/controllers/uicomponent_controller.class.php:171
+#, php-format
+msgid "%s has been created as component. at %s"
+msgstr "%s 已在 %s 创建为组件"
+
+#: app/modules/api/controllers/uicomponent_controller.class.php:197
+#: app/modules/uicomponent/controllers/delete_controller.class.php:36
+#: app/modules/uicomponent/controllers/delete_controller.class.php:46
+msgid "UI Component not found"
+msgstr "UI组件未找到"
+
+#: app/modules/api/controllers/uicomponent_controller.class.php:202
+msgid "UI Component not found."
+msgstr "UI Component not found。"
+
+#: app/modules/api/controllers/upload_controller.class.php:56
+#: app/modules/api/controllers/upload_controller.class.php:63
 #: app/modules/common/controllers/upload_controller.class.php:38
 #: app/modules/common/controllers/upload_controller.class.php:45
 #: app/modules/project/controllers/upload_controller.class.php:54
@@ -230,16 +473,20 @@ msgid "search icons..."
 msgstr "查询图标…"
 
 #: app/modules/api/views/icon-index.tpl.php:41
+#: app/modules/project/views/uicomponent-index.tpl.php:38
+#: app/modules/project/views/uicomponent-index.tpl.php:39
+#: app/modules/uicomponent/views/index-index.tpl.php:31
+#: app/modules/uicomponent/views/index-index.tpl.php:32
 msgid "Search"
 msgstr "查询"
 
-#: app/modules/build/controllers/code_controller.class.php:36
-#: app/modules/build/controllers/preview_controller.class.php:28
-msgid "Module Not Found..."
-msgstr "模块未找到…"
+#: app/modules/build/controllers/code_controller.class.php:38
+#: app/modules/build/controllers/preview_controller.class.php:29
+msgid "project Not Found..."
+msgstr "项目不存在…"
 
-#: app/modules/build/controllers/code_controller.class.php:40
-#: app/modules/build/views/master/preview.tpl.php:34
+#: app/modules/build/controllers/code_controller.class.php:47
+#: app/modules/build/views/master/preview.tpl.php:192
 #: app/modules/common/views/bind-index.tpl.php:29
 #: app/modules/common/views/index-index.tpl.php:31
 #: app/modules/user/views/profile-cellphone.tpl.php:32
@@ -247,51 +494,90 @@ msgstr "模块未找到…"
 msgid "Code"
 msgstr "Code"
 
-#: app/modules/build/controllers/code_controller.class.php:63
+#: app/modules/build/controllers/code_controller.class.php:78
+#: app/modules/build/controllers/code_controller.class.php:111
 #, php-format
 msgid "not found target %s"
 msgstr "未找到目标 %s"
 
-#: app/modules/build/controllers/preview_controller.class.php:32
-#: app/modules/build/views/master/preview.tpl.php:20
-#: app/modules/build/views/master/preview.tpl.php:25
+#: app/modules/build/controllers/preview_controller.class.php:39
+#: app/modules/build/views/master/preview.tpl.php:174
+#: app/modules/build/views/master/preview.tpl.php:179
 #: app/modules/dashboard/views/index-index.tpl.php:45
 #: app/modules/project/views/homepage-index.tpl.php:47
-#: app/modules/project/views/master/structure.tpl.php:53
-#: app/modules/project/views/recycle-index.tpl.php:46
-#: app/modules/project/views/structure-index.tpl.php:60
+#: app/modules/project/views/page-index.tpl.php:146
 msgid "Preview"
 msgstr "预览"
 
-#: app/modules/build/views/code/web/bootstrap_vue/vue.trait.php:226
+#: app/modules/build/views/code/web/bootstrap_vue/vue.trait.php:223
 #: app/modules/build/views/code/wxmp/wxmp_event_binding.trait.php:49
-#: app/modules/build/views/preview/html_event_binding.trait.php:57
-#: app/modules/build/views/preview/weui/weui_event_binding.trait.php:58
+#: app/modules/build/views/preview/alpine.trait.php:376
 msgid "You not setting popup page, you can open event panel to setting"
 msgstr "还未设置弹窗页面，请打开事件面板设置"
 
-#: app/modules/build/views/master/preview.tpl.php:28
-#: app/modules/project/views/add-index.tpl.php:30
+#: app/modules/build/views/master/preview.tpl.php:90
+#: app/modules/project/views/page-index.tpl.php:54
+msgid "Popup"
+msgstr "弹窗"
+
+#: app/modules/build/views/master/preview.tpl.php:116
+#: app/modules/project/views/master/project.tpl.php:113
+#: app/modules/project/views/page-index.tpl.php:67
+#: app/vendor/layouts/admin.layout.php:41
+msgid "UI Component"
+msgstr "UI 组件"
+
+#: app/modules/build/views/master/preview.tpl.php:142
+#: app/modules/project/views/page-index.tpl.php:79
+msgid "Sub Page"
+msgstr "子页"
+
+#: app/modules/build/views/master/preview.tpl.php:182
+#: app/modules/project/views/add-index.tpl.php:39
+#: app/modules/project/views/uicomponent-index.tpl.php:29
+#: app/modules/uicomponent/views/index-index.tpl.php:28
 msgid "PC"
 msgstr "PC"
 
-#: app/modules/build/views/master/preview.tpl.php:29
+#: app/modules/build/views/master/preview.tpl.php:182
 msgid "Tablet"
 msgstr "平板设备"
 
-#: app/modules/build/views/master/preview.tpl.php:30
+#: app/modules/build/views/master/preview.tpl.php:182
 msgid "Portrait"
 msgstr "手持设备"
 
-#: app/modules/build/views/master/preview.tpl.php:41
+#: app/modules/build/views/master/preview.tpl.php:199
+msgid "not specified"
+msgstr "未指定"
+
+#: app/modules/build/views/master/preview.tpl.php:220
+msgid "Mock data"
+msgstr "Mock数据"
+
+#: app/modules/build/views/master/preview.tpl.php:227
+msgid "Edit with UIBuilder"
+msgstr "用UIBuilder打开"
+
+#: app/modules/build/views/master/preview.tpl.php:235
 msgid "Back"
 msgstr "后退"
 
-#: app/modules/build/views/master/preview.tpl.php:42
+#: app/modules/build/views/master/preview.tpl.php:236
 msgid "Build Project"
 msgstr "构建项目"
 
-#: app/modules/build/views/preview/preview.view.php:392
+#: app/modules/build/views/preview/bootstrap/carousel.view.php:72
+msgid "Slide"
+msgstr "幻灯片"
+
+#: app/modules/build/views/preview/bootstrap/uicomponent.view.php:23
+#: app/modules/build/views/preview/layui/uicomponent.view.php:20
+#, php-format
+msgid "UI COMPONENT [%s] HAS BEEN DELETED"
+msgstr "UI组件 [%s] 已被删除"
+
+#: app/modules/build/views/preview/preview.view.php:1147
 #, php-format
 msgid "%s not found"
 msgstr "%s 未找到"
@@ -303,6 +589,10 @@ msgstr "手机号不正确"
 #: app/modules/common/controllers/bind_controller.class.php:69
 msgid "Code is not correct"
 msgstr "Code不正确"
+
+#: app/modules/common/controllers/download_controller.class.php:37
+msgid "Font not found"
+msgstr "字体未找到"
 
 #: app/modules/common/controllers/index_controller.class.php:32
 #: app/modules/common/controllers/index_controller.class.php:39
@@ -326,7 +616,7 @@ msgid "New user registration is not supported for the time being"
 msgstr "新用户注册暂时关闭"
 
 #: app/modules/common/controllers/index_controller.class.php:103
-#: app/modules/project/controllers/member_controller.class.php:161
+#: app/modules/project/controllers/member_controller.class.php:167
 msgid "Please Input Email Or Cellphone"
 msgstr "请输入邮箱或者手机号"
 
@@ -355,7 +645,7 @@ msgid "Your current sign in code is: %s, expire in 5 minutes"
 msgstr "你的登陆码是%s，5分钟后过期"
 
 #: app/modules/common/controllers/index_controller.class.php:157
-#: app/modules/project/controllers/member_controller.class.php:228
+#: app/modules/project/controllers/member_controller.class.php:234
 msgid "Send Email Fail, Please Check Your Email"
 msgstr "邮件发送失败，请检查你的邮箱地址"
 
@@ -455,8 +745,8 @@ msgstr "如果你没有账号，请通过验证码方式登录"
 msgid "Sign In By Code"
 msgstr "验证码登录"
 
-#: app/modules/dashboard/controllers/index_controller.class.php:71
-#: app/vendor/layouts/admin.layout.php:31
+#: app/modules/dashboard/controllers/index_controller.class.php:85
+#: app/vendor/layouts/admin.layout.php:35
 msgid "Dashboard"
 msgstr "控制台"
 
@@ -475,14 +765,14 @@ msgstr "详情"
 
 #: app/modules/dashboard/views/index-index.tpl.php:46
 #: app/modules/project/views/homepage-index.tpl.php:48
-#: app/modules/project/views/structure-index.tpl.php:61
+#: app/modules/project/views/page-index.tpl.php:147
 msgid "Build UI"
 msgstr "UI 设计"
 
 #: app/modules/dashboard/views/index-index.tpl.php:56
 #: app/modules/project/controllers/add_controller.class.php:35
 #: app/modules/project/controllers/tech_controller.class.php:47
-#: app/modules/project/views/index-index.tpl.php:68
+#: app/modules/project/views/index-index.tpl.php:74
 msgid "Add Project"
 msgstr "新增项目"
 
@@ -535,35 +825,40 @@ msgstr "雇佣我们，请联系：leeboo # yidianhulian.com"
 msgid "Edit %s"
 msgstr "编辑 %s"
 
-#: app/modules/project/controllers/add_controller.class.php:93
+#: app/modules/project/controllers/add_controller.class.php:96
 msgid "please input project name"
 msgstr "请输入项目名称"
 
-#: app/modules/project/controllers/add_controller.class.php:108
+#: app/modules/project/controllers/add_controller.class.php:111
 msgid "you can not edit project"
 msgstr "你不能编辑该项目"
 
-#: app/modules/project/controllers/add_controller.class.php:121
+#: app/modules/project/controllers/add_controller.class.php:124
 #, php-format
 msgid "Create Project %s"
 msgstr "创建项目 %s"
 
-#: app/modules/project/controllers/add_controller.class.php:127
+#: app/modules/project/controllers/add_controller.class.php:131
 msgid "Project Name Is Empty"
 msgstr "项目名是空的"
 
 #: app/modules/project/controllers/api_controller.class.php:34
-#: app/modules/project/views/master/project.tpl.php:90
+#: app/modules/project/views/master/project.tpl.php:96
 msgid "API"
 msgstr "API"
 
+#: app/modules/project/controllers/asset_controller.class.php:62
+msgid "File not found"
+msgstr "文件未找到"
+
 #: app/modules/project/controllers/build_controller.class.php:45
-#: app/modules/project/views/master/project.tpl.php:119
+#: app/modules/project/views/build-index.tpl.php:13
+#: app/modules/project/views/master/project.tpl.php:134
 msgid "Build"
 msgstr "构建"
 
 #: app/modules/project/controllers/database_controller.class.php:34
-#: app/modules/project/views/master/project.tpl.php:95
+#: app/modules/project/views/master/project.tpl.php:101
 msgid "Database"
 msgstr "数据库"
 
@@ -576,44 +871,51 @@ msgid "Please input project name"
 msgstr "请输入项目名称"
 
 #: app/modules/project/controllers/function_controller.class.php:50
-#: app/modules/project/views/master/structure.tpl.php:58
-#: app/modules/project/views/structure-index.tpl.php:47
+#: app/modules/project/views/page-index.tpl.php:133
 msgid "Add Function"
 msgstr "添加功能"
 
-#: app/modules/project/controllers/function_controller.class.php:65
+#: app/modules/project/controllers/function_controller.class.php:67
 msgid "you can not edit function"
 msgstr "你不能编辑功能"
 
-#: app/modules/project/controllers/function_controller.class.php:74
+#: app/modules/project/controllers/function_controller.class.php:76
 msgid "Function Name Is Empty"
 msgstr "功能名称是空的"
 
-#: app/modules/project/controllers/function_controller.class.php:83
+#: app/modules/project/controllers/function_controller.class.php:85
 #, php-format
 msgid "Add Function %s"
 msgstr "添加功能 %s"
 
-#: app/modules/project/controllers/function_controller.class.php:99
+#: app/modules/project/controllers/function_controller.class.php:102
 msgid "Function not exist"
 msgstr "功能未找到"
 
-#: app/modules/project/controllers/function_controller.class.php:100
+#: app/modules/project/controllers/function_controller.class.php:103
 msgid "Function name is not correct"
 msgstr "功能名称不正确"
 
-#: app/modules/project/controllers/function_controller.class.php:104
+#: app/modules/project/controllers/function_controller.class.php:107
 msgid "you can not delete function"
 msgstr "你不能删除功能"
 
-#: app/modules/project/controllers/function_controller.class.php:109
+#: app/modules/project/controllers/function_controller.class.php:112
 #, php-format
 msgid "Delete Function %s"
 msgstr "删除功能 %s"
 
-#: app/modules/project/controllers/homepage_controller.class.php:45
-#: app/modules/project/views/homepage-index.tpl.php:31
-#: app/modules/project/views/master/structure.tpl.php:34
+#: app/modules/project/controllers/homepage_controller.class.php:43
+#: app/modules/project/controllers/page_controller.class.php:89
+#: app/modules/project/models/activity_model_method.trait.php:18
+#: app/modules/project/views/master/project.tpl.php:43
+#: app/modules/project/views/master/project.tpl.php:92
+msgid "UI"
+msgstr "UI"
+
+#: app/modules/project/controllers/homepage_controller.class.php:44
+#: app/modules/project/controllers/homepage_controller.class.php:50
+#: app/modules/project/views/homepage-index.tpl.php:30
 msgid "Home Page"
 msgstr "主页"
 
@@ -622,19 +924,20 @@ msgid "Icons"
 msgstr "图标"
 
 #: app/modules/project/controllers/index_controller.class.php:31
-#: app/modules/project/views/index-index.tpl.php:67
+#: app/modules/project/views/index-index.tpl.php:73
 msgid "My Projects"
 msgstr "我的项目"
 
 #: app/modules/project/controllers/lib_controller.class.php:34
-#: app/modules/project/views/lib-index.tpl.php:18
 msgid "External Libraries"
 msgstr "扩展库"
 
 #: app/modules/project/controllers/member_controller.class.php:39
 #: app/modules/project/controllers/member_controller.class.php:52
 #: app/modules/project/models/activity_model_method.trait.php:20
-#: app/modules/project/views/master/project.tpl.php:108
+#: app/modules/project/views/index-index.tpl.php:84
+#: app/modules/project/views/master/project.tpl.php:118
+#: app/modules/project/views/member-index.tpl.php:16
 msgid "Member"
 msgstr "成员"
 
@@ -650,29 +953,34 @@ msgstr "成员不存在"
 msgid "There must be at least one admin member for the project"
 msgstr "项目必须至少有一个管理员"
 
-#: app/modules/project/controllers/member_controller.class.php:140
+#: app/modules/project/controllers/member_controller.class.php:124
+#, php-format
+msgid "Remove Project Member: %s"
+msgstr "移除项目成员： %s"
+
+#: app/modules/project/controllers/member_controller.class.php:146
 msgid "Please Contact Admin To Invite"
 msgstr "请联系管理员邀请"
 
-#: app/modules/project/controllers/member_controller.class.php:153
+#: app/modules/project/controllers/member_controller.class.php:159
 msgid "member not exist"
 msgstr "成员不存在"
 
-#: app/modules/project/controllers/member_controller.class.php:198
+#: app/modules/project/controllers/member_controller.class.php:204
 #, php-format
 msgid "%s is a member already"
 msgstr "%s 已经是成员了"
 
-#: app/modules/project/controllers/member_controller.class.php:204
+#: app/modules/project/controllers/member_controller.class.php:210
 msgid "Can not send sms, please check your cellphone or contact admin"
 msgstr "不能发生验证码，请检查你的手机号或联系管理员"
 
-#: app/modules/project/controllers/member_controller.class.php:208
+#: app/modules/project/controllers/member_controller.class.php:214
 #, php-format
 msgid "%s Invite you join YDECloud project %s"
 msgstr "%s邀请你参与项目%s"
 
-#: app/modules/project/controllers/member_controller.class.php:209
+#: app/modules/project/controllers/member_controller.class.php:215
 #, php-format
 msgid ""
 "Hi %s:<br/><br/> %s Invite you join YDECloud project %s, In YDECloud you can "
@@ -683,16 +991,12 @@ msgstr ""
 "开发软件. 点击该链接查看详情: <a href=‘%s’>%s</a><br/><br/><br/><br/"
 ">YDECloud by YDHL Team"
 
-#: app/modules/project/controllers/member_controller.class.php:244
+#: app/modules/project/controllers/member_controller.class.php:250
 #, php-format
 msgid "Invite User %s"
 msgstr "邀请用户 %s"
 
 #: app/modules/project/controllers/module_controller.class.php:50
-#: app/modules/project/views/master/structure.tpl.php:21
-#: app/modules/project/views/master/structure.tpl.php:22
-#: app/modules/project/views/master/structure.tpl.php:31
-#: app/modules/project/views/master/structure.tpl.php:32
 msgid "Add Module"
 msgstr "添加模块"
 
@@ -715,43 +1019,40 @@ msgstr "目录 %s 已存在"
 msgid "Add Module %s"
 msgstr "添加模块 %s"
 
-#: app/modules/project/controllers/module_controller.class.php:116
+#: app/modules/project/controllers/module_controller.class.php:117
 msgid "Module not exist"
 msgstr "模块未找到"
 
-#: app/modules/project/controllers/module_controller.class.php:117
+#: app/modules/project/controllers/module_controller.class.php:118
 msgid "Module name is not correct"
 msgstr "模块名称不正确"
 
-#: app/modules/project/controllers/module_controller.class.php:120
+#: app/modules/project/controllers/module_controller.class.php:121
 msgid "you can not delete module"
 msgstr "你不能删除模块"
 
-#: app/modules/project/controllers/module_controller.class.php:125
+#: app/modules/project/controllers/module_controller.class.php:126
 #, php-format
 msgid "Delete Module %s"
 msgstr "删除模块 %s"
 
 #: app/modules/project/controllers/pageversion_controller.class.php:53
 #: app/modules/project/views/homepage-index.tpl.php:52
-#: app/modules/project/views/pageversion-index.tpl.php:15
-#: app/modules/project/views/recycle-index.tpl.php:31
-#: app/modules/project/views/structure-index.tpl.php:65
+#: app/modules/project/views/page-index.tpl.php:151
+#: app/modules/project/views/pageversion-index.tpl.php:14
 msgid "Version"
 msgstr "版本"
 
-#: app/modules/project/controllers/recycle_controller.class.php:53
-msgid "Recycle"
-msgstr "回收站"
+#: app/modules/project/controllers/quit_controller.class.php:29
+#: app/modules/project/hooks/check_member.php:16
+msgid "you are not a project member"
+msgstr "你不是项目成员"
 
 #: app/modules/project/controllers/setting_controller.class.php:34
-#: app/modules/project/views/master/project.tpl.php:113
+#: app/modules/project/views/master/project.tpl.php:123
+#: app/modules/project/views/setting-index.tpl.php:18
 msgid "Setting"
 msgstr "设置"
-
-#: app/modules/project/controllers/structure_controller.class.php:77
-msgid "Structure"
-msgstr "项目结构"
 
 #: app/modules/project/controllers/tech_controller.class.php:45
 #: app/modules/project/controllers/tech_controller.class.php:67
@@ -762,7 +1063,7 @@ msgstr "只有项目管理员能修改技术集"
 msgid "please select UI"
 msgstr "请先选择UI"
 
-#: app/modules/project/controllers/tech_controller.class.php:94
+#: app/modules/project/controllers/tech_controller.class.php:96
 #, php-format
 msgid "Change Tech. from %s to %s"
 msgstr "%s换成了%s"
@@ -776,6 +1077,11 @@ msgstr "未找打该成员，请先邀请他"
 msgid "Transfer Project from %s to %s"
 msgstr "转移项目 %s换成了%s"
 
+#: app/modules/project/controllers/uicomponent_controller.class.php:75
+#: app/modules/project/views/uicomponent-index.tpl.php:18
+msgid "Project UI Component"
+msgstr "项目UI组件"
+
 #: app/modules/project/controllers/upload_controller.class.php:49
 msgid "unknown action"
 msgstr "未知的行为"
@@ -784,18 +1090,27 @@ msgstr "未知的行为"
 msgid "can not rend zip file"
 msgstr "不能读取zip文件"
 
-#: app/modules/project/hooks/check_member.php:16
-msgid "you are not member"
-msgstr "你不是项目成员"
-
-#: app/modules/project/models/activity_model_method.trait.php:18
-#: app/modules/project/views/master/project.tpl.php:39
-msgid "UI"
-msgstr "UI"
-
 #: app/modules/project/models/activity_model_method.trait.php:19
 msgid "Dev"
 msgstr "开发"
+
+#: app/modules/project/models/page_bind_api_action_model_method.trait.php:247
+#, php-format
+msgid "When the API 「%s」 is called and the expression (%s) is true "
+msgstr "当 API 「%s」 被调用同时表达式 (%s) 为真 "
+
+#: app/modules/project/models/page_bind_api_model_method.trait.php:174
+#, php-format
+msgid "The API is called when %s trigger event 「%s」 "
+msgstr "当 %s 触发事件 「%s」 时调用API"
+
+#: app/modules/project/models/page_bind_api_model_method.trait.php:204
+msgid "the bound output data"
+msgstr "绑定的输出数据"
+
+#: app/modules/project/models/page_bind_api_model_method.trait.php:205
+msgid "the bound output value"
+msgstr "绑定的输出值"
 
 #: app/modules/project/models/project_member_model_method.trait.php:34
 msgid "Admin"
@@ -813,87 +1128,100 @@ msgstr "报告者"
 msgid "Guest"
 msgstr "访客"
 
-#: app/modules/project/models/project_model_method.trait.php:128
+#: app/modules/project/models/project_model_method.trait.php:132
 msgid "Project Manage System (Demo)"
 msgstr "项目管理（演示）"
 
-#: app/modules/project/models/project_model_method.trait.php:130
+#: app/modules/project/models/project_model_method.trait.php:134
 msgid "You can edit this demo as you want"
 msgstr "这是演示项目，可任意编辑"
 
-#: app/modules/project/models/project_model_method.trait.php:160
+#: app/modules/project/models/project_model_method.trait.php:164
 msgid "Project Manage"
 msgstr "项目管理"
 
-#: app/modules/project/models/project_model_method.trait.php:162
+#: app/modules/project/models/project_model_method.trait.php:166
 msgid "Project manage such as add, edit..."
 msgstr "包含新增，编辑项目等功能…"
 
-#: app/modules/project/models/project_model_method.trait.php:168
+#: app/modules/project/models/project_model_method.trait.php:172
 msgid "Project Profile"
 msgstr "项目台账"
 
-#: app/modules/project/models/project_model_method.trait.php:170
+#: app/modules/project/models/project_model_method.trait.php:174
 msgid "such as query export ...."
 msgstr "比如查询，导出等…"
 
-#: app/modules/project/models/project_model_method.trait.php:181
-#: app/modules/project/models/project_model_method.trait.php:183
+#: app/modules/project/models/project_model_method.trait.php:185
+#: app/modules/project/models/project_model_method.trait.php:187
 msgid "Project List Page"
 msgstr "项目列表页面"
 
-#: app/modules/project/models/project_model_method.trait.php:193
-#: app/modules/project/models/project_model_method.trait.php:195
+#: app/modules/project/models/project_model_method.trait.php:199
+#: app/modules/project/models/project_model_method.trait.php:201
 msgid "Add Project Page"
 msgstr "新增项目页面"
 
-#: app/modules/project/models/project_model_method.trait.php:211
+#: app/modules/project/models/project_model_method.trait.php:219
 msgid "Customer Manage"
 msgstr "客户管理"
 
-#: app/modules/project/models/project_model_method.trait.php:213
+#: app/modules/project/models/project_model_method.trait.php:221
 msgid "Customer info manage, such as add, edit"
 msgstr "比如客户信息等添加，修改"
 
-#: app/modules/project/models/project_model_method.trait.php:218
+#: app/modules/project/models/project_model_method.trait.php:226
 msgid "Customer Profile"
 msgstr "客户台账"
 
-#: app/modules/project/models/project_model_method.trait.php:220
+#: app/modules/project/models/project_model_method.trait.php:228
 msgid "List, Search, Export...."
 msgstr "列表，查询，导出等。。。"
 
-#: app/modules/project/models/project_model_method.trait.php:226
-#: app/modules/project/models/project_model_method.trait.php:228
+#: app/modules/project/models/project_model_method.trait.php:234
+#: app/modules/project/models/project_model_method.trait.php:236
 msgid "Customer List Page"
 msgstr "客户列表页面"
 
-#: app/modules/project/models/project_model_method.trait.php:238
-#: app/modules/project/models/project_model_method.trait.php:240
+#: app/modules/project/models/project_model_method.trait.php:248
+#: app/modules/project/models/project_model_method.trait.php:250
 msgid "Add Customer Page"
 msgstr "添加客户页面"
 
-#: app/modules/project/views/add-index.tpl.php:18
+#: app/modules/project/views/add-index.tpl.php:19
 msgid "Project Name:"
 msgstr "项目名称:"
 
 #: app/modules/project/views/add-index.tpl.php:27
+msgid "Project Logo:"
+msgstr "项目Logo："
+
+#: app/modules/project/views/add-index.tpl.php:31
+#: app/modules/project/views/icon-index.tpl.php:24
+#: app/modules/user/views/profile-index.tpl.php:25
+msgid "Upload"
+msgstr "上传"
+
+#: app/modules/project/views/add-index.tpl.php:36
+#: app/modules/project/views/tech.inc.php:78
 msgid "Type:"
 msgstr "类型："
 
-#: app/modules/project/views/add-index.tpl.php:31
+#: app/modules/project/views/add-index.tpl.php:40
+#: app/modules/project/views/uicomponent-index.tpl.php:30
+#: app/modules/uicomponent/views/index-index.tpl.php:29
 msgid "Mobile"
 msgstr "移动端"
 
-#: app/modules/project/views/add-index.tpl.php:34
+#: app/modules/project/views/add-index.tpl.php:43
 msgid "Cannot be modified after setting"
 msgstr "设置后将不能更改"
 
-#: app/modules/project/views/add-index.tpl.php:38
+#: app/modules/project/views/add-index.tpl.php:47
 msgid "Brief:"
 msgstr "备注："
 
-#: app/modules/project/views/add-index.tpl.php:48
+#: app/modules/project/views/add-index.tpl.php:57
 #: app/modules/user/views/profile-cellphone.tpl.php:36
 #: app/modules/user/views/profile-email.tpl.php:30
 #: app/modules/user/views/profile-index.tpl.php:31
@@ -901,56 +1229,81 @@ msgstr "备注："
 msgid "Save"
 msgstr "保存"
 
-#: app/modules/project/views/add-index.tpl.php:48
-#: app/modules/project/views/function-add.tpl.php:34
+#: app/modules/project/views/add-index.tpl.php:57
+#: app/modules/project/views/function-add.tpl.php:45
 #: app/modules/project/views/module-add.tpl.php:45
 msgid "Add"
 msgstr "新增"
 
+#: app/modules/project/views/asset-index.tpl.php:22
+msgid "Image"
+msgstr "图片"
+
+#: app/modules/project/views/asset-index.tpl.php:23
+#: app/modules/project/views/master/project.tpl.php:129
+msgid "Asset"
+msgstr "资源"
+
+#: app/modules/project/views/asset-index.tpl.php:47
+msgid ""
+"Are you sure?<br/>Deletion is safe and will not affect existing content "
+msgstr "确定吗?<br/>删除是安全的并且不会影响已有内容"
+
+#: app/modules/project/views/asset-index.tpl.php:48
+#: app/modules/project/views/member-index.tpl.php:41
+msgid "Remove"
+msgstr "移除"
+
 #: app/modules/project/views/build-index.dlg.php:18
-#: app/modules/project/views/build-index.tpl.php:15
+#: app/modules/project/views/build-index.tpl.php:17
 msgid "please dont refresh or close page when building"
 msgstr "构建时请勿刷新或者关闭浏览器"
 
 #: app/modules/project/views/build-index.dlg.php:20
-#: app/modules/project/views/build-index.tpl.php:17
+#: app/modules/project/views/build-index.tpl.php:19
 msgid "Build Now"
 msgstr "立即构建"
 
-#: app/modules/project/views/function-add.tpl.php:18
+#: app/modules/project/views/function-add.tpl.php:19
 msgid "Function Name:"
 msgstr "功能名："
 
-#: app/modules/project/views/function-add.tpl.php:25
+#: app/modules/project/views/function-add.tpl.php:26
+msgid "Module:"
+msgstr "模块："
+
+#: app/modules/project/views/function-add.tpl.php:36
 #: app/modules/project/views/module-add.tpl.php:30
 msgid "Desc:"
 msgstr "描述："
 
-#: app/modules/project/views/homepage-index.tpl.php:19
+#: app/modules/project/views/homepage-index.tpl.php:18
 msgid "Reset home page to"
 msgstr "重置主页"
 
-#: app/modules/project/views/homepage-index.tpl.php:21
-#: app/modules/project/views/homepage-index.tpl.php:72
+#: app/modules/project/views/homepage-index.tpl.php:20
 msgid "Not set home page"
 msgstr "未设置主页"
 
-#: app/modules/project/views/homepage-index.tpl.php:40
+#: app/modules/project/views/homepage-index.tpl.php:39
 #: app/modules/project/views/tech-index.tpl.php:20
 msgid "Update"
 msgstr "更新"
 
 #: app/modules/project/views/homepage-index.tpl.php:55
 #: app/modules/project/views/homepage-index.tpl.php:61
-#: app/modules/project/views/structure-index.tpl.php:72
-#: app/modules/project/views/structure-index.tpl.php:78
+#: app/modules/project/views/page-index.tpl.php:172
+#: app/modules/project/views/page-index.tpl.php:178
 msgid "Move to trash"
 msgstr "移到回收站"
 
 #: app/modules/project/views/homepage-index.tpl.php:56
-#: app/modules/project/views/structure-index.tpl.php:73
 msgid "This action cannot be undone.  are you sure?"
 msgstr "该行为不能撤销，确定吗？"
+
+#: app/modules/project/views/homepage-index.tpl.php:72
+msgid "Not set home page，The home page is the default page when app launched"
+msgstr "未设置主页，主页是系统启动后的默认页面"
 
 #: app/modules/project/views/homepage-index.tpl.php:82
 msgid "Update Failed"
@@ -969,168 +1322,124 @@ msgstr "自定义图标"
 msgid "currently just support %s, you can upload iconfont zip and use it."
 msgstr "目前只支持 %s，你可以上传新的字体zip文件。"
 
-#: app/modules/project/views/icon-index.tpl.php:24
-#: app/modules/user/views/profile-index.tpl.php:25
-msgid "Upload"
-msgstr "上传"
-
-#: app/modules/project/views/index-index.tpl.php:18
+#: app/modules/project/views/index-index.tpl.php:17
 msgid "Invite Projects"
 msgstr "邀请的项目"
 
 #: app/modules/project/views/index-index.tpl.php:22
-#: app/modules/project/views/index-index.tpl.php:73
+#: app/modules/project/views/index-index.tpl.php:80
 msgid "Project Name"
 msgstr "项目名"
 
 #: app/modules/project/views/index-index.tpl.php:23
-#: app/modules/project/views/index-index.tpl.php:75
+#: app/modules/project/views/index-index.tpl.php:82
 msgid "Technology"
 msgstr "技术"
 
 #: app/modules/project/views/index-index.tpl.php:24
-#: app/modules/project/views/index-index.tpl.php:76
+#: app/modules/project/views/master/project.tpl.php:72
 msgid "Role"
 msgstr "角色"
 
-#: app/modules/project/views/index-index.tpl.php:46
-#: app/modules/project/views/index-index.tpl.php:99
-#: app/modules/project/views/master/project.tpl.php:71
-#: app/modules/project/views/member-index.tpl.php:46
+#: app/modules/project/views/index-index.tpl.php:52
+#: app/modules/project/views/index-index.tpl.php:127
+#: app/modules/project/views/master/project.tpl.php:75
+#: app/modules/project/views/member-index.tpl.php:49
 msgid "Creater"
 msgstr "创建者"
 
-#: app/modules/project/views/index-index.tpl.php:51
+#: app/modules/project/views/index-index.tpl.php:57
 msgid "Join Project"
 msgstr "加入项目"
 
-#: app/modules/project/views/index-index.tpl.php:56
+#: app/modules/project/views/index-index.tpl.php:62
 msgid "Disagree"
 msgstr "不同意"
 
-#: app/modules/project/views/index-index.tpl.php:74
-#: app/modules/project/views/master/project.tpl.php:22
+#: app/modules/project/views/index-index.tpl.php:81
+#: app/modules/project/views/master/project.tpl.php:26
 msgid "Type"
 msgstr "类型"
 
-#: app/modules/project/views/lib-index.tpl.php:19
-msgid "Search Libraries"
-msgstr "查询库"
+#: app/modules/project/views/index-index.tpl.php:83
+msgid "Pages"
+msgstr "页面"
 
-#: app/modules/project/views/lib-index.tpl.php:24
-msgid "Installed Libraries"
-msgstr "已安装的库"
+#: app/modules/project/views/index-index.tpl.php:114
+#, php-format
+msgid ""
+"modules: %s items, pages: %s items, popup: %s items, ui component: %s items, "
+"api: %s items"
+msgstr "模块: %s 项, 页面: %s 项, 弹窗: %s 项, 组件: %s 项, API: %s 项"
 
-#: app/modules/project/views/lib-index.tpl.php:44
-#: app/modules/project/views/member-index.tpl.php:38
-msgid "Remove"
-msgstr "移除"
+#: app/modules/project/views/index-index.tpl.php:136
+msgid "Are you sure you want to quit this project?"
+msgstr "确定要退出项目吗？"
 
-#: app/modules/project/views/master/project.tpl.php:27
-msgid "Front"
-msgstr "前端"
-
-#: app/modules/project/views/master/project.tpl.php:33
-msgid "Front Framework"
-msgstr "前端框架"
-
-#: app/modules/project/views/master/project.tpl.php:45
-msgid "Frontend Language"
-msgstr "前端语言"
-
-#: app/modules/project/views/master/project.tpl.php:51
-msgid "Backend Tech."
-msgstr "后端技术。"
-
-#: app/modules/project/views/master/project.tpl.php:57
-msgid "Framework"
-msgstr "框架"
-
-#: app/modules/project/views/master/project.tpl.php:63
-msgid "Backend Language"
-msgstr "后端语言"
-
-#: app/modules/project/views/master/project.tpl.php:68
-#: app/modules/project/views/member-invite.tpl.php:32
-msgid "Role:"
-msgstr "角色："
-
-#: app/modules/project/views/master/project.tpl.php:81
-msgid "Activity"
-msgstr "动态"
-
-#: app/modules/project/views/master/project.tpl.php:86
-#: app/modules/project/views/recovery-index.tpl.php:26
-#: app/modules/project/views/recycle-index.tpl.php:26
-msgid "Function"
-msgstr "功能"
-
-#: app/modules/project/views/master/project.tpl.php:99
-msgid "Icon"
-msgstr "图标"
-
-#: app/modules/project/views/master/project.tpl.php:103
+#: app/modules/project/views/lib-index.tpl.php:22
+#: app/modules/project/views/master/project.tpl.php:109
 msgid "Libraries"
 msgstr "扩展库"
 
-#: app/modules/project/views/master/structure.tpl.php:20
-msgid "please add module and function first"
-msgstr "请先添加模块和功能"
+#: app/modules/project/views/lib-index.tpl.php:25
+msgid "Installed Libraries"
+msgstr "已安装的库"
 
-#: app/modules/project/views/master/structure.tpl.php:36
-#, php-format
-msgid "Recycle %s"
-msgstr "回收站 %s"
+#: app/modules/project/views/master/project.tpl.php:31
+msgid "Front"
+msgstr "前端"
 
-#: app/modules/project/views/master/structure.tpl.php:54
-#: app/modules/project/views/setting-index.tpl.php:23
-msgid "Edit"
-msgstr "编辑"
+#: app/modules/project/views/master/project.tpl.php:37
+msgid "Front Framework"
+msgstr "前端框架"
 
-#: app/modules/project/views/master/structure.tpl.php:56
-#, php-format
-msgid ""
-"This action cannot be undone. You will lose this module's funciton, page, ui "
-"and api, please input the module name %s to delete"
-msgstr ""
-"该行为不能撤销，模块下的功能，ui等内容都将删除，请输入模块名 %s 确认删除"
+#: app/modules/project/views/master/project.tpl.php:49
+msgid "Frontend Language"
+msgstr "前端语言"
 
-#: app/modules/project/views/master/structure.tpl.php:57
-msgid "Delete Module"
-msgstr "删除模块"
+#: app/modules/project/views/master/project.tpl.php:55
+msgid "Backend Tech."
+msgstr "后端技术"
 
-#: app/modules/project/views/master/structure.tpl.php:75
-msgid "Edit Function"
-msgstr "编辑功能"
+#: app/modules/project/views/master/project.tpl.php:61
+msgid "Framework"
+msgstr "框架"
 
-#: app/modules/project/views/master/structure.tpl.php:77
-#, php-format
-msgid ""
-"This action cannot be undone.  please input the function name %s to delete"
-msgstr "该行为不能撤销，请输入功能名%s确认删除"
+#: app/modules/project/views/master/project.tpl.php:67
+msgid "Backend Language"
+msgstr "后端语言"
 
-#: app/modules/project/views/master/structure.tpl.php:78
-msgid "Delete Function"
-msgstr "删除功能"
+#: app/modules/project/views/master/project.tpl.php:87
+#: app/modules/project/views/project-index.tpl.php:15
+msgid "Activity"
+msgstr "动态"
 
-#: app/modules/project/views/member-index.tpl.php:33
-#: app/modules/project/views/member-index.tpl.php:34
+#: app/modules/project/views/master/project.tpl.php:105
+msgid "Icon"
+msgstr "图标"
+
+#: app/modules/project/views/member-index.tpl.php:36
+#: app/modules/project/views/member-index.tpl.php:37
 msgid "Change Role"
 msgstr "修改角色"
 
-#: app/modules/project/views/member-index.tpl.php:37
+#: app/modules/project/views/member-index.tpl.php:40
 msgid ""
 "Remove is safely, all member's content is still there, and you can always "
 "invite back"
 msgstr "移除后，成员的内容仍然保留，可随时再邀请回来"
 
-#: app/modules/project/views/member-index.tpl.php:49
+#: app/modules/project/views/member-index.tpl.php:52
 msgid "Inviting"
 msgstr "邀请中"
 
-#: app/modules/project/views/member-index.tpl.php:61
+#: app/modules/project/views/member-index.tpl.php:64
 msgid "Invite Member"
 msgstr "邀请成员"
+
+#: app/modules/project/views/member-invite.tpl.php:32
+msgid "Role:"
+msgstr "角色："
 
 #: app/modules/project/views/member-invite.tpl.php:46
 msgid "are you sure invite this user?"
@@ -1154,28 +1463,90 @@ msgid ""
 "saved in this folder"
 msgstr "目录是模块的保存目录，所有模块下的内容都将保存在该目录中"
 
-#: app/modules/project/views/pageversion-index.tpl.php:24
+#: app/modules/project/views/page-index.tpl.php:91
+msgid "Recycle"
+msgstr "回收站"
+
+#: app/modules/project/views/page-index.tpl.php:107
+#: app/modules/project/views/page-index.tpl.php:110
+msgid "Empty Trash"
+msgstr "清空回收站"
+
+#: app/modules/project/views/page-index.tpl.php:110
+#: app/modules/project/views/page-index.tpl.php:157
+msgid ""
+"This action cannot be undone, all content in page will be lost.  are you "
+"sure?"
+msgstr "该行为不能撤销，所有内容将丢失，确定吗？"
+
+#: app/modules/project/views/page-index.tpl.php:119
+msgid "please select module or function"
+msgstr "请先选择模块或功能"
+
+#: app/modules/project/views/page-index.tpl.php:120
+msgid "Add module"
+msgstr "添加模块"
+
+#: app/modules/project/views/page-index.tpl.php:125
+msgid "you have no page, please use uibuilder add page and design it"
+msgstr "还没有页面，请用uibuilder添加并设计页面"
+
+#: app/modules/project/views/page-index.tpl.php:128
+msgid "Open UIBuild Add Page"
+msgstr "打开UIBuilder添加页面"
+
+#: app/modules/project/views/page-index.tpl.php:131
+msgid "please add function first"
+msgstr "请先添加功能"
+
+#: app/modules/project/views/page-index.tpl.php:156
+#: app/modules/project/views/page-index.tpl.php:160
+msgid "Delete Page"
+msgstr "删除页面"
+
+#: app/modules/project/views/page-index.tpl.php:163
+#: app/modules/project/views/page-index.tpl.php:164
+msgid "Recovery"
+msgstr "恢复"
+
+#: app/modules/project/views/page-index.tpl.php:169
+msgid "Move page to"
+msgstr "移动页面"
+
+#: app/modules/project/views/page-index.tpl.php:170
+msgid "Move to"
+msgstr "移动到"
+
+#: app/modules/project/views/page-index.tpl.php:173
+msgid "are you sure?"
+msgstr "确定吗？"
+
+#: app/modules/project/views/pageversion-index.tpl.php:23
 msgid "Version Index"
 msgstr "版本号"
 
-#: app/modules/project/views/pageversion-index.tpl.php:28
+#: app/modules/project/views/pageversion-index.tpl.php:27
 msgid "Saved Time"
 msgstr "保存时间"
 
-#: app/modules/project/views/pageversion-index.tpl.php:32
+#: app/modules/project/views/pageversion-index.tpl.php:31
 msgid "Saved By"
 msgstr "保存者"
 
-#: app/modules/project/views/pageversion-index.tpl.php:40
+#: app/modules/project/views/pageversion-index.tpl.php:35
+msgid "Message"
+msgstr "消息"
+
+#: app/modules/project/views/pageversion-index.tpl.php:43
 msgid "Are you sure you want to reverse the selected version?"
 msgstr "确定要恢复到该版本吗？"
 
-#: app/modules/project/views/pageversion-index.tpl.php:41
-#: app/modules/project/views/pageversion-index.tpl.php:43
+#: app/modules/project/views/pageversion-index.tpl.php:44
+#: app/modules/project/views/pageversion-index.tpl.php:46
 msgid "Reverse to this"
 msgstr "恢复"
 
-#: app/modules/project/views/pageversion-index.tpl.php:47
+#: app/modules/project/views/pageversion-index.tpl.php:50
 msgid "Current Version"
 msgstr "当前版本"
 
@@ -1183,174 +1554,171 @@ msgstr "当前版本"
 msgid "No More"
 msgstr "没有了"
 
-#: app/modules/project/views/project-index.tpl.php:17
+#: app/modules/project/views/project-index.tpl.php:18
 msgid "All"
 msgstr "所有"
 
-#: app/modules/project/views/project-index.tpl.php:48
+#: app/modules/project/views/project-index.tpl.php:49
 msgid "Empty"
 msgstr "空的"
 
-#: app/modules/project/views/recovery-index.tpl.php:23
-msgid "Module"
-msgstr "模块"
-
-#: app/modules/project/views/recovery-index.tpl.php:48
+#: app/modules/project/views/recovery-index.tpl.php:47
 msgid "Confirm"
 msgstr "确定"
 
-#: app/modules/project/views/recycle-index.tpl.php:18
-msgid "empty"
-msgstr "空的"
-
-#: app/modules/project/views/recycle-index.tpl.php:28
-msgid "Page"
-msgstr "页面"
-
-#: app/modules/project/views/recycle-index.tpl.php:49
-#: app/modules/project/views/recycle-index.tpl.php:53
-msgid "Delete Page"
-msgstr "删除页面"
-
-#: app/modules/project/views/recycle-index.tpl.php:50
-msgid ""
-"This action cannot be undone, all content in page will be lost.  are you "
-"sure?"
-msgstr "该行为不能撤销，所有内容将丢失，确定吗？"
-
-#: app/modules/project/views/recycle-index.tpl.php:56
-#: app/modules/project/views/recycle-index.tpl.php:57
-msgid "Recovery"
-msgstr "恢复"
-
-#: app/modules/project/views/setting-index.tpl.php:19
-#: app/modules/project/views/setting-index.tpl.php:23
+#: app/modules/project/views/setting-index.tpl.php:22
+#: app/modules/project/views/setting-index.tpl.php:26
 msgid "Edit Project"
 msgstr "编辑项目"
 
-#: app/modules/project/views/setting-index.tpl.php:21
-msgid "Change base project info, such as name, brief and so on"
+#: app/modules/project/views/setting-index.tpl.php:24
+msgid "Change base project info, such as name, brief, logo and so on"
 msgstr "修改项目的基础信息，如名字，描述等"
 
-#: app/modules/project/views/setting-index.tpl.php:27
-#: app/modules/project/views/setting-index.tpl.php:32
+#: app/modules/project/views/setting-index.tpl.php:26
+msgid "Edit"
+msgstr "编辑"
+
+#: app/modules/project/views/setting-index.tpl.php:30
+#: app/modules/project/views/setting-index.tpl.php:35
 msgid "Change Tech."
 msgstr "更改技术集"
 
-#: app/modules/project/views/setting-index.tpl.php:30
+#: app/modules/project/views/setting-index.tpl.php:33
 msgid ""
 "Change Frontend, backend tech. such as framework, language, ui and so on"
 msgstr "修改前后端技术，如框架、语言、ui等"
 
-#: app/modules/project/views/setting-index.tpl.php:32
+#: app/modules/project/views/setting-index.tpl.php:35
+#: app/modules/project/views/setting-index.tpl.php:60
 msgid "Change"
 msgstr "更改"
 
-#: app/modules/project/views/setting-index.tpl.php:38
+#: app/modules/project/views/setting-index.tpl.php:41
+msgid "API URL"
+msgstr ""
+
+#: app/modules/project/views/setting-index.tpl.php:44
+msgid "API Environment"
+msgstr "API 环境"
+
+#: app/modules/project/views/setting-index.tpl.php:44
+msgid "Base URL"
+msgstr "基础URL"
+
+#: app/modules/project/views/setting-index.tpl.php:49
+#: app/modules/project/views/setting-index.tpl.php:54
+#: app/modules/project/views/setting-index.tpl.php:92
+msgid "Left blank will be deleted"
+msgstr "留空将被删除"
+
+#: app/modules/project/views/setting-index.tpl.php:66
 msgid "Transfer Project"
 msgstr "转移项目"
 
-#: app/modules/project/views/setting-index.tpl.php:41
-#: app/modules/project/views/setting-index.tpl.php:46
+#: app/modules/project/views/setting-index.tpl.php:69
+#: app/modules/project/views/setting-index.tpl.php:74
 msgid "Transfer the project to others"
 msgstr "把项目转移给别人"
 
-#: app/modules/project/views/setting-index.tpl.php:44
-#: app/modules/project/views/setting-index.tpl.php:48
+#: app/modules/project/views/setting-index.tpl.php:72
+#: app/modules/project/views/setting-index.tpl.php:76
 msgid "Transfer"
 msgstr "转移"
 
-#: app/modules/project/views/setting-index.tpl.php:53
-#: app/modules/project/views/setting-index.tpl.php:59
+#: app/modules/project/views/setting-index.tpl.php:81
+#: app/modules/project/views/setting-index.tpl.php:87
 msgid "Delete Project"
 msgstr "删除项目"
 
-#: app/modules/project/views/setting-index.tpl.php:55
+#: app/modules/project/views/setting-index.tpl.php:83
 msgid ""
 "Deleting the project will delete all related resources including ui pages, "
 "databases etc.Deleted projects cannot be restored!"
 msgstr "删除项目将删除该项目的所有内容，包含ui设计，数据库；删除不可恢复！"
 
-#: app/modules/project/views/setting-index.tpl.php:59
+#: app/modules/project/views/setting-index.tpl.php:87
 #, php-format
 msgid ""
 "Deleted projects cannot be restored.  please input the project name %s to "
 "delete"
 msgstr "删除不可恢复，请输入项目的名称 %s 确认删除"
 
-#: app/modules/project/views/setting-index.tpl.php:72
+#: app/modules/project/views/setting-index.tpl.php:110
 msgid "Transfer success"
 msgstr "转移成功"
 
-#: app/modules/project/views/structure-choosepage.tpl.php:71
-msgid "Cancel"
-msgstr "取消"
-
-#: app/modules/project/views/structure-choosepage.tpl.php:72
-msgid "OK"
-msgstr "确定"
-
-#: app/modules/project/views/structure-index.tpl.php:31
-msgid "Add Page"
-msgstr "新增页面"
-
-#: app/modules/project/views/structure-index.tpl.php:39
-msgid "you have no page, please use uibuilder add page and design it"
-msgstr "还没有页面，请用uibuilder添加并设计页面"
-
-#: app/modules/project/views/structure-index.tpl.php:42
-msgid "Open UIBuild Add Page"
-msgstr "打开UIBuilder添加页面"
-
-#: app/modules/project/views/structure-index.tpl.php:45
-msgid "please add function first"
-msgstr "请先添加功能"
-
-#: app/modules/project/views/structure-index.tpl.php:50
-msgid "please select function first"
-msgstr "请先选择功能"
-
-#: app/modules/project/views/structure-index.tpl.php:69
-msgid "Move page to"
-msgstr "移动页面"
-
-#: app/modules/project/views/structure-index.tpl.php:70
-msgid "Move to"
-msgstr "移动到"
-
-#: app/modules/project/views/tech.inc.php:78
+#: app/modules/project/views/tech.inc.php:84
 msgid "Frontend:"
 msgstr "前端："
 
-#: app/modules/project/views/tech.inc.php:81
-#: app/modules/project/views/tech.inc.php:134
-msgid "Choose..."
-msgstr "选择…"
-
-#: app/modules/project/views/tech.inc.php:91
-#: app/modules/project/views/tech.inc.php:142
+#: app/modules/project/views/tech.inc.php:96
+#: app/modules/project/views/tech.inc.php:146
 msgid "Framework:"
 msgstr "框架："
 
-#: app/modules/project/views/tech.inc.php:104
+#: app/modules/project/views/tech.inc.php:109
 msgid "UI:"
 msgstr "UI："
 
-#: app/modules/project/views/tech.inc.php:118
+#: app/modules/project/views/tech.inc.php:123
 msgid "Frontend Language:"
 msgstr "前端语言："
 
-#: app/modules/project/views/tech.inc.php:131
+#: app/modules/project/views/tech.inc.php:136
 msgid "Backend:"
 msgstr "后端："
 
-#: app/modules/project/views/tech.inc.php:156
+#: app/modules/project/views/tech.inc.php:160
 msgid "Backend Language:"
 msgstr "后端语言："
 
 #: app/modules/project/views/transfer-index.tpl.php:40
 msgid "has no member, please invite member first"
 msgstr "没有成员，请先邀请成员"
+
+#: app/modules/project/views/uicomponent-index.tpl.php:22
+#: app/modules/uicomponent/views/index-index.tpl.php:21
+msgid "All Type"
+msgstr "类型"
+
+#: app/modules/project/views/uicomponent-index.tpl.php:28
+#: app/modules/uicomponent/views/index-index.tpl.php:27
+msgid "All Kind"
+msgstr "类型"
+
+#: app/modules/project/views/uicomponent-index.tpl.php:33
+msgid "All Member"
+msgstr "成员"
+
+#: app/modules/project/views/uicomponent-index.tpl.php:44
+#: app/modules/uicomponent/views/index-index.tpl.php:37
+msgid "Has no UI Component "
+msgstr "没有UI组件"
+
+#: app/modules/project/views/uicomponent-index.tpl.php:64
+msgid "Page will move to Trash, you can put it back anytime."
+msgstr "页面将被移到回收站，可随时找回来"
+
+#: app/modules/project/views/uicomponent-index.tpl.php:65
+#: app/modules/project/views/uicomponent-index.tpl.php:66
+#: app/modules/uicomponent/views/index-index.tpl.php:58
+#: app/modules/uicomponent/views/index-index.tpl.php:59
+msgid "Delete"
+msgstr "删除"
+
+#: app/modules/uicomponent/controllers/delete_controller.class.php:43
+msgid "Just admin or author can delete project UI component"
+msgstr "只有管理员才能删除"
+
+#: app/modules/uicomponent/controllers/index_controller.class.php:60
+#: app/modules/uicomponent/views/index-index.tpl.php:17
+msgid "My UI Component"
+msgstr "我的UI组件"
+
+#: app/modules/uicomponent/views/index-index.tpl.php:57
+msgid "Deleting does not affect projects that already use this component."
+msgstr "删除不会影响已使用该组件的项目"
 
 #: app/modules/user/controllers/account_controller.class.php:24
 #: app/modules/user/views/account-index.tpl.php:21
@@ -1412,7 +1780,7 @@ msgstr "无限"
 
 #: app/modules/user/views/master/profile-master.tpl.php:17
 #: app/modules/user/views/profile-index.tpl.php:14
-#: app/vendor/layouts/admin.layout.php:45
+#: app/vendor/layouts/admin.layout.php:52
 msgid "Profile"
 msgstr "用户资料"
 
@@ -1463,123 +1831,6 @@ msgstr "至少8个字符"
 #: app/modules/user/views/profile-signinpwd.tpl.php:30
 msgid "Confirm New Password"
 msgstr "确认新密码"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:99
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:216
-msgid "Select files"
-msgstr "选择文件"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:100
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:217
-msgid "Add files to the upload queue and click the start button."
-msgstr "添加文件到上传队列并点击开始按钮。"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:106
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:227
-msgid "Filename"
-msgstr "文件名"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:108
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:228
-msgid "Status"
-msgstr "状态"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:109
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:229
-msgid "Size"
-msgstr "大小"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:118
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:248
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:244
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:901
-msgid "Add Files"
-msgstr "添加文件"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:119
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:245
-msgid "Start Upload"
-msgstr "开始上传"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:201
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:869
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:986
-#, javascript-format
-msgid "Uploaded %d/%d files"
-msgstr "上传文件 %d/%d"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:250
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:903
-#, javascript-format
-msgid "%d files queued"
-msgstr "%d 文件队列"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:262
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:361
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:235
-msgid "Drag files here."
-msgstr "拖动文件到这里。"
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:340
-msgid "Error: File too large:"
-msgstr "错误：文件太大："
-
-#: app/public_html/js/plupload/jquery.plupload.queue/jquery.plupload.queue.js:344
-msgid "Error: Invalid file extension:"
-msgstr "错误：无效的文件扩展："
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:219
-msgid "List"
-msgstr "列表"
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:220
-msgid "Thumbnails"
-msgstr "缩略图"
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:246
-msgid "Stop Upload"
-msgstr "停止上传"
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:442
-msgid "File count error."
-msgstr "文件数量错误。"
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:459
-#, javascript-format
-msgid "File: %s"
-msgstr "文件：%s"
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:463
-#, javascript-format
-msgid "File: %s, size: %d, max file size: %d"
-msgstr ""
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:467
-#, javascript-format
-msgid "%s already present in the queue."
-msgstr ""
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:471
-#, javascript-format
-msgid ""
-"Upload element accepts only %d file(s) at a time. Extra files were stripped."
-msgstr ""
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:475
-msgid "Image format either wrong or not supported."
-msgstr ""
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:479
-msgid "Runtime ran out of available memory."
-msgstr ""
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:488
-msgid "Upload URL might be wrong or doesn't exist."
-msgstr ""
-
-#: app/public_html/js/plupload/jquery.ui.plupload/jquery.ui.plupload.js:792
-msgid "Close"
-msgstr ""
 
 #: app/vendor/css/css_factory.class.php:25
 #: app/vendor/css/css_factory.class.php:26
@@ -1642,40 +1893,54 @@ msgid "1/12 col"
 msgstr "1/12 列宽"
 
 #: app/vendor/css/css_factory.class.php:33
-msgid "1/6 col"
-msgstr "1/6 列宽"
+#, fuzzy
+#| msgid "1/12 col"
+msgid "2/12 col"
+msgstr "1/12 列宽"
 
 #: app/vendor/css/css_factory.class.php:33
-msgid "1/4 col"
-msgstr "1/4 列宽"
+#, fuzzy
+#| msgid "1/12 col"
+msgid "3/12 col"
+msgstr "1/12 列宽"
 
 #: app/vendor/css/css_factory.class.php:33
-msgid "1/3 col"
-msgstr "1/3 列宽"
+#, fuzzy
+#| msgid "1/12 col"
+msgid "4/12 col"
+msgstr "1/12 列宽"
 
 #: app/vendor/css/css_factory.class.php:33
 msgid "5/12 col"
 msgstr "5/12 列宽"
 
 #: app/vendor/css/css_factory.class.php:33
-msgid "1/2 col"
-msgstr "1/2 列宽"
+#, fuzzy
+#| msgid "1/12 col"
+msgid "6/12 col"
+msgstr "1/12 列宽"
 
 #: app/vendor/css/css_factory.class.php:33
 msgid "7/12 col"
 msgstr "7/12 列宽"
 
 #: app/vendor/css/css_factory.class.php:33
-msgid "2/3 col"
-msgstr "2/3 列宽"
+#, fuzzy
+#| msgid "1/12 col"
+msgid "8/12 col"
+msgstr "1/12 列宽"
 
 #: app/vendor/css/css_factory.class.php:33
-msgid "3/4 col"
-msgstr "3/4 列宽"
+#, fuzzy
+#| msgid "1/12 col"
+msgid "9/12 col"
+msgstr "1/12 列宽"
 
 #: app/vendor/css/css_factory.class.php:33
-msgid "5/6 col"
-msgstr "5/6 列宽"
+#, fuzzy
+#| msgid "1/12 col"
+msgid "10/12 col"
+msgstr "1/12 列宽"
 
 #: app/vendor/css/css_factory.class.php:33
 msgid "11/12 col"
@@ -1690,40 +1955,54 @@ msgid "1/12 offset"
 msgstr "1/12 偏移"
 
 #: app/vendor/css/css_factory.class.php:34
-msgid "1/6 offset"
-msgstr "1/6 偏移"
+#, fuzzy
+#| msgid "1/12 offset"
+msgid "2/12 offset"
+msgstr "1/12 偏移"
 
 #: app/vendor/css/css_factory.class.php:34
-msgid "1/4 offset"
-msgstr "1/4 偏移"
+#, fuzzy
+#| msgid "1/12 offset"
+msgid "3/12 offset"
+msgstr "1/12 偏移"
 
 #: app/vendor/css/css_factory.class.php:34
-msgid "1/3 offset"
-msgstr "1/3 偏移"
+#, fuzzy
+#| msgid "1/12 offset"
+msgid "4/12 offset"
+msgstr "1/12 偏移"
 
 #: app/vendor/css/css_factory.class.php:34
 msgid "5/12 offset"
 msgstr "5/12 偏移"
 
 #: app/vendor/css/css_factory.class.php:34
-msgid "1/2 offset"
-msgstr "1/2 偏移"
+#, fuzzy
+#| msgid "1/12 offset"
+msgid "6/12 offset"
+msgstr "1/12 偏移"
 
 #: app/vendor/css/css_factory.class.php:34
 msgid "7/12 offset"
 msgstr "7/12 偏移"
 
 #: app/vendor/css/css_factory.class.php:34
-msgid "2/3 offset"
-msgstr "2/3 偏移"
+#, fuzzy
+#| msgid "1/12 offset"
+msgid "8/12 offset"
+msgstr "1/12 偏移"
 
 #: app/vendor/css/css_factory.class.php:34
-msgid "3/4 offset"
-msgstr "3/4 偏移"
+#, fuzzy
+#| msgid "1/12 offset"
+msgid "9/12 offset"
+msgstr "1/12 偏移"
 
 #: app/vendor/css/css_factory.class.php:34
-msgid "5/6 offset"
-msgstr "5/6 偏移"
+#, fuzzy
+#| msgid "1/12 offset"
+msgid "10/12 offset"
+msgstr "1/12 偏移"
 
 #: app/vendor/css/css_factory.class.php:34
 msgid "11/12 offset"
@@ -1895,79 +2174,90 @@ msgstr "Inset"
 msgid "Outset"
 msgstr "Outset"
 
-#: app/vendor/env.class.php:94
-msgid "jQuery is a fast, small, and feature-rich JavaScript library"
-msgstr ""
-
-#: app/vendor/env.class.php:102
+#: app/vendor/env.class.php:96
 msgid "Quickly design and customize responsive mobile-first sites"
 msgstr ""
 
-#: app/vendor/env.class.php:112
-msgid "https://www.layuiweb.com/layer/index.htm"
-msgstr ""
-
-#: app/vendor/env.class.php:120
-msgid ""
-"Zepto is a minimalist JavaScript library for modern browsers with a largely "
-"jQuery-compatible API, https://zeptojs.com/"
-msgstr ""
-
-#: app/vendor/env.class.php:128
+#: app/vendor/env.class.php:104
 msgid ""
 "由职业前端倾情打造，面向全层次的前后端开发者，易上手开箱即用的 Web UI 组件"
 "库, https://www.layuiweb.com/index.htm"
 msgstr ""
 
-#: app/vendor/env.class.php:136
+#: app/vendor/env.class.php:110
 msgid "WEUI(微信官方UI库)"
 msgstr ""
 
-#: app/vendor/env.class.php:146
+#: app/vendor/env.class.php:118
+msgid "Vant"
+msgstr ""
+
+#: app/vendor/env.class.php:124
 msgid "Android Native UI Theme"
 msgstr "Android原生主题"
 
-#: app/vendor/env.class.php:152
+#: app/vendor/env.class.php:130
 msgid "iOS Native UI Theme"
 msgstr "iOS原生主题"
 
-#: app/vendor/env.class.php:158
-msgid "Yangzie Framework By YDHL Team"
+#: app/vendor/env.class.php:139
+msgid "jQuery is a fast, small, and feature-rich JavaScript library"
 msgstr ""
 
-#: app/vendor/env.class.php:189
-msgid "PHP Language"
+#: app/vendor/env.class.php:147
+msgid "Promise based HTTP client for the browser and node.js"
 msgstr ""
 
-#: app/vendor/env.class.php:195
+#: app/vendor/env.class.php:155
+msgid ""
+"Zepto is a minimalist JavaScript library for modern browsers with a largely "
+"jQuery-compatible API, https://zeptojs.com/"
+msgstr ""
+
+#: app/vendor/env.class.php:163
+msgid ""
+"Alpine is a rugged, minimal tool for composing behavior directly in your "
+"markup. Think of it like jQuery for the modern web. Plop in a script tag and "
+"get going., https://alpinejs.dev/"
+msgstr ""
+
+#: app/vendor/env.class.php:169
 msgid "petite-vue"
 msgstr ""
 
-#: app/vendor/env.class.php:201
+#: app/vendor/env.class.php:200
+msgid "PHP Language"
+msgstr ""
+
+#: app/vendor/env.class.php:207
+msgid "Yangzie Framework By YDHL Team"
+msgstr ""
+
+#: app/vendor/env.class.php:214
 msgid "VUE"
 msgstr ""
 
-#: app/vendor/env.class.php:209
+#: app/vendor/env.class.php:225
 msgid "HTML"
 msgstr ""
 
-#: app/vendor/env.class.php:219
+#: app/vendor/env.class.php:238
 msgid "微信小程序"
 msgstr ""
 
-#: app/vendor/env.class.php:228
+#: app/vendor/env.class.php:248
 msgid "Android Native"
 msgstr "Android 原生"
 
-#: app/vendor/env.class.php:236
+#: app/vendor/env.class.php:256
 msgid "iOS Native"
 msgstr "iOS 原生"
 
-#: app/vendor/env.class.php:253
+#: app/vendor/env.class.php:273
 msgid "Web Application"
 msgstr "Web应用"
 
-#: app/vendor/env.class.php:259
+#: app/vendor/env.class.php:279
 msgid "WeiXin Mini Program"
 msgstr "微信小程序"
 
@@ -1976,15 +2266,15 @@ msgstr "微信小程序"
 msgid "cross platform, cross framework, cross language, cross terminal"
 msgstr "跨平台、跨框架、跨语言、跨终端"
 
-#: app/vendor/layouts/admin.layout.php:34
+#: app/vendor/layouts/admin.layout.php:38
 msgid "Projects"
 msgstr "项目"
 
-#: app/vendor/layouts/admin.layout.php:46
+#: app/vendor/layouts/admin.layout.php:53
 msgid "Quit"
 msgstr "退出"
 
-#: app/vendor/layouts/admin.layout.php:54
+#: app/vendor/layouts/admin.layout.php:61
 msgid "Please open by pc browser for best best experience"
 msgstr "PC浏览器打开体验最佳"
 
@@ -2020,77 +2310,91 @@ msgstr ""
 msgid "文件上传终止"
 msgstr ""
 
-#: app/vendor/util.php:126
+#: app/vendor/util.php:198
 msgid "一"
 msgstr ""
 
-#: app/vendor/util.php:126
+#: app/vendor/util.php:198
 msgid "二"
 msgstr ""
 
-#: app/vendor/util.php:126
+#: app/vendor/util.php:198
 msgid "三"
 msgstr ""
 
-#: app/vendor/util.php:126
+#: app/vendor/util.php:198
 msgid "四"
 msgstr ""
 
-#: app/vendor/util.php:126
+#: app/vendor/util.php:198
 msgid "五"
 msgstr ""
 
-#: app/vendor/util.php:126
+#: app/vendor/util.php:198
 msgid "六"
 msgstr ""
 
-#: app/vendor/util.php:126
+#: app/vendor/util.php:198
 msgid "日"
 msgstr ""
 
-#: app/vendor/util.php:132
+#: app/vendor/util.php:204
 msgid "今天（ W 周） H:i"
 msgstr ""
 
-#: app/vendor/util.php:136
+#: app/vendor/util.php:208
 msgid "昨天（ W 周） H:i"
 msgstr ""
 
-#: app/vendor/util.php:139
+#: app/vendor/util.php:211
 msgid "前天（ W 周） H:i"
 msgstr ""
 
-#: app/vendor/util.php:141
+#: app/vendor/util.php:213
 #, php-format
 msgid "Y-m-d 周 %s（ W 周） H:i"
 msgstr ""
 
-#: cli/build.php:44 cli/build.php:106
+#: app/vendor/views/pagination.tpl.php:67
+#: app/vendor/views/pagination.tpl.php:69
+msgid "First Page"
+msgstr "首页"
+
+#: app/vendor/views/pagination.tpl.php:85
+#: app/vendor/views/pagination.tpl.php:87
+msgid "Last Page"
+msgstr "尾页"
+
+#: app/vendor/views/pagination.tpl.php:89
+msgid "Total: "
+msgstr "总数："
+
+#: cli/build.php:43 cli/build.php:105
 msgid "project not exist"
 msgstr "项目未找到"
 
-#: cli/build.php:55
+#: cli/build.php:54
 #, php-format
 msgid "compile finished please: <a href=\"%s\">download</a>"
 msgstr "编译完成，请<a href=%s>下载</a>"
 
-#: cli/build.php:99
+#: cli/build.php:98
 msgid "page not exist"
 msgstr "页面未找到"
 
-#: cli/build.php:114
+#: cli/build.php:114 cli/build.php:115
 msgid "you have opened this page in another browser"
 msgstr "你已经在其他浏览器中打开了该页面，未来避免保存冲突，页面只能被打开一次"
 
-#: cli/build.php:190
+#: cli/build.php:191
 msgid "user auth fail, no token param"
 msgstr "认证失败，没有token"
 
-#: cli/build.php:195
+#: cli/build.php:196
 msgid "user auth fail, token is invalid"
 msgstr "认证失败，token无效"
 
-#: cli/build.php:200
+#: cli/build.php:201
 msgid "user auth fail"
 msgstr "认证失败"
 
@@ -2110,16 +2414,16 @@ msgstr "无法读取目录：%s"
 msgid "Add %s"
 msgstr "添加%s"
 
-#: cli/factory.php:70 cli/factory.php:76
+#: cli/factory.php:72 cli/factory.php:83
 #, php-format
-msgid "download image: %s"
-msgstr "下载图片：%s"
+msgid "%sdownload image: %s => %s%s"
+msgstr "%s下载图片: %s => %s%s"
 
-#: cli/factory.php:93
+#: cli/factory.php:100
 msgid "can not create zip file"
 msgstr "不能创建zip文件"
 
-#: cli/factory.php:96
+#: cli/factory.php:103
 msgid ""
 "\n"
 "\n"
@@ -2129,33 +2433,47 @@ msgstr ""
 "\n"
 "开始编译…"
 
-#: cli/web/html5.php:12 cli/web/vue3.php:124 cli/wxmp/wxmp2.php:81
+#: cli/web/html5.php:12 cli/web/vue3.php:123 cli/wxmp/wxmp2.php:81
 msgid "exporting iconfont"
 msgstr "导出iconfont"
 
-#: cli/web/html5.php:55
+#: cli/web/html5.php:56
 #, php-format
 msgid "add %s"
 msgstr "添加 %s"
 
-#: cli/web/html5.php:65
+#: cli/web/html5.php:71
+#, php-format
+msgid "%scompile popup page %s => %s%s"
+msgstr "%s编译弹窗页面 %s => %s%s"
+
+#: cli/web/html5.php:83 cli/web/html5.php:113
+#, php-format
+msgid "%scompile %s %s => %s%s"
+msgstr "%s编译 %s %s => %s%s"
+
+#: cli/web/html5.php:96
 #, php-format
 msgid "generate folder for modlue %s"
 msgstr "生成模块%s的目录"
 
-#: cli/web/html5.php:69
+#: cli/web/html5.php:100
 #, php-format
-msgid "compile page %s => %s"
-msgstr "编译文件 %s => %s"
+msgid "%scompile page %s => %s%s"
+msgstr "%s编译页面 %s => %s%s"
 
-#: cli/web/html5.php:84 cli/web/vue3.php:194
+#: cli/web/html5.php:125
+msgid "compile common style file： common.css"
+msgstr "编译通用样式文件：common.css"
+
+#: cli/web/html5.php:134 cli/web/vue3.php:193
 msgid "generating index page"
 msgstr "生成索引页"
 
 #: cli/web/vue3.php:46
 #, php-format
-msgid " can not found install_vue3 method in %s, ignore"
-msgstr " %s中未找到 install_vue3 方法 ，忽略"
+msgid " can not found installInVue3 method in %s, ignore"
+msgstr " %s中未找到 installInvue3 方法 ，忽略"
 
 #: cli/web/vue3.php:85 cli/web/vue3.php:98 cli/wxmp/wxmp2.php:72
 #: cli/wxmp/wxmp2.php:117 cli/wxmp/wxmp2.php:128
@@ -2163,20 +2481,20 @@ msgstr " %s中未找到 install_vue3 方法 ，忽略"
 msgid "generating %s"
 msgstr "生成 %s"
 
-#: cli/web/vue3.php:179
+#: cli/web/vue3.php:178
 #, php-format
 msgid "compile page %s to %s, url: %s"
 msgstr "编译文件 %s 到 %s, url: %s"
 
-#: cli/web/vue3.php:196
+#: cli/web/vue3.php:195
 msgid "Index page"
 msgstr "索引页"
 
-#: cli/web/vue3.php:199
+#: cli/web/vue3.php:198
 msgid "generating router"
 msgstr "生成路由"
 
-#: cli/web/vue3.php:202
+#: cli/web/vue3.php:201
 #, php-format
 msgid ""
 "compiled use : %s, you can <ol><li>npm install: install all need node "
@@ -2186,61 +2504,551 @@ msgstr ""
 "采用 %s 编译, 你可以<ol><li>npm install: 安装所有到依赖</li><li>npm run "
 "serve: 启动vue服务</li><li>npm run build: 编译</li></ol>"
 
-#: cli/web/vue3.php:229
+#: cli/web/vue3.php:228
 msgid "generating package.json"
 msgstr "生成package.json"
 
 #: cli/wxmp/wxmp2.php:54
 #, php-format
-msgid " can not found install2wxmp2 method in %s, ignore"
-msgstr " %s中未找到 install2wxmp2 方法 ，忽略"
+msgid " can not found installInWxmp2 method in %s, ignore"
+msgstr " %s中未找到 installInwxmp2 方法 ，忽略"
 
 #: cli/wxmp/wxmp2.php:98
 #, php-format
 msgid "compile page %s to %s"
 msgstr "编译文件 %s => %s"
 
-#: yangzie/controller.php:215
+#: yangzie/controller.php:228
 msgid "Yangzie Framework"
 msgstr ""
 
-#: yangzie/dba.php:291
+#: yangzie/dba.php:116
 #, php-format
 msgid "Field '%s' cannot be null"
 msgstr "字段 ‘%s’ 未设置"
 
-#: yangzie/dba.php:295
+#: yangzie/dba.php:120
 #, php-format
 msgid "Field '%s' doesn't have a default value"
 msgstr "字段 ‘%s’ 未设置值"
 
-#: yangzie/dba.php:302
+#: yangzie/dba.php:127
 #, php-format
 msgid "Field '%s' length exceeds limit %s"
 msgstr "字段 ‘%s’ 内容长度超过了 %s"
 
-#: yangzie/dba.php:305
+#: yangzie/dba.php:130
 #, php-format
 msgid "Field '%s' value %s is not in the accepted enum list"
 msgstr "字段 ‘%s’ 的值 %s 不在允许的范围内"
 
-#: yangzie/dba.php:309
+#: yangzie/dba.php:134
 #, php-format
 msgid "Field '%s' value %s is not the date value"
 msgstr "字段 ‘%s’ 的值 %s 不是有效的日期类型"
 
-#: yangzie/request.php:273
+#: yangzie/graphql__schema.trait.php:78
+#, php-format
+msgid "field 定义重复了请检查: %s"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:185 yangzie/graphql__schema.trait.php:194
+#, php-format
+msgid "%s count"
+msgstr "%s 条"
+
+#: yangzie/graphql__schema.trait.php:206
+msgid "分页，分组和排序"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:222
+msgid "Indicates this type is a scalar."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:223
+msgid ""
+"Indicates this type is an object. `fields` and `interfaces` are valid fields."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:224
+msgid ""
+"Indicates this type is an interface. `fields`, `interfaces`, and "
+"`possibleTypes` are valid fields."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:225
+msgid "Indicates this type is a union. `possibleTypes` is a valid field."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:226
+msgid "Indicates this type is an enum. `enumValues` is a valid field."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:227
+msgid "Indicates this type is an input object. `inputFields` is a valid field."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:228
+msgid "Indicates this type is a list. `ofType` is a valid field."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:229
+msgid "Indicates this type is a non-null. `ofType` is a valid field."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:231
+msgid "An enum describing what kind of type a given `__Type` is."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:248
+msgid ""
+"One possible value for a given Enum. Enum values are unique values, not a "
+"placeholder for a string or numeric value. However an Enum value is returned "
+"in a JSON response as a string."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:266
+msgid ""
+"A GraphQL-formatted string representing the default value for this input "
+"value."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:271
+msgid ""
+"Arguments provided to Fields or Directives and the input fields of an "
+"InputObject are represented as Input Values which describe their type and "
+"optionally a default value."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:278
+msgid "Location adjacent to a query operation."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:279
+msgid "Location adjacent to a mutation operation."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:280
+msgid "Location adjacent to a subscription operation."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:281
+msgid "Location adjacent to a field."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:282
+msgid "Location adjacent to a fragment definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:283
+msgid "Location adjacent to a fragment spread."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:284
+msgid "Location adjacent to an inline fragment."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:285
+msgid "Location adjacent to a variable definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:286
+msgid "Location adjacent to a schema definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:287
+msgid "Location adjacent to a scalar definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:288
+msgid "Location adjacent to an object type definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:289
+msgid "Location adjacent to a field definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:290
+msgid "Location adjacent to an argument definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:291
+msgid "Location adjacent to an interface definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:292
+msgid "Location adjacent to a union definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:293
+msgid "Location adjacent to an enum definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:294
+msgid "Location adjacent to an enum value definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:295
+msgid "Location adjacent to an input object type definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:296
+msgid "Location adjacent to an input object field definition."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:299
+msgid ""
+"A Directive can be adjacent to many parts of the GraphQL language, a "
+"__DirectiveLocation describes one such possible adjacencies."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:320
+msgid ""
+"A Directive provides a way to describe alternate runtime execution and type "
+"validation behavior in a GraphQL document.\n"
+"\n"
+"In some cases, you need to provide options to alter GraphQL's execution "
+"behavior in ways field arguments will not suffice, such as conditionally "
+"including or skipping a field. Directives provide this by describing "
+"additional information to the executor."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:349
+msgid ""
+"The fundamental unit of any GraphQL Schema is the type. There are many kinds "
+"of types in GraphQL as represented by the `__TypeKind` enum.\n"
+"\n"
+"Depending on the kind of a type, certain fields describe information about "
+"that type. Scalar types provide no information beyond a name, description "
+"and optional `specifiedByURL`, while Enum types provide their values. Object "
+"and Interface types provide the fields they describe. Abstract types, Union "
+"and Interface, provide the Object types possible at runtime. List and "
+"NonNull types compose other types."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:361
+msgid "A list of all types supported by this server."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:362
+msgid "The type that query operations will be rooted at."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:363
+msgid ""
+"If this server supports mutation, the type that mutation operations will be "
+"rooted at."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:364
+msgid ""
+"If this server support subscription, the type that subscription operations "
+"will be rooted at."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:365
+msgid "A list of all directives supported by this server."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:369
+msgid ""
+"A GraphQL Schema defines the capabilities of a GraphQL server. It exposes "
+"all available types and directives on the server, as well as the entry "
+"points for query, mutation, and subscription operations."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:392
+msgid ""
+"Object and Interface types are described by a list of Fields, each of which "
+"has a name, potentially a list of arguments, and a return type."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:460
+msgid "查询字段名"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:461
+msgid "比较条件"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:462
+msgid "查询值"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:463
+msgid "And / Or 拼接下一个where"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:472
+msgid "排序"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:473
+msgid "ASC / DESC"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:474
+msgid "分组"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:475
+msgid "当前页"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:476
+msgid "每页大小"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:489
+msgid "主键(数字)或uuid（字符串）, 当传入时忽略 wheres 参数"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:490
+msgid "查询条件数组"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:491
+msgid "分支、分页、排序"
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:511
+msgid ""
+"Directs the executor to include this field or fragment only when the `if` "
+"argument is true."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:513
+msgid "Included when true."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:522
+msgid ""
+"Directs the executor to skip this field or fragment when the `if` argument "
+"is true."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:524
+msgid "Skipped when true."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:534
+msgid ""
+"Directs the executor to defer this fragment when the `if` argument is true "
+"or undefined."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:536
+msgid "Deferred when true or undefined."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:537 yangzie/graphql__schema.trait.php:548
+msgid "Unique name."
+msgstr "唯一名称"
+
+#: yangzie/graphql__schema.trait.php:545
+msgid ""
+"Directs the executor to stream plural fields when the `if` argument is true "
+"or undefined."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:547
+msgid "Stream when true or undefined."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:549
+msgid "Number of items to return immediately."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:557
+msgid "Marks an element of a GraphQL schema as no longer supported."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:559
+msgid ""
+"Explains why this element was deprecated, usually also including a "
+"suggestion for how to access supported similar data. Formatted using the "
+"Markdown syntax, as specified by [CommonMark](https=>//commonmark.org/)."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:569
+msgid "Exposes a URL that specifies the behaviour of this scalar."
+msgstr ""
+
+#: yangzie/graphql__schema.trait.php:571
+msgid "The URL that specifies the behaviour of this scalar."
+msgstr ""
+
+#: yangzie/request.php:367
 msgid "Please signin"
 msgstr "请登录"
 
-#: yangzie/request.php:283
+#: yangzie/request.php:376
 #, php-format
 msgid "You do not have permission(%s:%s)"
 msgstr "无权访问(%s:%s)"
 
-#: yangzie/startup.php:61
+#: yangzie/startup.php:62
 msgid "app/__config__.php not found"
 msgstr "文件app/__config__.php 丢失"
+
+#~ msgid "Select files"
+#~ msgstr "选择文件"
+
+#~ msgid "Add files to the upload queue and click the start button."
+#~ msgstr "添加文件到上传队列并点击开始按钮。"
+
+#~ msgid "Filename"
+#~ msgstr "文件名"
+
+#~ msgid "Status"
+#~ msgstr "状态"
+
+#~ msgid "Size"
+#~ msgstr "大小"
+
+#~ msgid "Add Files"
+#~ msgstr "添加文件"
+
+#~ msgid "Start Upload"
+#~ msgstr "开始上传"
+
+#, javascript-format
+#~ msgid "Uploaded %d/%d files"
+#~ msgstr "上传文件 %d/%d"
+
+#, javascript-format
+#~ msgid "%d files queued"
+#~ msgstr "%d 文件队列"
+
+#~ msgid "Drag files here."
+#~ msgstr "拖动文件到这里。"
+
+#~ msgid "Error: File too large:"
+#~ msgstr "错误：文件太大："
+
+#~ msgid "Error: Invalid file extension:"
+#~ msgstr "错误：无效的文件扩展："
+
+#~ msgid "List"
+#~ msgstr "列表"
+
+#~ msgid "Thumbnails"
+#~ msgstr "缩略图"
+
+#~ msgid "Stop Upload"
+#~ msgstr "停止上传"
+
+#~ msgid "File count error."
+#~ msgstr "文件数量错误。"
+
+#, javascript-format
+#~ msgid "File: %s"
+#~ msgstr "文件：%s"
+
+#, fuzzy
+#~| msgid "unknown action"
+#~ msgid "Unknown option "
+#~ msgstr "未知的行为"
+
+#~ msgid "Save UI"
+#~ msgstr "保存设计"
+
+#~ msgid "Module Not Found..."
+#~ msgstr "模块未找到…"
+
+#~ msgid "Structure"
+#~ msgstr "项目结构"
+
+#~ msgid "Search Libraries"
+#~ msgstr "查询库"
+
+#~ msgid "Function"
+#~ msgstr "功能"
+
+#~ msgid "please add module and function first"
+#~ msgstr "请先添加模块和功能"
+
+#, php-format
+#~ msgid "Recycle %s"
+#~ msgstr "回收站 %s"
+
+#, php-format
+#~ msgid ""
+#~ "This action cannot be undone. You will lose this module's funciton, page, "
+#~ "ui and api, please input the module name %s to delete"
+#~ msgstr ""
+#~ "该行为不能撤销，模块下的功能，ui等内容都将删除，请输入模块名 %s 确认删除"
+
+#~ msgid "Delete Module"
+#~ msgstr "删除模块"
+
+#~ msgid "Edit Function"
+#~ msgstr "编辑功能"
+
+#, php-format
+#~ msgid ""
+#~ "This action cannot be undone.  please input the function name %s to delete"
+#~ msgstr "该行为不能撤销，请输入功能名%s确认删除"
+
+#~ msgid "Delete Function"
+#~ msgstr "删除功能"
+
+#~ msgid "empty"
+#~ msgstr "空的"
+
+#~ msgid "Cancel"
+#~ msgstr "取消"
+
+#~ msgid "OK"
+#~ msgstr "确定"
+
+#~ msgid "Add Page"
+#~ msgstr "新增页面"
+
+#~ msgid "Choose..."
+#~ msgstr "选择…"
+
+#~ msgid "1/6 col"
+#~ msgstr "1/6 列宽"
+
+#~ msgid "1/4 col"
+#~ msgstr "1/4 列宽"
+
+#~ msgid "1/3 col"
+#~ msgstr "1/3 列宽"
+
+#~ msgid "1/2 col"
+#~ msgstr "1/2 列宽"
+
+#~ msgid "2/3 col"
+#~ msgstr "2/3 列宽"
+
+#~ msgid "3/4 col"
+#~ msgstr "3/4 列宽"
+
+#~ msgid "5/6 col"
+#~ msgstr "5/6 列宽"
+
+#~ msgid "1/6 offset"
+#~ msgstr "1/6 偏移"
+
+#~ msgid "1/4 offset"
+#~ msgstr "1/4 偏移"
+
+#~ msgid "1/3 offset"
+#~ msgstr "1/3 偏移"
+
+#~ msgid "1/2 offset"
+#~ msgstr "1/2 偏移"
+
+#~ msgid "2/3 offset"
+#~ msgstr "2/3 偏移"
+
+#~ msgid "3/4 offset"
+#~ msgstr "3/4 偏移"
+
+#~ msgid "5/6 offset"
+#~ msgstr "5/6 偏移"
 
 #~ msgid "Change Tech"
 #~ msgstr "修改角色"
@@ -2365,9 +3173,6 @@ msgstr "文件app/__config__.php 丢失"
 #~ msgid "no project limit, every project can invite %s member"
 #~ msgstr "项目数量无限制，每个项目只能邀请%s人参与"
 
-#~ msgid "Base"
-#~ msgstr "基础版"
-
 #~ msgid "Organization"
 #~ msgstr "组织"
 
@@ -2386,9 +3191,6 @@ msgstr "文件app/__config__.php 丢失"
 
 #~ msgid "Kind:"
 #~ msgstr "类型："
-
-#~ msgid "Kind"
-#~ msgstr "类型"
 
 #~ msgid "frontend"
 #~ msgstr "前端"

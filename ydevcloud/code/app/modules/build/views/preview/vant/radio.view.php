@@ -1,0 +1,80 @@
+<?php
+namespace app\modules\build\views\preview\vant;
+
+use app\modules\build\views\preview\Html_Code_Helper;
+use app\modules\build\views\preview\Preview_View;
+
+
+class Radio_View extends Preview_View {
+    use Vant_Popup,Html_Code_Helper;
+    public function check_master()
+    {
+        $this->master_view = new Formgroup_View($this->data, $this->build->get_controller(), $this->build);
+        return true;
+    }
+    private function radio_css() {
+        $css = ['form-check'];
+        if (@$this->data['meta']['custom']['inline']){
+            $css[] = 'form-check-inline';
+        }
+        return join(' ', $css);
+    }
+    private function body_css() {
+        $arr = [];
+
+        if ($this->data['meta']['custom']['inline']) {
+            $arr[] = 'h-100 d-flex align-items-center';
+        } else {
+            $arr[] = 'h-auto';
+        }
+
+        if (@$this->data['meta']['css']['formSizing'] && $this->data['meta']['css']['formSizing']!='normal'){
+            $arr[] = 'form-control-'.$this->data['meta']['css']['formSizing'];
+        }
+        return join(" ", $arr);
+    }
+    private function body_style() {
+        $styleMap = parent::style_map();
+        $newStyle = [];
+        foreach ($styleMap as $key => $value) {
+            if (preg_match("/height/", $key)) {
+                $newStyle[$key] = $value;
+            }
+        }
+        $newStyle = array_values($newStyle);
+        return join(';', $newStyle);
+    }
+    public function build_ui()
+    {
+        $space =  $this->indent(2);
+        $values = @$this->data['meta']['values']?:[[ "text"=> 'sample', "value"=> '1' ]];
+        echo "{$space}<div";
+        echo $this->wrap_output('class', $this->body_css());
+        echo $this->wrap_output('style', $this->body_style());
+        echo ">\r\n";
+        foreach ((array)@$values as $index => $item){
+            echo $this->indent(3)."<div";
+            echo $this->wrap_output('class', $this->radio_css());
+            echo ">\r\n";
+            echo $this->indent(4);
+            echo "<input type='radio'";
+
+            if (@$item['checked']){
+                echo ' checked';
+            }
+            echo ' class="form-check-input" id="'.$this->myId(true).$item['value'].$index.'"';
+            echo $this->build_form_attrs();
+            echo ' value="'.@$item['value'].'"';
+            echo ">\r\n";
+
+            echo $this->indent(4);
+            echo "<label class='form-check-label' for='".$this->myId(true).$item['value'].$index."'>";
+            echo $item['text'];
+            echo "</label>\r\n";
+
+            echo $this->indent(3);
+            echo "</div>\r\n";
+        }
+        echo "{$space}</div>\r\n";
+    }
+}

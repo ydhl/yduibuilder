@@ -10,6 +10,8 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <span class="navbar-text me-3 pt-0 text-uppercase">{{ project.name }} <div style="font-size: 10px;line-height: 10px;">{{ project.endKind }}/{{ project.frontend }}/{{ project.framework }}</div></span>
         <ul class="navbar-nav me-auto">
+          <li class="nav-item"><span class="nav-link ydui-active">UIBuilder</span></li>
+          <li class="nav-item"><a class="nav-link" target="_blank" :href="ssoapi+'?url='+apiBuilder+'/sso&projectId='+project.id" >APIBox</a></li>
         </ul>
         <div class="form-inline my-2 my-lg-0">
           <ul class="navbar-nav me-auto">
@@ -17,7 +19,7 @@
             <li class="nav-item">
               <a class="nav-link" href="#" >
                 <div class='rounded-circle'
-                     :style="`width: 28px;height: 28px; background-size:cover; background-position:center;background-image: url(${userAvatar||'/favicon.png'})`" ></div>
+                     :style="`width: 28px;height: 28px; background-size:cover; background-position:center;background-image: url(${userAvatar||'/programer.jpg'})`" ></div>
               </a>
             </li>
           </ul>
@@ -41,9 +43,9 @@ export default {
   setup (props: any, ctx: any) {
     const { t } = useI18n()
     const store = useStore()
-    const userAvatar = computed(() => store.state.user.avatar)
+    const userAvatar = computed(() => ydhl.api + 'image?file=' + encodeURIComponent(store.state.user.avatar))
     const project = computed(() => store.state.design.project)
-    const logo = computed(() => project.value.logo ? ydhl.uploadApi + project.value.logo : '/logo.svg')
+    const logo = computed(() => project.value.logo ? ydhl.api + 'image?file=' + project.value.logo : '/logo.svg')
     const api = ydhl.api + 'project/' + project.value.id
 
     return {
@@ -52,7 +54,9 @@ export default {
       logo,
       project,
       userAvatar,
-      ssoapi: ydhl.api + 'api/sso/token'
+      ssoapi: ydhl.api + 'api/sso/token',
+      apiBuilder: ydhl.apiBuilder,
+      modelDesign: ydhl.modelDesign
     }
   }
 }

@@ -14,6 +14,7 @@ class Build_Module extends YZE_Base_Module{
             'name'=>'Build',
             'routers' => [
                 'preview/page/(?P<pageid>[^/]+)'	=> ['controller' => 'preview', 'action' => 'page'],
+                'preview/popup/(?P<pageid>[^/]+)'	=> ['controller' => 'preview', 'action' => 'popup'],
                 'preview/(?P<pid>[^/]+)'	=> [ 'controller' => 'preview' ],
                 'code/(?P<pid>[^/]+)'	=> [ 'controller' => 'code' ],
                 'code/(?P<pid>[^/]+)/common'	=> [ 'controller' => 'code', 'action'=>'common' ],

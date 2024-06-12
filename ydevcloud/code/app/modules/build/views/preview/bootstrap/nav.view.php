@@ -1,34 +1,48 @@
 <?php
 namespace app\modules\build\views\preview\bootstrap;
+
+use app\modules\build\views\code\Base_Code_Fragment;
+use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
-use app\modules\build\views\preview\Html_Event_Binding;
 
-class Nav_View extends Preview_View {
-    use Html_Event_Binding,Bootstrap_Popup,Html_Code_Helper;
-    private function theme_css($item) {
+
+class Nav_View extends ValueList_View {
+    private function theme_css($inputDataName, $staticData, $bindDataName=null) {
         $css = ["nav-link"];
-        if ($item['checked']){
-            $css[] = "active";
-        }
         $theme = $this->data['meta']['css']['foregroundTheme'];
-        $theme = $theme && $theme !== 'default' ? $theme : 'primary';
-        if ($item['checked']){
-            $css[] = $this->cssTranslate['backgroundTheme'][$theme].' text-white';
-        }else{
-            $css[] = $this->cssTranslate['foregroundTheme'][$theme];
+        if ($theme && $theme !== 'default'){
+            $checked = $this->cssTranslate['backgroundTheme'][$theme].' text-white';
+            $unchecked = $this->cssTranslate['foregroundTheme'][$theme];
         }
-        return join(' ', $css);
+
+        $value = $staticData['value']?"'{$staticData['value']}'":$bindDataName;
+        $css = ["'".join(' ', $css)."': true"];
+        if ($inputDataName){
+            $css[] = "'{$checked} active': {$inputDataName}=={$value}";
+            if ($unchecked) $css[] = "'{$unchecked}': {$inputDataName}!={$value}";
+        }else if (@$staticData['checked']){
+            $css[] = "'{$checked} active': true";
+        }else{
+            if($unchecked) $css[] = "'{$unchecked}': true";
+        }
+        return "{".join(', ', $css)."}";
     }
 
-    private function theme_style($item) {
-        $style = [];
-        if ($item['checked']){
-            $style[] = "background-color:".$this->data['meta']['style']['color']." !important;color:#fff;";
-        }else{
-            $style[] = "color:".$this->data['meta']['style']['color']." !important;";
+    private function theme_style($inputDataName, $staticData, $bindDataName=null) {
+        $color = $this->data['meta']['style']['color'];
+        if (!$color){
+            return null;
         }
-        return join(' ', $style);
+        $value = $staticData['value']?"'{$staticData['value']}'":$bindDataName;
+
+        $checkedStyle = "background-color:{$color} !important;color:#fff;";
+        $uncheckedStyle = "color:{$color} !important;";
+        if ($inputDataName){
+            return "{$inputDataName}=={$value} ? '$checkedStyle' : '{$uncheckedStyle}'";
+        }else{
+            return $staticData['checked'] ? "'{$checkedStyle}'" : "'{$uncheckedStyle}'";
+        }
     }
     protected function css_map()
     {
@@ -63,25 +77,104 @@ class Nav_View extends Preview_View {
         return $cssMap;
     }
 
-    public function build_ui()
+    protected function build_ui_static()
     {
+        $this->get_input_data($inputDataName);
+        if (!$inputDataName) $inputDataName = $this->myid() . '_temp';
         $values = @$this->data['meta']['values']?:[[ "text"=> 'Sample 1', "value"=> '#' ], [ "text"=> 'Sample 2', "value"=> '#', 'checked'=> true ]];
         $space =  $this->indent();
         echo "{$space}<div ";
         echo $this->build_main_attrs();
-        echo ">\r\n";
+        if ($inputDataName) echo $this->wrap_output('x-input', $inputDataName);
+        echo ">".PHP_EOL;
 
         foreach ((array)@$values as $item){
-            echo $this->indent(1) . "<div class='nav-item'>\r\n";
+            echo $this->indent(1) . "<div class='nav-item'>".PHP_EOL;
             echo $this->indent(2) . "<a"
-                .$this->wrap_output('class', $this->theme_css($item))
-                .$this->wrap_output('style', $this->theme_style($item))
-                ." href='{$item['value']}'>{$item['text']}</a>\r\n";
-            echo $this->indent(1) . "</div>\r\n";
+                .$this->wrap_output(':class', $this->theme_css($inputDataName, $item))
+                .$this->wrap_output(':style', $this->theme_style($inputDataName, $item))
+                .$this->wrap_output('href', "javascript:;")
+                .$this->wrap_output('data-value', $item['value']?:$item['text'])
+                .">{$item['text']}</a>".PHP_EOL;
+            echo $this->indent(1) . "</div>".PHP_EOL;
         }
         foreach ((array)@$this->childViews as $view){
             $view->output();
         }
-        echo "{$space}</div>\r\n";
+        echo "{$space}</div>".PHP_EOL;
+    }
+
+    protected function build_ui_2d_array($bindOutput, $outDataName)
+    {
+        $inputData = $this->get_input_data($inputDataName);
+        if (!$inputDataName) $inputDataName = $this->myid() . '_temp';
+        $itemName = $bindOutput['name'];
+        $space =  $this->indent();
+        echo "{$space}<div ";
+        echo $this->build_main_attrs();
+        if ($inputDataName) {
+            $inputDataName = $this->is_array($inputData) ? "{$inputDataName}[idxOf{$itemName}]" : $inputDataName;
+            echo $this->wrap_output('x-input', $inputDataName);
+        }
+        echo ">".PHP_EOL;
+
+        $this->ui($bindOutput['item'], $outDataName, true, $itemName);
+
+        echo "{$space}</div>".PHP_EOL;
+    }
+    protected function build_ui_array($bindOutput, $outDataName)
+    {
+        $this->get_input_data($inputDataName);
+        if (!$inputDataName) $inputDataName = $this->myid() . '_temp';
+        $space =  $this->indent();
+        echo "{$space}<div ";
+        echo $this->build_main_attrs();
+        if ($inputDataName) echo $this->wrap_output('x-input', $inputDataName);
+        echo ">".PHP_EOL;
+
+        $this->ui($bindOutput, $outDataName, false);
+
+        echo "{$space}</div>".PHP_EOL;
+    }
+    private function ui($bindOutput, $outDataName, $is2D, $topDataName=null) {
+        $itemName = $outDataName;
+        $this->get_input_data($inputDataName);
+        if ($is2D) $itemName .= '2';
+        list('name'=>$xText, 'value'=>$xValue) = $this->get_bind_name_value($bindOutput, $itemName);
+
+        echo $this->indent(1).'<template x-for="(itemOf'.$itemName.', idxOf'.$itemName.') in '
+            .($is2D?"itemOf":"").$outDataName.'" :key="idxOf'.$itemName.'">'.PHP_EOL;
+        echo $this->indent(1) . '<div class="nav-item">'.PHP_EOL;
+        echo $this->indent(2) . "<a";
+
+        echo $this->wrap_output(':class',$this->theme_css($is2D ? "{$inputDataName}[idxOf{$topDataName}]" : $inputDataName, [], $xValue));
+        echo $this->wrap_output(':style',$this->theme_style($is2D ? "{$inputDataName}[idxOf{$topDataName}]" : $inputDataName, [], $xValue));
+
+        echo $this->wrap_output('href', 'javascript:;');
+        echo $this->wrap_output('x-text', $xText);
+        echo $this->wrap_output(':data-value', $xValue);
+        if ($is2D){
+            echo $this->wrap_output(':data-bound', "'itemOf{$outDataName}[\''+idxOf{$itemName}+'\']'");
+        }else{
+            echo $this->wrap_output(':data-bound', "'{$outDataName}[\''+idxOf{$itemName}+'\']'");
+        }
+        echo '></a>'.PHP_EOL;
+        echo $this->indent(1) . "</div>".PHP_EOL;
+        echo $this->indent(1) . "</template>".PHP_EOL;
+
+        foreach ((array)@$this->childViews as $view){
+            $view->output();
+        }
+    }
+    function build_code(): Base_Code_Fragment
+    {
+        parent::build_code();
+        $codeFragment = $this->get_code_Fragment();
+        $inputData = $this->get_input_data($dataName);
+        // 如果没有数据绑定的话，定义一个临时数据
+        if (!$dataName) {
+            $codeFragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, $this->myid() . '_temp: "",');
+        }
+        return $codeFragment;
     }
 }

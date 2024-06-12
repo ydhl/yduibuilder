@@ -2,6 +2,8 @@
 namespace app\project;
 use app\user\User_Model;
 use app\vendor\Save_Model_Helper;
+use app\vendor\Smtp;
+use app\vendor\ydsms\Ydsms;
 use yangzie\YZE_DBAImpl;
 use yangzie\YZE_FatalException;
 use yangzie\YZE_Hook;
@@ -180,6 +182,12 @@ class Member_Controller extends YZE_Resource_Controller {
             $params[":email"] = $cellphone_email;
         }
 
+        $permission = new \Check_User_Permission();
+        $permission->check_type = \Check_User_Permission::LIMIT_INVITE_MEMBER;
+        $permission->user = $loginUser;
+        $permission->project = $project;
+        YZE_Hook::do_hook(CHECK_USER_PERMISSION, $permission);
+
         $user = User_Model::from()->where($where)->get_Single($params);
         /**
          * 用户不存在则先创建一个用户，等该用户注册时在和这条记录绑定
@@ -196,6 +204,36 @@ class Member_Controller extends YZE_Resource_Controller {
             throw new YZE_FatalException(vsprintf(__('%s is a member already'), $cellphone_email));
         }
 
+        if ($cellphone){
+            $ydsms = new Ydsms();
+            if(!$ydsms->sendSms('+'.$region.$cellphone, SMS_INVITE_TEMPLATE_ID, [$loginUser->nickname, $project->name])){
+                throw new YZE_FatalException(__('Can not send sms, please check your cellphone or contact admin'));
+            }
+        }else{
+            $mailto=$email;
+            $mailsubject = sprintf(__("%s Invite you join YDECloud project %s"), $loginUser->nickname, $project->name);
+            $mailbody = sprintf(__("Hi %s:<br/><br/> %s Invite you join YDECloud project %s, In YDECloud you can develop and cooperation online. you can click this link to see detail: <a href='%s'>%s</a><br/><br/><br/><br/>YDECloud by YDHL Team"),
+                $cellphone_email,
+                $loginUser->nickname,
+                $project->name,
+                SITE_URI."project/".$project->uuid,
+                SITE_URI."project/".$project->uuid);
+            $smtpserver     = SMTP_SERVER;
+            $smtpserverport = SMTP_PORT;
+            $smtpusermail   = SMTP_FROM_EMAiL;
+            $smtpuser       = SMTP_USER;
+            $smtppass       = SMTP_PASSWORD;
+            $mailsubject    = "=?UTF-8?B?" . base64_encode($mailsubject) . "?=";
+            $mailtype       = "HTML";
+
+            $smtp           = new Smtp($smtpserver, $smtpserverport, true, $smtpuser, $smtppass);
+            $smtp->debug    = false;
+            $sender  = SMTP_SENDER;
+            $rst = $smtp->sendmail($mailto,$smtpusermail, $mailsubject, $mailbody, $mailtype, '', '', '', $sender, '');
+            if (!$rst) {
+                throw new YZE_FatalException(__('Send Email Fail, Please Check Your Email'));
+            }
+        }
         $data = [
             'role'=>$role,
             'project_id'=>$project->id,

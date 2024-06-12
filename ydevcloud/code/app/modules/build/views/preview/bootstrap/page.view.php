@@ -1,14 +1,15 @@
 <?php
 namespace app\modules\build\views\preview\bootstrap;
+
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
-use app\modules\build\views\preview\Html_Event_Binding;
+
 
 class Page_View extends Preview_View {
-    use Html_Event_Binding,Bootstrap_Popup,Html_Code_Helper;
-    protected function style_map()
+    use Bootstrap_Popup,Html_Code_Helper;
+    protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map();
+        $map = parent::style_map($meta);
         $map['flex-grow']= 'flex-grow:1'; # 17502
 
         // 当是弹窗页面时，调整样式让里面的modal能居中，拉抻显示

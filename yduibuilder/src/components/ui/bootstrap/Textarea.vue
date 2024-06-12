@@ -2,10 +2,10 @@
   <div :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
        :data-pageid="pageid"
        :class="[dragableCss, bodyCss, uiCss,{'overflow-hidden':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
-    <textarea class="w-100 border-0" :style="uiconfig.meta.custom?.autoRow ? 'resize: none' : ''" :id="uiconfig.meta.id+uiconfig.type" :name="uiconfig.meta?.form?.inputName"
+    <textarea class="w-100 border-0 bg-transparent" :style="uiconfig.meta.custom?.autoRow ? 'resize: none' : ''" :id="uiconfig.meta.id+uiconfig.type" :name="uiconfig.meta?.form?.inputName"
               :disabled="uiconfig.meta?.form?.state==='disabled'"
               :readonly="uiconfig.meta?.form?.state==='readonly'"
-              :required="uiconfig.meta?.form?.required"  style="font-style: inherit"
+              :required="uiconfig.meta?.form?.required"  style="font: inherit;color:inherit"
               :placeholder="uiconfig.meta?.form?.placeholder" :rows="uiconfig.meta.custom?.row" v-model="defaultValue"></textarea>
     <div v-if="uiconfig.meta?.custom?.wordCountVisible" class="ml-3">0{{uiconfig.meta?.custom?.maxLength ? '/' + uiconfig.meta?.custom?.maxLength : ''}}</div>
     <div v-if="uiconfig.meta?.custom?.clearButtonVisible" class="cursor ml-3">×</div>

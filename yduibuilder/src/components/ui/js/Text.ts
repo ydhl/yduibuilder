@@ -35,7 +35,7 @@ export default class Text extends UIBase {
           data: {
             itemid: props.uiconfig.meta.id,
             pageId: props.pageid,
-            props: { value: document.getElementById(props.uiconfig.meta.id)?.innerText }
+            props: { value: document.getElementById(props.uiconfig.meta.id)?.innerText.trim() }
           }
         })
       }

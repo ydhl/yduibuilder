@@ -80,7 +80,7 @@
           <div class="form-group">
             <label>{{t("style.borderColor")}}</label>
             <div class="input-group input-group-sm mb-3">
-              <ColorPicker v-model="borderColor" css="form-control form-control-sm"></ColorPicker>
+              <ColorPicker v-model="borderColor" css="form-control form-control-sm flex-grow-1" style="width: 130px"></ColorPicker>
               <span class="input-group-text">{{t("style.predefinedClass")}}</span>
               <select class="form-select form-select-sm" v-model="borderColorClass">
                 <option v-for="theme in cssMap.borderColorClass" :key="theme">{{theme}}</option>
@@ -111,10 +111,11 @@
 </template>
 
 <script lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import initUI from '@/components/Common'
 import ColorPicker from '@/components/common/ColorPicker.vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'StyleBorder',
@@ -132,12 +133,15 @@ export default {
     const isOpenRadiusSetting = ref(false)
     const mpbSettingDialog = ref()
     const rightBackdropVisible = ref(false)
+    const previewMode = toRef(props, 'previewMode')
+    const store = useStore()
+    const previewStyleItem = computed(() => store.state.design.previewStyleItem)
 
     const attrs = computed(() => {
       const _css: any = []
       const _style: any = []
       const _attr: any = []
-      const meta = selectedUIItem.value?.meta
+      const meta = previewMode.value ? previewStyleItem.value.meta : selectedUIItem.value?.meta
       const cssMap = info.cssMap.value
       // console.log(meta)
 
@@ -165,20 +169,20 @@ export default {
     })
 
     const getStyle = (name) => {
-      const style = info.getMeta(name, 'style', props.previewMode)
+      const style = info.getMeta(name, 'style', previewMode)
       return style || ''
     }
-    const borderRoundSize = info.computedWrap('border-radius', 'style', '', false, props.previewMode)
-    const outlineWidth = info.computedWrap('outline-width', 'style', false, props.previewMode)
-    const outlineColor = info.computedWrap('outline-color', 'style', false, props.previewMode)
-    const outlineStyle = info.computedWrap('outline-style', 'style', false, props.previewMode)
+    const borderRoundSize = info.computedWrap('border-radius', 'style', '', false, previewMode)
+    const outlineWidth = info.computedWrap('outline-width', 'style', '', false, previewMode)
+    const outlineColor = info.computedWrap('outline-color', 'style', false, false, previewMode)
+    const outlineStyle = info.computedWrap('outline-style', 'style', false, false, previewMode)
 
     const size = computed<string>({
       get () {
         return getStyle(`${settingSide.value}-width`)
       },
       set (v) {
-        info.setMeta(`${settingSide.value}-width`, v || undefined, 'style', false, props.previewMode)
+        info.setMeta(`${settingSide.value}-width`, v || undefined, 'style', false, previewMode)
       }
     })
     const radius = computed<string>({
@@ -186,7 +190,7 @@ export default {
         return getStyle(`${settingSide.value}`)
       },
       set (v) {
-        info.setMeta(`${settingSide.value}`, v || undefined, 'style', false, props.previewMode)
+        info.setMeta(`${settingSide.value}`, v || undefined, 'style', false, previewMode)
       }
     })
     const borderColor = computed({
@@ -194,15 +198,15 @@ export default {
         return getStyle(`${settingSide.value}-color`)
       },
       set (v) {
-        info.setMeta(`${settingSide.value}-color`, v || undefined, 'style', false, props.previewMode)
+        info.setMeta(`${settingSide.value}-color`, v || undefined, 'style', false, previewMode)
       }
     })
     const borderColorClass = computed({
       get () {
-        return (info.getMeta('borderColorClass', 'css') || '').replace(/border-/, '', props.previewMode)
+        return (info.getMeta('borderColorClass', 'css') || '').replace(/border-/, '', previewMode)
       },
       set (v) {
-        info.setMeta('borderColorClass', v, 'css', false, props.previewMode)
+        info.setMeta('borderColorClass', v, 'css', false, previewMode)
       }
     })
     const borderStyle = computed({
@@ -210,7 +214,7 @@ export default {
         return getStyle(`${settingSide.value}-style`) || 'none'
       },
       set (v) {
-        info.setMeta(`${settingSide.value}-style`, v || undefined, 'style', false, props.previewMode)
+        info.setMeta(`${settingSide.value}-style`, v || undefined, 'style', false, previewMode)
       }
     })
     const openRadiusSetting = (type: string) => {
@@ -256,11 +260,11 @@ export default {
           'outline-color',
           'outline-style',
           'outline-width'
-        ]
+        ], previewMode
       ) ||
         info.hasInheritStyle(
           'css',
-          ['borderColorClass']
+          ['borderColorClass'], previewMode
         )
     })
 
@@ -284,11 +288,11 @@ export default {
           'outline-color',
           'outline-style',
           'outline-width'
-        ]
+        ], previewMode
       ) ||
         info.hasSetStyle(
           'css',
-          ['borderColorClass']
+          ['borderColorClass'], previewMode
         )
     })
     return {

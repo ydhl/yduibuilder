@@ -175,12 +175,11 @@ class layui_install{
 
     /**
      * 预览时要包含的js
-     * @return array ['file'=>'es'|'iife']
+     * @return array ['iife'=>[],'es'=>[],''vendor'=>[]]
      */
     public static function jsForPreview() {
         return [
-            'layui.js'=>'iife',
-            'keyboard-adapter.js'=>'iife'
+            'iife'=>['layui.js','keyboard-adapter.js']
         ];
     }
 }

@@ -104,7 +104,7 @@ trait Vue {
                             <button type="button" @click="popup<?= $page->id?>Minimize()" class="btn btn-secondary btn-sm" v-if="popup<?= $page->id?>State==''"><span class="iconfont icon-minimize"></span></button>
                             <button type="button" @click="popup<?= $page->id?>Maximize()" class="btn btn-secondary btn-sm" v-if="popup<?= $page->id?>State==''"><span class="iconfont icon-maximize"></span></button>
                             <button type="button" @click="popup<?= $page->id?>Resume()" class="btn btn-secondary btn-sm" v-if="popup<?= $page->id?>State!=''"><span class="iconfont icon-resume"></span></button>
-                            <button type="button" onclick="YDECloud.closeModal('<?= $pageId?>')" class="btn btn-secondary btn-sm"><span class="iconfont icon-close-win"></span></button>
+                            <button type="button" onclick="YDECloud.closeSelf(this)" class="btn btn-secondary btn-sm"><span class="iconfont icon-close-win"></span></button>
                         </div>
                     </div>
                     <iframe @load="popup<?= $page->id?>Loaded()" scrolling="auto" allowtransparency="true" class="w-100 h-100" frameborder="0" src="<?= $this->get_page_url($page)?>"></iframe>

@@ -30,7 +30,19 @@ YZE_Hook::add_hook(YZE_HOOK_GET_LOCALE, function () {
 });
 
 YZE_Hook::add_hook ( YZE_HOOK_GET_LOGIN_USER, function  ( $datas ) {
-	return User_Model::find_by_id(1);
+//    $token = $_SERVER['HTTP_TOKEN'];
+//    if ($token){ // 设计器jwt登录
+//        $getPayload = Jwt::verifyToken($token);
+//        if (!$getPayload) throw new YZE_FatalException(__("Please Signin"),1001);
+//        $loginUser = find_by_uuid(User_Model::CLASS_NAME,$getPayload['sub']);
+//        if (!$loginUser) throw new YZE_FatalException(__("Please Signin"),1001);
+//        return $loginUser;
+//    }
+
+	$loginUser = User_Model::find_by_id(1);
+	if( ! $loginUser)return null;
+
+	return $loginUser;
 } );
 
 YZE_Hook::add_hook ( YZE_HOOK_SET_LOGIN_USER, function  ( $data ) {
@@ -38,11 +50,23 @@ YZE_Hook::add_hook ( YZE_HOOK_SET_LOGIN_USER, function  ( $data ) {
 } );
 
 YZE_Hook::add_hook ( YZE_HOOK_GET_USER_ARO_NAME, function  ( $data ) {
-    return '/';
+    $token = $_SERVER['HTTP_TOKEN'];
+    if ($token){
+        $getPayload = Jwt::verifyToken($token);
+        if (!$getPayload) return "";
+//        $loginUser = find_by_uuid(User_Model::CLASS_NAME,$getPayload['sub']);
+        return "/";
+    }
+
+	if ( !@$_SESSION [ 'admin' ] )return "/";
+	return "TODO your ARO NAME";
 } );
 
 
 YZE_Hook::add_hook(YZE_HOOK_YZE_EXCEPTION, function ($datas){
+    //如果array("exception"=>$e, "controller"=>$controller, "response"=>$response)
+    // 把signin替换成自己的登录url
+
     $request = YZE_Request::get_instance();
     if(! is_a($datas['exception'], "\\yangzie\\YZE_Need_Signin_Exception")) return $datas;
 

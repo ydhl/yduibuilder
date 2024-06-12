@@ -1,0 +1,10 @@
+001+ Fatal error: Uncaught Error: Call to undefined method yangzie\YZE_DBAImpl::migration() in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/sql-save.php:36
+002+ Stack trace:
+003+ #0 {main}
+004+   thrown in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/sql-save.php on line 36
+001- INSERT INTO testusers3 (`name`,`email`,`register_time`) VALUES('aa','333','2015-12-17 17:50:30')
+002- INSERT IGNORE INTO testusers3 (`name`,`email`,`register_time`) VALUES('aa','333','2015-12-17 17:50:30')
+003- REPLACE INTO testusers3 SET `name`='aa',`email`='333',`register_time`='2015-12-17 17:50:30'
+004- INSERT INTO testusers3 (`name`,`email`,`register_time`) SELECT 'aa','333','2015-12-17 17:50:30' FROM dual WHERE EXISTS (SELECT id FROM testusers3 WHERE `id` = 1)
+005- INSERT INTO testusers3 (`name`,`email`,`register_time`) SELECT 'aa','333','2015-12-17 17:50:30' FROM dual WHERE NOT EXISTS (SELECT id FROM testusers3 WHERE `id` = 1)
+006- INSERT INTO testusers3 (`name`,`email`,`register_time`) VALUES('aa','333','2015-12-17 17:50:30')  ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), `name`=VALUES(`name`),`register_time`=VALUES(`register_time`)

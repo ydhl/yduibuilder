@@ -1,5 +1,5 @@
 .page-preview{
-    height:200px;background-repeat:no-repeat;background-size:contain;background-position: center;
+    height:150px;background-repeat:no-repeat;background-size:contain;background-position: center;
 }
 .bgtransparent{
     background-image: url(/img/transparent.svg);

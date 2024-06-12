@@ -46,20 +46,20 @@ export default function (uiconfig: any = null) {
    * @param value
    * @param complexTypeName
    * @param isMerge 默认情况下，都是进行覆盖赋值设置，对于复合元素，如果要合并新旧值，需要设置true
-   * @param previewMode true为预览模式，这是设置对是store中对previewStyleItem；false为设置选择对ui item
+   * @param previewMode 为了能跟踪该参数的值，传入的是toRef的引用，true为预览模式，这是设置对是store中对previewStyleItem；false为设置选择对ui item
    */
   const setMeta = (name, value, complexTypeName: string = '', isMerge:boolean = false, previewMode: any = undefined) => {
     const props = {}
     props[name] = value
     if (previewMode && previewMode.value) {
-      store.commit('updatePreviewStyle', {
+      store.commit('updatePreviewStyleMeta', {
         type: complexTypeName || null,
         isMerge: isMerge,
         props
       })
+      store.commit('updatePageState', { previewStyleItem: JSON.parse(JSON.stringify(store.state.design?.previewStyleItem || {})) })
       return
     }
-
     store.commit('updateItemMeta', {
       itemid: selectedUIItemId.value,
       type: complexTypeName || null,
@@ -72,13 +72,16 @@ export default function (uiconfig: any = null) {
    * 获取指定的meta值，找不到返回undefined
    * @param name
    * @param complexTypeName
-   * @param previewMode true为预览模式，这是设置对是store中对previewStyleItem；false为设置选择对ui item
+   * @param previewMode 为了能跟踪该参数的值，传入的是toRef的引用，true为预览模式，这是设置对是store中对previewStyleItem；false为设置选择对ui item
    */
   const getMeta = (name, complexTypeName: string = '', previewMode: any = undefined) => {
     if (previewMode && previewMode.value) {
       if (!previewStyleItem.value.meta) return undefined
-      if (complexTypeName && !previewStyleItem.value.meta[complexTypeName]) return undefined
-      return complexTypeName ? previewStyleItem.value.meta[complexTypeName][name] : previewStyleItem.value.meta[name]
+      if (complexTypeName) {
+        if (!previewStyleItem.value.meta[complexTypeName] && !previewStyleItem.value.meta.selector?.[complexTypeName]) return undefined
+        return previewStyleItem.value.meta?.[complexTypeName]?.[name] || previewStyleItem.value.meta?.selector?.[complexTypeName]?.[name]
+      }
+      return previewStyleItem.value.meta[name] || previewStyleItem.value.meta?.selector[name]
     }
 
     if (!selectedUIItem.value) return undefined
@@ -104,7 +107,7 @@ export default function (uiconfig: any = null) {
    * @param complexTypeName meta分组，比如style，custom
    * @param defalutValue get 时默认值
    * @param isMerge set时是否merge
-   * @param previewMode true为预览模式，这是设置对是store中对previewStyleItem；false为设置选择对ui item
+   * @param previewMode 为了能跟踪该参数的值，传入的是toRef的引用，true为预览模式，这是设置对是store中对previewStyleItem；false为设置选择对ui item
    */
   const computedWrap = (name, complexTypeName = '', defalutValue: any = undefined, isMerge = false, previewMode: any = undefined) => {
     return computed({

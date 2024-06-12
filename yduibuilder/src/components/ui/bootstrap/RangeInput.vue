@@ -3,8 +3,7 @@
            :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
            :data-pageid="pageid"
            :class="[dragableCss, uiCss,{'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]"
-         :name="uiconfig.meta?.form?.inputName"
-         :disabled="true"
+         :readonly="true"
          :placeholder="uiconfig.meta.title"
          :min="uiconfig.meta.custom?.min||1"
          :max="uiconfig.meta.custom?.max||100"
@@ -30,6 +29,7 @@ export default {
   setup (props: any, context: any) {
     const store = useStore()
     const rangeinput = new RangeInput(props, context, store)
+    // watch(rangeinput.ui)
 
     return {
       ...rangeinput.setup()

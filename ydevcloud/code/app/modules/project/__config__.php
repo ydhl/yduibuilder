@@ -35,24 +35,18 @@ class Project_Module extends YZE_Base_Module{
                 'project/(?P<pid>[^/]+)/pageversion' => [
                     'controller' => 'pageversion'
                 ],
-                'project/(?P<pid>[^/]+)/structure' => [
-                    'controller' => 'structure'
-                ],
-                'project/(?P<pid>[^/]+)/func' => [
-                    'controller' => 'func'
-                ],
                 'project/(?P<pid>[^/]+)/page' => [
                     'controller' => 'page'
                 ],
                 'project/(?P<pid>[^/]+)/recycle' => [
                     'controller' => 'recycle'
                 ],
+                'project/(?P<pid>[^/]+)/emptytrash' => [
+                    'controller' => 'recycle',
+                    'action'=>'emptytrash'
+                ],
                 'project/(?P<pid>[^/]+)/recovery' => [
                     'controller' => 'recovery'
-                ],
-                'project/(?P<pid>[^/]+)/choosepage' => [
-                    'controller' => 'structure',
-                    'action' => 'choosepage'
                 ],
                 'project/(?P<pid>[^/]+)/lib' => [
                     'controller' => 'lib'
@@ -124,6 +118,11 @@ class Project_Module extends YZE_Base_Module{
                 'project/(?P<pid>[^/]+)/setting' => [
                     'controller' => 'setting',
                 ],
+                'project/(?P<pid>[^/]+)/apiurl' => [
+                    'controller' => 'setting',
+                    'action' => 'apiurl',
+                ],
+
                 'project/(?P<pid>[^/]+)/database' => [
                     'controller' => 'database',
                 ],

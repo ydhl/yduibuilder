@@ -10,8 +10,7 @@
     top:15px;
     bottom: 15px;
     left: 15px;
-    width: 200px;
-    background: #efefef;
+    width: 300px;
     overflow: auto;
 }
 .preview-body{
@@ -19,7 +18,7 @@
     top:15px;
     bottom: 15px;
     right: 15px;
-    left: 230px;
+    left: 330px;
 }
 .preview-page{
     width: 100%;

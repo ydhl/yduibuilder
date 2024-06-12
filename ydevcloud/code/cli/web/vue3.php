@@ -42,11 +42,11 @@ class web_vue3 extends Base_Factory{
             include_once YZE_PUBLIC_HTML."vendor/{$package}/install.php";
             list ($packageName) = explode('@', $package);
             $requireClass = $packageName . '_install';
-            if (!method_exists($requireClass, "install_vue3")){
-                    $this->server->push($this->frame->fd, '<span class="text-danger">'.sprintf(__(' can not found install_vue3 method in %s, ignore'), $requireClass).'</span>');
+            if (!method_exists($requireClass, "installInVue3")){
+                    $this->server->push($this->frame->fd, '<span class="text-danger">'.sprintf(__(' can not found installInVue3 method in %s, ignore'), $requireClass).'</span>');
                     continue;
             }
-            $install = $requireClass::install_vue3();
+            $install = $requireClass::installInVue3();
             if ($install['devDependencies']) $this->packageJson['devDependencies'] += $install['devDependencies'];
             if ($install['dependencies']) $this->packageJson['dependencies'] += $install['dependencies'];
             if ($install['includeCSSFiles']) $this->includeCSSFiles[$package] = $install['includeCSSFiles'];

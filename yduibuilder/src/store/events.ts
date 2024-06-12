@@ -9,9 +9,12 @@ export default {
     'onResize',
     'onScroll'
   ],
+  form: [
+    'onChange',
+    'onBlur',
+    'onFocus'
+  ],
   interactive: [
-    'onClick',
-    'onDblClick',
     'onPullDown',
     'onReachBottom'
   ],
@@ -21,6 +24,8 @@ export default {
     'onKeyPress'
   ],
   mouse: [
+    'onClick',
+    'onDblClick',
     'onMouseDown',
     'onMouseUp',
     'onMouseOver',

@@ -1,4 +1,5 @@
 import { Frame } from 'scenejs'
+import _ from 'lodash'
 import JQuery from 'jquery'
 import MouseDownEvent = JQuery.MouseDownEvent
 import MouseUpEvent = JQuery.MouseUpEvent
@@ -18,13 +19,14 @@ let splitedCallback: any
  * @param splitedCallback
  */
 function split (target: string, splitCallback: Function | undefined = undefined) {
-  const move = (event: MouseMoveEvent) => {
+  const move = _.throttle((event: MouseMoveEvent) => {
     if (!isSpliting) return
     if (splitingCallback) {
       isSpliting = splitingCallback(event.clientX - downX + startX)
       // console.log(isSpliting)
     }
-  }
+  }, 100)
+
   const up = (event: MouseUpEvent) => {
     if (isSpliting) {
       if (splitedCallback) splitedCallback()

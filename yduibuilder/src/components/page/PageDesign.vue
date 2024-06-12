@@ -11,6 +11,7 @@
                :class="{'text-secondary user-select-none': !isInEditPageTitle,'form-control-sm form-control border-0 bg-transparent shadow-none': true}" v-model="title"
                @blur="isInEditPageTitle=false" :title="t('page.editPage')">
       </div>
+      <div class="bg-light text-truncate active ps-1 pe-1 text-muted rounded user-select-none" data-bs-toggle="tooltip" :title="t('page.boxModelTip')"><i class="iconfont icon-boxmodel"></i> <small>{{t('page.boxModel')}}</small></div>
       <div class="item" data-bs-toggle="tooltip" :title="t('page.copyPage')" @click="copyPage"><i class="iconfont icon-copy"></i></div>
       <div class="item" data-bs-toggle="tooltip" :title="t('page.deletePage')" @click="deletePage"><i class="iconfont icon-remove"></i></div>
       <div class="item" data-bs-toggle="tooltip" :title="t('page.code')" @click="openExportCodeDialog"><i class="iconfont icon-code"></i></div>

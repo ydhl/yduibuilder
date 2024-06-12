@@ -4,17 +4,21 @@
     <div class="col-sm-9">
       <div class="list-group">
         <template v-if="valueItems && valueItems.length>0">
-          <div class="list-group-item p-1 d-flex justify-content-between align-items-center" v-for="(item, index) in valueItems" :key="index">
-            <div><i class="iconfont icon-drag"></i></div>
-            <label class="flex-grow-1 m-0 text-truncate">
-              <input type="radio" v-if="!isMultiple" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
-              <input type="checkbox" v-if="isMultiple" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
-              {{item.text}} ({{item.value}})</label>
-            <div>
-              <button type="button" @click="edit(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-edit"></i></button>
-              <button type="button" @click="remove(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-remove"></i></button>
+          <draggable v-model="valueItems" handle=".icon-drag" @change="sortValueItems">
+            <transition-group>
+            <div class="list-group-item p-1 d-flex justify-content-between align-items-center" v-for="(item, index) in valueItems" :key="index">
+              <div><i class="iconfont icon-drag" style="cursor: move"></i></div>
+              <label class="flex-grow-1 m-0 text-truncate">
+                <input type="radio" v-if="!isMultiple" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
+                <input type="checkbox" v-if="isMultiple" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
+                {{item.text}} ({{item.value}})</label>
+              <div>
+                <button type="button" @click="openSetting(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-edit"></i></button>
+                <button type="button" @click="remove(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-remove"></i></button>
+              </div>
             </div>
-          </div>
+            </transition-group>
+          </draggable>
         </template>
       </div>
       <button type="button" @click="openSetting(-1)" class="btn btn-outline-primary btn-block btn-sm mt-1 mb-2">
@@ -66,11 +70,15 @@
 
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
-import { computed, nextTick, ref, reactive, watch, toRaw } from 'vue'
+import { computed, nextTick, ref, onMounted } from 'vue'
 import UIInit from '@/components/Common'
+import { VueDraggableNext } from 'vue-draggable-next'
 
 export default {
   name: 'StyleValueList',
+  components: {
+    draggable: VueDraggableNext
+  },
   props: {
     valueIsRequired: Boolean
   },
@@ -79,44 +87,30 @@ export default {
     const { t } = useI18n()
     const editValueIndex = ref(-1)
     const valueInvalid = ref(false)
-    const editValue = computed(() => {
-      if (editValueIndex.value <= -1) return { text: '', value: '', checked: false, disabled: false }
-      return valueItems.value[editValueIndex.value]
-    })
-    const newItem = reactive({ text: '', value: '', checked: false, disabled: false })
-    watch(editValue, (newValue) => {
-      newItem.text = newValue ? newValue.text : ''
-      newItem.value = newValue ? newValue.value : ''
-      newItem.checked = newValue ? newValue.checked : false
-      newItem.disabled = newValue ? newValue.disabled : false
-    })
-
-    const valueItems = computed(() => {
-      return initInfo.getMeta('values') || []
-    })
+    const newItem = ref({ text: '', value: '', checked: false, disabled: false })
+    const valueItems = ref<any>([])
 
     const remove = (index) => {
+      valueItems.value.splice(index, 1)
       const values = JSON.parse(JSON.stringify(valueItems.value))
       values.splice(index, 1)
       initInfo.setMeta('values', values)
     }
 
-    const updateChecked = (index) => {
-      const values = JSON.parse(JSON.stringify(valueItems.value))
+    const _updateChecked = (index) => {
       if (isMultiple.value) {
-        values[index].checked = !values[index].checked
+        valueItems.value[index].checked = !valueItems.value[index].checked
       } else {
         // 单选的话把其他的反过来
-        for (const valueIndex in values) {
-          values[valueIndex].checked = false
+        for (const valueIndex in valueItems.value) {
+          valueItems.value[valueIndex].checked = false
         }
-        values[index].checked = true
+        valueItems.value[index].checked = true
       }
-      initInfo.setMeta('values', values)
     }
-
-    const edit = (index) => {
-      openSetting(index)
+    const updateChecked = (index) => {
+      _updateChecked(index)
+      initInfo.setMeta('values', JSON.parse(JSON.stringify(valueItems.value)))
     }
 
     const isOpenSetting = ref(false)
@@ -124,14 +118,19 @@ export default {
     const openSetting = (editItemIndex) => {
       editValueIndex.value = editItemIndex
       valueInvalid.value = false
-      newItem.value = ''
-      newItem.text = ''
-      newItem.checked = false
-      newItem.disabled = false
+      if (editItemIndex > -1) {
+        newItem.value = JSON.parse(JSON.stringify(valueItems.value[editItemIndex]))
+      } else {
+        newItem.value = { text: '', value: '', checked: false, disabled: false }
+      }
       isOpenSetting.value = true
       nextTick(() => {
         rightBackdropVisible.value = true
       })
+    }
+    const sortValueItems = (n) => {
+      const values = JSON.parse(JSON.stringify(valueItems.value))
+      initInfo.setMeta('values', values)
     }
     const closeSetting = () => {
       isOpenSetting.value = false
@@ -142,21 +141,26 @@ export default {
       return initInfo.getMeta('multiple', 'custom') || initInfo.selectedUIItem.value.type.toLowerCase() === 'checkbox' || false
     })
     const updateValue = () => {
-      const rawItem = JSON.parse(JSON.stringify(toRaw(newItem)))
-      if (!rawItem.value && props.valueIsRequired) {
+      const rawItem = JSON.parse(JSON.stringify(newItem.value))
+      if (!rawItem && props.valueIsRequired) {
         valueInvalid.value = true
         return
       }
       if (editValueIndex.value > -1) {
+        valueItems.value[editValueIndex.value] = rawItem
+        if (rawItem.checked) _updateChecked(editValueIndex.value)
         const values = JSON.parse(JSON.stringify(valueItems.value))
-        values[editValueIndex.value] = rawItem
         initInfo.setMeta('values', values)
       } else {
+        valueItems.value.push(rawItem)
         initInfo.setMeta('values', [rawItem], '', true)
       }
 
       closeSetting()
     }
+    onMounted(() => {
+      valueItems.value = initInfo.getMeta('values') || []
+    })
 
     return {
       t,
@@ -168,11 +172,10 @@ export default {
       isMultiple,
       updateValue,
       valueItems,
-      editValue,
       newItem,
-      edit,
       remove,
       updateChecked,
+      sortValueItems,
       valueInvalid,
       ...initInfo
     }

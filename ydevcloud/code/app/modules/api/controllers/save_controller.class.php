@@ -1,6 +1,8 @@
 <?php
 namespace app\api;
 use app\project\Function_Model;
+use app\project\Page_Bind_Event_Model;
+use app\project\Page_Bind_Io_Model;
 use app\project\Page_Bind_Style_Model;
 use app\project\Page_Model;
 use app\project\Page_Version_Model;
@@ -70,6 +72,9 @@ class Save_Controller extends YZE_Resource_Controller {
         if (!$member || !$member->can_edit()){
             return YZE_JSON_View::error($this, __('you can not edit in this project'));
         }
+        $permission = new \Check_User_Permission();
+        $permission->user = $loginUser;
+        YZE_Hook::do_hook(CHECK_USER_PERMISSION, $permission);
 
         $oldID2newID = [];
         if ($copy){
@@ -82,6 +87,8 @@ class Save_Controller extends YZE_Resource_Controller {
             $pageConfig = Page_Model::replace_uiid($pageConfig, $oldID2newID);
             $pageConfig->meta->title .= ' Copy';
         }
+
+        $pageConfig = Page_Model::remove_node($pageConfig);
 
         if (!$currPage){
             $currPage = new Page_Model();
@@ -112,7 +119,11 @@ class Save_Controller extends YZE_Resource_Controller {
             $updateSets = [];
             $dba = YZE_DBAImpl::get_instance();
             foreach ($records as $column => $value) {
-                $updateSets[] = "`{$column}` = ".$dba->quote($value);
+                if (is_null($value)){
+                    $updateSets[] = "`{$column}` = NULL";
+                }else{
+                    $updateSets[] = "`{$column}` = ".(is_numeric($value) ? $value :$dba->quote($value));
+                }
             }
             $sql = "UPDATE `page` set ".join(",",$updateSets)." 
             WHERE `id` = ".$currPage->id." and {$versionId} = (select b.last_version_id from (select p.last_version_id from `page` as p where p.id=".$currPage->id." ) as b)";
@@ -124,7 +135,7 @@ class Save_Controller extends YZE_Resource_Controller {
                 $currPage->refresh();
                 $last_version = $currPage->get_last_version();
                 if ($last_version){
-                    return YZE_JSON_View::error($this, sprintf(__('page has been saved by %s at %s (%s)'),
+                    return YZE_JSON_View::error($this, $e->getMessage().sprintf(__('page has been saved by %s at %s (%s)'),
                         $last_version->get_project_member()->get_user()->nickname, $last_version->created_on,$last_version->index));
                 }else{
                     return YZE_JSON_View::error($this, __('page has been saved by other'));
@@ -147,13 +158,13 @@ class Save_Controller extends YZE_Resource_Controller {
             $data = [
                 'project_id'=>$member->project_id,
                 'member_id'=>$member->id,
-                'content'=> ($currPage->screen ? '<img src="'.YZE_UPLOAD_PATH.$currPage->screen.'" style="width: 50px"/>' : '').vsprintf(__('Save UI, Version: %s'), $last_version->index),
+                'content'=> ($currPage->screen ? '<img src="/download?file='.urlencode($currPage->screen).'" style="width: 50px"/>' : '').vsprintf(__('Save UI, Version: %s'), $last_version->index),
                 'type'=>'ui'];
             YZE_Hook::do_hook(YDE_CLOUD_PROJECT_ACTIVITY, $data);
         }
 
         $screen_path = "/screen/{$project->uuid}/{$pageConfig->meta->id}-{$last_version->id}.jpg";
-        $currPage->set(Page_Model::F_SCREEN, YZE_UPLOAD_PATH.$screen_path)->save();
+        $currPage->set(Page_Model::F_SCREEN, OSS_BUCKET_HOST.$screen_path)->save();
         $last_version->set(Page_Model::F_SCREEN, $currPage->screen)->save();
 
         $member->set('last_page_id', $currPage->id)

@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 2138106 */
-  src: url('iconfont.woff2?t=1708163158597') format('woff2'),
-       url('iconfont.woff?t=1708163158597') format('woff'),
-       url('iconfont.ttf?t=1708163158597') format('truetype');
+  src: url('iconfont.woff2?t=1715394716964') format('woff2'),
+       url('iconfont.woff?t=1715394716964') format('woff'),
+       url('iconfont.ttf?t=1715394716964') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,50 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-moveto:before {
+  content: "\e610";
+}
+
+.icon-subpage:before {
+  content: "\e60f";
+}
+
+.icon-page:before {
+  content: "\e618";
+}
+
+.icon-folder-open:before {
+  content: "\e61d";
+}
+
+.icon-folder:before {
+  content: "\e61e";
+}
+
+.icon-arrow-down:before {
+  content: "\e741";
+}
+
+.icon-emit:before {
+  content: "\e638";
+}
+
+.icon-mutation:before {
+  content: "\e615";
+}
+
+.icon-alert:before {
+  content: "\e6b9";
+}
+
+.icon-redirect:before {
+  content: "\e794";
+}
+
+.icon-connect:before {
+  content: "\e655";
 }
 
 .icon-info:before {
@@ -69,6 +113,10 @@
   content: "\ecbe";
 }
 
+.icon-output:before {
+  content: "\ecc1";
+}
+
 .icon-wuneirong:before {
   content: "\e606";
 }
@@ -85,12 +133,12 @@
   content: "\e639";
 }
 
-.icon-graphql:before {
-  content: "\e652";
+.icon-webapi:before {
+  content: "\ecc0";
 }
 
-.icon-folder:before {
-  content: "\e6b0";
+.icon-graphql:before {
+  content: "\e652";
 }
 
 .icon-theme:before {
@@ -287,10 +335,6 @@
 
 .icon-image:before {
   content: "\e92e";
-}
-
-.icon-page:before {
-  content: "\e640";
 }
 
 .icon-run:before {

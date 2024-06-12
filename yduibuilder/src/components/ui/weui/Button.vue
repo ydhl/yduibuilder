@@ -32,16 +32,14 @@ export default {
 
     const myButtonSetup = button.setup()
     // 如果上层是按钮，那么继承他的outline，size属性
-    const buttonMeta = computed(() => myButtonSetup.parentIsButtonGroup.value || myButtonSetup.parentIsNavbar.value ? myButtonSetup.parentUi.value.meta : props.uiconfig.meta)
+    const buttonMeta = computed(() => myButtonSetup.parentIsNavbar.value ? myButtonSetup.parentUi.value.meta : props.uiconfig.meta)
 
     const selfHasForeground = computed(() => props.uiconfig.meta?.css?.foregroundTheme && props.uiconfig.meta?.css?.foregroundTheme !== 'default')
     const selfHasBackground = computed(() => props.uiconfig.meta?.css?.backgroundTheme && props.uiconfig.meta?.css?.backgroundTheme !== 'default')
-    const buttonSizing = computed(() => {
-      return store.getters.translate('buttonSizing', buttonMeta.value?.css?.buttonSizing)
-    })
+
     const btnStyle = computed(() => {
       const myStyle = button.getUIStyle()
-      // 如果按钮有背景和前景则用按钮的，否则用上层的buttongroup
+      // 如果按钮有背景和前景则用按钮的，否则用上层的
       const color = myStyle?.color || buttonMeta.value?.style?.color
       const backgroundColor = myStyle?.['background-color'] || buttonMeta.value?.style?.['background-color']
       if (!selfHasForeground.value && color) {
@@ -57,7 +55,7 @@ export default {
     const btnCss = computed(() => {
       const topIsModal = myButtonSetup.parentUi.value?.type?.toLowerCase() === 'modal'
       const css = button.getUICss()
-      // 如果按钮有背景和前景则用按钮的，否则用上层的，如buttongroup
+      // 如果按钮有背景和前景则用按钮的，否则用上层的
       let myBackgruondTheme = css.backgroundTheme ? props.uiconfig.meta?.css?.backgroundTheme : ''
       let myForegroundTheme = css.foregroundTheme ? props.uiconfig.meta?.css?.foregroundTheme : ''
       delete css.backgroundTheme
@@ -87,13 +85,6 @@ export default {
       }
       if (myForegroundTheme && myForegroundTheme !== 'default') {
         raw.push(store.getters.translate('foregroundTheme', myForegroundTheme))
-      }
-      if (myButtonSetup.parentIsButtonGroup.value) {
-        const css = buttonSizing.value
-        // console.log(parentCss)
-        if (css) {
-          raw.push(css)
-        }
       }
 
       return raw.join(' ')

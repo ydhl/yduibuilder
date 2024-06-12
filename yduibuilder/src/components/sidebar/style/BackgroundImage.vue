@@ -84,7 +84,7 @@
 <script lang="ts">
 import Upload from '../../common/Upload.vue'
 import Position from '../../common/Position.vue'
-import { computed } from 'vue'
+import { computed, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import initUI from '../../Common'
 import { useStore } from 'vuex'
@@ -100,6 +100,7 @@ export default {
   setup (props: any, context: any) {
     const info = initUI()
     const store = useStore()
+    const previewMode = toRef(props, 'previewMode')
     const backgroundImageType = computed({
       get () {
         const type = arrayGet('background-image', 'style') || null
@@ -149,19 +150,19 @@ export default {
       }
     })
     const arraySet = (name, v, section) => {
-      const arr = JSON.parse(JSON.stringify(info.getMeta(name, section, props.previewMode) || []))
+      const arr = JSON.parse(JSON.stringify(info.getMeta(name, section, previewMode) || []))
       arr[props.index] = v
-      info.setMeta(name, arr, section, false, props.previewMode)
+      info.setMeta(name, arr, section, false, previewMode)
     }
     const arrayGet = (name, section) => {
-      const style = info.getMeta(name, section, props.previewMode) || []
+      const style = info.getMeta(name, section, previewMode) || []
       if (style.length === 0) return ''
       return style[props.index]
     }
     const arrayRemove = (name, section) => {
-      const arr = JSON.parse(JSON.stringify(info.getMeta(name, section, props.previewMode) || []))
+      const arr = JSON.parse(JSON.stringify(info.getMeta(name, section, previewMode) || []))
       arr.splice(props.index, 1)
-      info.setMeta(name, arr, section, false, props.previewMode)
+      info.setMeta(name, arr, section, false, previewMode)
     }
     const repeat = computed<string>({
       get () {
@@ -198,11 +199,11 @@ export default {
         return size.split(' ')[0] || ''
       },
       set (v) {
-        const old = JSON.parse(JSON.stringify(info.getMeta('background-position', 'style', props.previewMode) || []))
+        const old = JSON.parse(JSON.stringify(info.getMeta('background-position', 'style', previewMode) || []))
         const arr = old[props.index].split(' ') || []
         arr[0] = v
         old[props.index] = arr.join(' ')
-        info.setMeta('background-position', old, 'style', false, props.previewMode)
+        info.setMeta('background-position', old, 'style', false, previewMode)
       }
     })
     const positionY = computed<string>({
@@ -211,11 +212,11 @@ export default {
         return size.split(' ')[1] || ''
       },
       set (v) {
-        const old = JSON.parse(JSON.stringify(info.getMeta('background-position', 'style', props.previewMode) || []))
+        const old = JSON.parse(JSON.stringify(info.getMeta('background-position', 'style', previewMode) || []))
         const arr = old[props.index].split(' ') || []
         arr[1] = v
         old[props.index] = arr.join(' ')
-        info.setMeta('background-position', old, 'style', false, props.previewMode)
+        info.setMeta('background-position', old, 'style', false, previewMode)
       }
     })
     const sizeW = computed<string>({
@@ -226,11 +227,11 @@ export default {
         return _size.split(' ')[0] || ''
       },
       set (v) {
-        const old = JSON.parse(JSON.stringify(info.getMeta('background-size', 'style', props.previewMode) || []))
+        const old = JSON.parse(JSON.stringify(info.getMeta('background-size', 'style', previewMode) || []))
         const arr = old[props.index].split(' ') || []
         arr[0] = v
         old[props.index] = arr.join(' ')
-        info.setMeta('background-size', old, 'style', false, props.previewMode)
+        info.setMeta('background-size', old, 'style', false, previewMode)
       }
     })
     const sizeH = computed<string>({
@@ -241,11 +242,11 @@ export default {
         return _size.split(' ')[1] || ''
       },
       set (v) {
-        const old = JSON.parse(JSON.stringify(info.getMeta('background-size', 'style', props.previewMode) || []))
+        const old = JSON.parse(JSON.stringify(info.getMeta('background-size', 'style', previewMode) || []))
         const arr = old[props.index].split(' ') || []
         arr[1] = v
         old[props.index] = arr.join(' ')
-        info.setMeta('background-size', old, 'style', false, props.previewMode)
+        info.setMeta('background-size', old, 'style', false, previewMode)
       }
     })
     const clip = computed<string>({
@@ -254,7 +255,7 @@ export default {
       },
       set (v) {
         if (v === 'text') { // 文本剪裁需要把前景色设置为透明
-          info.setMeta('color', '#00000000', 'style', false, props.previewMode)
+          info.setMeta('color', '#00000000', 'style', false, previewMode)
         }
         arraySet('background-clip', v, 'style')
       }

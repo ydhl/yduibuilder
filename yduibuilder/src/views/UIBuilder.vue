@@ -1,8 +1,8 @@
 <template>
   <template v-if="loaded">
     <TopPanel />
-    <LeftPanel />
-    <RightPanel v-if="currPage" @contextMenu="contextMenu"/>
+    <LeftPanel @contextMenu="contextMenu"/>
+    <RightPanel v-if="currPage"/>
     <WorkspacePanel ref="workspace" @contextMenu="contextMenu"/>
     <div class="full-backdrop" v-if="backdropVisible"></div>
     <lay-layer v-model="exportDialogVisible" :title="t('common.createComponent')" :shade="true" :area="['500px', '500px']">
@@ -16,6 +16,7 @@
       <div class="item" @click.stop="copyUI()">{{t("common.copy")}}</div>
     </div>
   </template>
+
 </template>
 
 <script lang="ts">
@@ -24,17 +25,14 @@ import TopPanel from '@/components/page/TopPanelUI.vue'
 import RightPanel from '@/components/page/RightPanel.vue'
 import LeftPanel from '@/components/page/LeftPanelUI.vue'
 import WorkspacePanel from '@/components/page/WorkspacePanel.vue'
-import { computed, onMounted, getCurrentInstance, toRaw, ref, nextTick, watch } from 'vue'
+import { computed, onMounted, getCurrentInstance, toRaw, ref, watch, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import ydhl from '@/lib/ydhl'
 import { useI18n } from 'vue-i18n'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 import { YDJSStatic } from '@/lib/ydjs'
 import { pickStateFromDesign } from '@/store/page'
-import $ from 'jquery'
 import InitUI from '@/components/Common'
-declare const bootstrap: any
-
 declare const YDJS: YDJSStatic
 
 export default {
@@ -52,8 +50,25 @@ export default {
     const router = useRouter()
     const exportDialogVisible = ref(false)
     const showContextMenu = ref(false)
-    const contextLeft = ref(0)
-    const contextTop = ref(0)
+    const contextLeft = computed(() => {
+      if (!showContextMenu.value || !contextMenuDom.value) return ''
+      const menuRect = contextMenuDom.value?.getBoundingClientRect()
+      if (document.body.clientWidth < contextMenuPosition.value.x + menuRect?.width) {
+        return contextMenuPosition.value.x - menuRect?.width
+      } else {
+        return contextMenuPosition.value.x
+      }
+    })
+    const contextTop = computed(() => {
+      if (!showContextMenu.value || !contextMenuDom.value) return ''
+      const menuRect = contextMenuDom.value?.getBoundingClientRect()
+      if (document.body.clientHeight < contextMenuPosition.value.y + menuRect?.height) {
+        return contextMenuPosition.value.y - menuRect?.height
+      } else {
+        return contextMenuPosition.value.y
+      }
+    })
+    const contextMenuPosition = ref<any>({})
     const contextMenuDom = ref()
     const loaded = computed(() => {
       return store.state.design.project.id
@@ -62,12 +77,11 @@ export default {
       return store.state.design.backdropVisible
     })
     const { t } = useI18n()
-    const { selectedUIItemId, selectedPageId } = InitUI()
+    const { selectedUIItemId, selectedPageId, selectedUIItem } = InitUI()
     const currPage = computed(() => store.state.design.page)
     const saved = computed(() => store.state.design.pageSaved[currPage.value.meta.id])
     const currFunction = computed(() => store.state.design.function)
     const openedPages = computed(() => store.state.design.openedPages)
-
     const loadContent = (pageId, functionId, projectId, cb) => {
       // 已经打开了
       const openedPage = openedPages.value[pageId]
@@ -232,15 +246,6 @@ export default {
     })
     const openExportUIDialog = () => {
       exportDialogVisible.value = true
-      nextTick(() => {
-        const myModalEl = document.getElementById('exportUiDialog') as HTMLElement
-        const myModal = new bootstrap.Modal(myModalEl)
-        myModalEl.addEventListener('hide.bs.modal', function (event) {
-          exportDialogVisible.value = false
-          $('#exportUiDialog').remove()
-        })
-        myModal.show()
-      })
     }
     const deleteUI = () => {
       workspace.value.postMessage(selectedPageId.value, { type: 'deleteItem' })
@@ -254,22 +259,15 @@ export default {
       openExportUIDialog()
     }
     const contextMenu = (data) => {
-      showContextMenu.value = true
+      // 和上面watch selectedUIItemId有冲突，或导致右键点击两下才出现弹窗，因为右键
+      // 会把元素设置为选中，改变了selectuiitemid，这里执行后，watch又把showContextMenu设置为false（他们两个的顺序是未知的）
+      // 所以用nextTick
       nextTick(() => {
-        const menuRect = contextMenuDom.value?.getBoundingClientRect()
-        // console.log(document.body.clientWidth, document.body.clientHeight, menuRect, data)
-        if (document.body.clientWidth < data.x + menuRect?.width) {
-          contextLeft.value = data.x - menuRect?.width
-        } else {
-          contextLeft.value = data.x
-        }
-        if (document.body.clientHeight < data.y + menuRect?.height) {
-          contextTop.value = data.y - menuRect?.height
-        } else {
-          contextTop.value = data.y
-        }
+        showContextMenu.value = true
+        contextMenuPosition.value = data
       })
     }
+
     return {
       backdropVisible,
       loaded,
@@ -278,6 +276,7 @@ export default {
       contextMenuDom,
       workspace,
       t,
+      selectedUIItem,
       exportDialogVisible,
       showContextMenu,
       contextLeft,

@@ -1,9 +1,10 @@
 <?php
 namespace app\modules\build\views\code\wxmp\weui_wxmp;
 use app\modules\build\views\code\wxmp\Wxmp;
-use app\modules\build\views\preview\Preview_View;
+use app\modules\build\views\preview\bootstrap\Rangeinput_View as Preview_Rangeinput_View;
 
-class Rangeinput_View extends Preview_View {
+
+class Rangeinput_View extends Preview_Rangeinput_View {
     use Wxmp;
     public function check_master()
     {

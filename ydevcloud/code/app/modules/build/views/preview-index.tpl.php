@@ -30,7 +30,7 @@ if ($simulateDevice && $simulateDevice!='pc') {
 <div class="simulate-border shadow-sm mt-3" style="width: <?=$width?>px;<?= $height?>">
 <?php }
 ?>
-    <iframe style="border:1px solid #efefef" class="preview-page" id="preview-page" src="/preview/page/<?= $curr_page->uuid?>?api_env=<?= $_GET['api_env']?>"></iframe>
+    <iframe style="border:1px solid #efefef" class="preview-page" id="preview-page" src="/preview/page/<?= $curr_page->uuid?>?api_env=<?= $_GET['api_env']?>&mock=<?= $_GET['mock']?>"></iframe>
 <?php
 if ($simulateDevice && $simulateDevice!='pc') {
 ?>

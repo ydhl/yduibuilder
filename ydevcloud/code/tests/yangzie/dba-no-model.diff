@@ -1,0 +1,31 @@
+001+ Fatal error: Uncaught Error: Call to undefined method yangzie\YZE_DBAImpl::migration() in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/dba-no-model.php:33
+002+ Stack trace:
+003+ #0 {main}
+004+   thrown in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/dba-no-model.php on line 33
+001- 1
+002- Array
+003- (
+004-     [id] => 1
+005-     [title] => test user
+006- )
+007- Array
+008- (
+009-     [id] => 1
+010-     [title] => test user
+011- )
+012- Array
+013- (
+014-     [0] => Array
+015-         (
+016-             [id] => 1
+017-             [title] => test user
+018-         )
+019- 
+020-     [1] => Array
+021-         (
+022-             [id] => 2
+023-             [title] => test user 1
+024-         )
+025- 
+026- )
+027- 1

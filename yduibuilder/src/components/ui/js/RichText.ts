@@ -31,7 +31,7 @@ export default class RichText extends UIBase {
           data: {
             itemid: props.uiconfig.meta.id,
             pageId: props.pageid,
-            props: { value: valueHtml.value }
+            props: { value: valueHtml.value.trim() }
           }
         })
       }

@@ -1,6 +1,7 @@
 <?php
 namespace app\api;
 use app\build\Build_Model;
+use app\project\Page_Bind_State_Model;
 use app\project\Page_Bind_Style_Model;
 use app\project\Page_Model;
 use app\project\Project_Model;
@@ -199,14 +200,33 @@ class Style_Controller extends YZE_Resource_Controller {
         return YZE_JSON_View::success($this);
     }
     // uiitem 绑定selector，并返回所有绑定的selector的style定义
-    public function post_bind(){
+    public function post_selector(){
         $request = $this->request;
         $this->layout = '';
         $data = json_decode(file_get_contents("php://input"), true);
         $uiid = trim($data["uiid"]);
         $selectors = $data["selector"];
+        $state_uuid = $data["state_uuid"];
         $this->valid($data['page_uuid']);
         $styles = find_by_uuids(Style_Model::CLASS_NAME, $selectors);
+        // 某个ui，某个状态下的selector
+        if ($state_uuid){
+            $state = Page_Bind_State_Model::find_by_uuid($state_uuid);
+            if (!$state) return YZE_JSON_View::success($this, ['meta'=>null]);
+
+            $styleIds = [];
+            $meta = [];
+            foreach($styles as $style){
+                $styleIds[] = $style->id;
+                $meta = array_merge((array)$meta, (array)json_decode(html_entity_decode($style->meta)));
+            }
+            $state->set(Page_Bind_State_Model::F_STYLE_ID, join(',', $styleIds))->save();
+
+            //把所有selector的样式合并后返回
+            return YZE_JSON_View::success($this, ['meta'=>$meta?:null]);
+        }
+
+        // normal状态下的selector
         // 删除重新绑定
         Page_Bind_Style_Model::from()->where('page_id=:pid and uiid=:uiid')
             ->delete([':pid'=>$this->page->id, ':uiid'=>$uiid]);
@@ -225,20 +245,27 @@ class Style_Controller extends YZE_Resource_Controller {
         return YZE_JSON_View::success($this, ['meta'=>$meta?:null]);
     }
     // 加载uiitem 绑定的selector
-    public function bind(){
+    public function selector(){
         $request = $this->request;
         $this->layout = '';
         $uiid = trim($request->get_from_get("uiid"));
         $page_uuid = trim($request->get_from_get("page_uuid"));
+        $state_uuid = trim($request->get_from_get("state_uuid"));
         $this->valid($page_uuid);
         $data = [];
-        foreach (Page_Bind_Style_Model::from('pbs')
-            ->left_join(Style_Model::CLASS_NAME, 's', 's.id = pbs.style_id')
-            ->where('pbs.page_id=:pid and pbs.uiid=:uiid')
-            ->select([':pid'=>$this->page->id, ':uiid'=>$uiid]) as $item){
+        if($state_uuid){// 某个状态下的selecotr绑定
+            $bindState = Page_Bind_State_Model::find_by_uuid($state_uuid);
+            $rows = Style_Model::find_by_ids($bindState->style_id);
+        }else{
+            $rows = Page_Bind_Style_Model::from('pbs')
+                ->left_join(Style_Model::CLASS_NAME, 's', 's.id = pbs.style_id')
+                ->where('pbs.page_id=:pid and pbs.uiid=:uiid')
+                ->select([':pid'=>$this->page->id, ':uiid'=>$uiid], 's');
+        }
+        foreach ($rows as $item){
             $data[] = [
-                'text'=>$item['s']->class_name,
-                'id'=>$item['s']->uuid
+                'text'=>$item->class_name,
+                'id'=>$item->uuid
             ];
         }
         return YZE_JSON_View::success($this, $data);

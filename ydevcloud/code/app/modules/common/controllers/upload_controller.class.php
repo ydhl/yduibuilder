@@ -43,8 +43,8 @@ class Upload_Controller extends YZE_Resource_Controller {
             $filepath = \yangzie\yze_remove_path($res, YZE_UPLOAD_PATH);
         }
         if (!$filepath) return YZE_JSON_View::error($this,  __("Upload Failed"));
-
-        return YZE_JSON_View::success($this, ['url'=>UPLOAD_SITE_URI.$filepath, 'file'=>$filepath]);
+        $url = upload2oss($res, ltrim($filepath, '/'));
+        return YZE_JSON_View::success($this, ['url'=>SITE_URI."image?file=".urlencode($url), 'file'=>$url]);
     }
 
     public function exception(\Exception $e) {

@@ -94,7 +94,7 @@ class Code_Controller extends YZE_Resource_Controller {
         $this->set_View_Data('page', $page);
         $code_type = $request->get_from_get('code_type');
         $api_env = $request->get_from_get('api_env');
-        $mode = $request->get_from_get('mode');// preview 预览代码默认，compile 编译导出代码模式
+        $mode = $request->get_from_get('mode');// preview 预览代码（默认），compile 编译导出代码模式
         $project = $page->get_project();
         $project_setting = $project->get_setting();
         $frontendFramework = $project_setting['frontend_framework'];
@@ -104,7 +104,7 @@ class Code_Controller extends YZE_Resource_Controller {
 
         $this->set_View_Data('code_type', $code_type);
         $this->set_View_Data('api_env', $api_env);
-        $this->set_View_Data('mode', $mode);
+        $this->set_View_Data('mode', $mode);// preview时控制公共css输出
         if (file_exists($request->view_path().'/'.$view.'.tpl.php')){
             $this->view = $view;
         }else{

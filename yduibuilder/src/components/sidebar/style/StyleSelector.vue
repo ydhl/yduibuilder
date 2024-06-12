@@ -11,13 +11,17 @@
 
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import ydhl from '@/lib/ydhl'
 import initUI from '@/components/Common'
 declare const $: any
 
 export default {
   name: 'StyleSelector',
+  props: {
+    previewMode: Boolean,
+    stateUuid: String // 传入则绑定ui指定状态的样式
+  },
   setup (props: any, context: any) {
     const { t } = useI18n()
     const info = initUI()
@@ -25,9 +29,13 @@ export default {
     const notBindFlag = ref(false)
     const selectorDom = ref()
     const selectors = ref<any>([])
-    const loadSelector = () => {
+    const loadBoundSelector = () => {
       return new Promise((resolve) => {
-        ydhl.get('api/style/bind.json', { page_uuid: info.selectedPageId.value, uiid: info.selectedUIItemId.value }, function (rst) {
+        ydhl.get('api/style/selector.json', {
+          page_uuid: info.selectedPageId.value,
+          uiid: info.selectedUIItemId.value,
+          state_uuid: props.stateUuid
+        }, function (rst) {
           if (!rst.success) {
             resolve(true)
             return
@@ -40,7 +48,9 @@ export default {
     const formatTag = (item) => {
       return $('<span class="badge bg-success">' + item.text + '</span>')
     }
-    watch(info.selectedUIItemId, () => {
+    // 用来鉴别是否需要加载selector： ui改变后或者ui没变，但state变了
+    const needReloadSelector = computed(() => props.stateUuid + info.selectedUIItemId.value)
+    watch(needReloadSelector, () => {
       const control: any = $(selectorDom.value)
       control.select2('close')
       selectors.value = []
@@ -50,7 +60,7 @@ export default {
       $(selectorDom.value).val(null).trigger('change')
 
       // 加载最新数据
-      loadSelector().then(() => {
+      loadBoundSelector().then(() => {
         $(selectorDom.value).trigger('change')
         setTimeout(() => {
           notBindFlag.value = false
@@ -58,7 +68,7 @@ export default {
       })
     })
     onMounted(() => {
-      loadSelector().then(() => {
+      loadBoundSelector().then(() => {
         const control: any = $(selectorDom.value)
         control.select2({
           theme: 'bootstrap-5',
@@ -106,7 +116,12 @@ export default {
           for (const item of control.select2('data')) {
             selector.push(item.id)
           }
-          ydhl.postJson('api/style/bind.json', { page_uuid: info.selectedPageId.value, uiid: info.selectedUIItemId.value, selector }).then((rst: any) => {
+          ydhl.postJson('api/style/selector.json', {
+            page_uuid: info.selectedPageId.value,
+            uiid: info.selectedUIItemId.value,
+            selector,
+            state_uuid: props.stateUuid
+          }).then((rst: any) => {
             if (!rst.success) {
               ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
               return

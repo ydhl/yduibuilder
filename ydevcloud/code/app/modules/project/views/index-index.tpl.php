@@ -36,7 +36,7 @@ $env = Env::package();
                 <tr>
                     <td>
                         <?php if ($logo){?>
-                        <img src="<?= UPLOAD_SITE_URI.$logo?>" class="rounded-circle" style="width: 30px;height: 30px;object-fit: cover"/>
+                        <img src="<?= SITE_URI."image?file=".urlencode($logo)?>" class="rounded-circle" style="width: 30px;height: 30px;object-fit: cover"/>
                         <?php }?>
                     </td>
                     <td><a href="/project/<?= $project->uuid?>"><?= $project->name?></a></td>
@@ -80,13 +80,15 @@ $env = Env::package();
         <th><?= __('Project Name')?></th>
         <th><?= __('Type')?></th>
         <th><?= __('Technology')?></th>
-        <th><?= __('Role')?></th>
+        <th><?= __('Pages')?></th>
+        <th><?= __('Member')?></th>
         <th></th>
     </tr>
     </thead>
     <tbody>
         <?php foreach ($members as $project_member){
             $project = $project_member->get_project();
+            $members = $project->get_members();
 
             $frontendFramework = $project->get_setting_value(Env::FRONTEND_FRAMEWORK);
             $backendFramework = $project->get_setting_value(Env::FRAMEWORK);
@@ -96,7 +98,7 @@ $env = Env::package();
             <tr>
                 <td>
                     <?php if ($logo){?>
-                    <img src="<?= UPLOAD_SITE_URI.$logo?>" class="rounded-circle" style="width: 30px;height: 30px;object-fit: cover"/>
+                    <img src="<?= SITE_URI."image?file=".urlencode($logo)?>" class="rounded-circle" style="width: 30px;height: 30px;object-fit: cover"/>
                     <?php }?>
                 </td>
                 <td><a href="/project/<?= $project->uuid?>"><?= $project->name?></a></td>
@@ -108,11 +110,26 @@ $env = Env::package();
                     if ($ui) echo "<small class='badge bg-info'>{$ui}</small>";
                     ?>
                 </td>
-                <td><?php echo $project_member->get_role_desc();
-                if ($project_member->is_creater){
-                    echo ' <span class="badge bg-secondary">'.__('Creater').'</span>';
-                }
-                ?></td>
+                <td><?php
+                    echo sprintf(__('modules: %s items, pages: %s items, popup: %s items, ui component: %s items, api: %s items'),
+                    $project->module_count(),
+                    $project->page_count(),
+                    $project->popup_count(),
+                    $project->component_count(),
+                    $project->api_count(),
+                    );
+                    ?></td>
+                <td class=" fs-7"><?php
+                    $names = [];
+                    foreach ($members as $member){
+                        $name = $member->get_user()->nickname;
+                        if ($project_member->is_creater){
+                            $name.='<span class="badge bg-secondary">'.__('Creater').'</span>';
+                        }
+                        $names[] = $name;
+                        echo join(',', $names);
+                    }?>
+                </td>
                 <th>
                     <?php if (!$project_member->is_creater){?>
                        <button class="btn btn-sm btn-outline-primary yd-confirm-post" data-redirect="reload"

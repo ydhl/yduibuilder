@@ -7,7 +7,6 @@ use \yangzie\YZE_RuntimeException;
 use function yangzie\__;
 use function yangzie\_e;
 
-$this->master_view = 'master/structure';
 $page = $this->get_Data('page');
 $pageVersions = $page->get_versions();
 $token = $this->get_data('token');
@@ -17,7 +16,7 @@ $token = $this->get_data('token');
     <?php foreach ($pageVersions as $pageVersion){?>
     <div class="card me-3 mb-3" style="width: 20rem">
         <div class="card-body p-0 bgtransparent">
-            <div class="page-preview" style="background-image: url(<?= $pageVersion->screen ? UPLOAD_SITE_URI.$pageVersion->screen : '/img/design.svg'?>)"></div>
+            <div class="page-preview" style="background-image: url(<?= $pageVersion->screen ? SITE_URI.'image?file='.urlencode($pageVersion->screen).'&time='.time() : '/img/design.svg'?>)"></div>
         </div>
         <table class="table m-0 table-striped table-hover table-bordered">
             <tr>

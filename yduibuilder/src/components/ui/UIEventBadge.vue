@@ -1,5 +1,5 @@
 <template>
-  <div :style="positionStyle" v-if="loaded && eventCount && showEventPanel" class="ui-events-badge"><span class="badge bg-danger text-white"><i class="iconfont icon-api"></i> {{ eventCount }}</span></div>
+  <div :style="positionStyle" v-if="loaded && eventCount && showEventPanel" class="ui-events-badge"><span class="badge bg-danger text-white"><i class="iconfont icon-event"></i> {{ eventCount }}</span></div>
   <UIEventBadge v-for="(item, index) in uiconfig?.items" :key="index" :uiconfig="item" :pageid="pageid"></UIEventBadge>
 </template>
 

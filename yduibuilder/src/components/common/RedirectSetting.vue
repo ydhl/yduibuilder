@@ -1,75 +1,70 @@
 <template>
-  <div class="row">
-    <label class="col-sm-3 col-form-label text-end">{{ t('action.redirectType') }}</label>
-    <div class="col-sm-9">
-      <select class="form-select form-select-sm" v-model="myModelValue.redirect_type">
-        <option value="inside">Inside</option>
-        <option value="outside">Outside</option>
-      </select>
-    </div>
-  </div>
-  <template v-if="myModelValue.redirect_type=='outside'">
-    <div class="row">
-      <label class="col-sm-3 col-form-label text-end">{{ t('action.redirectUrl') }}</label>
-      <div class="col-sm-9">
-        <textarea v-model="myModelValue.redirect" class="form-control form-control-sm"></textarea>
+  <div class="flex-grow-1 ps-2 pe-2">
+    <div class="row align-items-center">
+      <label class="col-sm-3 p-1 col-form-label text-start text-truncate">{{ t('action.redirectType') }}</label>
+      <div class="col-sm-9 p-1">
+        <AdvanceSelect :options="redirectTypes" :default-text="myAction.redirect_type" @click="(option)=>chnageRedirectType(option.value)"></AdvanceSelect>
       </div>
     </div>
-  </template>
-  <template v-else-if="myModelValue.redirect_type=='inside'">
-    <template v-if="project.rewrite">
-      <div class="row align-items-center">
-        <label class="col-sm-3 col-form-label text-end">{{ t('action.redirectUrl') }}</label>
-        <div class="col-sm-9">
-          <div class="dropdown">
-            <button class="btn btn-sm btn-light w-100" data-bs-toggle="dropdown">{{myModelValue.redirect|| t('action.notSet')}}</button>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li v-for="(url, index) in urls" :key="index">
-                <div class="dropdown-item" @click="updateUrl(url)">{{ url.url }}&nbsp;<small class="text-muted">{{ url.name }}</small></div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </template>
-    <template v-else>
+    <template v-if="myAction.redirect_type=='outside'">
       <div class="row">
-        <label class="col-sm-3 col-form-label text-end">{{ t('action.redirectPage') }}</label>
-        <div class="col-sm-9">
-          <button class="btn btn-light btn-sm" type="button" @click="pagePickDialogVisible=true">{{myModelValue.popupPageTitle|| t('action.notSet')}}</button>
-          <template v-if="pageDatas.length>0">
-            <div class="text-muted">{{t('action.pageInputDesc')}}</div>
-          </template>
-          <ModelItemInput v-for="(item, index) in pageDatas" @updateBoundInput="updateBoundInput"
-                          :bound-input="myModelValue.input" :variables="variables"
-                          :key="index" :intent="0" :model="item" :index="0">
-          </ModelItemInput>
+        <label class="col-sm-12 p-1 col-form-label text-start text-truncate">{{ t('action.redirectUrl') }}</label>
+        <div class="col-sm-12 p-1">
+          <textarea v-model="myAction.redirect" placeholder="/foo/bar/{data}" class="form-control form-control-sm"></textarea>
+          <DataConnect v-for="(item, index) in tplDatas" @updateConnectData="updateConnectData"
+                       connect="to"
+                       :bound-data="myAction.input" :variables="variables" path="" :root-uuid="item.uuid"
+                       :key="index" :intent="0" :model="item" :index="0">
+          </DataConnect>
         </div>
       </div>
     </template>
+    <template v-else-if="myAction.redirect_type=='inside'">
+    <div class="row">
+      <label class="col-sm-3 p-1 col-form-label text-start text-truncate">{{ t('action.redirectPage') }}</label>
+      <div class="col-sm-9 p-1">
+        <button class="btn btn-light btn-xs" type="button" @click="pagePickDialogVisible=true">
+          {{myAction.popup_page_type=='page' && myAction.popupPageTitle ? myAction.popupPageTitle : t('action.notSet')}}
+        </button>
+      </div>
+      <div class="col-sm-12 p-0">
+        <DataConnect v-for="(item, index) in pageDatas" @updateConnectData="updateConnectData"
+                     connect="to"
+                     :bound-data="myAction.input" :variables="variables" path="" :root-uuid="item.uuid"
+                     :key="index" :intent="0" :model="item" :index="0">
+        </DataConnect>
+      </div>
+    </div>
   </template>
-
+  </div>
   <lay-layer v-model="pagePickDialogVisible" :title="t('common.page')" :shade="true" :area="['500px', '500px']" :btn="pagePickButtons">
     <div class="p-3">
-      <PagePicker :defualt-page-uuid="pickedPageInfo.popupPageId" @update="pickedPage"></PagePicker>
+      <PagePicker :page-types="['page']" :defualt-page-uuid="pickedPageInfo.popupPageId" @update="pickedPage"></PagePicker>
     </div>
   </lay-layer>
 </template>
 
 <script lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import ydhl from '@/lib/ydhl'
 import PagePicker from '@/components/common/PagePicker.vue'
-import ModelItemInput from '@/components/common/ModelItemInput.vue'
+import DataConnect from '@/components/common/DataConnect.vue'
+import _ from 'lodash'
+import { Expression } from '@/store/model'
+import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 
 export default {
   name: 'RedirectSetting',
-  components: { ModelItemInput, PagePicker },
+  components: { AdvanceSelect, DataConnect, PagePicker },
   props: {
     modelValue: Object,
-    variables: Array
+    variables: Array,
+    autosave: {
+      default: true,
+      type: Boolean
+    } // 是否自动提交接口保存
   },
   emits: ['update:modelValue'],
   setup (props: any, context: any) {
@@ -78,73 +73,148 @@ export default {
     const pagePickDialogVisible = ref(false)
     const urls = ref([])
     const pageDatas = ref<any>([])
+    const tplDatas = ref<any>([])
     const project = computed(() => store.state.design.project)
-    const myModelValue = ref(props.modelValue)
+    const myAction = ref(props.modelValue)
     const pickedPageInfo = ref<any>({ // 用于缓存pickPage中的数据
-      popupPageId: myModelValue.value.popupPageId,
-      popupPageTitle: myModelValue.value.popupPageTitle
+      popupPageId: myAction.value.popupPageId,
+      popupPageTitle: myAction.value.popupPageTitle
     })
-
-    const updateUrl = (url) => {
-      myModelValue.value.redirect = url.url
-      myModelValue.value.url_type = 'url'
-      update()
+    const redirectTypes = ref<any>([
+      { name: 'Inside', value: 'inside', desc: 'Redirect to another page' },
+      { name: 'Outside', value: 'outside', desc: 'Navigation to external address' }
+    ])
+    watch(() => myAction.value.redirect, _.debounce((redirect: string) => {
+      tplDatas.value = []
+      saveRedirect().then(() => {
+        update()
+      }).catch(() => {
+        update()
+      })
+      if (!redirect) return
+      parseTplData(redirect)
+    }, 800))
+    watch(() => myAction.value.redirect_type, (v) => {
+      saveRedirect().then(() => {
+        update()
+      }).catch(() => {
+        update()
+      })
+    })
+    const parseTplData = (redirect) => {
+      tplDatas.value = []
+      if (!redirect) return
+      const match = redirect.match(/\{[^}]+\}/g)
+      if (!match) return
+      for (const item of match) {
+        const name = item.replace(/{|}/g, '')
+        tplDatas.value.push({
+          uuid: name,
+          name,
+          type: 'string'
+        })
+      }
     }
     const pickedPage = (pageTitle, pageUuid) => {
       pickedPageInfo.value.popupPageId = pageUuid
       pickedPageInfo.value.popupPageTitle = pageTitle
-      myModelValue.value.url_type = 'page'
     }
     onMounted(() => {
-      if (project.value.rewrite) {
-        ydhl.get('api/url.json', { project_uuid: project.value.id }, (rst: any) => {
-          urls.value = rst.data || []
-        })
-      }
+      parseTplData(myAction.value.redirect)
       loadPageData()
     })
     const loadPageData = () => {
-      if (myModelValue.value.popupPageId) {
-        ydhl.get('api/bind/data.json?data_from=path,query&page_uuid=' + myModelValue.value.popupPageId, [], (rst: any) => {
+      // 重定向时只重定向到页面
+      if (myAction.value.popupPageId && myAction.value.popup_page_type === 'page') {
+        ydhl.get('api/bind/data.json?data_from=path,query&page_uuid=' + myAction.value.popupPageId, [], (rst: any) => {
           pageDatas.value = rst.data.query || []
           if (rst.data.path) pageDatas.value.push(...rst.data.path)
         }, 'json')
       }
+    }
+
+    // eslint-disable-next-line camelcase
+    const saveRedirect = () => {
+      return new Promise((resolve, reject) => {
+        // 某些情况下不需要自动保存，比如在对话框中，因为他总的有个保存按钮
+        if (!props.autosave) {
+          reject(new Error(''))
+          return
+        }
+        if (myAction.value.uuid) {
+          ydhl.postJson('api/action/redirect.json', myAction.value).then((res: any) => {
+            if (!res.success) {
+              ydhl.alert(res.msg || t('common.operationFail'), t('common.ok'))
+              reject(new Error(''))
+              return
+            }
+            resolve(res.data)
+          }).catch((rst) => {
+            ydhl.alert(rst || t('common.operationFail'), t('common.ok'))
+            reject(rst)
+          })
+        } else {
+          reject(new Error(''))
+        }
+      })
     }
     const pagePickButtons = ref([
       {
         text: t('common.ok'),
         callback: () => {
           pagePickDialogVisible.value = false
-          myModelValue.value.popupPageId = pickedPageInfo.value.popupPageId
-          myModelValue.value.popupPageTitle = pickedPageInfo.value.popupPageTitle
-          update()
+          myAction.value.popupPageId = pickedPageInfo.value.popupPageId
+          myAction.value.popupPageTitle = pickedPageInfo.value.popupPageTitle
+          myAction.value.popup_page_type = 'page'
+          saveRedirect().then(() => {
+            update()
+          }).catch(() => {
+            update()
+          })
           loadPageData()
         }
       }
     ])
 
     const update = () => {
-      context.emit('update:modelValue', myModelValue.value)
+      context.emit('update:modelValue', myAction.value)
     }
-    const updateBoundInput = (uuid, v) => {
-      if (!myModelValue.value.input) {
-        myModelValue.value.input = {}
+    const chnageRedirectType = (value) => {
+      myAction.value.redirect_type = value
+    }
+    // v: { scope, path, data, rootDataId }
+    const updateConnectData = (fromRootUuid, fromPath, fromUuid, toData: Expression, remove, toDataDesc: string) => {
+      if (remove) {
+        delete myAction.value.input
+        return
       }
-      myModelValue.value.input[uuid] = v
+      if (!myAction.value.input) {
+        myAction.value.input = {}
+      }
+      myAction.value.input[fromUuid] = {
+        expression: toData,
+        desc: toDataDesc
+      }
+      saveRedirect().then(() => {
+        update()
+      }).catch(() => {
+        update()
+      })
     }
     return {
       project,
       pageDatas,
+      tplDatas,
       pagePickDialogVisible,
-      myModelValue,
+      myAction,
       t,
       urls,
       pagePickButtons,
       pickedPageInfo,
+      redirectTypes,
+      chnageRedirectType,
       pickedPage,
-      updateUrl,
-      updateBoundInput
+      updateConnectData
     }
   }
 }

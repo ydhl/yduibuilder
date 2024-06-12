@@ -89,6 +89,50 @@ class Env {
     public static function package() {
         // TODO 需要改成从数据库读取
         return [
+            // UI
+            'bootstrap'=>[
+                'name'=>'Bootstrap',
+                'type'=>'ui',
+                'desc'=>__('Quickly design and customize responsive mobile-first sites'),
+                'version'=>[
+                    '4.6.0'=>[]
+                ]
+            ],
+            'layui'=>[
+                'name'=>'LayUI',
+                'type'=>'ui',
+                'desc'=>__('由职业前端倾情打造，面向全层次的前后端开发者，易上手开箱即用的 Web UI 组件库, https://www.layuiweb.com/index.htm'),
+                'version'=>[
+                    '2.9.6'=>[]
+                ]
+            ],
+            'weui'=>[
+                'name'=>__('WEUI(微信官方UI库)'),
+                'desc'=>'',
+                'type'=>'ui',
+                'version'=>[
+                    '2.5.1'=>['require'=>['zepto@1.2.0']]
+                ]
+            ],
+            'vant' => [
+                'name'=>__('Vant'),
+                'desc'=>'',
+                'type'=>'ui',
+                'version'=>['3.4.6'=>[] ]
+            ],
+            'android-ui'=>[
+                'name'=>__('Android Native UI Theme'),
+                'desc'=>'',
+                'type'=>'ui',
+                'version'=>['update'=>[]]
+            ],
+            'ios-ui'=>[
+                'name'=>__('iOS Native UI Theme'),
+                'desc'=>'',
+                'type'=>'ui',
+                'version'=>['update'=>[]]
+            ],
+            // LIB
             'jquery'=>[
                 'name'=>'jQuery',
                 'type'=>'lib',
@@ -105,22 +149,6 @@ class Env {
                     '1.1.2'=>[]
                 ]
             ],
-            'bootstrap'=>[
-                'name'=>'Bootstrap',
-                'type'=>'ui',
-                'desc'=>__('Quickly design and customize responsive mobile-first sites'),
-                'version'=>[
-                    '4.6.0'=>['require'=>['jquery@3.5.1']]
-                ]
-            ],
-            'weui'=>[
-                'name'=>__('WEUI(微信官方UI库)'),
-                'desc'=>'',
-                'type'=>'ui',
-                'version'=>[
-                    '2.5.1'=>['require'=>['zepto@1.2.0']]
-                ]
-            ],
             'zepto'=>[
                 'name'=>'zepto',
                 'type'=>'lib',
@@ -129,18 +157,32 @@ class Env {
                     '1.2.0'=>[]
                 ]
             ],
-            'yangzie' => [
-                'name'=>__('Yangzie Framework By YDHL Team'),
-                'desc'=>'',
-                'type'=>'framework',
-                'language'=>['php'],
-                'version'=>[ '2.0.0'=>[] ]
+            'alpinejs'=>[
+                'name'=>'alpinejs',
+                'type'=>'lib',
+                'desc'=>__('Alpine is a rugged, minimal tool for composing behavior directly in your markup. Think of it like jQuery for the modern web. Plop in a script tag and get going., https://alpinejs.dev/'),
+                'version'=>[
+                    '3.x.x'=>[]
+                ]
             ],
+            'petitevue' => [
+                'name'=>__('petite-vue'),
+                'desc'=>'https://github.com/vuejs/petite-vue',
+                'type'=>'lib',
+                'version'=>['0.4.0'=>[] ]
+            ],
+            //Language
             'java' => [
                 'name'=>'Java',
                 'desc'=>'',
                 'type'=>'language',
                 'version'=>[ '7'=>[] ]
+            ],
+            'objective-c' => [
+                'name'=>'Objective-c',
+                'desc'=>'',
+                'type'=>'language',
+                'version'=>[ '2'=>[] ]
             ],
             'javascript' => [
                 'name'=>'Javascript',
@@ -160,18 +202,20 @@ class Env {
                 'type'=>'language',
                 'version'=>[ '7.0.0'=>[] ]
             ],
-            'petitevue' => [
-                'name'=>__('petite-vue'),
-                'desc'=>'https://github.com/vuejs/petite-vue',
-                'type'=>'lib',
-                'version'=>['0.4.0'=>[] ]
+            //Framework
+            'yangzie' => [
+                'name'=>__('Yangzie Framework By YDHL Team'),
+                'desc'=>'',
+                'type'=>'framework',
+                'language'=>['php'],
+                'version'=>[ '2.0.0'=>[] ]
             ],
             'vue' => [
                 'name'=>__('VUE'),
                 'desc'=>'',
                 'type'=>'framework',
                 'rewrite'=>true,
-                'ui'=>['bootstrap'],
+                'ui'=>['bootstrap','vant'],
                 'language'=>['typescript'],
                 'version'=>['3.x'=>[
                     'require'=>['axios@1.1.2', 'ydecloud@0.0.1']
@@ -182,11 +226,12 @@ class Env {
                 'desc'=>'',
                 'type'=>'framework',
                 'rewrite'=>false,
-                'ui'=>['bootstrap'],
+                'ui'=>['bootstrap','layui'],
                 'codeType'=>['html'=>'html','css'=>'css','js'=>'javascript'],
                 'language'=>['javascript'],
                 'version'=>[ '5.0'=>[
-                    'require'=>['petitevue@0.4.0','axios@1.1.2','layui@2.9.6','ydecloud@0.0.1'] // 用petitevue做逻辑，这里固定了就不能改动，因为编译器按照这个思路去编译代码
+                    // 固定使用 jquery操作dom，alpinejs做界面操作逻辑，axios做http请求，ydecloud是前端数据处理封装
+                    'require'=>['jquery@3.5.1', 'alpinejs@3.x.x','axios@1.1.2','ydecloud@0.0.1']
                 ] ]
             ],
             'wxmp' => [
@@ -194,10 +239,26 @@ class Env {
                 'desc'=>'',
                 'rewrite'=>true,
                 'type'=>'framework',
-                'ui'=>['weui'],
+                'ui'=>['weui','vant'],
                 'codeType'=>['wxml'=>'xml','wxss'=>'css','json'=>'json','js'=>'javascript'],
                 'language'=>['javascript'],
                 'version'=>[ '2.x'=>[] ]
+            ],
+            'android' => [
+                'name'=>__('Android Native'),
+                'desc'=>'',
+                'type'=>'framework',
+                'ui'=>['android-ui'],
+                'language'=>['java'],
+                'version'=>[23=>[],30=>[]]
+            ],
+            'ios' => [
+                'name'=>__('iOS Native'),
+                'desc'=>'',
+                'type'=>'framework',
+                'ui'=>['ios-ui'],
+                'language'=>['objective-c'],
+                'version'=>[14.1=>[]]
             ]
         ];
     }
@@ -211,7 +272,7 @@ class Env {
             'web' => [
                 'name'=>__('Web Application'),
                 'endKind'=>['mobile','pc'],
-                'framework'=>['html', 'vue']
+                'framework'=>['html','vue']
             ],
             // wxmp， android， ios前端环境本身也是框架
             'wxmp' => [
@@ -219,6 +280,16 @@ class Env {
                 'endKind'=>['mobile'],
                 'framework'=>['wxmp'],
             ],
+//            'android' => [
+//                'name'=>__('Android App'),
+//                'endKind'=>['mobile'],
+//                'framework'=>['android'],
+//            ],
+//            'ios' => [
+//                'name'=>__('iOS App'),
+//                'endKind'=>['mobile'],
+//                'framework'=>['ios'],
+//            ],
         ];
     }
 

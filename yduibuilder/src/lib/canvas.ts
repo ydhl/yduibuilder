@@ -63,11 +63,14 @@ function startDrawline (screenX: any, screenY: any, fromid: string) {
   srcY = screenY
 
   document.body.removeEventListener('mousemove', drawMousemove)
-  document.body.removeEventListener('mouseup', stopDrawline)
+  document.body.removeEventListener('mouseup', delayStopDrawline)
   document.body.addEventListener('mousemove', drawMousemove)
-  // setTimeout(function () {
-  document.body.addEventListener('mouseup', stopDrawline)
-  // }, 1000)
+  document.body.addEventListener('mouseup', delayStopDrawline)
+}
+function delayStopDrawline (event) {
+  if (!event.target.closest('.uimouseup')) {
+    stopDrawline()
+  }
 }
 function setStartDrag (bool: boolean) {
   isStartDrag = bool

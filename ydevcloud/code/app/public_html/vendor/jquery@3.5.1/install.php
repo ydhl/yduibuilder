@@ -1,6 +1,6 @@
 <?php
 class jquery_install{
-    public static function install_vue3() {
+    public static function installInVue3() {
         return [
             'devDependencies'=>["@types/jquery"=>"^3.5.4"],
             'dependencies'=>['jquery'=>"^3.5.1"],
@@ -14,11 +14,11 @@ class jquery_install{
     }
     /**
      * 预览时要包含的js
-     * @return array ['file'=>'es'|'iife']
+     * @return array ['iife'=>[],'es'=>[],''vendor'=>[]]
      */
     public static function jsForPreview() {
         return [
-            'jquery-3.5.1.min.js'=>'iife'
+            'iife'=>['jquery-3.5.1.min.js']
         ];
     }
 }

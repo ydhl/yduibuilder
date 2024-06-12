@@ -26,4 +26,18 @@ trait Uicomponent_Instance_Model_Method{
             }
         }
     }
+    public static function add_instance($page_id, $uicomponent_id, $instance_uuid) {
+        $sql = new YZE_SQL();
+        $sql->select('a',['id'])->from(Uicomponent_Instance_Model::CLASS_NAME, 'a')
+            ->where('a','page_id','=', $page_id)
+            ->where('a','uicomponent_page_id','=', $uicomponent_id)
+            ->where('a','instance_uuid','=', $instance_uuid);
+        
+        $instance = new Uicomponent_Instance_Model();
+        $instance->set('uuid', Uicomponent_Instance_Model::uuid())
+            ->set('page_id', $page_id)
+            ->set('uicomponent_page_id', $uicomponent_id)
+            ->set('instance_uuid', $instance_uuid)
+            ->save(YZE_SQL::INSERT_NOT_EXIST, $sql);
+    }
 }?>

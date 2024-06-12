@@ -2,6 +2,7 @@
 namespace app\dashboard;
 use app\project\Function_Model;
 use app\project\Module_Model;
+use app\project\Page_Bind_Data_Model;
 use app\project\Page_Model;
 use app\project\Project_Member_Model;
 use app\project\Project_Model;
@@ -64,6 +65,15 @@ class Index_Controller extends YZE_Resource_Controller {
                 $recent_pages[] = ['page'=>$objs['page'],'function'=>$objs['func']];
             }
         }
+
+//        $bindData = Page_Bind_Data_Model::find_by_id(26);
+//
+//        $path = [];
+//        $data = [];
+//        $iterateParent = $bindData->get_parent_of_data_id('B8D15ECC-E140-448F-AC02-0C74E146BE0F', ['array'], $path, $data);
+//        print_r($path);
+//        print_r($iterateParent);
+//        print_r($data);
 
         // 邀请我的项目
         $invitedCount= Project_Member_Model::from('pm')

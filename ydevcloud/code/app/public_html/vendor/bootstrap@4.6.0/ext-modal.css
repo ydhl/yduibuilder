@@ -1,15 +1,6 @@
-/*采用layer弹出model，重载bs已有的样式*/
+/**
+ * 由于提供的modal的放置位置，需要去掉bs默认的media query设置的margin
+ */
 .modal-dialog{
-    margin: unset !important;
-    max-width: unset !important;
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-}
-.modal-content{
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
+    margin: 0px !important;
 }

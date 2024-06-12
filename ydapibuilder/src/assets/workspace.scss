@@ -1,0 +1,332 @@
+html{
+  background-color: $light;
+}
+.bgtransparent{
+  background-image: url(/transparent.svg);
+  background-size: 30px;
+  background-color: #ccc!important;
+}
+.workspace{
+  .workspace-header{
+    height: 45px;
+    z-index: 9;
+    background-color: $gray-200;
+    position: fixed;
+    top: $topPanelHeight;
+    left: $leftPanelWidth;
+    user-select: none;
+    overflow: hidden;
+
+    .left-tip{
+      width: 0px !important;
+      box-shadow: 0px 0px 14px 2px #333;
+      height: 100%;
+      z-index: 1;
+      position: absolute;
+    }
+    .right-tip{
+      width: 0px !important;
+      box-shadow: 0px 0px 14px 2px #333;
+      height: 100%;
+      z-index: 1;
+      position: absolute;
+      right: 0;
+    }
+    .header-scrollbar{
+      position: absolute;
+      z-index: 0;
+      width: 100%;
+      overflow-y: hidden;
+      overflow-x: scroll;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      height: 55px + $scrollbarSize;/*大于header+滚动条的高度即可*/
+    }
+
+    .divider{
+      width: 1px;
+      height: 40%;
+      background-color: $gray-500;
+    }
+    word-break: keep-all;
+  }
+  .nav-tabs .nav-link:hover, .nav-tabs .nav-link:focus{
+    background-color: #fff;
+  }
+  .cooperation{
+    position: fixed;
+    height: 32px;
+    top: $topPanelHeight + 38px;
+    right:0px;
+    left: $leftPanelWidth;
+    overflow: hidden;
+    z-index: 1;/*在 workspace-body上面*/
+  }
+  .cooperation-body{
+    height: 40px;
+    width: 100%;
+    background-color: #fff;
+    padding-top: 5px;
+    display: flex;
+    justify-content: center;
+    align-content: flex-start;
+    align-items: center;
+    overflow: scroll;
+  }
+  .cooperation-avatar{
+    height: 20px;
+    width: 20px;
+    background-size:cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .workspace-body{
+    border-top: 1px solid $gray-300;
+    position: fixed;
+    top: $topPanelHeight + 40px;
+    right:0px;
+    bottom:0px;
+    left: $leftPanelWidth;
+    overflow: hidden;
+  }
+
+  .workspace-scrollbar{
+    //display: flex;
+    //flex-direction: column;
+    //align-items: center;
+    //justify-content: flex-start;
+    transform-origin: left top;
+    padding: 25px 50px 50px 50px;
+    overflow: scroll;
+    height: calc(100% - 0px);
+    background-color: #ffffff;
+  }
+  .btn-light{
+    border-color: $gray-200 !important;
+    background-color: $gray-200 !important;
+  }
+}
+.full-backdrop{
+  opacity: 0.5;
+  position: absolute;
+  top: 0;
+  left: 0px;
+  z-index: 1040;
+  right: 0;
+  bottom: 0;
+  background-color: #000;
+}
+.cursor{
+  cursor: pointer;
+}
+.api-status{
+  display: inline-block;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+.api-status-develop{
+  background-color: var(--bs-primary)
+}
+.api-status-test{
+  background-color: var(--bs-gray-600)
+}
+.api-status-released{
+  background-color: var(--bs-success)
+}
+.api-status-deprecated{
+  background-color: var(--bs-danger)
+}
+
+/**
+ * 参数输出树
+ */
+.arg-tree{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  list-style-image: none;
+}
+.arg-tree-icon{
+  background-image: url(32px.png);
+}
+.arg-tree-icon:empty{
+  width: 24px;
+  height: 24px;
+  max-width: 24px;
+  min-width:24px;
+  line-height: 24px;
+  display: inline-block;
+  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  vertical-align: top;
+  text-align: center;
+}
+.arg-tree-node {
+  min-height: 24px;
+  line-height: 24px;
+  margin-left: 24px;
+  background-image: url(32px.png);
+  background-position: -292px -4px;
+  background-repeat: repeat-y;
+}
+.arg-tree-leaf .arg-tree-icon {
+  background-position: -68px -4px !important;
+}
+.arg-tree-disable{
+  background-position: -168px -35px !important;
+}
+.arg-tree-open .arg-tree-icon {
+  background-position: -132px -4px;
+}
+.arg-tree-close .arg-tree-icon {
+  background-position: -100px -4px;
+}
+.arg-tree .arg-tree-leaf:last-child, .arg-tree .arg-tree-open:last-child, .arg-tree .arg-tree-close:last-child{
+  background: 0 0 !important;
+}
+
+/**
+ * 菜单树
+ */
+.tree{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  list-style-image: none;
+  .iconfont{
+    width: 20px;
+  }
+}
+.tree-item{
+}
+.tree-node {
+  font-size: 0.875em;
+  min-height: 40px;
+  line-height: 40px;
+}
+.tree-node:hover{
+  background-color: #e2e6ea;
+  border-radius: 4px;
+}
+.api-method{
+  font-weight: bolder;
+  padding-right: 2px;
+  max-width: 40px;text-transform:uppercase!important;
+  display: inline-block;
+}
+.param-string{
+  color: #0c63e4;
+}
+.param-number{
+  color: #22a100;
+}
+.param-integer{
+  color: #8b00d4;
+}
+.param-array{
+  color: #ef0487;
+}
+.param-map{
+  color: #f50808;
+}
+.param-object{
+  color: #8a0d0d;
+}
+.param-boolean{
+  color: #e1bd0c;
+}
+.param-null{
+  color: #a9a9a9;
+}
+.param-any{
+  color: #dd8efd;
+}
+.api-method-get,.api-method-GET{
+  color: #22a100;
+}
+.api-method-post,.api-method-POST{
+  color: #f1456d;
+}
+.api-method-put,.api-method-PUT{
+  color: #0083a1;
+}
+.api-method-delete,.api-method-DELETE{
+  color: #f8020a;
+}
+.api-method-head,.api-method-HEAD{
+  color: #76936d;
+}
+.api-method-options,.api-method-OPTIONS{
+  color: #7e7e7e;
+}
+.text-grey{
+  color: #d9d9d9;
+}
+.pointer{
+  cursor: pointer;
+}
+.layui-popper{
+  z-index: 9999999 !important;
+}
+.model-item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .treeicon:hover{
+    color: $blue;
+  }
+  input{
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-radius: 0px;
+    background-color: transparent;
+  }
+  input:focus{
+    background-color: transparent;
+    outline: none;
+    box-shadow: none;
+  }
+  .model-title{
+    width: 200px;
+  }
+  .model-field{
+    display: flex;
+    align-items: center;
+    width: 300px
+  }
+  .model-advance{
+    width: 200px;
+  }
+  .model-mock{
+    width: 200px;
+  }
+  .model-default{
+    width: 100px;
+  }
+  .model-sample{
+    width: 100px;
+  }
+  .model-action{
+    width: 50px;
+  }
+  .model-type{
+    display: flex;
+    align-items: center;
+    width: 100px;
+    justify-content: space-between;
+  }
+}
+.model-item:hover{
+  background-color: #efefef;
+}
+.import-dialog{
+  .layui-tab-content{
+    padding: 0px !important;
+  }
+}

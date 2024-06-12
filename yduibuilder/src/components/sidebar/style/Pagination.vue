@@ -9,30 +9,37 @@
         </select>
       </div>
     </div>
+    <div class="row">
+      <label class="col-sm-3 col-form-label text-end">{{ t('style.form.pagination') }}</label>
+      <div class="col-sm-9">
+        <div class="input-group input-group-sm ">
+          <span class="input-group-text p-1">{{ t('style.form.total') }}</span>
+          <input type="number" class="form-control  p-1 form-control-sm" minlength="1" v-model="total">
+          <span class="input-group-text p-1">{{ t('style.form.pageSize') }}</span>
+          <input type="number" class="form-control  p-1 form-control-sm" minlength="1" v-model="pageSize">
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import initUI from '@/components/Common'
 import { useI18n } from 'vue-i18n'
-import { computed } from 'vue'
 
 export default {
   name: 'StylePagination',
   setup (props: any, context: any) {
     const info = initUI()
     const { t } = useI18n()
-    const sizing = computed({
-      get: () => {
-        return info.getMeta('paginationSizing', 'css') || ''
-      },
-      set: (v) => {
-        info.setMeta('paginationSizing', v, 'css')
-      }
-    })
+    const sizing = info.computedWrap('paginationSizing', 'css', '')
+    const total = info.computedWrap('total', 'custom', '100')
+    const pageSize = info.computedWrap('pageSize', 'custom', '10')
     return {
       ...info,
       sizing,
+      total,
+      pageSize,
       t
     }
   }

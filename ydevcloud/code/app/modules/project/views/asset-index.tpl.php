@@ -26,7 +26,7 @@ $pagination = new YZE_Simple_View(YZE_APP_VIEWS_INC."pagination", ['total'=>$tot
 <?php
 foreach ($files as $file){
     if ($file->type == 'image'){
-        $preview = $file->url ? UPLOAD_SITE_URI.$file->url : '/logo2.svg';
+        $preview = $file->url ? SITE_URI . 'image?file=' . urlencode($file->url) : '/logo2.svg';
     }else{
         $preview = '/logo2.svg';
     }

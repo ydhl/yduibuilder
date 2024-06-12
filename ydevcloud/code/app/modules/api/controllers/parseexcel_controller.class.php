@@ -48,7 +48,7 @@ class Parseexcel_Controller extends YZE_Resource_Controller {
             'row'=>[]
         ];
         $tmp = tempnam('/tmp', 'excel');
-        file_put_contents($tmp, file_get_contents(YZE_UPLOAD_PATH.$file->url));
+        file_put_contents($tmp, file_get_contents(getOssLink($file->url)));
         $spreadsheet = IOFactory::load($tmp); //载入excel表格
 
         $worksheet = $spreadsheet->getActiveSheet();

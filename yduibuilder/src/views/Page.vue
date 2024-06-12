@@ -31,8 +31,9 @@
   </div>
   <!--拖动提示-->
   <div id="drop-placeholder" v-if="dragoverUIItemId" :style="dragoverHolderStyle"></div>
+  <!--富文本上传实现-->
   <div style="display:none">
-    <Upload v-model="image" width="50px" @click.prevent.stop height="50px" :project-id="projectId"></Upload>
+    <Upload v-model="image" width="50px" height="50px" :project-id="projectId"></Upload>
   </div>
 
   <div class="full-backdrop" v-if="backdropVisible"></div>
@@ -40,7 +41,7 @@
 
 <script lang="ts">
 /* eslint-disable */
-import { computed, onMounted, onUnmounted, onUpdated, ref } from 'vue'
+import { computed, onMounted, onUpdated, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
@@ -54,6 +55,7 @@ import { YDJSStatic } from '@/lib/ydjs'
 import { Boot, ISelectMenu, IButtonMenu } from '@wangeditor/editor'
 import Upload from '@/components/common/Upload.vue'
 import UIExport from '@/components/sidebar/UIExport.vue'
+import _ from "lodash"
 
 declare const YDJS: YDJSStatic
 declare const ports: any
@@ -164,8 +166,8 @@ export default {
     const backdropVisible = computed(() => store.state.page.backdropVisible)
     const { t } = useI18n()
     const popPlacementStyle = computed(() => {
-      // 弹窗时第一个元素只会是Modal, 预览时通过page的布局定位其位置，实际代码web通过layer来实现弹窗
-      const rootUI = currPage.value?.items?.[0]
+      // 弹窗时页面元素是Modal, 预览时通过page的布局定位其位置
+      const rootUI = currPage.value
       const placements  = rootUI?.meta?.custom?.position || ['center', 'center']
       let showBackdrop = rootUI?.meta?.custom?.backdrop
       showBackdrop = showBackdrop === undefined || showBackdrop !== 'no' ? true : false
@@ -193,7 +195,6 @@ export default {
       }
     })
     let checkUpdated
-
     Boot.registerMenu({
       key: 'imageMenu',
       factory () {
@@ -243,7 +244,7 @@ export default {
       for (const face of currPage.value?.meta.custom?.fontFace || []) {
         fontFace.push(`@font-face{
           font-family: "${face.uuid}";
-          src: url('${ydhl.api}download?uuid=${face.uuid}') format('${face.type}')
+          src: url('${ydhl.api}font?uuid=${face.uuid}') format('${face.type}')
           }`)
       }
       $(window.document.head).append(`<style id="custom-font-face">${fontFace.join('')}</style>`)
@@ -292,9 +293,9 @@ export default {
     const mousemove = (event: any) => {
       postMessage({ type: 'mouseover', data: { clientX: event.clientX, clientY: event.clientY } })
     }
-    const mouseup = (event: any) => {
-      postMessage({ type: 'mouseup' })
-    }
+    const mouseup =  _.debounce((event) => {
+      postMessage({ type: 'mouseup', data: event.clientX + '_' + event.clientY })
+    }, 100)
     const uiClick = (event: any) => {
       uiChange($(event.target))
     }
@@ -451,11 +452,6 @@ export default {
             }
 
             if (uuid){
-              // 不能自己包含自己
-              if ($(`#${targetId}`).parents(`#${uuid}`).length > 0) {
-                ydhl.alert(t("common.uicomponentNestTip"));
-                return
-              }
               ydhl.loading(t('common.pleaseWait')).then((dialogId) => {
                 ydhl.post(`api/uicomponent/detail.json`,{ target_id: targetId, uuid, instance_uuid: meta.id, page_uuid: selectedPageId.value }, [], (rst) => {
                   ydhl.closeLoading(dialogId)
@@ -492,21 +488,24 @@ export default {
         }
       })
     })
+    const refreshHeight = () => {
+      const clientHeight = document.querySelector(`#${currPage.value.meta.id}`)?.clientHeight || 0
+      if (clientHeight > 50 && currPage.value) {
+        // console.log(currPage.value.meta.id + ':' + clientHeight)
+        postMessage({
+          type: 'updatePageContentHeight',
+          data: {
+            pageId: currPage.value.meta.id,
+            contentHeight: clientHeight
+          }
+        })
+      }
+    }
     onUpdated(() => {
       if (checkUpdated) clearInterval(checkUpdated)
       checkUpdated = setInterval(() => {
-        const clientHeight = document.querySelector(`#${currPage.value.meta.id}`)?.clientHeight || 0
-        if (clientHeight > 50 && currPage.value) {
-          // console.log(currPage.value.meta.id + ':' + clientHeight)
-          postMessage({
-            type: 'updatePageContentHeight',
-            data: {
-              pageId: currPage.value.meta.id,
-              contentHeight: clientHeight
-            }
-          })
+          refreshHeight()
           clearInterval(checkUpdated)
-        }
       }, 500)
       $(function() {
         pageIsLoaded.value = true
@@ -564,56 +563,41 @@ export default {
     })
     const addToastPopup = () => {
       const pageId = currPage.value.meta.id
-      const text ={
-        type: 'Text',
-        id: ydhl.uuid(5, 0, pageId),
-        meta: {
-          value: 'This is Toast',
-          css:{
-            foregroundTheme: 'light'
+
+      postMessage({
+        type: 'updateItemMeta',
+        data: {
+          itemid: pageId,
+          type: 'css',
+          pageId: selectedPageId.value,
+          props: {
+            backgroundTheme: 'bg-secondary'
           }
         }
-      }
-
-      const type = 'Modal'
+      })
       postMessage({
-        type: 'addItem',
+        type: 'updateItemMeta',
         data: {
-          type: type,
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            isContainer: true,
-            custom:{
-              headless: true,
-              footless: true
-            },
-            css: {
-              backgroundTheme: 'secondary',
-              foregroundTheme: 'light',
-              '-': 'move-handler' // 只真对web有用
-            },
-            title: type
-          },
-          items: [text],
-          placement: 'in',
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
+          itemid: pageId,
+          type: 'custom',
+          pageId: selectedPageId.value,
+          props: {
+            headless: true,
+            footless: true
+          }
         }
       })
-    }
-    const addModal = (items) => {
-      const pageId = currPage.value.meta.id
-      const type = 'Modal'
       postMessage({
         type: 'addItem',
         data: {
-          type: type,
+          type: 'Text',
           meta: {
             id: ydhl.uuid(5, 0, pageId),
-            isContainer: true,
-            title: type
+            value: 'This is Toast',
+            css:{
+              foregroundTheme: 'light'
+            }
           },
-          items,
           placement: 'in',
           pageId: currPage.value.meta.id,
           targetId: currPage.value.meta.id
@@ -622,124 +606,192 @@ export default {
     }
     const addConfirmPopup = () => {
       const pageId = currPage.value.meta.id
-      addModal([{
-        type: 'Text',
-        placeInParent: 'head',
-        meta: {
-          id: ydhl.uuid(5, 0, pageId),
-          value: 'This is head',
-          type: 'h3'
-        }
-      },{
-        type: 'Text',
-        meta: {
-          id: ydhl.uuid(5, 0, pageId),
-          value: 'This is body',
-        }
-      },{
-        type: 'Button',
-        placeInParent: 'foot',
-        meta: {
-          id: ydhl.uuid(5, 0, pageId),
-          type: 'button',
-          title: 'OK',
-          css: {
-            backgroundTheme: 'primary'
-          }
-        }
-      },{
-        type: 'Button',
-        placeInParent: 'foot',
-        meta: {
-          id: ydhl.uuid(5, 0, pageId),
-          type: 'button',
-          title: 'Cancel',
-          css: {
-            backgroundTheme: 'secondary'
-          }
-        }
-      }])
-    }
-    const addPromptPopup = () => {
-      const pageId = currPage.value.meta.id
-      addModal([{
-        type: 'Text',
-        placeInParent: 'head',
-        meta: {
-          id: ydhl.uuid(5, 0, pageId),
-          value: 'This is head',
-          type: 'h3'
-        }
-      },{
-        type: 'Input',
-        meta: {
-          title: 'Input',
-          custom: {
-            inputType: 'Textarea',
-          },
-          value: 'This is input',
-          id: ydhl.uuid(5, 0, pageId)
-        }
-      },{
-        type: 'Button',
-        placeInParent: 'foot',
-        meta: {
-          id: ydhl.uuid(5, 0, pageId),
-          type: 'button',
-          title: 'OK',
-          css: {
-            backgroundTheme: 'primary'
-          }
-        }
-      }])
-    }
-    const addAlertPopup = () => {
-      const pageId = currPage.value.meta.id
-      addModal([{
-        type: 'Text',
-        placeInParent: 'head',
-        meta: {
-          id: ydhl.uuid(5, 0, pageId),
-          value: 'This is head',
-          type: 'h3'
-        }
-      },{
-        type: 'Text',
-        meta: {
-          id: ydhl.uuid(5, 0, pageId),
-          value: 'This is body',
-        }
-      },{
-        type: 'Button',
-        placeInParent: 'foot',
-        meta: {
-          id: ydhl.uuid(5, 0, pageId),
-          title: 'OK',
-          type: 'button',
-          css: {
-            backgroundTheme: 'primary'
-          }
-        }
-      }])
-    }
-    const addCustomPopup = () => {
-      const pageId = currPage.value.meta.id
-      const type = 'Modal'
       postMessage({
         type: 'addItem',
         data: {
-          type: type,
+          type: 'Text',
+          placeInParent: 'head',
           meta: {
             id: ydhl.uuid(5, 0, pageId),
-            isContainer: true,
-            custom:{
-              headless: true,
-              footless: true
-            },
-            title: type
+            value: 'This is head',
+            type: 'h3'
           },
-          items: [],
-          placement: 'in',
+          pageId: currPage.value.meta.id,
+          targetId: currPage.value.meta.id
+        }
+      })
+      postMessage({
+        type: 'addItem',
+        data: {
+          type: 'Text',
+          meta: {
+            id: ydhl.uuid(5, 0, pageId),
+            value: 'This is body',
+          },
+          pageId: currPage.value.meta.id,
+          targetId: currPage.value.meta.id
+        }
+      })
+      postMessage({
+        type: 'addItem',
+        data: {
+          type: 'Button',
+          placeInParent: 'foot',
+          meta: {
+            id: ydhl.uuid(5, 0, pageId),
+            type: 'button',
+            title: 'OK',
+            css: {
+              backgroundTheme: 'primary'
+            }
+          },
+          pageId: currPage.value.meta.id,
+          targetId: currPage.value.meta.id
+        }
+      })
+      postMessage({
+        type: 'addItem',
+        data: {
+          type: 'Button',
+          placeInParent: 'foot',
+          meta: {
+            id: ydhl.uuid(5, 0, pageId),
+            type: 'button',
+            title: 'Cancel',
+            css: {
+              backgroundTheme: 'secondary'
+            }
+          },
+          pageId: currPage.value.meta.id,
+          targetId: currPage.value.meta.id
+        }
+      })
+    }
+    const addPromptPopup = () => {
+      const pageId = currPage.value.meta.id
+
+      postMessage({
+        type: 'addItem',
+        data: {
+          type: 'Text',
+          placeInParent: 'head',
+          meta: {
+            id: ydhl.uuid(5, 0, pageId),
+            value: 'This is head',
+            type: 'h3'
+          },
+          pageId: currPage.value.meta.id,
+          targetId: currPage.value.meta.id
+        }
+      })
+      postMessage({
+        type: 'addItem',
+        data: {
+          type: 'Input',
+          meta: {
+            title: 'Input',
+            custom: {
+              inputType: 'Textarea',
+            },
+            value: 'This is input',
+            id: ydhl.uuid(5, 0, pageId)
+          },
+          pageId: currPage.value.meta.id,
+          targetId: currPage.value.meta.id
+        }
+      })
+      postMessage({
+        type: 'addItem',
+        data: {
+          type: 'Button',
+          placeInParent: 'foot',
+          meta: {
+            id: ydhl.uuid(5, 0, pageId),
+            type: 'button',
+            title: 'OK',
+            css: {
+              backgroundTheme: 'primary'
+            }
+          },
+          pageId: currPage.value.meta.id,
+          targetId: currPage.value.meta.id
+        }
+      })
+    }
+    const addAlertPopup = () => {
+      const pageId = currPage.value.meta.id
+
+      postMessage({
+        type: 'addItem',
+        data: {
+          type: 'Text',
+          placeInParent: 'head',
+          meta: {
+            id: ydhl.uuid(5, 0, pageId),
+            value: 'This is head',
+            type: 'h3'
+          },
+          pageId: currPage.value.meta.id,
+          targetId: currPage.value.meta.id
+        }
+      })
+      postMessage({
+        type: 'addItem',
+        data: {
+          type: 'Text',
+          meta: {
+            id: ydhl.uuid(5, 0, pageId),
+            value: 'This is body',
+          },
+          pageId: currPage.value.meta.id,
+          targetId: currPage.value.meta.id
+        }
+      })
+      postMessage({
+        type: 'addItem',
+        data: {
+          type: 'Button',
+          placeInParent: 'foot',
+          meta: {
+            id: ydhl.uuid(5, 0, pageId),
+            type: 'button',
+            title: 'OK',
+            css: {
+              backgroundTheme: 'primary'
+            }
+          },
+          pageId: currPage.value.meta.id,
+          targetId: currPage.value.meta.id
+        }
+      })
+    }
+    const addCustomPopup = () => {
+      const pageId = currPage.value.meta.id
+      postMessage({
+        type: 'updateItemMeta',
+        data: {
+          itemid: pageId,
+          type: 'custom',
+          pageId: selectedPageId.value,
+          props: {
+            headless: true,
+            footless: true
+          }
+        }
+      })
+
+      postMessage({
+        type: 'addItem',
+        data: {
+          type: 'Container',
+          meta: {
+            id: ydhl.uuid(5, 0, pageId),
+            style:{
+              width: '300px',
+              height: '300px'
+            }
+          },
+          items:[],
           pageId: currPage.value.meta.id,
           targetId: currPage.value.meta.id
         }

@@ -5,7 +5,7 @@
       <template v-if="uiconfig.meta.custom?.showIndicator">
         <ol class="carousel-indicators">
           <template v-for="(item, index) in uiconfig.items?.length" :key="index">
-            <li :data-target="`#${uiconfig.meta.id}`" :data-slide-to="index" :class="(!uiconfig.meta.custom?.activeSlide && index ==0) || uiconfig.meta.custom?.activeSlide === index ? 'active' : ''"></li>
+            <li :data-target="`#${uiconfig.meta.id}`" :data-slide-to="index" :class="(!uiconfig.meta.custom?.activeIndex && index ==0) || uiconfig.meta.custom?.activeIndex === index ? 'active' : ''"></li>
           </template>
           <template v-if="!uiconfig.items?.length">
             <li :data-target="`#${uiconfig.meta.id}`" data-slide-to="0" class="active"></li>
@@ -22,7 +22,7 @@
         </template>
         <template v-else>
           <div v-for="(subpage, index) in uiconfig.items" :key="index"
-               :class="{'carousel-item': true, 'active': (!uiconfig.meta.custom?.activeSlide && index ==0) || uiconfig.meta.custom?.activeSlide === index}">
+               :class="{'carousel-item': true, 'active': (!uiconfig.meta.custom?.activeIndex && index ==0) || uiconfig.meta.custom?.activeIndex === index}">
             <UIBase :uiconfig="subpage"  :is-readonly="true" :is-lock="myIsLock" :pageid="pageid"></UIBase>
           </div>
         </template>

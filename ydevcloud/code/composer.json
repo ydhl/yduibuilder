@@ -14,9 +14,12 @@
         }
     ],
     "require": {
-        "php": ">=7.2.0",
+        "php": ">=7.3.0",
+        "aliyuncs/oss-sdk-php": "~2.3.1",
         "php-amqplib/php-amqplib": "^2.11",
+        "tencentcloud/tencentcloud-sdk-php": "^3.0",
         "phpoffice/phpspreadsheet": "^1.18",
+        "alibabacloud/sts": "^1.8",
         "overtrue/pinyin": "^4.1"
     },
     "autoload": {

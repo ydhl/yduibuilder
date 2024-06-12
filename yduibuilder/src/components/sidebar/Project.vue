@@ -17,11 +17,11 @@
          @click="openProject=!openProject">
       <div class="d-flex align-items-center fw-bold">
         <i :class="{'iconfont': true, 'icon-tree-open': openProject, 'icon-tree-close': !openProject}"></i>
-        <i class="iconfont icon-folder"></i>&nbsp;<small>{{project.name}}</small></div>
+        <i :class="{'iconfont': true,'icon-folder':!openProject,'icon-folder-open':openProject}"></i>&nbsp;<small>{{project.name}}</small></div>
       <div :class="{'dropdown': true, 'invisible':hoverId!='project'}">
         <i class="iconfont icon-more" @click.stop data-bs-toggle="dropdown" aria-expanded="false"></i>
         <ul class="dropdown-menu dropdown-menu-end" id="projectproject">
-          <li><a href="#" @click.stop="addModule(project)" class="dropdown-item">{{t('module.addModule')}}</a></li>
+          <li><a href="javascript:;" @click.stop="addModule(project)" class="dropdown-item">{{t('module.addModule')}}</a></li>
         </ul>
       </div>
     </div>
@@ -35,15 +35,15 @@
              @click="toggleModule($event, module.id)">
           <div class="flex-grow-1">
             <i :class="{'iconfont': true, 'icon-tree-open': openModuleIds[module.id], 'icon-tree-close': !openModuleIds[module.id]}"></i>
-            <i class="iconfont icon-folder"></i>&nbsp;<small>{{module.name}}</small>
+            <i :class="{'iconfont': true, 'icon-folder':!openModuleIds[module.id],'icon-folder-open': openModuleIds[module.id]}"></i>&nbsp;<small>{{module.name}}</small>
           </div>
           <div :class="{'dropdown': true, 'invisible':hoverId!=module.id}">
             <i class="iconfont icon-more" @click.stop data-bs-toggle="dropdown" aria-expanded="false"></i>
             <ul class="dropdown-menu dropdown-menu-end" :id="'module' + module.id">
-              <li><a href="#" @click.stop="editModule(module)" class="dropdown-item"><i class="iconfont icon-edit"></i> {{t('common.edit')}}</a></li>
-              <li><a href="#" class="dropdown-item text-danger" @click.stop="deleteModuleConfirm(module)"><i class="iconfont icon-remove"></i>
+              <li><a href="javascript:;" @click.stop="editModule(module)" class="dropdown-item"><i class="iconfont icon-edit"></i> {{t('common.edit')}}</a></li>
+              <li><a href="javascript:;" class="dropdown-item text-danger" @click.stop="deleteModuleConfirm(module)"><i class="iconfont icon-remove"></i>
                 {{ t('module.deleteModule') }}</a></li>
-              <li><a href="#"  @click.stop="addFunction(module)" class="dropdown-item"><i class="iconfont icon-function"></i> {{t('module.addFunction')}}</a></li>
+              <li><a href="javascript:;"  @click.stop="addFunction(module)" class="dropdown-item"><i class="iconfont icon-function"></i> {{t('module.addFunction')}}</a></li>
             </ul>
           </div>
         </div>
@@ -57,16 +57,16 @@
                class="list-group-item-action d-flex align-items-center tab-2">
             <div class="flex-grow-1">
               <i :class="{'iconfont': true, 'icon-tree-close': !openFunctionIds[func.id], 'icon-tree-open': openFunctionIds[func.id]}"></i>
-              <i class="iconfont icon-folder"></i>&nbsp;<small>{{func.name}}</small>
+              <i :class="{'iconfont': true, 'icon-folder':!openFunctionIds[func.id],'icon-folder-open': openFunctionIds[func.id]}"></i>&nbsp;<small>{{func.name}}</small>
             </div>
 
             <div :class="{'dropdown': true, 'invisible':hoverId!=func.id}">
               <i class="iconfont icon-more" @click.stop data-bs-toggle="dropdown" aria-expanded="false"></i>
               <ul class="dropdown-menu dropdown-menu-end" :id="'function'+func.id">
-                <li><a href="#" @click.stop="editFunction(func)" class="dropdown-item"><i class="iconfont icon-edit"></i> {{t('common.edit')}}</a></li>
-                <li><a href="#" class="dropdown-item text-danger" @click.stop="deleteFunctionConfirm(func)"><i class="iconfont icon-remove"></i>
+                <li><a href="javascript:;" @click.stop="editFunction(func)" class="dropdown-item"><i class="iconfont icon-edit"></i> {{t('common.edit')}}</a></li>
+                <li><a href="javascript:;" class="dropdown-item text-danger" @click.stop="deleteFunctionConfirm(func)"><i class="iconfont icon-remove"></i>
                   {{ t('module.deleteFunction') }}</a></li>
-                <li><a href="#" @click.stop="gotoFunction(func.id)" class="dropdown-item"><i class="iconfont icon-plus"></i> {{t('common.addPage')}}</a></li>
+                <li><a href="javascript:;" @click.stop="gotoFunction(func.id)" class="dropdown-item"><i class="iconfont icon-plus"></i> {{t('common.addPage')}}</a></li>
               </ul>
             </div>
           </div>
@@ -78,17 +78,18 @@
                  @contextmenu="contextMenu($event, 'page', page.id)"
                  :class="{'list-group-item-action d-flex align-items-center tab-3': true, 'bg-light': page.id==currPageId}"
                  v-for="(page, pageIndex) in func.pages" @click="gotoPage(page.id)">
-              <div class="flex-grow-1" @mouseover="openPagePreview($event, page.screen)">
+              <div class="flex-grow-1 text-truncate" @mouseover="openPagePreview($event, page.screen)">
                 <i class="iconfont icon-page"></i>&nbsp;<small>{{ page.name }}</small>
               </div>
 
               <div :class="{'dropdown': true, 'invisible':hoverId!=page.id}">
                 <i class="iconfont icon-more" @click.stop data-bs-toggle="dropdown" aria-expanded="false"></i>
                 <ul class="dropdown-menu dropdown-menu-end" :id="'page'+page.id">
-                  <li><a href="#" @click.stop="copyPage(page.id)" class="dropdown-item"><i class="iconfont icon-copy"></i> {{t('common.copy')}}</a></li>
-                  <li><a href="#" class="dropdown-item text-danger" @click.stop="deletePage(page.id)"><i class="iconfont icon-remove"></i>
+                  <li><a href="javascript:;" @click.stop="copyPage(page.id)" class="dropdown-item"><i class="iconfont icon-copy"></i> {{t('common.copy')}}</a></li>
+                  <li><a href="javascript:;" @click.stop="movePage(module,func,page)" class="dropdown-item"><i class="iconfont icon-moveto"></i> {{t('common.moveTo')}}</a></li>
+                  <li><a href="javascript:;" class="dropdown-item text-danger" @click.stop="deletePage(page.id)"><i class="iconfont icon-remove"></i>
                     {{ t('page.deletePage') }}</a></li>
-                  <li><a href="#" @click.stop="preview(currModuleId, page.id)" class="dropdown-item"><i class="iconfont icon-preview"></i> {{t('common.preview')}}</a></li>
+                  <li><a href="javascript:;" @click.stop="preview(currModuleId, page.id)" class="dropdown-item"><i class="iconfont icon-preview"></i> {{t('common.preview')}}</a></li>
                 </ul>
               </div>
             </div>
@@ -111,23 +112,22 @@
              @mouseleave="mouseleave($event, 'popup', popup.id)"
              @mouseover="hoverId=popup.id"
              @click="gotoPage(popup.id)">
-          <div class="flex-grow-1" @mouseover="openPagePreview($event, popup.screen)">
+          <div class="flex-grow-1 text-truncate" @mouseover="openPagePreview($event, popup.screen)">
             <i class="iconfont icon-popup"></i>&nbsp;<small>{{popup.name}}</small>
           </div>
 
           <div :class="{'dropdown': true, 'invisible':hoverId!=popup.id}">
             <i class="iconfont icon-more" @click.stop data-bs-toggle="dropdown" aria-expanded="false"></i>
             <ul class="dropdown-menu dropdown-menu-end" :id="'popup'+popup.id">
-              <li><a href="#" @click.stop="copyPage(popup.id)" class="dropdown-item"><i class="iconfont icon-copy"></i> {{t('common.copy')}}</a></li>
-              <li><a href="#" class="dropdown-item text-danger" @click.stop="deletePage(popup.id)"><i class="iconfont icon-remove"></i>
+              <li><a href="javascript:;" @click.stop="copyPage(popup.id)" class="dropdown-item"><i class="iconfont icon-copy"></i> {{t('common.copy')}}</a></li>
+              <li><a href="javascript:;" class="dropdown-item text-danger" @click.stop="deletePage(popup.id)"><i class="iconfont icon-remove"></i>
                 {{ t('page.deletePage') }}</a></li>
-              <li><a href="#" @click.stop="preview('', popup.id, 'popup')" class="dropdown-item"><i class="iconfont icon-preview"></i> {{t('common.preview')}}</a></li>
+              <li><a href="javascript:;" @click.stop="preview('', popup.id, 'popup')" class="dropdown-item"><i class="iconfont icon-preview"></i> {{t('common.preview')}}</a></li>
             </ul>
           </div>
         </div>
       </template>
     </template>
-
     <div class="list-group-item-action d-flex align-items-center fw-bold"
          @mouseleave="mouseleave($event, 'component', 'component')"
          @mouseover="hoverId='component'"
@@ -142,7 +142,7 @@
              @mouseleave="mouseleave($event, 'component', component.id)"
              @mouseover="hoverId=component.id"
              @click="gotoPage(component.id)">
-          <div class="flex-grow-1"  @mouseover="openPagePreview($event, component.screen)">
+          <div class="flex-grow-1 text-truncate"  @mouseover="openPagePreview($event, component.screen)">
             <i class="iconfont icon-uicomponent"></i>&nbsp;<small>{{component.name}}</small>&nbsp;
             <span v-if="component.instance_count>0" class="text-muted ms-1" style="font-size: 11px">
               {{t('common.uicomponentInstance', [component.instance_count])}}
@@ -152,9 +152,38 @@
           <div :class="{'dropdown': true, 'invisible':hoverId!=component.id}">
             <i class="iconfont icon-more" @click.stop data-bs-toggle="dropdown" aria-expanded="false"></i>
             <ul class="dropdown-menu dropdown-menu-end" :id="'component'+component.id">
-              <li><a href="#" class="dropdown-item text-danger" @click.stop="deletePage(component.id)"><i class="iconfont icon-remove"></i>
+              <li><a href="javascript:;" class="dropdown-item text-danger" @click.stop="deletePage(component.id)"><i class="iconfont icon-remove"></i>
                 {{ t('page.deletePage') }}</a></li>
-              <li><a href="#" @click.stop="preview('', component.id, 'component')" class="dropdown-item"><i class="iconfont icon-preview"></i> {{t('common.preview')}}</a></li>
+              <li><a href="javascript:;" @click.stop="preview('', component.id, 'component')" class="dropdown-item"><i class="iconfont icon-preview"></i> {{t('common.preview')}}</a></li>
+            </ul>
+          </div>
+        </div>
+      </template>
+    </template>
+    <div class="list-group-item-action d-flex align-items-center fw-bold"
+         @mouseleave="mouseleave($event, 'subpage', 'subpage')"
+         @mouseover="hoverId='subpage'"
+         @click="openSubpage=!openSubpage">
+      <i :class="{'iconfont': true, 'icon-tree-open': openSubpage, 'icon-tree-close': !openSubpage}"></i>
+      <i class="iconfont icon-subpage"></i>&nbsp;<small>{{t('common.subPage')}}</small>
+    </div>
+    <template v-if="openState || openSubpage">
+      <template v-for="(subpage,index) in subpages" :key="index">
+        <div :class="{'tab-2 list-group-item-action d-flex justify-content-between align-items-center': true, 'bg-light': subpage.id==currPageId}"
+             @contextmenu="contextMenu($event, 'subpage', subpage.id)"
+             @mouseleave="mouseleave($event, 'subpage', subpage.id)"
+             @mouseover="hoverId=subpage.id"
+             @click="gotoPage(subpage.id)">
+          <div class="flex-grow-1 text-truncate"  @mouseover="openPagePreview($event, subpage.screen)">
+            <i class="iconfont icon-subpage"></i>&nbsp;<small>{{subpage.name}}</small>
+          </div>
+
+          <div :class="{'dropdown': true, 'invisible':hoverId!=subpage.id}">
+            <i class="iconfont icon-more" @click.stop data-bs-toggle="dropdown" aria-expanded="false"></i>
+            <ul class="dropdown-menu dropdown-menu-end" :id="'subpage'+subpage.id">
+              <li><a href="javascript:;" class="dropdown-item text-danger" @click.stop="deletePage(subpage.id)"><i class="iconfont icon-remove"></i>
+                {{ t('page.deletePage') }}</a></li>
+              <li><a href="javascript:;" @click.stop="preview('', subpage.id, 'subpage')" class="dropdown-item"><i class="iconfont icon-preview"></i> {{t('common.preview')}}</a></li>
             </ul>
           </div>
         </div>
@@ -162,8 +191,13 @@
     </template>
   </div>
   <div v-if="pagePreviewVisible && pagePreviewURL" ref="pagePreviewPopup" style="padding-left: 20px">
-    <img style="width: 200px; height: 200px;object-fit:contain" class="bg-white"  :src="`${uploadApi+pagePreviewURL}`"/>
+    <img style="width: 200px; height: 200px;object-fit:contain" class="bg-white"  :src="`${api+'image?file='+encodeURI(pagePreviewURL)}&${timestamp}`"/>
   </div>
+  <lay-layer v-model="movePageDlgVisible" :title="t('common.moveTo')" :shade="true" :area="['420px', '300px']" :btn="movePageButtons">
+    <div class="p-2">
+      <FunctionPicker :data="modules" :single="true" :defualt-func-uuid="movePageFuncUuid" @update="(m,f)=>moveToFuncUuid = f.id" :defualt-module-uuid="movePageModuleUuid"></FunctionPicker>
+    </div>
+  </lay-layer>
 </template>
 
 <script lang="ts">
@@ -174,11 +208,13 @@ import { useI18n } from 'vue-i18n'
 import { YDJSStatic } from '@/lib/ydjs'
 import { useRouter } from 'vue-router'
 import { createPopper } from '@popperjs/core'
+import FunctionPicker from '@/components/common/FunctionPicker.vue'
 declare const YDJS: YDJSStatic
 declare const $
 
 export default {
   name: 'Project',
+  components: { FunctionPicker },
   setup (props: any, context: any) {
     const store = useStore()
     const currFunctionId = computed(() => store.state.design.function.id)
@@ -188,10 +224,17 @@ export default {
     const openProject = ref(true)
     const openPopup = ref(true)
     const openComponent = ref(true)
+    const openSubpage = ref(true)
     const pagePreviewVisible = ref(false)
+    const movePageDlgVisible = ref(false)
     const contextLeft = ref(0)
     const contextTop = ref(0)
     const pagePreviewURL = ref('')
+    const movePageFuncUuid = ref('')
+    const movePageModuleUuid = ref('')
+    let movePageUuid = ''
+    const moveToFuncUuid = ref('')
+    const { t } = useI18n()
     const pagePreviewPopup = ref()
     const hoverId = ref('')
     const openModuleIds = ref({})
@@ -205,6 +248,7 @@ export default {
     const modules = ref<Array<any>>()
     const popups = ref<Array<any>>()
     const components = ref<Array<any>>()
+    const subpages = ref<Array<any>>()
     const api = ydhl.api
     const refresh = (cb) => {
       // modules.value = []
@@ -213,6 +257,7 @@ export default {
           modules.value = rst.data.modules
           popups.value = rst.data.popups
           components.value = rst.data.components
+          subpages.value = rst.data.subpages
         } else {
           ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
         }
@@ -338,6 +383,12 @@ export default {
           refresh(null)
         })
     }
+    const movePage = (module, func, page) => {
+      movePageModuleUuid.value = module.id
+      movePageFuncUuid.value = func.id
+      movePageUuid = page.id
+      movePageDlgVisible.value = true
+    }
     const editModule = (item) => {
       const dialogid = YDJS.dialog(api + 'module/' + item.id + '/edit'
         , ''
@@ -382,6 +433,7 @@ export default {
       openProject.value = false
       openPopup.value = false
       openComponent.value = false
+      openSubpage.value = false
       openModuleIds.value = {}
       openFunctionIds.value = {}
     }
@@ -390,6 +442,7 @@ export default {
       openProject.value = true
       openPopup.value = true
       openComponent.value = true
+      openSubpage.value = true
       if (!modules.value) return
       for (const module of modules.value) {
         openModuleIds.value[module.id] = true
@@ -442,7 +495,21 @@ export default {
 
     const copyPage = (pageid) => {
       // console.log(props)
-      store.commit('copyPage', { pageid })
+      ydhl.loading(t('common.pleaseWait')).then((dlg) => {
+        ydhl.closeLoading(dlg)
+        ydhl.postJson('api/copy/page.json', { copy_page_uuid: pageid }).then((rst: any) => {
+          if (!rst || !rst.success) {
+            ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
+            return
+          }
+          router.push({
+            path: '/',
+            query: {
+              uuid: rst.data.meta.id
+            }
+          })
+        })
+      })
     }
     const positionToPage = function () {
       collapseAll()
@@ -454,7 +521,9 @@ export default {
       ydhl.confirm(t('page.deletePageConfirm'), t('page.deletePage'), t('common.cancel')).then((dialogid: any) => {
         ydhl.closeLoading(dialogid)
         store.commit('deletePage', { pageid })
-        refresh(null)
+        setTimeout(() => {
+          refresh(null)
+        }, 1000)
       })
     }
     const preview = (moduleId: any, pageId: any, type = '') => {
@@ -464,7 +533,21 @@ export default {
         link.click()
       }
     }
-    const { t } = useI18n()
+    const movePageButtons = ref([
+      {
+        text: t('common.moveTo'),
+        callback: () => {
+          movePageDlgVisible.value = false
+          ydhl.post('project/' + project.value.id + '/recovery', { page: movePageUuid, to: moveToFuncUuid.value }, [], (rst) => {
+            if (!rst || !rst.success) {
+              ydhl.alert(rst ? rst.msg : 'Oops, Please try again')
+              return
+            }
+            refresh(null)
+          })
+        }
+      }
+    ])
     return {
       t,
       currFunctionId,
@@ -473,15 +556,17 @@ export default {
       modules,
       popups,
       components,
+      subpages,
       api,
-      uploadApi: ydhl.uploadApi,
       contextMenuDom,
       currPageId,
       openModuleIds,
       openState,
       openComponent,
+      openSubpage,
       openFunctionIds,
       pagePreviewVisible,
+      movePageDlgVisible,
       pagePreviewURL,
       openProject,
       hoverId,
@@ -493,6 +578,10 @@ export default {
       preview,
       deletePage,
       pagePreviewPopup,
+      movePageButtons,
+      movePageModuleUuid,
+      movePageFuncUuid,
+      moveToFuncUuid,
       timestamp: Date.parse((new Date()).toTimeString()),
       contextMenu,
       mouseleave,
@@ -501,6 +590,7 @@ export default {
       deleteFunctionConfirm,
       addModule,
       editFunction,
+      movePage,
       editModule,
       addFunction,
       toggleFunction,

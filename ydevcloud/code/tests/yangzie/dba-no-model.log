@@ -1,0 +1,35 @@
+
+---- EXPECTED OUTPUT
+1
+Array
+(
+    [id] => 1
+    [title] => test user
+)
+Array
+(
+    [id] => 1
+    [title] => test user
+)
+Array
+(
+    [0] => Array
+        (
+            [id] => 1
+            [title] => test user
+        )
+
+    [1] => Array
+        (
+            [id] => 2
+            [title] => test user 1
+        )
+
+)
+1
+---- ACTUAL OUTPUT
+Fatal error: Uncaught Error: Call to undefined method yangzie\YZE_DBAImpl::migration() in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/dba-no-model.php:33
+Stack trace:
+#0 {main}
+  thrown in /Users/ydhleeboo/workspace/ydhl/ydevcloud/code/tests/yangzie/dba-no-model.php on line 33
+---- FAILED

@@ -16,7 +16,7 @@
     </template>
     <template #panel>
       <keep-alive>
-        <component :is="currSidebar" />
+        <component :is="currSidebar"  @contextMenu="contextMenu"/>
       </keep-alive>
     </template>
   </LeftPanelBase>
@@ -38,6 +38,7 @@ import { useStore } from 'vuex'
 import ydhl from '@/lib/ydhl'
 export default {
   name: 'LeftPanelUI',
+  emits: ['contextMenu'],
   components: {
     LeftPanelBase,
     SidebarUploadUI,
@@ -67,10 +68,15 @@ export default {
     })
     const { t } = useI18n()
     const version = computed(() => ydhl.version)
+
+    const contextMenu = (data) => {
+      context.emit('contextMenu', data)
+    }
     return {
       t,
       version,
       currSidebar,
+      contextMenu,
       changeSidebar
     }
   }

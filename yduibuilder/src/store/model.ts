@@ -1,8 +1,12 @@
 export declare type UIState = 'normal' | 'readonly' | 'disabled' | 'hidden'
-export declare type UIActionType = 'popup' | 'call'
+export declare type UIActionType = 'popup' | 'mutation' | 'webapi' | 'emit' | 'redirect' | 'closepopup'
 export declare type PageType = 'popup' | 'subpage' | 'page' | 'master' | 'component'
 export declare type UIKind = 'pc' | 'mobile'
-export declare type DataType = 'string' | 'integer' | 'number' | 'array' | 'boolean' | 'object' | 'null' | 'any' // 数据结构那类型
+/**
+ * 对于非表单和迭代类元素，用来知道数据绑定为元素的value还是bound，便于在事件内知道ui上的数据信息
+ */
+export declare type BoundAsType = 'value' | 'bound'
+export declare type DataType = 'string' | 'integer' | 'number' | 'array' | 'map' | 'boolean' | 'object' | 'any' // 数据结构那类型
 export declare type UIType = 'Breadcrumb' | 'Button'
   | 'Card' | 'Carousel' | 'Checkbox' | 'Collapse' | 'Container'
   | 'Dropdown'
@@ -19,7 +23,7 @@ export declare type UIType = 'Breadcrumb' | 'Button'
 export declare type InputType = 'Text' | 'Number' | 'Email' | 'URL' | 'Password' | 'Color'
 export declare type ArgType = 'Number' | 'String' | 'Array' | 'Object' | 'Map'
 export declare type Placement = 'Center' | 'Left' | 'Right' | 'Top' | 'Bottom' | 'TopLeft' | 'TopRight' | 'BottomLeft' | 'BottomRight'
-export declare type OutputASItem = 'HTML' | 'TEXT' | 'VALUE' | 'NAME' | 'STYLE' | 'CSS'
+export declare type OutputASItem = 'HTML' | 'TEXT' | 'VALUELIST' | 'STYLE' | 'CSS' | 'ALT' | 'TITLE' | 'KEYVALUE' | 'NONE' | 'VALUE'
 export interface KeyValue{
   name: string,
   value?: string
@@ -106,11 +110,11 @@ export interface UIMeta{
    */
   files?: Array<FileInfo>;
   /**
-   * 元素的样式JSON结构体，其内容可以转换成最终的Style字符串
+   * 元素的样式JSON结构体，其内容可以转换成最终的Style字符串: style name: style value
    */
   style?: Record<string, any>;
   /**
-   * 元素使用的selector中的样式JSON结构体，其内容可以转换成最终的Style字符串，格式同style
+   * 元素使用的selector中的样式JSON结构体，其内容可以转换成最终的Style字符串，格式同mate, 里面只包含style，custom，css内容
    */
   selector?: Record<string, any>;
   /**
@@ -173,13 +177,25 @@ export interface DataStruct{
    */
   required?: boolean;
   action?: string;
+  /**
+   * 提供数据的ui uuid数组
+   */
+  in?: string;
+  /**
+   * 输出该数据的ui uuid及输出类型
+   */
+  out?: Record<string, string>;
+  /**
+   * 绑定该数据的ui uuid及绑定类型
+   */
+  bound?: Record<string, BoundAsType>;
 }
 export interface DataStructString extends DataStruct{
   min?: number;
   max?: number;
   pattern?: string;
   defaultValue?: string;
-  constValue?: string;
+  mock?: string;
   /**
    * 枚举值及说明
    */
@@ -190,7 +206,7 @@ export interface DataStructInteger extends DataStruct{
   max?: number;
   format?:string;
   defaultValue?: number;
-  constValue?: string;
+  mock?: string;
   enumValue?: Record<string, string>;
 }
 export interface DataStructNumber extends DataStruct{
@@ -198,7 +214,7 @@ export interface DataStructNumber extends DataStruct{
   max?: number;
   numberFormat?:string;
   defaultValue?: number;
-  constValue?: string;
+  mock?: string;
   enumValue?: Record<string, string>;
 }
 export interface DataStructBoolean extends DataStruct{
@@ -207,6 +223,10 @@ export interface DataStructBoolean extends DataStruct{
 export interface DataStructArray extends DataStruct{
   min?: number;
   max?: number;
+  /**
+   * 初始化长度
+   */
+  initLength?: number;
   unique?: boolean;
   /**
    * 只有一个元素，表示array中的item都是指定的dataStruct类型
@@ -221,12 +241,7 @@ export interface DataStructObject extends DataStruct{
    */
   props?: Array<DataStruct>;
 }
-export interface DataStructParam extends DataStruct{
-  /**
-   * 样例
-   */
-  sample?: string | Array<string> | Array<KeyValue>;
-}
+
 /**
  * 具体行为设置的基类
  */
@@ -278,11 +293,6 @@ export interface UIActionRedirect extends UIAction{
   // eslint-disable-next-line camelcase
   redirect_type?: string;
   /**
-   * page，url；如果项目支持重定向的是url，否则是page
-   */
-  // eslint-disable-next-line camelcase
-  url_type?: string;
-  /**
    * 重定向时，如果url type为page，那么popupPageId指定重定向的目标页面id
    */
   popupPageId: string;
@@ -306,17 +316,76 @@ export interface UIActionWebAPI extends UIAction{
   /**
    * 中间表page_bind_api uuid
    */
-  bindApiUuid?: string;
+  Uuid?: string;
   /**
    * 绑定的api uuid
    */
   apiUuid?: string;
 }
 
+export interface Expression{
+  type?: 'literal' | 'connect' | 'expression' | 'expression_group' | 'operator' | 'ternary',
+  data?:{
+    fromUuid?: string,
+    id?: string,
+    scope?: 'local' | 'page' | 'global',
+    path?: string,
+    name?: string,
+    modifier?: string,
+    literal?: string,
+    type?: string
+  }
+  rightData?:{
+    fromUuid?: string,
+    id?: string,
+    scope?: 'local' | 'page' | 'global',
+    path?: string,
+    name?: string,
+    modifier?: string,
+    literal?: string,
+    type?: string
+  }
+  /**
+   * 操作符
+   */
+  operator?: string,
+  literal?: string,
+  subexpression?: Array<Expression>,
+  expression?: Expression,
+  rightExpression?: Expression,
+  trueExpression?: Expression,
+  falseExpression?: Expression
+}
+export interface Mutation{
+  // eslint-disable-next-line camelcase
+  from_uuid?: string;
+  // eslint-disable-next-line camelcase
+  data_id?: string;
+  // eslint-disable-next-line camelcase
+  data_name?: string;
+  // eslint-disable-next-line camelcase
+  data_type?: string;
+  expression?: Expression;
+  // eslint-disable-next-line camelcase
+  expression_code?: string
+}
+/**
+ * 数据赋值行为
+ */
+export interface UIActionMutation extends UIAction{
+  mutations?: Record<string, Mutation>;
+}
+/**
+ * 触发事件行为
+ */
+export interface UIActionEmit extends UIAction{
+  name?: string;
+}
+
 export interface UIBase{
   type: UIType;
   /**
-   * 页面类型，当ui作为最顶层元素时，用于表示该ui用作什么类型，
+   * 页面类型，当前ui作为最顶层元素时，用于表示该ui的page用作什么类型，
    * page 就是常规的页面，popup表示该页面是弹窗， master 母版页，subpage 子页，component 自定义的ui组件
    */
   pageType?: PageType;
@@ -346,5 +415,21 @@ export interface UIBase{
    * 事件ID
    */
   events?: Array</* binding唯一id */string>;
+  /**
+   * 绑定输入的数据path
+   */
+  dataIn?: {
+    path: string;
+  };
+  /**
+   * 可以绑定多个输出
+   * outputAs: path
+   */
+  dataOut?: Record<string, string>
+  /**
+   * 可以绑定多个绑定类型
+   * BoundTypeAs: path
+   */
+  dataBound?: Record<string, string>
 }
 export type UIPage = UIBase

@@ -1,10 +1,11 @@
 <?php
 namespace app\modules\build\views\preview\weui;
+
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 
 class Nav_View extends Preview_View {
-    use Weui_Event_Binding, Weui_Popup,Html_Code_Helper;
+    use Weui_Popup,Html_Code_Helper;
     protected function activeItemCss() {
         $styleMap =  parent::style_map();
         if ($styleMap['color']) return '';// 有自定义颜色，则忽略预定义样式
@@ -36,9 +37,9 @@ class Nav_View extends Preview_View {
 
         return $cssMap;
     }
-    protected function style_map()
+    protected function style_map($meta=null, $state = 'normal')
     {
-        $styleArray = parent::style_map();
+        $styleArray = parent::style_map($meta);
         unset($styleArray['color']);
         return $styleArray;
     }

@@ -1,5 +1,6 @@
 <?php
 namespace app\api;
+use app\project\Action_Model;
 use app\project\Function_Model;
 use app\project\Page_Model;
 use app\project\Page_User_Model;
@@ -32,6 +33,7 @@ class Deletepage_Controller extends YZE_Resource_Controller {
 
     /**
      * 页面移到回收站，并返回下一个（如果有）或者上一个（如果有）页面
+     * 所有关联到该页面到关系都会被断开，比如弹窗
      * @actionname 设计器保存
      */
     public function post_index(){
@@ -51,13 +53,14 @@ class Deletepage_Controller extends YZE_Resource_Controller {
         $data = [
             'project_id'=>$member->project_id,
             'member_id'=>$member->id,
-            'content'=> ($page->screen ? '<img src="'.UPLOAD_SITE_URI.$page->screen.'" style="width: 50px"/>' : '').__('Deleted Page：').$page->name,
+            'content'=> ($page->screen ? '<img src="/download?file='.urlencode($page->screen).'" style="width: 50px"/>' : '').__('Deleted Page：').$page->name,
             'type'=>'ui'];
         YZE_Hook::do_hook(YDE_CLOUD_PROJECT_ACTIVITY, $data);
 
         $return['deletedPageId'] = $page->id;
 
         $page->set('is_deleted', 1)->save();
+        YZE_DBAImpl::get_instance()->update(Action_Model::TABLE, "popupPageId='',input=''", "popupPageId=:popupid", [':popupid'=>$page->uuid]);
         return YZE_JSON_View::success($this, $return);
     }
 

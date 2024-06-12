@@ -11,8 +11,8 @@
           <path fill="#858585" d="M1 0H0l6 14-6 14h1l6-14z"></path>
         </svg>
       </div>
-      <div class="item" v-for="(value, index) in paths" :key="index" :data-pageid="selectedPageId" :data-uiid="value.meta.id"
-           @click.stop="uiClick" @mouseover.stop="uiMouseEnter" @mouseout.stop="uiMouseLeave">
+      <div class="item uimouseup" v-for="(value, index) in paths" :key="index" :data-pageid="selectedPageId" :data-uiid="value.meta.id"
+           @click.stop="uiClick" @mouseup="uiMouseUp" @mouseover.stop="uiMouseEnter" @mouseout.stop="uiMouseLeave">
         <svg width="7" height="28" viewBox="0 0 7 28" style="display: block;transform: translate(0px, 0px);color: rgb(235, 235, 235);">
           <path fill="currentColor" class="path" d="M6.5 14L.5 0H0v28h.5z"></path>
           <path fill="#858585" d="M1 0H0l6 14-6 14h1l6-14z"></path>
@@ -42,6 +42,7 @@ import { useStore } from 'vuex'
 import { computed, nextTick, Ref, ref, watch } from 'vue'
 import $ from 'jquery'
 import InitUI from '@/components/Common'
+import _ from 'lodash'
 
 export default {
   name: 'ElementPath',
@@ -82,6 +83,9 @@ export default {
         }
       })
     })
+    const uiMouseUp = _.debounce((event) => {
+      store.commit('updateState', { mouseupInFrame: event.clientX + '_' + event.clientY })
+    }, 100)
     const uiMouseEnter = (event: any) => {
       const el = $(event.target)
       hoverUIItemId.value = $(el).parents('.item').attr('data-uiid')
@@ -135,6 +139,7 @@ export default {
       input,
       getContainerDisplay,
       uiMouseEnter,
+      uiMouseUp,
       uiMouseLeave,
       uiClick,
       rightClick

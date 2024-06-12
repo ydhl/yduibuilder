@@ -7,6 +7,8 @@ import i18nMessage from '@/i18n/index'
 import ydhl from '@/lib/ydhl'
 import layer from '@layui/layer-vue'
 import '@layui/layer-vue/lib/index.css'
+import DataConnect from '@/components/common/DataConnect.vue'
+import DataCheckPanel from '@/components/common/DataCheckPanel.vue'
 
 if (window.top === window) {
   if (navigator.userAgent.indexOf('Firefox') > -1) {
@@ -16,6 +18,7 @@ if (window.top === window) {
   }
 } else { // iframe
   require('@/assets/iframe.scss')
+  require('@/assets/icon/iconfont.css')
 }
 
 // console.log(language)
@@ -27,4 +30,7 @@ const i18n = createI18n({
 })
 
 const app = createApp(App)
-app.use(store).use(router).use(layer).use(i18n).mount('#app')
+app.use(store).use(router).use(layer).use(i18n)
+  .component('DataConnect', DataConnect)
+  .component('DataCheckPanel', DataCheckPanel)
+  .mount('#app')

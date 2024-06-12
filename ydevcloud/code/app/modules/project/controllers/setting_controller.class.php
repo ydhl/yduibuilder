@@ -34,6 +34,25 @@ class Setting_Controller extends YZE_Resource_Controller {
         $this->set_view_data('yze_page_title', __('Setting'));
     }
 
+    public function post_apiurl(){
+        $request = $this->request;
+        $pid = $request->get_var('pid');
+        $names = $request->get_from_post("name");
+        $urls = $request->get_from_post("url");
+
+        $project = find_by_uuid(Project_Model::CLASS_NAME, $pid);
+        $this->layout = '';
+        if (!$project) throw new YZE_FatalException(__('project not found'));
+        $setting = [];
+        foreach ($names as $index => $name){
+            $name = trim($name);
+            if (!$name) continue;
+            $setting[$name] = trim($urls[$index]);
+        }
+        Project_Setting_Model::set_setting_value($project->id,'api_env', json_encode($setting, JSON_UNESCAPED_UNICODE));
+        return YZE_JSON_View::success($this);
+    }
+
     public function exception(\Exception $e){
         $request = $this->request;
         $this->layout = 'error';

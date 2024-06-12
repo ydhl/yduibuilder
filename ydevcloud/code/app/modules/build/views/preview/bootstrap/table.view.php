@@ -1,16 +1,17 @@
 <?php
 namespace app\modules\build\views\preview\bootstrap;
+
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 use app\common\File_Model;
-use app\modules\build\views\preview\Html_Event_Binding;
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use yangzie\YZE_Hook;
 use yangzie\YZE_JSON_View;
 use function yangzie\__;
 
 class Table_View extends Preview_View {
-    use Html_Event_Binding,Bootstrap_Popup,Html_Code_Helper;
+    use Bootstrap_Popup,Html_Code_Helper;
     private function parseExcel() {
         $files = @$this->data['meta']['files']['datasource'] ?: [];
         $fid = $files[0]["id"];
@@ -22,7 +23,7 @@ class Table_View extends Preview_View {
             'row'=>[]
         ];
         $tmp = tempnam('/tmp', 'excel');
-        file_put_contents($tmp, file_get_contents(YZE_UPLOAD_PATH.$file->url));
+        file_put_contents($tmp, file_get_contents(getOssLink($file->url)));
         $spreadsheet = IOFactory::load($tmp);
         $worksheet = $spreadsheet->getActiveSheet();
         $rowData = $worksheet->toArray();
@@ -139,9 +140,9 @@ class Table_View extends Preview_View {
     private function backgroundTheme(){
         return $this->data['meta']['css']['backgroundTheme'] === 'default' ? '' : $this->data['meta']['css']['backgroundTheme'];
     }
-    protected function style_map()
+    protected function style_map($meta=null, $state = 'normal')
     {
-        $style = parent::style_map();
+        $style = parent::style_map($meta);
         foreach ($style as $name => $value) {
             if (preg_match("/^background/", $name)) unset($style[$name]);
             if (preg_match("/^color/", $name)) unset($style[$name]);

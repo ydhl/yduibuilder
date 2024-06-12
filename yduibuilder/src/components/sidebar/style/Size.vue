@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import initUI from '@/components/Common'
-import { computed } from 'vue'
+import { computed, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default {
@@ -65,25 +65,28 @@ export default {
   setup (props: any, context: any) {
     const info = initUI()
     const { t } = useI18n()
+    const previewMode = toRef(props, 'previewMode')
 
-    const currWidth = info.computedWrap('width', 'style', '', false, props.previewMode)
-    const currHeight = info.computedWrap('height', 'style', '', false, props.previewMode)
-    const minWidth = info.computedWrap('min-width', 'style', '', false, props.previewMode)
-    const minHeight = info.computedWrap('min-height', 'style', '', false, props.previewMode)
-    const maxWidth = info.computedWrap('max-width', 'style', '', false, props.previewMode)
-    const maxHeight = info.computedWrap('max-height', 'style', '', false, props.previewMode)
+    const currWidth = info.computedWrap('width', 'style', '', false, previewMode)
+    const currHeight = info.computedWrap('height', 'style', '', false, previewMode)
+    const minWidth = info.computedWrap('min-width', 'style', '', false, previewMode)
+    const minHeight = info.computedWrap('min-height', 'style', '', false, previewMode)
+    const maxWidth = info.computedWrap('max-width', 'style', '', false, previewMode)
+    const maxHeight = info.computedWrap('max-height', 'style', '', false, previewMode)
 
     const hasInherit = computed(() => {
       return info.hasInheritStyle(
         'style',
-        ['width', 'height', 'min-width', 'min-height', 'max-width', 'max-height']
+        ['width', 'height', 'min-width', 'min-height', 'max-width', 'max-height'],
+        previewMode
       )
     })
 
     const hasSet = computed(() => {
       return info.hasSetStyle(
         'style',
-        ['width', 'height', 'min-width', 'min-height', 'max-width', 'max-height']
+        ['width', 'height', 'min-width', 'min-height', 'max-width', 'max-height'],
+        previewMode
       )
     })
     return {

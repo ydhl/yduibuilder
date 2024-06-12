@@ -1,10 +1,11 @@
 <?php
 namespace app\modules\build\views\preview\weui;
+
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 
 class Radio_View extends Preview_View {
-    use Weui_Event_Binding, Weui_Popup, Html_Code_Helper;
+    use Weui_Popup, Html_Code_Helper;
     public function check_master()
     {
         $this->master_view = new Formgroup_View($this->data, $this->build->get_controller(), $this->build);
@@ -28,7 +29,7 @@ class Radio_View extends Preview_View {
                 echo ' checked';
             }
             echo ' class="weui-check" id="'.$this->myId(true).$index.'"';
-            echo $this->build_form_attrs(true);
+            echo $this->build_form_attrs();
             echo ' value="'.@$item['value'].'"';
             echo ">\r\n";
             echo $this->indent(7);

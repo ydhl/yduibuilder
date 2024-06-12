@@ -3,6 +3,11 @@
 namespace app\api;
 
 use app\common\File_Model;
+use app\project\Page_Bind_API_Action_Model;
+use app\project\Page_Bind_Api_Model;
+use app\project\Page_Bind_Data_Model;
+use app\project\Page_Bind_Event_Model;
+use app\project\Page_Bind_Io_Model;
 use app\project\Page_Bind_Style_Model;
 use app\project\Page_Model;
 use app\project\Uicomponent_Instance_Model;
@@ -145,13 +150,29 @@ class Uicomponent_Controller extends YZE_Resource_Controller {
         $config = $page->find_ui_item($uiid);
         $uiids = [];
         Page_Model::all_sub_item_uiid($config, $uiids);
+        $hasBound = Page_Bind_Event_Model::from()
+            ->where("page_id=:pid and is_deleted=0 and uiid in ('".join("','", array_keys($uiids))."')")
+            ->count('id', [":pid"=>$page->id]);
+        if (!$hasBound) {
+            $hasBound = Page_Bind_Io_Model::from()
+                ->where("page_id=:pid and is_deleted=0 and uiid in ('".join("','", array_keys($uiids))."')")
+                ->count('id', [":pid"=>$page->id]);
+        }
+        if (!$hasBound) {
+            $hasBound = Page_Bind_API_Action_Model::from()
+                ->where("page_id=:pid and is_deleted=0 and uiid in ('".join("','", array_keys($uiids))."')")
+                ->count('id', [":pid"=>$page->id]);
+        }
 
-        if ($uicomponent){
+        if ($uicomponent || $hasBound){
             $data = [];
             if ($uicomponent){
                 $data['name'] =$uicomponent->name;
                 $data['msg'] =  sprintf(__("%s has been created as component. at %s"),
                             $uicomponent->get_user()->nickname, $uicomponent->created_on);
+            }
+            if ($hasBound) {
+                $data['hasBound'] = $hasBound;
             }
             return YZE_JSON_View::success($this, $data);
         }
@@ -183,15 +204,8 @@ class Uicomponent_Controller extends YZE_Resource_Controller {
         // 在指定的页面中运用组件
         $page = find_by_uuid(Page_Model::CLASS_NAME, $page_uuid);
         if ($page){
-            //检查是否自己包含了自己
-            if($page->is_parent_contain_sub_page($target_id, $uuid)) return YZE_JSON_View::error($this, __('UI Component cannot contain oneself.'));
             $uiconfig = $uicomponent->get_config();
-            $instance = new Uicomponent_Instance_Model();
-            $instance->set('uuid', Uicomponent_Instance_Model::uuid())
-                ->set('page_id', $page->id)
-                ->set('uicomponent_page_id', $uicomponent->id)
-                ->set('instance_uuid', $instance_uuid)
-                ->save();
+            Uicomponent_Instance_Model::add_instance($page->id, $uicomponent->id, $instance_uuid);
         }
         return YZE_JSON_View::success($this, $uiconfig);
     }

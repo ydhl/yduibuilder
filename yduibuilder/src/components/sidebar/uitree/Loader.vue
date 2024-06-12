@@ -22,7 +22,7 @@
     </div>
     <div>
       <small v-if="eventCount"><i class="iconfont icon-event"></i> {{eventCount}}</small>
-      <i :class="{'iconfont': true, 'icon-tree-open':isContainer && isOpen, 'icon-tree-close':isContainer && !isOpen, 'invisible icon-tree-open': !isContainer}"></i>
+      <i :class="{'iconfont': true, 'icon-tree-open':uiconfig.items.length > 0 && isOpen, 'icon-tree-close':uiconfig.items.length > 0 && !isOpen, 'invisible icon-tree-open': !uiconfig.items.length}"></i>
     </div>
   </div>
 </template>

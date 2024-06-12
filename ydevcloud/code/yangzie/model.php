@@ -1,6 +1,8 @@
 <?php
 namespace yangzie;
 
+use app\App_Module;
+
 /**
  * model基类，封装了基本的表与model的映射、操作。
  * yangzie约定表都必需包含以下的字段内容：
@@ -24,6 +26,8 @@ abstract class YZE_Model extends YZE_Object{
 	 * @var YZE_SQL
 	 */
 	private $sql;
+	private $suffix;
+	private $db;
 	protected $records = array();
 	/**
 	 * 映射：
@@ -189,7 +193,7 @@ abstract class YZE_Model extends YZE_Object{
 		$array = json_decode($json, true);
 		if(is_null($array))return null;
 
-		return self::from_Array($array);
+		return static::from_Array($array);
 	}
 
 	/**
@@ -283,28 +287,34 @@ abstract class YZE_Model extends YZE_Object{
 	 * 根据主键查询model
 	 *
 	 * @param int $id
+	 * @param string $db 数据库名
+	 * @param string $suffix 分表查询时表后缀
 	 * @return YZE_Model
 	 * @throws YZE_DBAException
 	 */
-	public static function find_by_id($id){
-		return YZE_DBAImpl::get_instance()->find($id,get_called_class());
+	public static function find_by_id($id, $db=null, $suffix=null){
+		if (!$id) return null;
+		return YZE_DBAImpl::get_instance($db)->find($id,get_called_class(), $suffix);
 	}
 
 	/**
 	 * 查询指定主键的model，并以id作为键返回数组
 	 *
 	 * @param string|array $ids
+	 * @param string $db 数据库名
+	 * @param string $suffix 分表查询时表后缀
 	 * @throws YZE_DBAException
 	 * @return array<YZE_Model>
 	 */
-	public static function find_by_ids($ids){
+	public static function find_by_ids($ids, $db=null, $suffix=null){
+		if (!$ids) return [];
 	    $arr = [];
 	    if (is_string($ids)){
 	        $ids = explode(",", $ids);
 	    }
 	    $ids = array_filter($ids);
 	    if( ! $ids)return $arr;
-	    foreach (YZE_DBAImpl::get_instance()->find_by($ids, get_called_class()) as $obj){
+	    foreach (YZE_DBAImpl::get_instance($db)->find_by($ids, get_called_class(), $suffix) as $obj){
 	        $arr[ $obj->id ] = $obj;
 	    }
 	    return $arr;
@@ -316,19 +326,17 @@ abstract class YZE_Model extends YZE_Object{
 	 *
 	 * @author leeboo
 	 * @param int $id 主键
+	 * @param string $db 数据库名
+	 * @param string $suffix 分表查询时表后缀
 	 * @throws YZE_DBAException
 	 * @return YZE_Model 返回被删除的model
 	 */
-	public static function remove_by_id($id){
-		$class = get_called_class();
-
-		if(!($class instanceof YZE_Model) && !class_exists($class)){
-			throw new YZE_DBAException("Model Class $class not found");
+	public static function remove_by_id($id, $db=null, string $suffix=null){
+		$entity = static::find_by_id($id, $db, $suffix);
+		if(!$entity){
+			throw new YZE_DBAException("Model ({$id}) not found");
 		}
-
-		$entity = $class instanceof YZE_Model ? $class : new $class;
-
-		YZE_DBAImpl::get_instance()->delete($entity);
+		$entity->remove();
         return $entity;
 	}
 
@@ -336,10 +344,12 @@ abstract class YZE_Model extends YZE_Object{
 	 * 通过uuid查找model
 	 *
 	 * @param $uuid
+	 * @param string $db 数据库名
+	 * @param string $suffix 分表查询时表后缀
 	 * @return YZE_Model
 	 */
-	public static function find_by_uuid($uuid){
-		return self::from()->where("uuid=:uuid")->get_Single([":uuid"=>$uuid]);
+	public static function find_by_uuid($uuid, $db=null, $suffix=null){
+		return static::from('m', $suffix)->in_db($db)->where("uuid=:uuid")->get_Single([":uuid"=>$uuid]);
 	}
 	/**
 	 * 删除数据库中指定uuid的记录
@@ -348,15 +358,16 @@ abstract class YZE_Model extends YZE_Object{
 	 *
 	 * @author leeboo
 	 * @param string $uuid
+	 * @param string $db 数据库名
+	 * @param string $suffix 分表查询时表后缀
 	 * @throws YZE_DBAException
 	 */
-	public static function remove_by_uuid($uuid){
-		$dba = YZE_DBAImpl::get_instance();
-		$entity = self::find_by_uuid($uuid);
+	public static function remove_by_uuid($uuid, $db=null, string $suffix=null){
+		$entity = static::find_by_uuid($uuid, $db, $suffix);
 		if(!$entity){
 			throw new YZE_DBAException("Model ({$uuid}) not found");
 		}
-		$dba->delete($entity);
+		$entity->remove();
 	}
 
 	/**
@@ -376,38 +387,34 @@ abstract class YZE_Model extends YZE_Object{
 	 * @author leeboo
 	 * @param int | array $id 可以是一个主键，也可以是主键数组
 	 * @param array $attrs
+	 * @param string $db 数据库名
+	 * @param string $suffix 分表查询时表后缀
 	 * @throws YZE_DBAException
 	 * @return boolean
 	 */
-	public static function update_by_id($id, $attrs){
-		$class = get_called_class();
-
-		if(!($class instanceof YZE_Model) && !class_exists($class)){
-			throw new YZE_DBAException("Model Class $class not found");
-		}
-
-		$entity = $class instanceof YZE_Model ? $class : new $class;
-
+	public static function update_by_id($id, $attrs, $db=null, $suffix=null){
 		$sql = new YZE_SQL();
-		$sql->update("t", $attrs)->from(get_called_class(), "t");
+		$sql->update("t", $attrs)->from(get_called_class(), "t", $suffix);
 		if (is_array($id)) {
-		    $sql->where("t", $entity->get_key_name(), YZE_SQL::IN, $id);
+		    $sql->where("t", static::KEY_NAME, YZE_SQL::IN, $id);
 		} else {
-		    $sql->where("t", $entity->get_key_name(), YZE_SQL::EQ, $id);
+		    $sql->where("t", static::KEY_NAME, YZE_SQL::EQ, $id);
 		}
 
-		YZE_DBAImpl::get_instance()->execute($sql);
+		YZE_DBAImpl::get_instance($db)->execute($sql);
 	}
 
 
 	/**
 	 * 然后所有数据
 	 *
+	 * @param string $db 数据库名
+	 * @param string $suffix 分表查询时表后缀
 	 * @return array
 	 * @throws YZE_DBAException
 	 */
-	public static function find_all(){
-		return YZE_DBAImpl::get_instance()->find_All(get_called_class());
+	public static function find_all($db=null, $suffix=null){
+		return YZE_DBAImpl::get_instance($db)->find_All(get_called_class(), $suffix);
 	}
 
 	/**
@@ -442,7 +449,7 @@ abstract class YZE_Model extends YZE_Object{
 	 */
 	public function save($type=YZE_SQL::INSERT_NORMAL, YZE_SQL $checkSql=null){
 		$this->before_Save();
-	    YZE_DBAImpl::get_instance()->save($this, $type, $checkSql);
+	    YZE_DBAImpl::get_instance($this->db)->save($this, $type, $checkSql);
 		return $this;
 	}
 
@@ -474,7 +481,7 @@ abstract class YZE_Model extends YZE_Object{
 	 * <strong>对象所包含的数据还存在，只是主键不存在了</strong>
 	 */
 	public function remove(){
-		YZE_DBAImpl::get_instance()->delete($this);
+		YZE_DBAImpl::get_instance($this->db)->delete($this);
 		return $this;
 	}
 
@@ -486,7 +493,7 @@ abstract class YZE_Model extends YZE_Object{
 	 * @author leeboo
 	 */
 	public function refresh(){
-		$new = YZE_DBAImpl::get_instance()->find($this->get_key(), get_class($this));
+		$new = YZE_DBAImpl::get_instance($this->db)->find($this->get_key(), get_class($this), $this->suffix);
 		if($new){
 			foreach ($new->get_records() as $name => $value){
 				$this->set($name, $value);
@@ -497,13 +504,15 @@ abstract class YZE_Model extends YZE_Object{
 
 	/**
 	 * 删除所有记录
+	 * @param string $db 数据库名
+	 * @param string $suffix 分表查询时表后缀
 	 * @return bool
 	 * @throws YZE_DBAException
 	 */
-	public static function remove_all(){
+	public static function remove_all($db=null, $suffix=null){
 		$sql = new YZE_SQL();
-		$sql->delete()->from(get_called_class(),'a');
-		return YZE_DBAImpl::get_instance()->execute($sql);
+		$sql->delete()->from(get_called_class(),'a', $suffix);
+		return YZE_DBAImpl::get_instance($db)->execute($sql);
 	}
 
 	/**
@@ -563,14 +572,14 @@ abstract class YZE_Model extends YZE_Object{
 	public function __get($name){
 	    $value = $this->get($name);
 	    if (in_array($name, $this->encrypt_columns)){
-	    	$value = YZE_DBAImpl::get_instance()->decrypt($value, YZE_DB_CRYPT_KEY);
+	    	$value = YZE_DBAImpl::get_instance($this->db)->decrypt($value, YZE_DB_CRYPT_KEY);
 		}
 	    return $value;
 	}
 
 	public function __set($name, $value){
 		if (in_array($name, $this->encrypt_columns)){
-			$value = YZE_DBAImpl::get_instance()->encrypt($value, YZE_DB_CRYPT_KEY);
+			$value = YZE_DBAImpl::get_instance($this->db)->encrypt($value, YZE_DB_CRYPT_KEY);
 		}
 	    return $this->set($name, $value);
 	}
@@ -589,12 +598,34 @@ abstract class YZE_Model extends YZE_Object{
 	 * 调用from开始Model Query后就会缓存相应查询条件等信息，如果要开始新对查询，需要调用clean方法
 	 *
 	 * @param string $myAlias
+	 * @param string $suffix
 	 * @return YZE_Model
 	 */
-	public static function from($myAlias=null){
+	public static function from($myAlias=null, $suffix=null){
 		$obj = new static;
-		$obj->init_Sql ($myAlias?:'m');
+		$obj->suffix = $suffix;
+		$obj->init_Sql ();
+		if ( ! $obj->sql->has_from()){
+			$obj->sql->from(static::CLASS_NAME, $myAlias ?: "m", $suffix);
+		}
 		return $obj;
+	}
+
+	/**
+	 * 设置查询的数据库
+	 * @param $db string
+	 * @return $this
+	 */
+	public function in_db($db){
+		$this->db = $db;
+		return $this;
+	}
+	public function suffix($suffix){
+		$this->suffix = $suffix;
+		return $this;
+	}
+	public function get_suffix(){
+		return $this->suffix;
 	}
 	/**
 	 * 条件语句，变量用命名占位符: ("CHAR_LENGTH(title)=:title and (id>10 or id<20)")
@@ -651,12 +682,13 @@ abstract class YZE_Model extends YZE_Object{
 	 * @param string $joinClass 连接的model class
 	 * @param string $joinAlias 连接的model的别名
 	 * @param string $join_on 连接条件
+	 * @param string $suffix left join表的分表后缀
 	 * @return YZE_Model
 	 */
-	public function left_join($joinClass, $joinAlias, $join_on){
+	public function left_join($joinClass, $joinAlias, $join_on, $suffix=null){
 		$this->init_Sql ();
 
-		$this->sql->left_join($joinClass, $joinAlias, $join_on);
+		$this->sql->left_join($joinClass, $joinAlias, $join_on, $suffix);
 		return $this;
 	}
 	/**
@@ -664,12 +696,13 @@ abstract class YZE_Model extends YZE_Object{
 	 * @param string $joinClass 连接的model class
 	 * @param string $joinAlias 连接的model的别名
 	 * @param string $join_on 连接条件
+	 * @param string $suffix 分表查询的后缀
 	 * @return YZE_Model
 	 */
-	public function right_join( $joinClass, $joinAlias, $join_on){
+	public function right_join( $joinClass, $joinAlias, $join_on, $suffix=null){
 		$this->init_Sql ();
 
-		$this->sql->right_join($joinClass, $joinAlias, $join_on);
+		$this->sql->right_join($joinClass, $joinAlias, $join_on, $suffix);
 		return $this;
 	}
 	/**
@@ -677,12 +710,13 @@ abstract class YZE_Model extends YZE_Object{
 	 * @param string $joinClass 连接的model class
 	 * @param string $joinAlias 连接的model的别名
 	 * @param string $join_on 连接条件
+	 * @param string $suffix 分表查询的后缀
 	 * @return YZE_Model
 	 */
-	public function join($joinClass, $joinAlias, $join_on){
+	public function join($joinClass, $joinAlias, $join_on, $suffix=null){
 		$this->init_Sql ();
 
-		$this->sql->join($joinClass, $joinAlias, $join_on);
+		$this->sql->join($joinClass, $joinAlias, $join_on, $suffix);
 		return $this;
 	}
 
@@ -697,15 +731,13 @@ abstract class YZE_Model extends YZE_Object{
 	public function select(array $params=array(), $alias=null){
 		$this->init_Sql ();
 		if ( ! $this->sql->has_from()){
-			$this->sql->from(static::CLASS_NAME, $alias ?: "m");
+			$this->sql->from(static::CLASS_NAME, $alias ?: "m", $this->suffix);
 		}
 		if ($alias){
 			$this->sql->select($alias);
 		}
 
-		$obj = YZE_DBAImpl::get_instance()->select($this->sql, $params);
-
-		$this->sql->clean_select();
+		$obj = YZE_DBAImpl::get_instance($this->db)->select($this->sql, $params);
 		return $obj;
 	}
 
@@ -721,14 +753,14 @@ abstract class YZE_Model extends YZE_Object{
 		$this->init_Sql ();
 
 		if ( ! $this->sql->has_from()){
-			$this->sql->from(static::CLASS_NAME, $alias ?: "m");
+			$this->sql->from(static::CLASS_NAME, $alias ?: "m", $this->suffix);
 		}
 		if ($alias){
 			$this->sql->select($alias);
 		}
 		$this->sql->limit(1);
-		$obj = YZE_DBAImpl::get_instance()->get_Single($this->sql, $params);
-		$this->sql->clean_select();
+
+		$obj = YZE_DBAImpl::get_instance($this->db)->get_Single($this->sql, $params);
 		return $obj;
 	}
 	/**
@@ -746,12 +778,11 @@ abstract class YZE_Model extends YZE_Object{
 			$alias = "m";
 		}
 		if ( ! $this->sql->has_from()){
-			$this->sql->from(static::CLASS_NAME, $alias ?: "m");
+			$this->sql->from(static::CLASS_NAME, $alias ?: "m", $this->suffix);
 		}
 		$this->sql->count($alias , $field, "COUNT_ALIAS", $distinct);
+		$obj = YZE_DBAImpl::get_instance($this->db)->get_Single($this->sql, $params);
 
-		$obj = YZE_DBAImpl::get_instance()->get_Single($this->sql, $params);
-		$this->sql->clean_select();
 		if ( ! $obj)return 0;
 		$obj = is_array($obj) ? $obj[$alias] : $obj;
 		return intval($obj ? $obj->Get("COUNT_ALIAS") : 0);
@@ -769,12 +800,11 @@ abstract class YZE_Model extends YZE_Object{
 			$alias = "m";
 		}
 		if ( ! $this->sql->has_from()){
-			$this->sql->from(static::CLASS_NAME, $alias ?: "m");
+			$this->sql->from(static::CLASS_NAME, $alias ?: "m", $this->suffix);
 		}
 		$this->sql->sum($alias, $field, "SUM_ALIAS");
 
-		$obj = YZE_DBAImpl::get_instance()->get_Single($this->sql, $params);
-		$this->sql->clean_select();
+		$obj = YZE_DBAImpl::get_instance($this->db)->get_Single($this->sql, $params);
 		if ( ! $obj)return 0;
 		$obj = is_array($obj) ? $obj[$alias] : $obj;
 		return $obj ? $obj->Get("SUM_ALIAS") : 0;
@@ -792,12 +822,11 @@ abstract class YZE_Model extends YZE_Object{
 			$alias = "m";
 		}
 		if ( ! $this->sql->has_from()){
-			$this->sql->from(static::CLASS_NAME, $alias ?: "m");
+			$this->sql->from(static::CLASS_NAME, $alias ?: "m", $this->suffix);
 		}
 		$this->sql->max($alias, $field, "MAX_ALIAS");
 
-		$obj = YZE_DBAImpl::get_instance()->get_Single($this->sql, $params);
-		$this->sql->clean_select();
+		$obj = YZE_DBAImpl::get_instance($this->db)->get_Single($this->sql, $params);
 		if ( ! $obj)return 0;
 		$obj = is_array($obj) ? $obj[$alias] : $obj;
 		return $obj ? $obj->Get("MAX_ALIAS") : 0;
@@ -815,12 +844,11 @@ abstract class YZE_Model extends YZE_Object{
 			$alias = "m";
 		}
 		if ( ! $this->sql->has_from()){
-			$this->sql->from(static::CLASS_NAME, $alias ?: "m");
+			$this->sql->from(static::CLASS_NAME, $alias ?: "m", $this->suffix);
 		}
 		$this->sql->min($alias, $field, "MIN_ALIAS");
 
-		$obj = YZE_DBAImpl::get_instance()->get_Single($this->sql, $params);
-		$this->sql->clean_select();
+		$obj = YZE_DBAImpl::get_instance($this->db)->get_Single($this->sql, $params);
 		if ( ! $obj)return 0;
 		$obj = is_array($obj) ? $obj[$alias] : $obj;
 		return $obj ? $obj->Get("MIN_ALIAS") : 0;
@@ -841,13 +869,12 @@ abstract class YZE_Model extends YZE_Object{
 			$alias = "m";
 		}
 		if ( ! $this->sql->has_from()){
-			$this->sql->from(static::CLASS_NAME, $alias ?: "m");
+			$this->sql->from(static::CLASS_NAME, $alias ?: "m", $this->suffix);
 		}
-		$statement = YZE_DBAImpl::get_instance()->get_Conn()->prepare($this->sql->delete()->__toString());
+		$statement = YZE_DBAImpl::get_instance($this->db)->get_Conn()->prepare($this->sql->delete()->__toString());
 		if(! $statement->execute($params) ){
 		    throw new YZE_FatalException(join(",", $statement->errorInfo()));
 		}
-		$this->sql->clean_select();
 		return $this;
 	}
 
@@ -870,20 +897,25 @@ abstract class YZE_Model extends YZE_Object{
 	}
 	/**
 	 * 清空表中所有数据
+	 * @param string $db 数据库名
+	 * @param string $suffix 分表查询时表后缀
 	 */
-	public static function truncate(){
-		$sql = "TRUNCATE `".YZE_DB_DATABASE."`.`".static::TABLE."`;";
-		YZE_DBAImpl::get_instance()->exec($sql);
+	public static function truncate($db=null, $suffix=null){
+		$app_module = new App_Module();
+		$db = $db ?: $app_module->get_module_config('default_db');
+		$sql = "TRUNCATE `".$db."`.`".static::TABLE.$suffix."`;";
+		YZE_DBAImpl::get_instance($db)->exec($sql);
 	}
 
-	private function init_Sql($alias=null) {
+	public function get_Sql(){
+		return $this->sql;
+	}
+
+	private function init_Sql() {
 		if ($this->sql == null){
 			$this->sql = new YZE_SQL();
 		}
 
-		if ( ! $this->sql->has_from() && $alias){
-		    $this->sql->from(static::CLASS_NAME, $alias);
-		}
 		return $this->sql;
 	}
 

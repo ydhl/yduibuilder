@@ -118,7 +118,7 @@ export default {
     }
     onMounted(() => {
       // const uploadApi = ydhl.api + 'api/' + props.projectId + '/upload.json'
-      yd_upload_render(uploadBtn.value, '#', mimeType[props.type], imageAdded, imageUploaded)
+      if (uploadBtn.value) yd_upload_render(uploadBtn.value, '#', mimeType[props.type], imageAdded, imageUploaded)
     })
     const select = (event, file: any) => {
       selectFile.value = file

@@ -17,7 +17,7 @@ $packages = Env::package();
 ?>
 <div class="d-flex align-items-center pb-2">
     <?php if ($setting['logo']){?>
-        <img src="<?= UPLOAD_SITE_URI.$setting['logo']?>" class="rounded-circle me-2" style="width: 50px;height: 50px;object-fit: cover">
+        <img src="<?= SITE_URI."image?file=".urlencode($setting['logo'])?>" class="rounded-circle me-2" style="width: 50px;height: 50px;object-fit: cover">
     <?php }?>
     <h4>
         <?= $project->name?><small class="text-muted ms-2 fs-8"><?= $project->desc?></small>
@@ -87,9 +87,13 @@ $packages = Env::package();
                 <?= __("Activity")?>
             </a>
             <div class="list-group-item p-1 bg-light"></div>
-            <a href="/project/<?= $project->uuid?>/structure" class="list-group-item list-group-item-action <?= $menu == 'structure' ? "active" : ""?>">
+            <a href="/project/<?= $project->uuid?>/page" class="list-group-item list-group-item-action <?= $menu == 'structure' ? "active" : ""?>">
                 <i class="iconfont icon-module"></i>
                 <?= __("UI")?>
+            </a>
+            <a target="_blank" href="/api/sso/token?url=<?=API_BUILDER_URI?>sso&projectId=<?=$project->uuid?>" class="list-group-item list-group-item-action <?= $menu == 'api' ? "active" : ""?>">
+                <i class="iconfont icon-api"></i>
+                <?= __("API")?>
             </a>
 
             <a href="/project/<?= $project->uuid?>/icon" class="list-group-item list-group-item-action <?= $menu == 'icon' ? "active" : ""?>">
@@ -101,7 +105,7 @@ $packages = Env::package();
                 <?= __("Libraries")?>
             </a>
             <a href="/project/<?= $project->uuid?>/uicomponent" class="list-group-item list-group-item-action <?= $menu == 'uicomponent' ? "active" : ""?>">
-                <i class="iconfont icon-ui"></i>
+                <i class="iconfont icon-edit"></i>
                 <?= __("UI Component")?>
             </a>
             <div class="list-group-item p-1 bg-light"></div>

@@ -8,14 +8,14 @@ use app\modules\build\views\preview\Preview_View;
 class Image_View extends Preview_View {
     use Wxmp;
 
-    protected function style_map()
+    protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map();
+        $map = parent::style_map($meta);
 
-        if (strtolower(@$this->data['meta']['style']['width']) == 'auto'){
+        if (strtolower(@$meta['style']['width']) == 'auto'){
             unset($map['width']);
         }
-        if (strtolower(@$this->data['meta']['style']['height']) == 'auto'){
+        if (strtolower(@$meta['style']['height']) == 'auto'){
             unset($map['height']);
         }
         return $map;

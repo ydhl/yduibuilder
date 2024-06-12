@@ -2,7 +2,7 @@
 namespace yangzie;
 define("YZE_SCRIPT_LOGO", "
 ================================================================
-		YANGZIE(V2.0.0) Generate Script
+		YANGZIE(V%s) Generate Script
 		易点互联®
 ================================================================");
 
@@ -55,7 +55,7 @@ if(true){
 
 function display_home_wizard(){
 	clear_terminal();
-	echo wrap_output(YZE_SCRIPT_USAGE);
+	echo wrap_output(sprintf(YZE_SCRIPT_USAGE, YZE_Object::VERSION));
 
 	while(!in_array(($input = fgets(STDIN)), array(0,1, 2, 3, 4, 5, 6))){
 		echo wrap_output(__("please input number to select: "));
@@ -238,30 +238,43 @@ function display_mvc_wizard(){
 	echo wrap_output(sprintf(__( YZE_METHED_HEADER."
   
 generate controller and view，%s back:
-1. (1/3)module name:  "), "generate controller", get_colored_text(" 0 ", "red", "white")));
+1. (1/4)module name:  "), "generate controller", get_colored_text(" 0 ", "red", "white")));
 
 	while (!is_validate_name(($module = get_input()))){
 		echo get_colored_text(wrap_output(__("\tname is invalid, please type again:  ")), "red");
 	}
 
-	echo wrap_output(__("2. (2/3)controller name:  "));
+	echo wrap_output(__("2. (2/4)controller name:  "));
 	while (!is_validate_name(($controller = get_input()))){
 		echo get_colored_text(wrap_output(__("\tname is invalid, please type again:  ")), "red");
 	}
-	$uri = '';
-	if(($uris = is_controller_exists($controller, $module))){
-		echo wrap_output(__("3. (3/3)controller is exist，it's URI:\n\n"));
-		foreach ($uris as $index => $uri){
-			echo "\t ".($index+1).". {$uri}\n";
+
+	echo wrap_output(__("3. (3/4)action name，default is index:  "));
+	while(true){
+		$action = get_input() ?: 'index';
+		if (!is_validate_name($action)){
+			echo get_colored_text(wrap_output(__("\tname is invalid, please type again:  ")), "red");
+			continue;
 		}
-	}else{
-		echo wrap_output(__("3. (3/3)URI route, default uri is /{$module}/{$controller}:  "));
-		$uri = get_input();
+
+		if(($uris = is_controller_exists($action, $controller, $module))){
+			echo wrap_output(sprintf(__("3. (3/4)%s->%s is exist，it's URI:\n\n"), $controller, $action));
+			foreach ($uris as $index => $uri){
+				echo "\t ".($index+1).". {$uri}\n";
+			}
+			echo wrap_output(__("please reenter:"));
+			continue;
+		}
+		break;
 	}
+
+	echo wrap_output(__("4. (4/4)URI route, default uri is /{$module}/{$controller}/{$action}, you can use regex like foobar/(?P<id>\\d+):  "));
+	$uri = get_input();
 
 	return @array(
 		"cmd" => "controller",
 		"controller"=>$controller,
+		"action"=>$action,
         "uri"=>$uri,
         "module_name"=>$module,
         "view_format"=>"tpl" ,
@@ -271,32 +284,44 @@ generate controller and view，%s back:
 	);
 }
 
-function is_controller_exists($controller, $module){
-	if(file_exists(YZE_APP_MODULES_INC.$module."/__config__.php")){
-		include_once YZE_APP_MODULES_INC.$module."/__config__.php";
-		$class = "\\app\\".$module."\\".ucfirst(strtolower($module))."_Module";
-		$object = new $class();
-		return $object->get_uris_of_controller($controller);
+function is_controller_exists($action, $controller, $module){
+	$controller = strtolower($controller);
+	if(!file_exists(YZE_APP_MODULES_INC.$module."/__config__.php")) return false;
+	if(!file_exists(YZE_APP_MODULES_INC.$module."/controllers/{$controller}_controller.class.php")) return false;
+	include_once YZE_APP_MODULES_INC.$module."/controllers/{$controller}_controller.class.php";
+	$controllerClass = ucfirst($controller).'_Controller';
+	if (!method_exists('app\\user\\'.$controllerClass, $action)) return false;
 
-	}
-	return false;
+	include_once YZE_APP_MODULES_INC.$module."/__config__.php";
+	$class = "\\app\\".$module."\\".ucfirst(strtolower($module))."_Module";
+	$object = new $class();
+	return $object->get_uris_of_controller($controller, $action) ?: ["/{$module}/{$controller}/{$action}"];
+
 }
 
 function display_model_wizard(){
     global $db;
 	clear_terminal();
 
+	$app_module = new \app\App_Module();
+	$db_name = $app_module->get_module_config('default_db');
+
 	echo wrap_output(sprintf(__( YZE_METHED_HEADER."
 
 generate model，%s back:
-1. (1/2)db table name: "), "generate model", get_colored_text(" 0 ", "red", "white")));
+1. (1/3)database name, default is %s: "), "generate model", get_colored_text(" 0 ", "red", "white"), $db_name));
 
-
-	while (!is_validate_table(($table=get_input()))){
-		echo get_colored_text(wrap_output(sprintf(__("\tdb table not exist (%s)，please check:  "), mysqli_error($db))), "red");
+	while (!is_validate_db(($database = get_input()))){
+		echo get_colored_text(wrap_output(sprintf(__("\tdb not exist (%s)，please check:  "), $database)), "red");
 	}
 
-	echo wrap_output(__("2. (2/2)module name:  "));
+	echo wrap_output(__("2. (2/3)table name:  "));
+
+	while (!is_validate_table($database, ($table=get_input()))){
+		echo get_colored_text(wrap_output(sprintf(__("\ttable not exist (%s)，please check:  "), mysqli_error($db))), "red");
+	}
+
+	echo wrap_output(__("3. (3/3)module name:  "));
 	while (!is_validate_name(($module = get_input()))){
 		echo get_colored_text(wrap_output(__("\tmodule is invalid, please check:  ")), "red");
 	}
@@ -306,6 +331,7 @@ generate model，%s back:
 		"cmd" => "model",
 		"base"=>"table",
 		"module_name"=>$module,
+		"db_name"=>$database,
 		"class_name"=>$table,
 		"table_name"=>$table,
 	);
@@ -382,17 +408,30 @@ function is_validate_name($input){
 	return preg_match('/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/', $input);
 }
 
-function is_validate_table($table){
+function is_validate_db($db_name){
     global $db;
 	$app_module = new \app\App_Module();
+	$db_name = $db_name ?: $app_module->get_module_config('default_db');
+	$db_connection = $app_module->get_module_config('db_connections')[$db_name];
+
+	if (!$db_connection) return false;
 	$db = mysqli_connect(
-			$app_module->get_module_config("db_host"),
-			$app_module->get_module_config("db_user"),
-			$app_module->get_module_config("db_psw"),
-			$app_module->get_module_config("db_name"),
-			$app_module->get_module_config("db_port")
+		$db_connection["db_host"],
+		$db_connection["db_user"],
+		$db_connection["db_psw"],
+		$db_name,
+		$db_connection["db_port"]
 	);
-	mysqli_select_db($db, $app_module->get_module_config("db_name"));
+	return $db;
+}
+
+
+function is_validate_table($db_name, $table){
+    global $db;
+	$app_module = new \app\App_Module();
+	$db_name = $db_name ?: $app_module->get_module_config('default_db');
+
+	mysqli_select_db($db, $db_name);
 	return mysqli_query($db, "show full columns from `$table`");
 }
 

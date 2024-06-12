@@ -1,10 +1,13 @@
 <?php
 namespace app\modules\build\views\preview\bootstrap;
+
+use app\modules\build\views\code\Base_Code_Fragment;
+use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
-use app\modules\build\views\preview\Html_Event_Binding;
-class Dropdown_View extends Preview_View {
-    use Html_Event_Binding, Bootstrap_Popup,Html_Code_Helper;
+
+class Dropdown_View extends ValueList_View {
+
     private function dropdownMeta () {
         $parentUI = $this->get_parent_UI();
         $type = strtolower($parentUI['type']);
@@ -99,9 +102,9 @@ class Dropdown_View extends Preview_View {
         }
         return $arr ? join(' ', $arr) : '';
     }
-    protected function style_map()
+    protected function style_map($meta=null, $state = 'normal')
     {
-        $styleArray = parent::style_map();
+        $styleArray = parent::style_map($meta);
         unset($styleArray['color'], $styleArray['background-color']);
         return $styleArray;
     }
@@ -120,7 +123,7 @@ class Dropdown_View extends Preview_View {
             $styleArray['background-color'] = "background-color: ${backgroundColor} !important";
             $styleArray['border-color'] = "border-color: ${backgroundColor} !important";
         }
-        return $styleArray ? join(';', array_values($styleArray)) : '';
+        return $styleArray ? join(';', array_values($styleArray)) : NULL;
 
     }
 
@@ -149,59 +152,141 @@ class Dropdown_View extends Preview_View {
         return $cssArray;
     }
 
-    public function build_ui()
-    {
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'Sample 1', "value"=> '#', 'type'=>'action' ], [ "text"=> 'Sample 2', "value"=> '#', 'type'=>'action'  ]];
+    private function build_begin($outDataName, $is2D=false){
+        $inputData = $this->get_input_data($inputDataName);
+        if (!$inputDataName) $inputDataName = $this->myid() . '_temp';
         $space =  $this->indent();
         echo "{$space}<div ";
-        echo $this->build_main_attrs();
-        echo ">\r\n";
+        echo $this->build_main_attrs(false);
+        if ($inputDataName) {
+            if ($is2D){
+                echo $this->wrap_output('x-input', $this->is_array($inputData) ? "{$inputDataName}[idxOf{$outDataName}]" : $inputDataName);
+            }else{
+                echo $this->wrap_output('x-input', $inputDataName);
+            }
+        }
+        echo ">".PHP_EOL;
 
         if (@$this->data['meta']['custom']['isSplit']){
             echo $this->indent(1) . '<a class="'.$this->btnCss().'" ';
             echo $this->wrap_output('style', $this->btyStyle());
+            $this->build_data_output_bind();
             echo ' id="'.$this->myId(true).'MenuLink" href="javascript:;">';
-            $this->wrap_icon(function(){
-                echo $this->data['meta']['title'] ?: $this->data['type'];
+            $this->wrap_icon(function() use($inputDataName){
+                echo "<span";
+                if ($inputDataName) {
+                    echo $this->wrap_output('x-text', $inputDataName."?.text || '".($this->data['meta']['title'] ?: $this->data['type'])."'");
+                }
+                echo ">".($this->data['meta']['title'] ?: $this->data['type'])."</span>";
+
             }, $this->build->get_indent() + 2);
-            echo "\r\n";
+            echo PHP_EOL;
             echo $this->indent(1);
-            echo "</a>\r\n";
+            echo "</a>".PHP_EOL;
             echo $this->indent(1) . '<button class="dropdown-toggle dropdown-toggle-split '.$this->splitBtnCss().'" role="button" ';
             echo $this->wrap_output('style', $this->btyStyle());
-            echo ' data-toggle="dropdown" aria-haspopup="true" href="#" aria-expanded="false">';
-            echo "</button>\r\n";
+            echo ' data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+            echo "</button>".PHP_EOL;
         }else{
             echo $this->indent(1) . '<a class="dropdown-toggle '.$this->btnCss().'"';
             echo ' role="button" id="'.$this->myId(true).'MenuLink" ';
             echo $this->wrap_output('style', $this->btyStyle());
-            echo ' data-toggle="dropdown" aria-haspopup="true" href="#" aria-expanded="false">';
-            $this->wrap_icon(function(){
-                echo $this->data['meta']['title'] ?: $this->data['type'];
-            }, $this->build->get_indent() + 2);
-            echo "\r\n";
+            $this->build_data_output_bind();
+            echo ' data-toggle="dropdown" aria-haspopup="true" href="javascript:;" aria-expanded="false">';
+            $this->wrap_icon(function() use($inputDataName){
+                echo "<span";
+                if ($inputDataName) {
+                    echo $this->wrap_output('x-text', $inputDataName."?.text || '".($this->data['meta']['title'] ?: $this->data['type'])."'");
+                }
+                echo ">".($this->data['meta']['title'] ?: $this->data['type'])."</span>";
+            }, 2);
+            echo PHP_EOL;
             echo $this->indent(1);
-            echo "</a>\r\n";
+            echo "</a>".PHP_EOL;
         }
 
         echo $this->indent(1) . '<div class="dropdown-menu';
         echo @$this->data['meta']['custom']['menuAlign']=='right' ? ' dropdown-menu-right': '';
-        echo '" aria-labelledby="'.$this->myId(true).'MenuLink">'."\r\n";
+        echo '"';
+        $this->build_event_listen();
+        echo ' aria-labelledby="'.$this->myId(true).'MenuLink">'.PHP_EOL;
+
+    }
+    private function build_end(){
+        $space =  $this->indent();
+        echo $this->indent(1) . "</div>".PHP_EOL;
+        echo "{$space}</div>".PHP_EOL;
+    }
+    protected function build_ui_static()
+    {
+        $values = @$this->data['meta']['values']?:[[ "text"=> 'Sample 1', "value"=> '#', 'type'=>'action' ], [ "text"=> 'Sample 2', "value"=> '#', 'type'=>'action'  ]];
+        $this->build_begin(null);
+
         foreach ((array)@$values as $item){
             echo $this->indent(2);
             if (@$item['type']=='action'){
-                echo "<a href='{$item['value']}' class='dropdown-item ".(@$item['checked'] ? 'active' : '')."'>{$item['text']}</a>";
+                echo "<a href='javascript:;' data-value='{$item['value']}' class='dropdown-item ".(@$item['checked'] ? 'active' : '')."'>{$item['text']}</a>";
             }elseif (@$item['type']=='header'){
                 echo "<h6 class='dropdown-header'>{$item['text']}</h6>";
             }elseif (@$item['type']=='divider'){
                 echo '<div class="dropdown-divider"></div>';
             }else{
-                echo "<p>{$item['text']}</p>";
+                echo '<div class="pl-4 pr-4 text-muted"><p>'.$item['text'].'</p></div>';
             }
-            echo "\r\n";
+            echo PHP_EOL;
         }
-        echo $this->indent(1) . "</div>\r\n";
+        $this->build_end();
+    }
 
-        echo "{$space}</div>\r\n";
+    protected function build_ui_2d_array($bindOutput, $outDataName)
+    {
+        $this->build_dropdown_item($bindOutput, $outDataName, true);
+    }
+
+    protected function build_ui_array($bindOutput, $outDataName)
+    {
+        $this->build_dropdown_item($bindOutput, $outDataName, false);
+    }
+
+    private function build_item($bindOutput, $itemName, $outDataName){
+        list('name'=>$name, 'value'=>$value) = $this->get_bind_name_value($bindOutput, $itemName);
+        echo $this->indent(2).'<a href="javascript:void(0)"';
+        echo $this->wrap_output(':data-bound', "'{$outDataName}[\''+idxOf{$itemName}+'\']'");
+        echo $this->wrap_output(':data-value', $value);
+        echo $this->wrap_output('class', "dropdown-item");
+        echo $this->wrap_output('x-text', $name);
+        echo "></a>";
+        echo PHP_EOL;
+    }
+
+    private function build_dropdown_item($bindOutput, $outDataName, $is2D){
+        $this->build_begin($outDataName, $is2D);
+
+        $itemName = $bindOutput['name'];
+        if ($is2D) $itemName .= '2';
+
+        echo $this->indent(2).'<template x-for="(itemOf'.$itemName.', idxOf'.$itemName.') in '
+            .($is2D?"itemOf":"").$outDataName.'" :key="idxOf'.$itemName.'">'.PHP_EOL;
+
+        if ($is2D){
+            $this->build_item($bindOutput['item'], $itemName, "itemOf{$outDataName}");
+        }else{
+            $this->build_item($bindOutput, $itemName, $outDataName);
+        }
+
+        echo $this->indent(2).'</template>'.PHP_EOL;
+        $this->build_end();
+    }
+
+    function build_code(): Base_Code_Fragment
+    {
+        parent::build_code();
+        $codeFragment = $this->get_code_Fragment();
+        $inputData = $this->get_input_data($dataName);
+        // 如果没有数据绑定的话，定义一个临时数据
+        if (!$dataName) {
+            $codeFragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, $this->myid() . '_temp: "",');
+        }
+        return $codeFragment;
     }
 }
