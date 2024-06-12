@@ -177,6 +177,7 @@ function updateMeta (state, type, props, item, isMerge) {
     }
     node[name] = newValue
   }
+
   state.pageSaved[state.page.meta.id] = 0
   if (type && !item.meta[type]) item.meta[type] = {}
   for (const name in props) {
@@ -568,6 +569,7 @@ export default {
         item = obj.uiConfig
       }
       if (!item) return
+
       updateMeta(state, type, props, item, isMerge)
     },
     /**

@@ -199,7 +199,6 @@ export default {
     const currPage = computed(() => {
       return store.state.design.page
     })
-    // const saved = computed(() => store.state.design.pageSaved[currPage.value.meta.id])
     const hasSize = computed(() => {
       return isNotPage.value
     })

@@ -295,7 +295,7 @@ export default {
     }
     const mouseup =  _.debounce((event) => {
       postMessage({ type: 'mouseup', data: event.clientX + '_' + event.clientY })
-    }, 100)
+    }, 300)
     const uiClick = (event: any) => {
       uiChange($(event.target))
     }

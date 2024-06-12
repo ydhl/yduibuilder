@@ -77,9 +77,14 @@ export default {
     const spread = info.computedWrap('boxShadowSpread', 'custom', '', false, previewMode)
     const inset = info.computedWrap('boxShadowInset', 'custom', '', false, previewMode)
     const color = info.computedWrap('boxShadowColor', 'custom', '', false, previewMode)
+    const boxShadow = info.computedWrap('box-shadow', 'style', '', false, previewMode)
     const cursors = ['auto', 'crosshair', 'pointer', 'move', 'e-resize', 'ne-resize', 'nw-resize', 'n-resize', 'se-resize', 'sw-resize', 's-resize', 'w-resize', 'text', 'wait', 'help']
     watch([hshadow, vshadow, blur, color, inset, spread], (v) => {
-      info.setMeta('box-shadow', `${hshadow.value} ${vshadow.value} ${blur.value} ${spread.value} ${color.value} ${inset.value}`, 'style', false, previewMode)
+      const box = `${hshadow.value} ${vshadow.value} ${blur.value} ${spread.value} ${color.value} ${inset.value}`
+      // console.log('box-shadow change in Utilities:' + box)
+      if (boxShadow.value !== box) {
+        info.setMeta('box-shadow', `${hshadow.value} ${vshadow.value} ${blur.value} ${spread.value} ${color.value} ${inset.value}`, 'style', false, previewMode)
+      }
     })
     const opacity = info.computedWrap('opacity', 'style', 100, false, previewMode)
     const cursor = info.computedWrap('cursor', 'style', 'auto', false, previewMode)

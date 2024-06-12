@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineAsyncComponent, ref } from 'vue'
+import { computed, defineAsyncComponent, ref, watch } from 'vue'
 import UIBase from '@/components/ui/js/UIBase'
 import { useStore } from 'vuex'
 
@@ -71,42 +71,69 @@ export default {
     const showRect = computed(() => {
       if (inlineEditItemId.value !== '') return false
       const highlights = setup.highlightUIItemIds.value || []
-      if (setup.hoverUIItemId.value !== props.uiconfig.meta.id && setup.selectedUIItemId.value !== props.uiconfig.meta.id && highlights.indexOf(props.uiconfig.meta.id) === -1) return false
-      return true
+      if (setup.hoverUIItemId.value === props.uiconfig.meta.id ||
+        setup.selectedUIItemId.value === props.uiconfig.meta.id ||
+        highlights.indexOf(props.uiconfig.meta.id) !== -1) return true
+      return false
     })
     const showAction = computed(() => {
       if (inlineEditItemId.value !== '') return false
-      if (setup.hoverUIItemId.value !== props.uiconfig.meta.id && setup.selectedUIItemId.value !== props.uiconfig.meta.id) return false
-      return true
+      if (setup.hoverUIItemId.value === props.uiconfig.meta.id ||
+        setup.selectedUIItemId.value === props.uiconfig.meta.id) return true
+      return false
     })
-    const rectStyle = computed(() => {
-      if (!showRect.value || !ui.value) return 'display:none'
-      const el = document.getElementById(props.uiconfig.meta.id)
-      if (!el) return 'display:none;'
-      const { width, height, x, y } = el.getBoundingClientRect()
-      const marginLeft = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-left')) || 0
-      const marginTop = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-top')) || 0
-      const marginRight = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-right')) || 0
-      const marginBottom = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-bottom')) || 0
-      if (props.uiconfig.type === 'Page') {
-        return `top:0px;left:0px;transform:translateX(${x + 2}px) translateY(${y + 2}px);width:${width - 4}px;height:${height - 4}px`
+    // 用于观测显示标志和dom都是否准备好
+    const watchAction = computed(() => (showAction.value ? '1' : '0') + (ui.value ? '1' : '0'))
+    const watchRect = computed(() => (showRect.value ? '1' : '0') + (ui.value ? '1' : '0'))
+    const rectStyle = ref('display:none')
+    const actionStyle = ref('display:none')
+    watch(watchRect, (v) => {
+      if (v !== '11') {
+        rectStyle.value = 'display:none'
+        return
       }
-      // if (props.uiconfig.meta.id === 'Page44PqXWVlhV36') console.log(el.getBoundingClientRect())
-      return `top:0px;left:0px;transform:translateX(${x - marginLeft - 2}px) translateY(${y - marginTop - 2}px);width:${width + marginLeft + marginRight + 4}px;height:${height + marginTop + marginBottom + 4}px`
-    })
-    const actionStyle = computed(() => {
-      if (!showAction.value || !ui.value) return 'display:none;'
-      const el = document.getElementById(props.uiconfig.meta.id)
-      if (!el) return 'display:none;'
-      const { height, x, y } = el.getBoundingClientRect()
-      const marginLeft = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-left')) || 0
-      const marginTop = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-top')) || 0
+      // nexttick 仍然会导致getBoundingClientRect获取的不是事件的元素数据
+      setTimeout(() => {
+        const el = document.getElementById(props.uiconfig.meta.id)
+        if (!el) {
+          rectStyle.value = 'display:none'
+          return
+        }
+        const { width, height, x, y } = el.getBoundingClientRect()
+        const marginLeft = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-left')) || 0
+        const marginTop = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-top')) || 0
+        const marginRight = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-right')) || 0
+        const marginBottom = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-bottom')) || 0
+        if (props.uiconfig.type === 'Page') {
+          rectStyle.value = `top:0px;left:0px;transform:translateX(${x + 2}px) translateY(${y + 2}px);width:${width - 4}px;height:${height - 4}px`
+          return
+        }
+        rectStyle.value = `top:0px;left:0px;transform:translateX(${x - marginLeft - 2}px) translateY(${y - marginTop - 2}px);width:${width + marginLeft + marginRight + 4}px;height:${height + marginTop + marginBottom + 4}px`
+      }, 100)
+    }, { immediate: true })
+    watch(watchAction, (v) => {
+      if (v !== '11') {
+        rectStyle.value = 'display:none'
+        return
+      }
 
-      if (props.uiconfig.type === 'Page') {
-        return `transform:translateX(${x + 2}px) translateY(${y + height - 20}px);`
-      }
-      return `transform:translateX(${x - marginLeft - 5.2}px) translateY(${y + marginTop + 5 + height}px);`
-    })
+      setTimeout(() => {
+        const el = document.getElementById(props.uiconfig.meta.id)
+        if (!el) {
+          actionStyle.value = 'display:none;'
+          return
+        }
+        const { height, x, y } = el.getBoundingClientRect()
+        const marginLeft = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-left')) || 0
+        const marginTop = parseFloat(window.getComputedStyle(el).getPropertyValue('margin-top')) || 0
+
+        if (props.uiconfig.type === 'Page') {
+          actionStyle.value = `transform:translateX(${x + 2}px) translateY(${y + height - 20}px);`
+          return
+        }
+        actionStyle.value = `transform:translateX(${x - marginLeft - 5.2}px) translateY(${y + marginTop + 5 + height}px);`
+      }, 100)
+    }, { immediate: true })
 
     return {
       ...setup,

@@ -27,7 +27,7 @@
     </div>
     <template v-if="tree.children.length > 0">
       <ul :class="{'tree':true, 'd-none':!subIsOpen}">
-        <APITree :key="index" v-for="(subitem, index) in tree.children" :open="open" :tree="subitem" :indent="indent+1" :path="path+'/'+tree.name">
+        <APITree :key="index" v-for="(subitem, index) in tree.children" :open="open" :tree="subitem" :indent="indent+1" :path="path+'/'+tree.title">
           <template #leaf="{data}">
             <slot name="leaf" :data="data"></slot>
           </template>
