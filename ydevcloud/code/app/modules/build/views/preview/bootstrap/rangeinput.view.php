@@ -2,13 +2,16 @@
 namespace app\modules\build\views\preview\bootstrap;
 use app\modules\build\views\code\Base_Code_Fragment;
 
+use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 
 
 class Rangeinput_View extends Preview_View {
-    use Bootstrap_Popup,Html_Code_Helper;
+    use Bootstrap_Popup,Html_Code_Helper,Alpine {
+        Alpine::build_code as alpineBuildCode;
+    }
 
 
     public function build_style($justSelf = true)
@@ -49,6 +52,7 @@ class Rangeinput_View extends Preview_View {
     }
     protected function style_map($meta=null, $state = 'normal')
     {
+        $meta = $meta??$this->data['meta'];
         $map = parent::style_map($meta);
 
         $background = [];
@@ -98,7 +102,7 @@ class Rangeinput_View extends Preview_View {
     }
     public function build_code():Base_Code_Fragment
     {
-        parent::build_code();
+        $this->alpineBuildCode();
         $codeLines = [];
         $codeFragment = $this->get_code_Fragment();
         $this->get_input_data($inputDataName);

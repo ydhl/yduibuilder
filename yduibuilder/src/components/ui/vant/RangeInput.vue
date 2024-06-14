@@ -1,9 +1,9 @@
 <template>
-  <div :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
+  <div :draggable='draggable' :style="myStyle" :id="myId" :data-type="uiconfig.type"
        :data-pageid="pageid"
-       :class="[dragableCss, uiCss,{'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
+       :class="[dragableCss, myCss,{'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
     <div class="van-field__control van-field__control--custom">
-      <div class="van-slider" :style="sliderStyle">
+      <div class="van-slider">
         <!--背景条-->
         <div :style="bgStyle" :class="bgTheme">
           <!--滑块按钮-->
@@ -40,15 +40,16 @@ export default {
     const handleStyle = computed(() => {
       const style: any = []
       style.push(`left: ${props.uiconfig.meta.value || 50}%; !important;`)
-      if (props.uiconfig.meta?.custom?.color) {
-        style.push('background-color:' + props.uiconfig.meta?.custom?.color + ' !important;')
+      if (props.uiconfig.meta?.style?.color) {
+        style.push('background-color:' + props.uiconfig.meta?.style?.color + ' !important;')
       }
       return style.join(';')
     })
     const handleTheme = computed(() => {
       const css: any = ['van-slider__button van-text-center']
-      if (props.uiconfig.meta?.custom?.theme && props.uiconfig.meta?.custom?.theme !== 'default') {
-        css.push(store.getters.translate('backgroundTheme', props.uiconfig.meta?.custom?.theme))
+      if (props.uiconfig.meta?.css?.foregroundTheme && props.uiconfig.meta?.css?.foregroundTheme !== 'default') {
+        css.push(store.getters.translate('backgroundTheme', props.uiconfig.meta?.css?.foregroundTheme))
+        css.push(store.getters.translate('foregroundTheme', 'light'))
       }
 
       if (props.uiconfig.meta?.form?.state === 'disabled' || props.uiconfig.meta?.form?.state === 'readonly') {
@@ -69,31 +70,39 @@ export default {
      */
     const bgTheme = computed(() => {
       const css: any = ['van-slider__bar']
-
+      if (props.uiconfig.meta?.css?.backgroundTheme && props.uiconfig.meta?.css?.backgroundTheme !== 'default') {
+        css.push(store.getters.translate('backgroundTheme', props.uiconfig.meta?.css?.backgroundTheme))
+      }
       return css.join(' ')
     })
     const bgStyle = computed(() => {
       const style: any = [`width: ${props.uiconfig.meta.value || 50}% !important;`]
-      if (props.uiconfig.meta?.custom?.color) {
-        style.push('background-color:' + props.uiconfig.meta?.custom?.color + ' !important;')
-      }
-      return style.join(';')
-    })
-    const sliderStyle = computed(() => {
-      const style: any = []
-      if (props.uiconfig.meta?.custom?.backgroundColor) {
-        style.push('background-color:' + props.uiconfig.meta?.custom?.backgroundColor + ' !important;')
+      if (props.uiconfig.meta?.style?.['background-color']) {
+        style.push('background-color:' + props.uiconfig.meta?.style?.['background-color'] + ' !important;')
       }
       return style.join(';')
     })
 
+    const myCss = computed(() => {
+      const css = rangeinput.getUICss()
+      delete css.backgroundTheme
+      const arr: any = Object.values(css)
+      return arr
+    })
+    const myStyle = computed(() => {
+      const myStyle = rangeinput.getUIStyle()
+      delete myStyle?.['background-color']
+      delete myStyle?.['background-image']
+      return rangeinput.appendImportant(myStyle)
+    })
     return {
       ...rangeinput.setup(),
+      myCss,
+      myStyle,
       bgTheme,
       bgStyle,
       trackTheme,
       handleStyle,
-      sliderStyle,
       handleTheme
     }
   }

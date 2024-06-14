@@ -2,13 +2,18 @@
 namespace app\modules\build\views\preview\bootstrap;
 
 use app\modules\build\views\code\Base_Code_Fragment;
+use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
-use app\modules\build\views\preview\Preview_View;
+use app\modules\build\views\preview\ValueList_View;
 use yangzie\YZE_View_Component;
 use function yangzie\__;
 
 class Select_View extends ValueList_View {
+    use Bootstrap_Popup,Html_Code_Helper,Alpine {
+        Alpine::build_code as alpineBuildCode;
+    }
+
     protected function css_map()
     {
         $cssmap = parent::css_map();
@@ -108,7 +113,7 @@ class Select_View extends ValueList_View {
 
     function build_code(): Base_Code_Fragment
     {
-        parent::build_code();
+        $this->alpineBuildCode();
         $hasIterate = $this->need_iterate_data($iterateOutputAs, $outputDataName, $iterateDataName) || $this->data['meta']['custom']['multiple'];
         $codeFragment = $this->get_code_Fragment();
         $inputData = $this->get_input_data($dataName);

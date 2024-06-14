@@ -134,8 +134,8 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         }
     }
     /**
-     * 元素上的css样式字符串
-     * @var string
+     * 元素上的css样式字符串, 返回数组，key是样式主题名称，value是对于的样式字符串
+     * @var array
      */
     protected function css_map() {
         $cssArray = [];
@@ -1287,7 +1287,8 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                     if ($this->is_1d_any_array($outputData)) return "JSON.stringify(itemOf{$dataName})";
                     if ($this->is_1d_object_array($outputData) || $this->is_2d_array($outputData)) return "JSON.stringify(itemOf{$dataName})";
                     return null;
-                case 'VALUELIST':
+                case 'VALUELIST': return null;
+                case 'VALUE':
                     if ($this->is_scale($outputData)) return $outputDataName;
                     if ($this->is_object($outputData) || $this->is_1d_array($outputData)) return "itemOf{$dataName}";
                     if ($this->is_2d_array($outputData)) return "itemOf{$dataName}2";

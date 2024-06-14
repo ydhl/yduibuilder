@@ -336,8 +336,8 @@ export default {
         unIterable: {
           HTML: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
           TEXT: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
-          VALUELIST: ['string', 'number', 'integer', 'array'],
-          VALUE: ['string', 'number', 'integer'],
+          VALUELIST: [],
+          VALUE: ['string', 'number', 'integer', 'array'],
           STYLE: ['string', 'number', 'integer', 'map', 'object', 'array'],
           CSS: ['string', 'number', 'integer', 'map', 'object', 'array'],
           TITLE: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
@@ -367,7 +367,7 @@ export default {
           if (output === 'NONE' && !is2DArray) continue
           if (output === 'VALUELIST' && ['Collapse', 'Carousel'].indexOf(uiType) !== -1 && (isObject || is1DObjectArray || (is2DArray && !is2DScaleArray))) continue
         } else {
-          if (output === 'VALUELIST' && !isScale && !is1DScaleArray) continue
+          if (output === 'VALUE' && !isScale && !is1DScaleArray) continue
           if (output === 'STYLE' && !isScale && !isObject && !is1DArray && (is2DArray && !is2DScaleArray)) continue
           if (output === 'CSS' && !isScale && !is1DScaleArray && (is2DArray && !is2DScaleArray)) continue
           if (output === 'KEYVALUE' && !isObject && !is1DObjectArray) continue

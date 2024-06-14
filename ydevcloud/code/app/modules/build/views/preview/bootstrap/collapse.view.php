@@ -2,11 +2,17 @@
 namespace app\modules\build\views\preview\bootstrap;
 
 use app\modules\build\views\code\Base_Code_Fragment;
+use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Html_Code_Fragment;
-
+use app\modules\build\views\preview\Html_Code_Helper;
+use app\modules\build\views\preview\ValueList_View;
 class Collapse_View extends ValueList_View {
+    use Bootstrap_Popup,Html_Code_Helper,Alpine {
+        Alpine::build_code as alpineBuildCode;
+    }
+
     public function build_code(): Base_Code_Fragment{
-        parent::build_code();
+        $this->alpineBuildCode();
         $fragment = $this->get_code_fragment();
         $bindOutputs = $this->get_output_datas($outDataName);
         if (!$bindOutputs['VALUELIST']) return $fragment;

@@ -2,18 +2,21 @@
 namespace app\modules\build\views\preview\bootstrap;
 
 use app\modules\build\views\code\Base_Code_Fragment;
+use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
-
+use app\modules\build\views\preview\ValueList_View;
 class Dropdown_View extends ValueList_View {
+    use Bootstrap_Popup,Html_Code_Helper,Alpine {
+        Alpine::build_code as alpineBuildCode;
+    }
 
     private function dropdownMeta () {
         $parentUI = $this->get_parent_UI();
         $type = strtolower($parentUI['type']);
-        $parentIsButtonGroup = $type == 'buttongroup';
         $parentIsNavbar = in_array($type, ['nav', 'navbar']);
-        if ($parentIsButtonGroup || $parentIsNavbar) {
+        if ($parentIsNavbar) {
             return $parentUI['meta'];
         }
         return $this->data['meta'];
@@ -24,7 +27,7 @@ class Dropdown_View extends ValueList_View {
      * @return mixed
      */
     private function theme() {
-        // 如果自己有背景和前景则用自己的，否则用上层的，如buttongroup
+        // 如果自己有背景和前景则用自己的，否则用上层的
         $cssMap = parent::css_map();
         $dropdownMeta = $this->dropdownMeta();
         $myTheme = $cssMap['backgroundTheme'] ? $this->data['meta']['css']['backgroundTheme'] : '';
@@ -36,7 +39,7 @@ class Dropdown_View extends ValueList_View {
      * @return mixed
      */
     private function forceTheme() {
-        // 如果自己有背景和前景则用自己的，否则用上层的，如buttongroup
+        // 如果自己有背景和前景则用自己的，否则用上层的
         $cssMap = parent::css_map();
         $dropdownMeta = $this->dropdownMeta();
         $myTheme = $cssMap['foregroundTheme'] ? $this->data['meta']['css']['foregroundTheme'] : '';
@@ -45,12 +48,7 @@ class Dropdown_View extends ValueList_View {
     }
 
     private function sizing() {
-        $parentUI = $this->get_parent_UI();
-        $parentIsButtonGroup = strtolower($parentUI['type']) == 'buttongroup';
-        $buttonMeta = $parentIsButtonGroup ? $parentUI['meta'] : $this->data['meta'];
-        if ($parentIsButtonGroup) {
-            return $this->cssTranslate['buttonSizing'][$buttonMeta['css']['buttonSizing']];
-        }
+        $buttonMeta = $this->data['meta'];
         return $this->cssTranslate['dropdownSizing'][$buttonMeta['css']['dropdownSizing']];
     }
     private function splitBtnCss() {
@@ -110,7 +108,7 @@ class Dropdown_View extends ValueList_View {
     }
     private function btyStyle () {
         $styleArray = parent::style_map();
-        // 如果自己有背景和前景则用自己的，否则用上层的，如buttongroup
+        // 如果自己有背景和前景则用自己的，否则用上层的
         $dropdownMeta = $this->dropdownMeta();
         $color = $this->data['meta']['style']['color'] ?: $dropdownMeta['style']['color'];
         $backgroundColor = $this->data['meta']['style']['background-color'] ?: $dropdownMeta['style']['background-color'];
@@ -130,8 +128,7 @@ class Dropdown_View extends ValueList_View {
     protected function css_map()
     {
         $parentUI = $this->get_parent_UI();
-        $parentIsButtonGroup = strtolower($parentUI['type']) == 'buttongroup';
-        $buttonMeta = $parentIsButtonGroup ? $parentUI['meta'] : $this->data['meta'];
+        $buttonMeta = $this->data['meta'];
 
         $cssArray = parent::css_map();
         unset($cssArray['dropdownSizing'], $cssArray['backgroundTheme'], $cssArray['foregroundTheme']);
@@ -144,7 +141,7 @@ class Dropdown_View extends ValueList_View {
             $arr[] = 'nav-item';
         }
 
-        if ($parentIsButtonGroup || @$buttonMeta['custom']['isSplit']){
+        if (@$buttonMeta['custom']['isSplit']){
             $arr[] = 'btn-group';
         }
 
@@ -280,7 +277,7 @@ class Dropdown_View extends ValueList_View {
 
     function build_code(): Base_Code_Fragment
     {
-        parent::build_code();
+        $this->alpineBuildCode();
         $codeFragment = $this->get_code_Fragment();
         $inputData = $this->get_input_data($dataName);
         // 如果没有数据绑定的话，定义一个临时数据

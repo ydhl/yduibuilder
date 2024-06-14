@@ -1,15 +1,12 @@
 <?php
-namespace app\modules\build\views\preview\bootstrap;
+namespace app\modules\build\views\preview;
 
-use app\modules\build\views\preview\Html_Code_Helper;
-use app\modules\build\views\preview\Preview_View;
 use function yangzie\__;
 
 /**
  * 迭代类ui公共逻辑封装
  */
 abstract class ValueList_View extends Preview_View {
-    use Bootstrap_Popup,Html_Code_Helper;
 
     // 重载，数组不循环输出自己，循环输出自己的子项
     protected function build_data_output_bind(){

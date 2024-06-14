@@ -6,9 +6,9 @@
               :disabled="uiconfig.meta?.form?.state==='disabled'"
               :placeholder="uiconfig.meta?.form?.placeholder" :rows="uiconfig.meta.custom?.row" v-model="defaultValue"></textarea>
     <div class="van-ml-3" v-if="uiconfig.meta?.custom?.wordCountVisible">0{{uiconfig.meta?.custom?.maxLength ? '/' + uiconfig.meta?.custom?.maxLength : ''}}</div>
-    <button v-if="uiconfig.meta?.custom?.clearButtonVisible" class="van-button van-button--mini van-border-0 van-button--default">
+    <div v-if="uiconfig.meta?.custom?.clearButtonVisible" class="cursor van-ml-3">
       <i class="van-badge__wrapper van-icon van-icon-cross"></i>
-    </button>
+    </div>
   </div>
 </template>
 

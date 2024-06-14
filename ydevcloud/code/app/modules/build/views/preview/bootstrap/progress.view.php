@@ -39,7 +39,7 @@ class Progress_View extends Preview_View {
         $outputDatas = $this->get_output_datas($outputDataName);
 
         $value = $this->data['meta']['value']?:50;
-        if ($outputDatas['VALUELIST']){
+        if ($outputDatas['VALUE']){
             $style = [];// build_ui中绑定
         }else{
             $style = ["width: {$value}%"];
@@ -66,8 +66,8 @@ class Progress_View extends Preview_View {
         echo $this->wrap_output('style', $this->bar_style());
 
         $value = $this->data['meta']['value']?:50;
-        if ($outputDatas['VALUELIST']){
-            $outputDataName = $this->get_output_data_name('VALUELIST', $outputDatas['VALUELIST'], $outputDataName['VALUELIST']);
+        if ($outputDatas['VALUE']){
+            $outputDataName = $this->get_output_data_name('VALUE', $outputDatas['VALUE'], $outputDataName['VALUE']);
             echo $this->wrap_output(':aria-valuenow', $outputDataName);
             echo $this->wrap_output(':style', "'width:' + {$outputDataName} + '%'");
         }else{

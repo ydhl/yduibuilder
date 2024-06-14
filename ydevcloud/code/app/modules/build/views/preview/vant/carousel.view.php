@@ -1,23 +1,20 @@
 <?php
-namespace app\modules\build\views\preview\bootstrap;
+namespace app\modules\build\views\preview\vant;
 
 use app\modules\build\views\code\Base_Code_Fragment;
-use app\modules\build\views\preview\Alpine;
+use app\modules\build\views\preview\ValueList_View;
 use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
 use function yangzie\__;
-use app\modules\build\views\preview\ValueList_View;
-class Carousel_View extends ValueList_View {
-    use Bootstrap_Popup,Html_Code_Helper,Alpine {
-        Alpine::build_code as alpineBuildCode;
-    }
 
+class Carousel_View extends ValueList_View {
+    use  Vant_Popup,Html_Code_Helper;
     protected function css_map()
     {
         $map = parent::css_map();
-        $css = ['carousel slide'];
+        $css = ['van-carousel slide'];
         if ($this->data['meta']['custom']['effect'] == 'crossfade'){
-            $css[] = 'carousel-fade';
+            $css[] = 'van-carousel-fade';
         }
         $map['-'] = join(' ',$css);
         return $map;
@@ -37,7 +34,7 @@ class Carousel_View extends ValueList_View {
     private function build_static_indicator(){
         if ( ! $this->data['meta']['custom']['showIndicator']) return;
         echo $this->indent(1);
-        echo '<ol class="carousel-indicators">'.PHP_EOL;
+        echo '<ol class="van-carousel-indicators">'.PHP_EOL;
         if ( ! $this->data['items']) {
             echo $this->indent(2);
             echo "<li";
@@ -61,13 +58,13 @@ class Carousel_View extends ValueList_View {
     private function build_static_slide(){
         $this->get_input_data($inputDataName);
         echo $this->indent(1);
-        echo '<div class="carousel-inner"';
+        echo '<div class="van-carousel-inner"';
         $this->build_event_listen();
         if ($inputDataName) echo $this->wrap_output('x-input', $inputDataName);
         echo '>'.PHP_EOL;
         if ( ! $this->data['items']) {
             echo $this->indent(2);
-            echo '<div class="carousel-item active">'.PHP_EOL;
+            echo '<div class="van-carousel-item active">'.PHP_EOL;
             echo $this->indent(3);
             echo '<div class="d-block w-100 d-flex justify-content-center align-items-center"';
             echo $this->wrap_output('style', $this->placeholder_style());
@@ -85,7 +82,7 @@ class Carousel_View extends ValueList_View {
         foreach ((array)@$this->childViews as $index => $view){
             echo $this->indent(2);
             echo "<div";
-            echo $this->wrap_output('class', 'carousel-item '.(!isset($this->data['meta']['custom']['activeIndex']) && !$index || $this->data['meta']['custom']['activeIndex'] == $index ? 'active' : null));
+            echo $this->wrap_output('class', 'van-carousel-item '.(!isset($this->data['meta']['custom']['activeIndex']) && !$index || $this->data['meta']['custom']['activeIndex'] == $index ? 'active' : null));
             echo $this->wrap_output('data-value', $index);
             echo ">".PHP_EOL;
             $view->increase_indent(2);
@@ -109,24 +106,24 @@ class Carousel_View extends ValueList_View {
             }
         }
 
-        echo $this->indent(1).'<a class="carousel-control-prev" type="button"';
+        echo $this->indent(1).'<a class="van-carousel-control-prev" type="button"';
         if ($needDataBind){
             echo $this->wrap_output(":data-target", "'#'+".$this->container_id());
         }else{
             echo $this->wrap_output("data-target", "#".$this->myid(true));
         }
         echo " data-slide=\"prev\">".PHP_EOL;
-        echo $this->indent(2)."<span class='carousel-control-prev-icon' aria-hidden='true'></span>".PHP_EOL;
+        echo $this->indent(2)."<span class='van-carousel-control-prev-icon' aria-hidden='true'></span>".PHP_EOL;
         echo $this->indent(1)."</a>".PHP_EOL;
 
-        echo $this->indent(1).'<a class="carousel-control-next" type="button"';
+        echo $this->indent(1).'<a class="van-carousel-control-next" type="button"';
         if ($needDataBind){
             echo $this->wrap_output(":data-target", "'#'+".$this->container_id());
         }else{
             echo $this->wrap_output("data-target", "#".$this->myid(true));
         }
         echo " data-slide='next'>".PHP_EOL;
-        echo $this->indent(2)."<span class=\"carousel-control-next-icon\" aria-hidden=\"true\"></span>".PHP_EOL;
+        echo $this->indent(2)."<span class=\"van-carousel-control-next-icon\" aria-hidden=\"true\"></span>".PHP_EOL;
         echo $this->indent(1)."</a>".PHP_EOL;
     }
 
@@ -158,8 +155,7 @@ class Carousel_View extends ValueList_View {
     }
 
     public function build_code(): Base_Code_Fragment{
-        $this->alpineBuildCode();
-
+        parent::build_code();
         $fragment = $this->get_code_fragment();
         $bindOutputs = $this->get_output_datas($outDataName);
         if (!$bindOutputs['VALUELIST']) return $fragment;
@@ -226,8 +222,8 @@ class Carousel_View extends ValueList_View {
         // 由于carousel 自身代码的原因 indicator和inner内的元素不能有其他的dom，所以在输出ui时把template放到他们的外面，然后这里
         // 通过脚本把动态生成的内容通过createDocumentFragment移到indicator和inner内
         $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent, true).'this.$nextTick(() => {');
-        $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'let elements = document.querySelectorAll("#'.$indicatorSelector.' .carousel-indicator");');
-//        $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'console.log("#'.$indicatorSelector.' .carousel-indicator", elements)');
+        $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'let elements = document.querySelectorAll("#'.$indicatorSelector.' .van-carousel-indicator");');
+//        $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'console.log("#'.$indicatorSelector.' .van-carousel-indicator", elements)');
         $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'let fragment = document.createDocumentFragment();');
         $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'elements.forEach(function(element) {');
         $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+2, true).'fragment.appendChild(element);');
@@ -237,7 +233,7 @@ class Carousel_View extends ValueList_View {
         $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'targetElement.appendChild(fragment);');
         $fragment->add_code(Html_Code_Fragment::SECTION_INIT, '');
 
-        $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'elements = document.querySelectorAll("#'.$indicatorSelector.' .carousel-item");');
+        $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'elements = document.querySelectorAll("#'.$indicatorSelector.' .van-carousel-item");');
         $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'fragment = document.createDocumentFragment();');
         $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+1, true).'elements.forEach(function(element) {');
         $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent($indent+2, true).'fragment.appendChild(element);');
@@ -293,7 +289,7 @@ class Carousel_View extends ValueList_View {
         echo ">".PHP_EOL;
 
         if ( $this->data['meta']['custom']['showIndicator']) {
-            echo $this->indent(1).'<ol class="carousel-indicators"';
+            echo $this->indent(1).'<ol class="van-carousel-indicators"';
             if ($is2D){
                 echo $this->wrap_output(':id', $this->container_id(). "+'_indicators'");
             }else{
@@ -311,14 +307,14 @@ class Carousel_View extends ValueList_View {
             }else{
                 echo $this->wrap_output("data-target", "#".$this->myid(true));
             }
-            echo $this->wrap_output("class", "carousel-indicator");
+            echo $this->wrap_output("class", "van-carousel-indicator");
             echo $this->wrap_output(":data-slide-to", "idxOf{$itemName}");
             echo $this->wrap_output(':class', "{$activeExp} ? 'active' : ''");
             echo "></li>".PHP_EOL;
             echo $this->indent(1).'</template>'.PHP_EOL;
         }
 
-        echo $this->indent(1).'<div class="carousel-inner"';
+        echo $this->indent(1).'<div class="van-carousel-inner"';
         if ($is2D){
             echo $this->wrap_output(':id', $this->container_id(). "+'_inner'");
         }else{
@@ -341,7 +337,7 @@ class Carousel_View extends ValueList_View {
         $needLoadSubpage = $this->is_2d_scale_array($bindOutput) || $this->is_1d_scale_array($bindOutput);
 
         echo $this->indent(1)."<div";
-        echo $this->wrap_output('class', 'carousel-item');
+        echo $this->wrap_output('class', 'van-carousel-item');
         echo $this->wrap_output(':data-value', $value);
         echo $this->wrap_output(':data-bound', "'{$outDataName}[\''+idxOf{$itemName}+'\']'");
         echo $this->wrap_output(':class', "{'active': {$activeExp}}");

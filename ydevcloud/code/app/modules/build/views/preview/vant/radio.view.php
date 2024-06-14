@@ -3,78 +3,74 @@ namespace app\modules\build\views\preview\vant;
 
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
+use phpseclib3\Math\BigInteger\Engines\PHP;
 
 
 class Radio_View extends Preview_View {
     use Vant_Popup,Html_Code_Helper;
-    public function check_master()
+    protected $type = 'radio';
+    protected function disable_style()
     {
-        $this->master_view = new Formgroup_View($this->data, $this->build->get_controller(), $this->build);
-        return true;
-    }
-    private function radio_css() {
-        $css = ['form-check'];
-        if (@$this->data['meta']['custom']['inline']){
-            $css[] = 'form-check-inline';
+        if (in_array($this->data['meta']['form']['state'], ['readonly','disabled'])) {
+           return 'border-color:var(--van-gray-6);background-color:var(--van-gray-6)';
         }
-        return join(' ', $css);
+        return null;
     }
-    private function body_css() {
-        $arr = [];
 
-        if ($this->data['meta']['custom']['inline']) {
-            $arr[] = 'h-100 d-flex align-items-center';
-        } else {
-            $arr[] = 'h-auto';
+    protected function css_map() {
+        $map = parent::css_map();
+        $map['-'] = 'van-h-auto';
+        if (@$this->data['meta']['form']['state'] == 'hidden'){
+            $map['-'] .= ' van-d-none';
         }
+        return $map;
+    }
+    private function icon_class($item){
+        $_ = ['van-'.$this->type.'__icon '.($this->type=='radio' ? 'van-radio__icon--round' : 'van-checkbox__icon--square')];
+        if (@$item['checked']){
+            $_[] = 'van-'.$this->type.'__icon--checked';
+        }
+        return join(' ', $_);
+    }
 
-        if (@$this->data['meta']['css']['formSizing'] && $this->data['meta']['css']['formSizing']!='normal'){
-            $arr[] = 'form-control-'.$this->data['meta']['css']['formSizing'];
-        }
-        return join(" ", $arr);
-    }
-    private function body_style() {
-        $styleMap = parent::style_map();
-        $newStyle = [];
-        foreach ($styleMap as $key => $value) {
-            if (preg_match("/height/", $key)) {
-                $newStyle[$key] = $value;
-            }
-        }
-        $newStyle = array_values($newStyle);
-        return join(';', $newStyle);
-    }
     public function build_ui()
     {
         $space =  $this->indent(2);
         $values = @$this->data['meta']['values']?:[[ "text"=> 'sample', "value"=> '1' ]];
         echo "{$space}<div";
-        echo $this->wrap_output('class', $this->body_css());
-        echo $this->wrap_output('style', $this->body_style());
-        echo ">\r\n";
+        $this->build_main_attrs();
+        echo ">".PHP_EOL;
         foreach ((array)@$values as $index => $item){
             echo $this->indent(3)."<div";
-            echo $this->wrap_output('class', $this->radio_css());
-            echo ">\r\n";
+            echo $this->wrap_output('class', 'van-'.$this->type.'-group van-'.$this->type.'-group--horizontal');
+            echo ">".PHP_EOL;
             echo $this->indent(4);
-            echo "<input type='radio'";
+            echo '<div class="van-'.$this->type.' van-'.$this->type.'--horizontal">'.PHP_EOL;
 
-            if (@$item['checked']){
-                echo ' checked';
-            }
-            echo ' class="form-check-input" id="'.$this->myId(true).$item['value'].$index.'"';
-            echo $this->build_form_attrs();
-            echo ' value="'.@$item['value'].'"';
-            echo ">\r\n";
+            echo $this->indent(5);
+            echo '<div';
+            echo $this->wrap_output('class', $this->icon_class($item));
+            echo '>'.PHP_EOL;
 
-            echo $this->indent(4);
-            echo "<label class='form-check-label' for='".$this->myId(true).$item['value'].$index."'>";
+            echo '<i';
+            echo $this->wrap_output('class', 'van-badge__wrapper van-icon van-icon-success');
+            echo $this->wrap_output('style', $item['checked'] ? $this->disable_style() : null);
+            echo '></i>' . PHP_EOL;
+
+            echo $this->indent(5);
+            echo '</div>';
+
+            echo $this->indent(5);
+            echo "<label class='van-{$this->type}__label'>";
             echo $item['text'];
-            echo "</label>\r\n";
+            echo "</label>".PHP_EOL;
+
+            echo $this->indent(4);
+            echo "</div>".PHP_EOL;
 
             echo $this->indent(3);
-            echo "</div>\r\n";
+            echo "</div>".PHP_EOL;
         }
-        echo "{$space}</div>\r\n";
+        echo "{$space}</div>".PHP_EOL;
     }
 }

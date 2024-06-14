@@ -80,7 +80,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
   },
   Dropdown: {
     type: 'Dropdown',
-    kind: ['pc'],
+    kind: ['pc', 'mobile'],
     name: 'ui.dropdown',
     isIterable: true,
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
@@ -108,20 +108,20 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     type: 'Icon',
     kind: ['mobile', 'pc'],
     name: 'ui.icon',
-    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
+    outputAs: ['VALUE', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Image: {
     type: 'Image',
     kind: ['mobile', 'pc'],
     name: 'ui.image',
-    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'ALT', 'TITLE', 'KEYVALUE', 'NONE']
+    outputAs: ['VALUE', 'STYLE', 'CSS', 'ALT', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Input: {
     type: 'Input',
     kind: ['mobile', 'pc'],
     isInput: true,
     name: 'ui.input',
-    outputAs: ['STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'VALUE', 'NONE']
+    outputAs: ['VALUE', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   List: {
     type: 'List',
@@ -163,7 +163,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     type: 'Progress',
     kind: ['mobile', 'pc'],
     name: 'ui.progress',
-    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
+    outputAs: ['VALUE', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Radio: {
     type: 'Radio',
@@ -178,14 +178,14 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     kind: ['mobile', 'pc'],
     isInput: true,
     name: 'ui.rangeInput',
-    outputAs: ['STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
+    outputAs: ['VALUE', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   RichText: {
     type: 'RichText',
     kind: ['mobile', 'pc'],
     isInput: false,
     name: 'ui.richText',
-    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE', 'NONE']
+    outputAs: ['VALUE', 'STYLE', 'CSS', 'KEYVALUE', 'NONE']
   },
   Select: {
     type: 'Select',
@@ -213,7 +213,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     kind: ['mobile', 'pc'],
     isInput: true,
     name: 'ui.textarea',
-    outputAs: ['STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'VALUE', 'NONE']
+    outputAs: ['VALUE', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   UIComponent: {
     type: 'UIComponent',

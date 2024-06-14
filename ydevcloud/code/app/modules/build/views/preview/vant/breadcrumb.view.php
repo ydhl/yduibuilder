@@ -33,7 +33,7 @@ class Breadcrumb_View extends Preview_View {
     protected function css_map()
     {
         $cssArray = parent::css_map();
-        $cssArray['breadcrumb'] = 'breadcrumb';
+        $cssArray['breadcrumb'] = 'van-breadcrumb';
         unset($cssArray['foregroundTheme']);
         return $cssArray;
     }
@@ -49,26 +49,27 @@ class Breadcrumb_View extends Preview_View {
         $space =  $this->indent();
         echo "{$space}<ol";
         echo $this->build_main_attrs();
-        echo ">\r\n";
+        echo ">".PHP_EOL;
 
         foreach ($this->values() as $item){
             echo $this->indent();
-            echo "<li class='breadcrumb-item";
+            echo "<li class='van-breadcrumb-item";
             echo @$item['checked'] ? ' active' : '';
-            echo "'>\r\n";
+            echo "'>".PHP_EOL;
             if (!@$item['checked']){
                 echo $this->indent();
-                echo "<a href='{$item['value']}'".$this->wrap_output('class', $this->foregroundCss())
-                    .$this->wrap_output('style', $this->foregroundStyle()).">{$item['text']}</a>\r\n";
+                echo "<span"
+                    .$this->wrap_output('class', $this->foregroundCss())
+                    .$this->wrap_output('style', $this->foregroundStyle()).">{$item['text']}</span>".PHP_EOL;
             }else{
                 echo $this->indent(2);
-                echo "{$item['text']}\r\n";
+                echo "{$item['text']}".PHP_EOL;
             }
             echo $this->indent(1);
-            echo "</li>\r\n";
+            echo "</li>".PHP_EOL;
         }
 
         echo $space;
-        echo "</ol>\r\n";
+        echo "</ol>".PHP_EOL;
     }
 }

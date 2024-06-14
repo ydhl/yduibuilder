@@ -20,6 +20,7 @@ class Logs_Module extends YZE_Base_Module{
     public function check()
     {
         // 判断如果表不存在，则创建日志表
+        try{
         YZE_DBAImpl::get_instance()->native_Query("
         CREATE TABLE IF NOT EXISTS `log` (
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -55,6 +56,7 @@ class Logs_Module extends YZE_Base_Module{
     REFERENCES `log` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4;");
+        }catch (\Exception $e){}
     }
 
     protected function config(){

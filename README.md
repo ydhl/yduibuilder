@@ -67,12 +67,12 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 
 ### 安装ydecloud 管理后端
 1. 初始化数据库: 导入`db_init.sql`创建数据库
-2. 修改`ydevcloud/code/app/__config__.php`中的配置
-   1. `YZE_DB_USER`： 用户名
-   2. `YZE_DB_HOST_M`： 访问地址
-   3. `YZE_DB_DATABASE`： 数据库名
-   4. `YZE_DB_PORT`： 访问端口
-   5. `YZE_DB_PASS`： 密码
+2. 修改`ydevcloud/code/app/__config__.php`中的配置, 在config方法中配置数据库信息
+   1. `default_db`： 你的数据库名称
+   2. `db_host`： 访问地址
+   3. `db_user`: 用户名
+   4. `db_port`： 访问端口
+   5. `db_psw`： 密码
    6. `SITE_URI`： 为你本地设置的虚拟域名
    7. `UPLOAD_SITE_URI`： 为上传文件的访问域名，该演示环境上传的文件都放到upload下，所以就是你的域名加 `upload/`
    8. `UI_BUILDER_URI`： yduibuilder前端的访问地址，如果没有端口冲突，则不用做更改

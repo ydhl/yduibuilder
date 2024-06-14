@@ -27,7 +27,7 @@ export default {
     const setup = hr.setup()
     const uiStyle = computed(() => {
       const myStyle = hr.getUIStyle()
-      delete myStyle?.height
+      // delete myStyle?.height
 
       // 背景色是边框颜色
       if (myStyle?.['background-color']) {

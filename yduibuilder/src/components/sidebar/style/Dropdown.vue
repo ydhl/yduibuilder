@@ -8,7 +8,7 @@
       </div>
     </div>
     <DropdownValueList></DropdownValueList>
-    <div class="row">
+    <div class="row" v-if="!isMobile">
       <div class="col-sm-9 offset-3">
         <label class=" form-check-label text-truncate d-block"><input type="checkbox" v-model="isSplitBtn" value="1"> {{ t('style.dropdown.splitBtn') }}</label>
       </div>
@@ -19,12 +19,14 @@
         <select class="form-select form-select-sm" v-model="direction">
           <option value="dropup">{{ t('style.dropdown.directionUp') }}</option>
           <option value="dropdown">{{ t('style.dropdown.directionDown') }}</option>
-          <option value="dropleft">{{ t('style.dropdown.directionLeft') }}</option>
-          <option value="dropright">{{ t('style.dropdown.directionRight') }}</option>
+          <template v-if="!isMobile">
+            <option value="dropleft">{{ t('style.dropdown.directionLeft') }}</option>
+            <option value="dropright">{{ t('style.dropdown.directionRight') }}</option>
+          </template>
         </select>
       </div>
     </div>
-    <div class="row">
+    <div class="row"  v-if="!isMobile">
       <label for="dropdown-title" class="col-sm-3 col-form-label text-truncate text-end">{{ t('style.dropdown.menuAlign') }}</label>
       <div class="col-sm-9">
         <select class="form-select form-select-sm" v-model="menuAlign">
@@ -33,7 +35,7 @@
         </select>
       </div>
     </div>
-    <template v-if="!parentIsNav">
+    <template v-if="!parentIsNav && !isMobile">
       <div class="row">
         <label for="dropdown-title" class="col-sm-3 col-form-label text-truncate text-end">{{ t('style.sizing') }}</label>
         <div class="col-sm-9">
@@ -50,7 +52,7 @@
       </div>
     </template>
 
-    <div class="row">
+    <div class="row" v-if="!isMobile">
       <label class="col-sm-3 col-form-label text-end">{{ t('common.icon') }}</label>
       <div class="col-sm-9">
         <IconSetting></IconSetting>
@@ -127,6 +129,7 @@ export default {
       return parentConfig.type.toLowerCase() === 'navbar' || parentConfig.type.toLowerCase() === 'nav'
     })
 
+    const isMobile = computed(() => store.state.design.endKind === 'mobile')
     return {
       ...info,
       t,
@@ -136,6 +139,7 @@ export default {
       title,
       isOutline,
       parentIsNav,
+      isMobile,
       isSplitBtn
     }
   }

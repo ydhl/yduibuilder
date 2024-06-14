@@ -20,9 +20,10 @@ trait Alpine {
             return $fragment;
         }
 
-        $parent = $this->find_parent($this->myid());
+        $isTopPage = !$this->find_parent($this->myid()) && !$this->build->is_subpage();
+
         // 顶级元素构建alpine代码结构主体
-        if (!$parent){
+        if ($isTopPage){
             $fragment->add_code(Html_Code_Fragment::SECTION_BEGIN,"Alpine.data('".$this->myid()."', () => ({");
             $this->build_page_data_code(1);
         }
@@ -53,7 +54,7 @@ trait Alpine {
             $fragment->merge($view->get_code_fragment());
         }
 
-        if (!$parent){
+        if ($isTopPage){
             // 在主页面记录加载的子页url及其title
             if ($this->build->get_page()->page_type == 'page'){
                 $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, '$loadSubPages: {},');

@@ -43,7 +43,7 @@ export default class RangeInput extends UIBase {
     const minValue = uiconfig.meta.custom?.min === undefined ? 1 : uiconfig.meta.custom?.min
     const defaultValue = uiconfig.meta.value === undefined ? 50 : uiconfig.meta.value
     const maxValue = uiconfig.meta.custom?.max === undefined ? 100 : uiconfig.meta.custom?.max
-    backgroundSize[0] = defaultValue === 0 ? '0%' : ((defaultValue - minValue) / (maxValue - minValue) * 100) + '%'
+    backgroundSize[0] = defaultValue === 0 || maxValue === minValue ? '0%' : ((defaultValue - minValue) / (maxValue - minValue) * 100) + '%'
     style['background-size'] = backgroundSize.join(' ')
     // console.log(style)
     return style

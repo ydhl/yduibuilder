@@ -4,12 +4,12 @@
        :class="[dragableCss, bodyCss, uiCss,{'overflow-hidden':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
     <IconWrapper :uiconfig="uiconfig">
       <input :type="uiconfig.meta?.custom?.inputType || 'Text'" :id="uiconfig.meta.id+uiconfig.type" class="van-field__control"
-           :name="uiconfig.meta?.form?.inputName" :placeholder="uiconfig.meta?.form?.placeholder"
+           :placeholder="uiconfig.meta?.form?.placeholder"
            :disabled="uiconfig.meta?.form?.state==='disabled'"
            :value="uiconfig.meta.value">
     </IconWrapper>
     <div v-if="uiconfig.meta?.custom?.wordCountVisible" class="van-ml-3">0{{uiconfig.meta?.custom?.maxLength ? '/' + uiconfig.meta?.custom?.maxLength : ''}}</div>
-    <div v-if="uiconfig.meta?.custom?.clearButtonVisible" class="cursor ml-3">
+    <div v-if="uiconfig.meta?.custom?.clearButtonVisible" class="cursor van-ml-3">
       <i class="van-badge__wrapper van-icon van-icon-cross"></i>
     </div>
   </div>

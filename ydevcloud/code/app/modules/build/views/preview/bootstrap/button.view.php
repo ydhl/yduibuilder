@@ -10,9 +10,8 @@ class Button_View extends Preview_View {
     private function buttonMeta () {
         $parentUI = $this->get_parent_UI();
         $type = strtolower($parentUI['type']);
-        $parentIsButtonGroup = $type == 'buttongroup';
         $parentIsNavbar = in_array($type, ['nav', 'navbar']);
-        if ($parentIsButtonGroup || $parentIsNavbar) {
+        if ($parentIsNavbar) {
             return $parentUI['meta'];
         }
         return $this->data['meta'];
@@ -21,8 +20,7 @@ class Button_View extends Preview_View {
     {
         $cssMap = parent::css_map();
         $parentUI = $this->get_parent_UI();
-        $parentIsButtonGroup = strtolower($parentUI['type']) == 'buttongroup';
-        // 如果按钮有背景和前景则用按钮的，否则用上层的，如buttongroup
+        // 如果按钮有背景和前景则用按钮的，否则用上层的
         $myBackgruondTheme = $cssMap['backgroundTheme'] ? $this->data['meta']['css']['backgroundTheme'] : '';
         $myForegroundTheme = $cssMap['foregroundTheme'] ? $this->data['meta']['css']['foregroundTheme'] : '';
         unset($cssMap['backgroundTheme']);
@@ -49,8 +47,7 @@ class Button_View extends Preview_View {
         if ($myForegroundTheme && $myForegroundTheme!= 'default'){
             $css[] = $this->cssTranslate['foregroundTheme'][$myForegroundTheme];
         }
-
-        if (@$buttonMeta['css']['buttonSizing'] && $parentIsButtonGroup){
+        if (@$buttonMeta['css']['buttonSizing']){
             $sizing = $this->cssTranslate['buttonSizing'][$buttonMeta['css']['buttonSizing']];
             if ($sizing){
                 $css[] = $sizing;
@@ -61,12 +58,13 @@ class Button_View extends Preview_View {
     }
     protected function style_map($meta=null, $state='normal')
     {
+        $meta = $meta??$this->data['meta'];
         $styleArray = parent::style_map($meta);
 
         $buttonMeta = $this->buttonMeta();
         $selfHasForeground = $meta['css']['foregroundTheme'] && $meta['css']['foregroundTheme'] !== 'default';
         $selfHasBackground = $meta['css']['backgroundTheme'] && $meta['css']['backgroundTheme'] !== 'default';
-        // 如果按钮有背景和前景则用按钮的，否则用上层的buttongroup
+        // 如果按钮有背景和前景则用按钮的，否则用上层的
         $color = $meta['style']['color'] ?: $buttonMeta['style']['color'];
         $backgroundColor = $meta['style']['background-color'] ?: $buttonMeta['style']['background-color'];
         if (!$selfHasForeground && $color){
@@ -85,9 +83,7 @@ class Button_View extends Preview_View {
     public function build_ui()
     {
         $space =  $this->indent();
-        $parentUI = $this->get_parent_UI();
-        $parentIsButtonGroup = strtolower($parentUI['type']) == 'buttongroup';
-        $meta = $parentIsButtonGroup ? $parentUI['meta'] : $this->data['meta'];
+        $meta = $this->data['meta'];
         $type = $meta['custom']['type'] ?: "button";
         // 一般按钮
         echo $space;

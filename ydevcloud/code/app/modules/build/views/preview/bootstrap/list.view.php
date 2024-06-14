@@ -2,13 +2,19 @@
 namespace app\modules\build\views\preview\bootstrap;
 
 use app\modules\build\views\code\Base_Code_Fragment;
+use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
+use app\modules\build\views\preview\ValueList_View;
 use function yangzie\__;
 
 
 class List_View extends ValueList_View {
+    use Bootstrap_Popup,Html_Code_Helper,Alpine {
+        Alpine::build_code as alpineBuildCode;
+    }
+
     private function bind_theme($inputDataName, $currItemValue) {
         $css = ["'list-group-item list-group-item-action': true"];
         if ($inputDataName){
@@ -197,7 +203,7 @@ class List_View extends ValueList_View {
 
     function build_code(): Base_Code_Fragment
     {
-        parent::build_code();
+        $this->alpineBuildCode();
         $codeFragment = $this->get_code_Fragment();
         $inputData = $this->get_input_data($dataName);
         // 如果没有数据绑定的话，定义一个临时数据

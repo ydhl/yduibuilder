@@ -30,36 +30,36 @@ class Card_View extends Preview_View {
         $space =  $this->indent();
         echo "{$space}<div";
         echo $this->build_main_attrs();
-        echo ">\r\n";
+        echo ">".PHP_EOL;
 
         if (!@$this->data['meta']['custom']['headless']){
-            echo $this->indent(1) . "<div class='van-card__header'>\r\n";
+            echo $this->indent(1) . "<div class='van-card__header'>".PHP_EOL;
             foreach ($myItems['head'] as $view){
                 $view->increase_indent(2);
                 $view->output();
             }
-            echo $this->indent(1) . "</div>\r\n";
+            echo $this->indent(1) . "</div>".PHP_EOL;
         }
 
         if ($myItems['inBody']){
-            echo $this->indent(1) . "<div class='van-card__body'>\r\n";
+            echo $this->indent(1) . "<div class='van-card__body'>".PHP_EOL;
 
             foreach ($myItems['inBody'] as $view){
                 $view->increase_indent(2);
                 $view->output();
             }
-            echo $this->indent(1) . "</div>\r\n";
+            echo $this->indent(1) . "</div>".PHP_EOL;
         }
 
         if (!@$this->data['meta']['custom']['footless']){
-            echo $this->indent(1) . "<div class='van-card__footer'>\r\n";
+            echo $this->indent(1) . "<div class='van-card__footer'>".PHP_EOL;
             foreach ($myItems['foot'] as $view){
                 $view->increase_indent(2);
                 $view->output();
             }
-            echo $this->indent(1) . "</div>\r\n";
+            echo $this->indent(1) . "</div>".PHP_EOL;
         }
 
-        echo "{$space}</div>\r\n";
+        echo "{$space}</div>".PHP_EOL;
     }
 }

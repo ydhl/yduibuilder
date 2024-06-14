@@ -2,12 +2,17 @@
 namespace app\modules\build\views\preview\bootstrap;
 
 use app\modules\build\views\code\Base_Code_Fragment;
+use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
-use app\modules\build\views\preview\Preview_View;
+use app\modules\build\views\preview\ValueList_View;
 
 
 class Nav_View extends ValueList_View {
+    use Bootstrap_Popup,Html_Code_Helper,Alpine {
+        Alpine::build_code as alpineBuildCode;
+    }
+
     private function theme_css($inputDataName, $staticData, $bindDataName=null) {
         $css = ["nav-link"];
         $theme = $this->data['meta']['css']['foregroundTheme'];
@@ -168,7 +173,7 @@ class Nav_View extends ValueList_View {
     }
     function build_code(): Base_Code_Fragment
     {
-        parent::build_code();
+        $this->alpineBuildCode();
         $codeFragment = $this->get_code_Fragment();
         $inputData = $this->get_input_data($dataName);
         // 如果没有数据绑定的话，定义一个临时数据

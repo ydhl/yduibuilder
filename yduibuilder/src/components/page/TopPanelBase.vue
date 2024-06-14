@@ -12,6 +12,7 @@
         <ul class="navbar-nav me-auto">
           <li class="nav-item"><span class="nav-link ydui-active">UIBuilder</span></li>
           <li class="nav-item"><a class="nav-link" target="_blank" :href="ssoapi+'?url='+apiBuilder+'/sso&projectId='+project.id" >APIBox</a></li>
+          <li class="nav-item"><a class="nav-link" target="_blank" :href="ssoapi+'?url='+modelDesign+'/sso&projectId='+project.id" >Model Design</a></li>
         </ul>
         <div class="form-inline my-2 my-lg-0">
           <ul class="navbar-nav me-auto">

@@ -11,7 +11,7 @@ class Progress_View extends Preview_View {
     {
         $cssMap = parent::css_map();
         unset($cssMap['foregroundTheme']);
-        $cssMap['-'] = 'progress';
+        $cssMap['-'] = 'van-progress';
         return $cssMap;
     }
     protected function style_map($meta=null, $state = 'normal')
@@ -22,19 +22,18 @@ class Progress_View extends Preview_View {
     }
 
     private function bar_css() {
-        $css = ['progress-bar'];
+        $css = ['van-progress__portion'];
         if (@$this->data['meta']['css']['foregroundTheme']){
             $css[] = $this->cssTranslate['backgroundTheme'][$this->data['meta']['css']['foregroundTheme']];
         }
         if (@$this->data['meta']['custom']['striped']){
-            $css[] = "progress-bar-striped";
+            $css[] = "van-progress-bar-striped";
         }
         if (@$this->data['meta']['custom']['animatedStrip']){
-            $css[] = "progress-bar-animated";
+            $css[] = "van-progress-bar-animated";
         }
         return join(' ', $css);
     }
-
     private function bar_style() {
         $value = $this->data['meta']['value']?:50;
         $style = ["width: {$value}%"];
@@ -45,14 +44,31 @@ class Progress_View extends Preview_View {
         return join(';', $style);
     }
 
+    private function label_css() {
+        $css = ['van-progress__pivot'];
+        if (@$this->data['meta']['css']['foregroundTheme']){
+            $css[] = $this->cssTranslate['backgroundTheme'][$this->data['meta']['css']['foregroundTheme']];
+        }
+        return join(' ', $css);
+    }
+
+    private function label_style() {
+        $value = $this->data['meta']['value']?:50;
+        $style = ["left: {$value}%;transform: translate(-50%, -50%);"];
+        $styleMap = parent::style_map();
+        if ($styleMap['color']){
+            $style[] = "background-color:".$this->data['meta']['style']['color']." !important";
+        }
+        return join(';', $style);
+    }
     public function build_ui()
     {
         $space =  $this->indent();
         echo "{$space}<div";
         echo $this->build_main_attrs();
-        echo ">\r\n";
+        echo ">".PHP_EOL;
 
-        echo $this->indent(1).'<div';
+        echo $this->indent(1).'<span';
         echo $this->wrap_output('class', $this->bar_css());
         echo ' role="progressbar"';
         echo $this->wrap_output('style', $this->bar_style());
@@ -60,12 +76,16 @@ class Progress_View extends Preview_View {
         $value = $this->data['meta']['value']?:50;
         echo ' aria-valuenow="'.$value.'"';
         echo ' aria-valuemin="'.(@$this->data['meta']['custom']['min'] ?? 0).'"';
-        echo ' aria-valuemax="'.(@$this->data['meta']['custom']['max'] ?? 100)."\">\r\n";
-
+        echo ' aria-valuemax="'.(@$this->data['meta']['custom']['max'] ?? 100)."\">".PHP_EOL;
+        echo $this->indent(1)."</span>".PHP_EOL;
         if (@$this->data['meta']['custom']['label']){
-            echo $this->indent(2)."{$value}%\r\n";
+            echo $this->indent(1).'<span';
+            echo $this->wrap_output('class', $this->label_css());
+            echo $this->wrap_output('style', $this->label_style());
+            echo "\">".PHP_EOL;
+            echo $this->indent(2)."{$value}%".PHP_EOL;
+            echo $this->indent(1).'</span>';
         }
-        echo $this->indent(1)."</div>\r\n";
-        echo "{$space}</div>\r\n";
+        echo "{$space}</div>".PHP_EOL;
     }
 }

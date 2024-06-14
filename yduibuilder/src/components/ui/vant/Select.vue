@@ -1,14 +1,9 @@
 <template>
   <div :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
        :data-pageid="pageid"
-       :class="[dragableCss, uiCss,{'overflow-hidden':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
-    <input type="text" :value="firstValue"
-            :disabled="uiconfig.meta?.form?.state==='disabled'"
-            readonly
-            :required="uiconfig.meta?.form?.required"
-            :id="uiconfig.meta.id+uiconfig.type"
-            :style="bodyStyle"
-            :class="bodyCss">
+       :class="[dragableCss, bodyCss, uiCss,{'overflow-hidden':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
+      {{firstValue}}
+      <i class="van-icon van-icon-arrow"></i>
   </div>
 </template>
 
@@ -31,16 +26,11 @@ export default {
     const select = new Select(props, context, useStore())
     const bodyCss = computed(() => {
       const css = select.getUICss()
-      const arr: any = ['van-field__control']
+      const arr: any = ['van-d-flex van-align-items-center van-justify-content-between']
       if (css.foregroundTheme) arr.push(css.foregroundTheme)
       return arr
     })
-    const bodyStyle = computed(() => {
-      const style: any = {}
-      const baseStyle = select.getUIStyle()
-      if (baseStyle?.color) style.color = baseStyle?.color
-      return select.appendImportant(style)
-    })
+
     const firstValue = computed(() => {
       const values = props.uiconfig.meta.values
       if (!values || values.length === 0) return 'Simple 1'
@@ -52,8 +42,7 @@ export default {
     return {
       ...select.setup(),
       bodyCss,
-      firstValue,
-      bodyStyle
+      firstValue
     }
   }
 }

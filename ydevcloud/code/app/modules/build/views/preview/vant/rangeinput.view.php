@@ -8,110 +8,107 @@ use app\modules\build\views\preview\Preview_View;
 
 class Rangeinput_View extends Preview_View {
     use Vant_Popup,Html_Code_Helper;
-    public function check_master()
+    protected function style_map($meta = null, $state = 'normal')
     {
-        $this->master_view = new Formgroup_View($this->data, $this->build->get_controller(), $this->build);
-        return true;
+        $styles = parent::style_map($meta, $state);
+        unset($styles['background-color']);
+        return $styles;
     }
 
-    protected function body_css() {
-        $css = ['w-100 h-100 d-flex align-items-center mb-2'];
-        if (@$this->data['meta']['form']['state']=='disabled'){
-            $css[] = ' disabled';
+    protected function css_map() {
+        $map = parent::css_map();
+        unset($map['backgroundTheme']);
+        $map['-'] = 'van-h-auto';
+        if (@$this->data['meta']['form']['state'] == 'hidden'){
+            $map['-'] .= ' van-d-none';
         }
-        if (@$this->data['meta']['form']['state']=='readonly'){
-            $css[] = ' readonly';
-        }
-        return join(' ', $css);
-    }
-    protected function body_style() {
-        $styleMap = parent::style_map();
-        $newStyle = [];
-        foreach ($styleMap as $key => $value) {
-            if (preg_match("/height/", $key)) {
-                $newStyle[$key] = $value;
-            }
-        }
-        $newStyle = array_values($newStyle);
-        return join(';', $newStyle);
-    }
-    protected function rangeCss() {
-        $css = ['form-control-range'];
-        if ($this->data['meta']['css']['formSizing'] && $this->data['meta']['css']['formSizing'] != 'normal') {
-            $css[] = 'form-control-range-' . $this->data['meta']['css']['formSizing'];
-        }
-        if ($this->data['meta']['custom']['theme'] && $this->data['meta']['custom']['theme']!='default') {
-            $css[] = 'range-' . $this->data['meta']['custom']['theme'];
-        }
-        return join(' ', $css);
-    }
-    protected function rangeStyle() {
-        $style = [];
-        $background = [];
-        $backgroundSize = ['50%', '100%'];
-        $color = $this->data['meta']['custom']['color'];
-        $backgroundColor = $this->data['meta']['custom']['backgroundColor'];
-        if ($color) {
-            $style['border'] = "1px solid {$color} !important";
-            $background[] = "-webkit-linear-gradient({$color}, {$color}) no-repeat";
-        }
-        if ($backgroundColor) {
-            $background[] = $backgroundColor;
-        }
-        if ($background) {
-            $style['background'] = join(',', $background) . ' !important';
-        }
-
-        $min = $this->data['meta']['custom']['min'] ?? 1;
-        $default = $this->data['meta']['value'] ?: 50;
-        $max = $this->data['meta']['custom']['max'] ?: 100;
-        $backgroundSize[0] = (($default - $min) / ($max - $min) * 100) . '%';
-        $style['background-size'] = join(' ', $backgroundSize) . ' !important';
-        return $style;
-    }
-    protected function rangeStyleString() {
-        $styles = $this->rangeStyle();
-        array_walk($styles, function (&$val, $key){
-            $val = $key.":".$val;
-        });
-        return join(";", array_values($styles));
+        return $map;
     }
     public function build_ui()
     {
         $space =  $this->indent(2);
         echo "{$space}";
         echo "<div";
-        echo $this->wrap_output('class', $this->body_css());
-        echo $this->wrap_output('style', $this->body_style());
-        echo ">\r\n";
-        echo $this->indent(3)."<input type='range' ";
-        echo $this->build_form_attrs();
-        echo ' min="'.(@$this->data['meta']['custom']['min']??1);
-        echo '" max="'.(@$this->data['meta']['custom']['max']??100);
-        echo '" step="'.(@$this->data['meta']['custom']['step']??1);
-        echo '"';
-        echo $this->wrap_output('class', $this->rangeCss());
+        $this->build_main_attrs();
+        echo ">".PHP_EOL;
 
-        echo $this->wrap_output('style', $this->rangeStyleString());
-        echo ' value="'.@$this->data['meta']['value'].'"';
-        echo ">\r\n";
-        echo "{$space}";
-        echo "</div>\r\n";
+        echo $this->indent(3).'<div class="van-field__control van-field__control--custom">'.PHP_EOL;
+        echo $this->indent(4).'<div class="van-slider"';
+        echo '>'.PHP_EOL;
+        // 背景条
+        echo $this->indent(5).'<div';
+        echo $this->wrap_output('style', $this->bg_style());
+        echo $this->wrap_output('class', $this->bg_class());
+        echo '>'.PHP_EOL;
+        // 滑块
+        echo $this->indent(6).'<div';
+        echo $this->wrap_output('class', 'van-slider__button-wrapper van-slider__button-wrapper--right');
+        echo '>'.PHP_EOL;
+
+        echo $this->indent(7).'<div';
+        echo $this->wrap_output('style', $this->handle_style());
+        echo $this->wrap_output('class', $this->handle_class());
+        echo '>';
+
+        echo $this->data['meta']['value'] ?: 50;
+        echo "</div>";
+
+
+        echo $this->indent(6).'</div>';
+        echo $this->indent(5).'</div>';
+        echo $this->indent(4).'</div>';
+        echo $this->indent(3).'</div>';
+
+
+        echo "{$space}</div>".PHP_EOL;
     }
     public function build_code():Base_Code_Fragment
     {
         parent::build_code();
-        ob_start();
-?>
-document.getElementById('<?= $this->myId(true)?>')?.addEventListener('change', function(event) {
-    var minValue = event.target.min || 1;
-    var value = event.target.value;
-    var maxValue = event.target.max || 100;
-    var percent = ((value - minValue) / (maxValue - minValue) * 100) + '%';
-    event.target.style.backgroundSize = percent + ' 100%';
-});
-<?php
-        $this->get_code_Fragment()->add_code(ob_get_clean());
+
         return $this->get_code_fragment();
+    }
+
+    // 滑块
+    private function handle_style(){
+        $style = [];
+        $meta = $this->data['meta'];
+        $style[] = 'left: '.($meta['value']?:50).'%;important;';
+        if ($meta['style']['color']){
+            $style[] = 'background-color:'.($meta['style']['color']).';important;';
+        }
+        return join(';', $style);
+    }
+
+    private function handle_class(){
+        $class = ['van-slider__button van-text-center'];
+        $meta = $this->data['meta'];
+        if ($meta['css']['foregroundTheme'] && $meta['css']['foregroundTheme'] != 'default'){
+            $class[] = $this->cssTranslate['backgroundTheme'][$meta['css']['foregroundTheme']];
+            $class[] = $this->cssTranslate['foregroundTheme']['light'];
+        }
+        if (in_array($meta['form']['state'], ['disabled', 'readonly'])){
+            $class[] = 'van-disabled';
+        }
+        return join(' ', $class);
+    }
+
+    // 背景色样式，底色
+    private function bg_class(){
+        $class = ['van-slider__bar'];
+        $meta = $this->data['meta'];
+        if ($meta['css']['backgroundTheme'] && $meta['css']['backgroundTheme'] != 'default'){
+            $class[] = $this->cssTranslate['backgroundTheme'][$meta['css']['backgroundTheme']];
+        }
+        return join(' ', $class);
+    }
+    private function bg_style(){
+        $style = [];
+        $meta = $this->data['meta'];
+        $style[] = 'width: '.($meta['value']?:50).'%;important;';
+        if ($meta['style']['background-color']){
+            $style[] = 'background-color:'.($meta['style']['background-color']).';important;';
+        }
+        return join(';', $style);
     }
 }
