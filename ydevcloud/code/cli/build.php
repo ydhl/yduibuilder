@@ -51,7 +51,7 @@ function buildProject($server, $frame, $loginUser, $data) {
         $server->push($frame->fd, $e->getMessage());
         return;
     }
-    $server->push($frame->fd, sprintf(__('compile finished please: <a href="%s">download</a>'), getOssLink($url)));
+    $server->push($frame->fd, sprintf(__('compile finished please: <a href="%s">download</a>'), $url));
     $server->push($frame->fd, "done");
 }
 
