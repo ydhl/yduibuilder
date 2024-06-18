@@ -51,7 +51,9 @@ function buildProject($server, $frame, $loginUser, $data) {
         $server->push($frame->fd, $e->getMessage());
         return;
     }
-    $server->push($frame->fd, sprintf(__('compile finished please: <a href="%s">download</a>'), $url));
+
+    $url = \yangzie\yze_move_file($url, YZE_UPLOAD_PATH.basename($url));
+    $server->push($frame->fd, sprintf(__('compile finished please: <a href="%s">download</a>'), UPLOAD_SITE_URI.\yangzie\yze_remove_path($url, YZE_UPLOAD_PATH)));
     $server->push($frame->fd, "done");
 }
 
