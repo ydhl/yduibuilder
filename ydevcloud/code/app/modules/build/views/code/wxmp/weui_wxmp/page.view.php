@@ -8,7 +8,7 @@ class Page_View extends Preview_Page_View {
     use Wxmp;
     protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map($meta);
+        $map = parent::style_map($meta, $state);
         $map['flex-grow']= 'flex-grow:1'; # 17502
         return $map;
     }

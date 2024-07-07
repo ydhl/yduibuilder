@@ -68,9 +68,7 @@ export default {
     const textStyle = computed(() => {
       const myStyle = hr.getUIStyle()
       const newStyle: any = {}
-      if (!myStyle?.height) {
-        newStyle['line-height'] = '1px'
-      } else {
+      if (myStyle?.height) {
         newStyle['line-height'] = myStyle.height
       }
 

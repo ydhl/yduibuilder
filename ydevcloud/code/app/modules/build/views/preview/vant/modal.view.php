@@ -34,7 +34,7 @@ class Modal_View extends Preview_View {
     }
     protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map($meta);
+        $map = parent::style_map($meta, $state);
         $map['width'] = 'width:100%';
         $map['flex-grow'] = 'flex-grow:1';
         $map['display'] = 'display:flex';

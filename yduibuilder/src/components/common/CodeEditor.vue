@@ -1,7 +1,7 @@
 <template>
-  <lay-layer v-model="myDlgVisible" :title="t('common.customCode')" :shade="true" :area="['520px', '400px']" :btn="buttons">
-    <div class="p-3">
-      <div ref="codeEditor" style="height: 500px"></div>
+  <lay-layer resize :resizeEnd="recomputed" v-model="myDlgVisible" :title="t('common.customCode')" :shade="true" :area="['520px', '400px']" :btn="buttons">
+    <div class="p-3" ref="editorContainer">
+      <div ref="codeEditor" :style="editStyle"></div>
     </div>
   </lay-layer>
 </template>
@@ -30,6 +30,8 @@ export default {
   setup (props: any, context: any) {
     const { t } = useI18n()
     const codeEditor = ref()
+    const editorContainer = ref()
+    const editStyle = ref('height: 500px; width:100%')
     const myCode = computed(() => props.code)
     let editorInstance
     const myDlgVisible = computed({
@@ -73,7 +75,7 @@ export default {
       } else {
         return [
           {
-            text: t('common.add'),
+            text: t('common.ok'),
             callback: () => {
               myDlgVisible.value = false
               context.emit('update', editorInstance.getValue())
@@ -88,11 +90,21 @@ export default {
         ]
       }
     })
+    const recomputed = () => {
+      const { width, height } = editorContainer.value.getBoundingClientRect()
+      editStyle.value = `height:${height - 40}px;width:${width - 40}px`
+      nextTick(() => {
+        if (editorInstance) editorInstance.layout()
+      })
+    }
     return {
       buttons,
       t,
       myCode,
       codeEditor,
+      editorContainer,
+      editStyle,
+      recomputed,
       myDlgVisible
     }
   }

@@ -9,7 +9,7 @@ class Page_View extends Preview_View {
     use Bootstrap_Popup,Html_Code_Helper;
     protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map($meta);
+        $map = parent::style_map($meta, $state);
         $map['flex-grow']= 'flex-grow:1'; # 17502
 
         // 当是弹窗页面时，调整样式让里面的modal能居中，拉抻显示
@@ -26,12 +26,11 @@ class Page_View extends Preview_View {
         $space =  $this->indent();
         echo "{$space}<div";
         echo $this->build_main_attrs();
-        echo ">";
-        echo "\r\n";
+        echo ">".PHP_EOL;
         foreach ($this->childViews as $view){
             $view->output();
         }
 
-        echo "{$space}</div>\r\n";
+        echo "{$space}</div>".PHP_EOL;
     }
 }

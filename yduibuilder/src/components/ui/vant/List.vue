@@ -5,7 +5,7 @@
     <div :class="['van-cell van-align-items-center', itemTheme]" v-for="(item, index) in values"
         :key="index" :style="`${itemStyle}`">
       <div :class="['van-cell__value van-cell__value--alone', itemTheme]" :style="`${itemStyle}`">
-        {{item.text}}
+        {{item.name}}
       </div>
       <i v-if="item.checked" :class="['van-badge__wrapper van-icon van-icon-success van-text-success', itemTheme]" :style="`font-size: 1.5rem;${itemStyle}`"></i>
     </div>

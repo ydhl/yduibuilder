@@ -1,10 +1,10 @@
 <template>
     <div :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
          :data-pageid="pageid"
-         :class="[dragableCss, bodyCss, uiCss,{'overflow-hidden':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
+         :class="[dragableCss, bodyCss, myUiCss,{'overflow-hidden':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
       <IconWrapper :uiconfig="uiconfig">
         <input :type="uiconfig.meta?.custom?.inputType || 'Text'" :id="uiconfig.meta.id+uiconfig.type" class="w-100 border-0 bg-transparent"
-             :name="uiconfig.meta?.form?.inputName" :placeholder="uiconfig.meta?.form?.placeholder"
+             :placeholder="uiconfig.meta?.form?.placeholder"
              :disabled="uiconfig.meta?.form?.state==='disabled'"
              :readonly="uiconfig.meta?.form?.state==='readonly'"  style="font: inherit;color:inherit"
              :required="uiconfig.meta?.form?.required"
@@ -35,7 +35,7 @@ export default {
   setup (props: any, context: any) {
     const input = new Input(props, context, useStore())
     const bodyCss = computed(() => {
-      const arr: any = ['form-control d-flex justify-content-between align-items-center bg-transparent']
+      const arr: any = ['form-control d-flex justify-content-between align-items-center']
       if (props.uiconfig.meta?.custom?.borderless) {
         arr.push('border-0')
       }
@@ -50,9 +50,16 @@ export default {
       }
       return arr
     })
+    const myUiCss = computed(() => {
+      const css = input.getUICss()
+      if (props.uiconfig.meta.style?.color) delete css.foregroundTheme
+      if (props.uiconfig.meta.style?.['background-color']) delete css.backgroundTheme
+      return Object.values(css).join(' ')
+    })
 
     return {
       ...input.setup(),
+      myUiCss,
       bodyCss
     }
   }

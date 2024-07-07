@@ -43,7 +43,7 @@ class Hr_View extends Preview_View {
     protected function style_map($meta=null, $state = 'normal')
     {
         $meta = $meta??$this->data['meta'];
-        $styles = parent::style_map($meta);
+        $styles = parent::style_map($meta, $state);
         unset($styles['height']);
         unset($styles['background-color']);
 

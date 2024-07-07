@@ -492,7 +492,6 @@ export default {
         if (rst && rst.success) {
           pages.value = rst.data
         }
-        // pages.value.unshift({ isInput: false, kind: ['pc', 'mobile'], name: t('ui.page'), type: 'Page' })
       })
     }, {
       immediate: true

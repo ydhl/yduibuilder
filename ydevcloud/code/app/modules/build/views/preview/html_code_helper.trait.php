@@ -17,7 +17,7 @@ trait Html_Code_Helper {
      * @return Html_Code_Fragment
      */
     public function get_code_Fragment():Base_Code_Fragment{
-        if (!$this->codeFragment) $this->codeFragment = new Alpine_Code_Fragment();
+        if (!$this->codeFragment) $this->codeFragment = new Alpinejs_Code_Fragment();
         return $this->codeFragment;
     }
 }

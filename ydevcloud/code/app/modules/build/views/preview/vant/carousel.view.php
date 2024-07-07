@@ -2,13 +2,16 @@
 namespace app\modules\build\views\preview\vant;
 
 use app\modules\build\views\code\Base_Code_Fragment;
+use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\ValueList_View;
 use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
 use function yangzie\__;
 
 class Carousel_View extends ValueList_View {
-    use  Vant_Popup,Html_Code_Helper;
+    use  Vant_Popup,Html_Code_Helper,Alpine{
+        Alpine::build_code as alpineBuildCode;
+    }
     protected function css_map()
     {
         $map = parent::css_map();
@@ -155,7 +158,7 @@ class Carousel_View extends ValueList_View {
     }
 
     public function build_code(): Base_Code_Fragment{
-        parent::build_code();
+        $this->alpineBuildCode();
         $fragment = $this->get_code_fragment();
         $bindOutputs = $this->get_output_datas($outDataName);
         if (!$bindOutputs['VALUELIST']) return $fragment;
@@ -339,7 +342,6 @@ class Carousel_View extends ValueList_View {
         echo $this->indent(1)."<div";
         echo $this->wrap_output('class', 'van-carousel-item');
         echo $this->wrap_output(':data-value', $value);
-        echo $this->wrap_output(':data-bound', "'{$outDataName}[\''+idxOf{$itemName}+'\']'");
         echo $this->wrap_output(':class', "{'active': {$activeExp}}");
         if ($needLoadSubpage){
             echo $this->wrap_output(':id', "'".$this->myid(true)."'+{$idSuffix}");

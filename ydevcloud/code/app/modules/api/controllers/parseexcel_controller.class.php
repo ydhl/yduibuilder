@@ -47,25 +47,29 @@ class Parseexcel_Controller extends YZE_Resource_Controller {
             'footer'=>[],
             'row'=>[]
         ];
-        $tmp = tempnam('/tmp', 'excel');
-        file_put_contents($tmp, file_get_contents(getOssLink($file->url)));
-        $spreadsheet = IOFactory::load($tmp); //载入excel表格
+        try{
+            $tmp = tempnam('/tmp', 'excel');
+            @file_put_contents($tmp, file_get_contents(getOssLink($file->url)));
+            $spreadsheet = IOFactory::load($tmp); //载入excel表格
 
-        $worksheet = $spreadsheet->getActiveSheet();
-//        $rowData = array_map(function ($row) {
-//            return array_filter($row);
-//        },$worksheet->toArray());
-        $rowData = $worksheet->toArray();
+            $worksheet = $spreadsheet->getActiveSheet();
+    //        $rowData = array_map(function ($row) {
+    //            return array_filter($row);
+    //        },$worksheet->toArray());
+            $rowData = $worksheet->toArray();
 
-//        print_r($rowData);
-        $data['row'] = array_map(function ($row) {
-            return array_map(function ($column) {
-                return ['text'=>$column];
-            }, $row);
-        }, $rowData);
-        // 第一行默认为header，最后一行默认为footer
-        $data['header'] = array_shift($data['row']);
-        $data['footer'] = array_pop($data['row']);
+    //        print_r($rowData);
+            $data['row'] = array_map(function ($row) {
+                return array_map(function ($column) {
+                    return ['name'=>$column];
+                }, $row);
+            }, $rowData);
+            // 第一行默认为header，最后一行默认为footer
+            $data['header'] = array_shift($data['row']);
+            $data['footer'] = array_pop($data['row']);
+        }catch (\Exception $e){
+            $data['row'][] = [['name'=>$e->getMessage()]];
+        }
         return YZE_JSON_View::success($this, $data);
     }
 

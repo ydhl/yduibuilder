@@ -43,7 +43,7 @@ export default {
     const value = computed(() => {
       if (!props.uiconfig.meta.values) return ''
       for (const item of props.uiconfig.meta.values) {
-        if (item.checked) return item.text
+        if (item.checked) return item.name
       }
       return ''
     })

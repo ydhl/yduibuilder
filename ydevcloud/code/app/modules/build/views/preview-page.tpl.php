@@ -56,53 +56,7 @@ if ($page->page_type == 'popup'){
         ?>
 
         import ydecloudRun from "<?='/preview/page/'.$page->uuid.'.js?api_env='.$_GET['api_env'].'&mock='.$_GET['mock']?>";
-
-        Alpine.directive('keyvalue', (el, { expression }, { effect, evaluate }) => {
-            effect(() => {
-                const keyValue = evaluate(expression)
-                if (!keyValue || (typeof keyValue) !== 'object') return
-                for(const key in keyValue){
-                    console.log(key)
-                    el.setAttribute(key, keyValue[key])
-                }
-            });
-        });
-        Alpine.directive('style', (el, { expression }, { effect, evaluate }) => {
-            effect(() => {
-                const keyValue = evaluate(expression)
-                if (!keyValue) return
-                let style = []
-                if (Object.prototype.toString.call(keyValue) === '[object Object]'){
-                    for(const key in keyValue){
-                        style.push(`${key}: ${keyValue[key]}`)
-                    }
-                }else if (Object.prototype.toString.call(keyValue) === '[object Array]') {
-                    style = keyValue
-                }else {
-                    return
-                }
-                const old = el.getAttribute('style');
-                el.setAttribute('style', old ? old + ';' + style.join(';') : style.join(';'))
-            });
-        });
-        Alpine.directive('class', (el, { expression }, { effect, evaluate }) => {
-            effect(() => {
-                const keyValue = evaluate(expression)
-                if (!keyValue) return
-                if (Object.prototype.toString.call(keyValue) !== '[object Array]') {
-                    return
-                }
-                const old = el.getAttribute('class');
-                el.setAttribute('class', old ? old + ' ' + keyValue.join(' ') : keyValue.join(' '))
-            });
-        });
-        Alpine.directive('input', (el, { expression, modifiers }, { effect, evaluate, Alpine }) => {
-            Alpine.bind(el, { '@click'(event) {
-                const eventTarget = event.target.dataset?.value ? event.target : event.target.closest('[data-value]');
-                if (!eventTarget) return;
-                evaluate(`${expression} = "${eventTarget.dataset?.value}"`);
-            }})
-        });
+        alpinejs_init_directive(Alpine);
         if(document.readyState === "complete" ||(document.readyState !== "loading" && !document.documentElement.doScroll)) {
             ydecloudRun()
         } else {

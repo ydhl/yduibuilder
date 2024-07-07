@@ -22,6 +22,9 @@ class Project_Module extends YZE_Base_Module{
                 'project/(?P<pid>[^/]+)/tech' => [
                     'controller' => 'tech'
                 ],
+                'project/(?P<pid>[^/]+)/copy' => [
+                    'controller' => 'copy'
+                ],
                 'project/(?P<pid>[^/]+)/transfer' => [
                     'controller' => 'transfer'
                 ],

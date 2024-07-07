@@ -293,7 +293,7 @@ export default {
       canvas.stopDrawline()
       currBindOutUI.value = hoverUIItem.value
       if (currBindType.value === 'in') {
-        if (!hoverUIItem.value?.meta.form && !baseUIDefines[hoverUIItem.value.type].isIterable) {
+        if (!baseUIDefines[hoverUIItem.value.type].isValuable) {
           ydhl.alert(t('variable.bindInputInvalid'))
           return
         }
@@ -366,6 +366,7 @@ export default {
           if (output === 'CSS' && !is1DScaleArray && !isScale) continue
           if (output === 'NONE' && !is2DArray) continue
           if (output === 'VALUELIST' && ['Collapse', 'Carousel'].indexOf(uiType) !== -1 && (isObject || is1DObjectArray || (is2DArray && !is2DScaleArray))) continue
+          if (output === 'VALUELIST' && uiType === 'Table' && !is2DArray) continue
         } else {
           if (output === 'VALUE' && !isScale && !is1DScaleArray) continue
           if (output === 'STYLE' && !isScale && !isObject && !is1DArray && (is2DArray && !is2DScaleArray)) continue
@@ -394,7 +395,7 @@ export default {
     }
     const hasBoundAs = (uiType) => {
       if (!hasOutputAs(uiType)) return false
-      if (baseUIDefines[uiType].isInput) return false
+      if (baseUIDefines[uiType].IsForm) return false
       if (baseUIDefines[uiType].isIterable) return false
       return true
     }

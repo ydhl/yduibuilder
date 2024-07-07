@@ -96,6 +96,10 @@ $packages = Env::package();
                 <?= __("API")?>
             </a>
 
+            <a href="#/project/<?= $project->uuid?>/database" class="disabled list-group-item list-group-item-action <?= $menu == 'database' ? "active" : ""?>">
+                <i class="iconfont icon-database"></i>
+                <?= __("Database")?>
+            </a>
             <a href="/project/<?= $project->uuid?>/icon" class="list-group-item list-group-item-action <?= $menu == 'icon' ? "active" : ""?>">
                 <i class="iconfont icon-image"></i>
                 <?= __("Icon")?>

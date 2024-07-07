@@ -7,7 +7,7 @@
         <div :class="{'van-checkbox__icon van-checkbox__icon--square': true, 'van-radio__icon--checked':item.checked}">
           <i class="van-badge__wrapper van-icon van-icon-success" :style="item.checked ? disabledStyle : ''"></i>
         </div>
-        <span class="van-radio__label">{{item.text}}</span>
+        <span class="van-radio__label">{{item.name}}</span>
       </div>
     </div>
   </div>

@@ -9,7 +9,7 @@ class Breadcrumb_View extends Preview_View {
     use  Vant_Popup, Html_Code_Helper;
     protected function values() {
         if (@!$this->data['meta']['values']){
-            return [["text"=> 'Page A', "value"=> '#1' ], [ "text"=> 'Page B', "value"=> '#2' ]];
+            return [["name"=> 'Page A', "value"=> '#1' ], [ "name"=> 'Page B', "value"=> '#2' ]];
         }
         return $this->data['meta']['values'];
     }
@@ -39,7 +39,7 @@ class Breadcrumb_View extends Preview_View {
     }
     protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map($meta);
+        $map = parent::style_map($meta, $state);
         unset($map['color']);
         return $map;
     }

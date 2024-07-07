@@ -21,7 +21,7 @@
       </div>
     </div>
     <component :is="itemStyle"></component>
-    <StyleForm v-if="selectedUIItemIsInput"></StyleForm>
+    <StyleForm v-if="selectedUIItemIsForm"></StyleForm>
   </div>
 </template>
 

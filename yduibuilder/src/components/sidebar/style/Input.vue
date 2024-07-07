@@ -79,7 +79,7 @@ export default {
     const wordCountVisible = info.computedWrap('wordCountVisible', 'custom', 0)
     const clearButtonVisible = info.computedWrap('clearButtonVisible', 'custom', 0)
     const autocomplete = info.computedWrap('autocomplete', 'custom')
-    const currType = info.computedWrap('custom', 'custom', 'Text')
+    const currType = info.computedWrap('inputType', 'custom', 'Text')
     return {
       t,
       currType,

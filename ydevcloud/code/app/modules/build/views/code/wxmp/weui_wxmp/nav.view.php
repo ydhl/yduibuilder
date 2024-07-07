@@ -18,7 +18,7 @@ class Nav_View extends Preview_Nav_View {
 
     public function build_ui()
     {
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'Sample 1', "value"=> '#' ], [ "text"=> 'Sample 2', "value"=> '#', 'checked'=> true ]];
+        $values = @$this->data['meta']['values']?:[[ "name"=> 'Sample 1', "value"=> '#' ], [ "name"=> 'Sample 2', "value"=> '#', 'checked'=> true ]];
         $space =  $this->indent();
         echo "{$space}<view ";
         echo $this->build_main_attrs();

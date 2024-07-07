@@ -36,7 +36,7 @@ class Radio_View extends Preview_View {
     public function build_ui()
     {
         $space =  $this->indent(2);
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'sample', "value"=> '1' ]];
+        $values = @$this->data['meta']['values']?:[[ "name"=> 'sample', "value"=> '1' ]];
         echo "{$space}<div";
         $this->build_main_attrs();
         echo ">".PHP_EOL;

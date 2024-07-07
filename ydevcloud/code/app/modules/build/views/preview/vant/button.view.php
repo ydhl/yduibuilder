@@ -52,7 +52,7 @@ class Button_View extends Preview_View {
     protected function style_map($meta=null, $state = 'normal')
     {
         $meta = $meta??$this->data['meta'];
-        $styleArray = parent::style_map($meta);
+        $styleArray = parent::style_map($meta, $state);
 
         $buttonMeta = $this->buttonMeta();
         $selfHasForeground = $meta['css']['foregroundTheme'] && $meta['css']['foregroundTheme'] !== 'default';

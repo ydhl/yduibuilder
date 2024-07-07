@@ -750,7 +750,7 @@ export default {
     success: 'Export Success, you can edit component from the left project panel'
   },
   variable: {
-    bindInputInvalid: 'Only form and iteratable UI can bind data input',
+    bindInputInvalid: 'Only valuable UI can bind data input',
     bound: 'Bind Data',
     boundAsValue: 'Bind as input 「value」 parameters for events',
     boundAsBound: 'Bind as input 「boundData」 parameters for events',

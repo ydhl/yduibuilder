@@ -14,8 +14,8 @@
           <select class="form-select" v-model="headerCss">
             <option :key="value" :value="value" v-for="value in cssMap['backgroundTheme']">{{value}}</option>
           </select>
-          <ColorPicker css="form-control" v-model="headerColor"></ColorPicker>
         </div>
+        <ColorPicker css="form-control" v-model="headerColor"></ColorPicker>
       </div>
     </div>
     <div class="row mt-2">
@@ -30,8 +30,8 @@
           <select class="form-select" v-model="footerCss">
             <option :key="value" :value="value" v-for="value in cssMap['backgroundTheme']">{{value}}</option>
           </select>
-          <ColorPicker css="form-control" v-model="footerColor"></ColorPicker>
         </div>
+        <ColorPicker css="form-control" v-model="footerColor"></ColorPicker>
       </div>
     </div>
     <div class="row mt-2">
@@ -51,7 +51,7 @@
     <div class="row mt-2">
       <div class="col-sm-3 text-end"> {{ t('style.table.verticalAlignment') }}</div>
       <div class="col-sm-9">
-        <select class="mb-1 form-control form-control-sm" v-model="verticalAlignment">
+        <select class="mb-1 form-select form-select-sm" v-model="verticalAlignment">
           <option :value="value" v-for="(name,value) in cssMap['verticalAlignment']" :key="value">{{ name }}</option>
         </select>
       </div>
@@ -59,7 +59,7 @@
     <div class="row mt-2">
       <div class="col-sm-3 text-end"> {{ t('style.table.horizontalAlignment') }}</div>
       <div class="col-sm-9">
-        <select class="mb-1 form-control form-control-sm" v-model="horizontalAlignment">
+        <select class="mb-1 form-select form-select-sm" v-model="horizontalAlignment">
           <option :value="value" v-for="(name,value) in cssMap['textAlignment']" :key="value">{{ name }}</option>
         </select>
       </div>
@@ -67,7 +67,7 @@
     <div class="row mt-2">
       <div class="col-sm-3 text-end"> {{ t('style.table.grid') }}</div>
       <div class="col-sm-9">
-        <select class="mb-1 form-control form-control-sm" v-model="grid">
+        <select class="mb-1 form-select form-select-sm" v-model="grid">
           <option value="bordered">{{ t('style.table.bordered') }}</option>
           <option value="borderless">{{ t('style.table.borderless') }}</option>
           <option value="normal">{{ t('style.table.normal') }}</option>
@@ -87,10 +87,13 @@
 <script lang="ts">
 import initUI from '@/components/Common'
 import { useI18n } from 'vue-i18n'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import ColorPicker from '@/components/common/ColorPicker.vue'
 import Upload from '@/components/common/Upload.vue'
 import { useStore } from 'vuex'
+import ydhl from '@/lib/ydhl'
+import { YDJSStatic } from '@/lib/ydjs'
+declare const YDJS: YDJSStatic
 
 export default {
   name: 'StyleTable',
@@ -99,39 +102,19 @@ export default {
     const info = initUI()
     const { t } = useI18n()
     const store = useStore()
-    const headless = computed({
-      get: () => {
-        return info.getMeta('headless', 'custom') || false
-      },
-      set: (v) => {
-        info.setMeta('headless', v, 'custom')
-      }
-    })
-    const stripedRow = computed({
-      get: () => {
-        return info.getMeta('stripedRow', 'custom')
-      },
-      set: (v) => {
-        info.setMeta('stripedRow', v, 'custom')
-      }
-    })
-    const hoverableRow = computed({
-      get: () => {
-        return info.getMeta('hoverableRow', 'custom')
-      },
-      set: (v) => {
-        info.setMeta('hoverableRow', v, 'custom')
-      }
-    })
-
-    const grid = computed({
-      get () {
-        return info.getMeta('grid', 'custom') || ''
-      },
-      set (v) {
-        info.setMeta('grid', v, 'custom')
-      }
-    })
+    const headless = info.computedWrap('headless', 'custom', false)
+    const stripedRow = info.computedWrap('stripedRow', 'custom', false)
+    const hoverableRow = info.computedWrap('hoverableRow', 'custom', false)
+    const grid = info.computedWrap('grid', 'custom', 'normal')
+    const footless = info.computedWrap('footless', 'custom', false)
+    const small = info.computedWrap('small', 'custom', false)
+    const horizontalAlignment = info.computedWrap('textAlignment', 'css', '')
+    const verticalAlignment = info.computedWrap('verticalAlignment', 'css', '')
+    const headerCss = info.computedWrap('header', 'css')
+    const headerColor = info.computedWrap('header', 'custom')
+    const footerCss = info.computedWrap('footer', 'css')
+    const footerColor = info.computedWrap('footer', 'custom')
+    const project = computed(() => store.state.design.project)
     const currExcelFile = computed({
       get () {
         const files = info.getMeta('datasource', 'files') || []
@@ -141,71 +124,32 @@ export default {
         info.setMeta('datasource', [{ id: v.id, name: v.name }], 'files')
       }
     })
-    const footless = computed({
-      get: () => {
-        return info.getMeta('footless', 'custom') || false
-      },
-      set: (v) => {
-        info.setMeta('footless', v, 'custom')
-      }
+    const currExcelID = computed(() => {
+      const files = info.getMeta('datasource', 'files') || []
+      return files[0]?.id
+    })
+    watch(currExcelID, (newV, oldV) => {
+      if (oldV !== newV) parseExcel(newV)
     })
 
-    const small = computed({
-      get: () => {
-        return info.getMeta('small', 'custom') || false
-      },
-      set: (v) => {
-        info.setMeta('small', v, 'custom')
-      }
-    })
-    const horizontalAlignment = computed({
-      get: () => {
-        return info.getMeta('textAlignment', 'css') || ''
-      },
-      set: (v) => {
-        info.setMeta('textAlignment', v, 'css')
-      }
-    })
-    const verticalAlignment = computed({
-      get: () => {
-        return info.getMeta('verticalAlignment', 'css') || ''
-      },
-      set: (v) => {
-        info.setMeta('verticalAlignment', v, 'css')
-      }
-    })
-    const headerCss = computed({
-      get () {
-        return info.getMeta('header', 'css')
-      },
-      set (v) {
-        info.setMeta('header', v, 'css')
-      }
-    })
-    const headerColor = computed({
-      get () {
-        return info.getMeta('header', 'custom')
-      },
-      set (v) {
-        info.setMeta('header', v, 'custom')
-      }
-    })
-    const footerCss = computed({
-      get () {
-        return info.getMeta('footer', 'css')
-      },
-      set (v) {
-        info.setMeta('footer', v, 'css')
-      }
-    })
-    const footerColor = computed({
-      get () {
-        return info.getMeta('footer', 'custom')
-      },
-      set (v) {
-        info.setMeta('footer', v, 'custom')
-      }
-    })
+    const parseExcel = (fid) => {
+      if (!fid) return
+      const loadingid = YDJS.loading(t('page.loading'))
+      ydhl.get('api/parseexcel', { pid: project.value.id, fid }, (rst) => {
+        YDJS.hide_dialog(loadingid)
+        if (!rst || !rst.success) {
+          YDJS.alert(rst?.msg || t('table.canNotParseExcel'), 'Oops')
+          return
+        }
+        const data = {
+          header: rst.data.header || [],
+          footer: rst.data.footer || [],
+          row: rst.data.row || []
+        }
+
+        info.setMeta('data', data, 'custom')
+      }, 'json')
+    }
     const projectId = computed(() => store.state.design.project.id)
     return {
       ...info,

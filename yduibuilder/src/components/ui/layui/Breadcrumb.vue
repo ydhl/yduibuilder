@@ -5,8 +5,8 @@
        :data-pageid="pageid">
     <template v-for="(item, index) in values" :key="index" >
       <a href="javascript:;">
-        <template v-if="!item.checked"><span :class="foreTheme" :style="foreStyle">{{item.text}}</span></template>
-        <template v-if="item.checked"><cite :style="activeStyle">{{item.text}}</cite></template>
+        <template v-if="!item.checked"><span :class="foreTheme" :style="foreStyle">{{item.name}}</span></template>
+        <template v-if="item.checked"><cite :style="activeStyle">{{item.name}}</cite></template>
       </a>
       <span v-if="index!==values.length-1" lay-separator="/"  :class="foreTheme" :style="foreStyle">/</span>
     </template>

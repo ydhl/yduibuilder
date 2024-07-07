@@ -9,7 +9,7 @@ class Page_View extends Preview_View {
     use Vant_Popup,Html_Code_Helper;
     protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map($meta);
+        $map = parent::style_map($meta, $state);
         $map['flex-grow']= 'flex-grow:1'; # 17502
 
         // 当是弹窗页面时，调整样式让里面的modal能居中，拉抻显示

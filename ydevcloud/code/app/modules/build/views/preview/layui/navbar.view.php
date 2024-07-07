@@ -42,7 +42,7 @@ class Navbar_View extends Preview_View {
     public function build_ui()
     {
         $items = $this->get_items();
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'Sample 1', "value"=> '1' ], [ "text"=> 'Sample 2', "value"=> '2', "checked"=> true ]];
+        $values = @$this->data['meta']['values']?:[[ "name"=> 'Sample 1', "value"=> '1' ], [ "name"=> 'Sample 2', "value"=> '2', "checked"=> true ]];
         $space =  $this->indent();
         echo "{$space}<div ";
         echo $this->build_main_attrs();

@@ -1,5 +1,5 @@
 <template>
-  <div :class="[dragableCss, uiCss, 'weui-panel']"
+  <div :class="[dragableCss, uiCss, 'weui-panel weui-panel_access']"
        :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
        :data-isContainer="true"
        :data-pageid="pageid">
@@ -15,7 +15,6 @@
       </template>
       <UIBase v-for="(item, index) in mainItems" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
     </div>
-    <UIBase v-for="(item, index) in otherMainItems" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
     <div :class="['weui-panel__ft subui',{'dragenter-subcontainer': isDragIn && dragoverInParent=='foot'}]" v-if="!uiconfig.meta.custom?.footless" data-placeInParent="foot">
       <template v-if="!myItems.foot.length">
         {{t('style.card.drapTip')}}
@@ -28,7 +27,7 @@
 <script lang="ts">
 import UIBase from '@/components/ui/UIBase.vue'
 import Card from '../js/Card'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
 
 export default {
@@ -45,19 +44,10 @@ export default {
   setup (props: any, context: any) {
     const card = new Card(props, context, useStore())
     const setup = card.setup()
-    const mainItems = ref<Array<any>>([])
-    const otherMainItems = ref<Array<any>>([])
+    const mainItems = computed(() => setup.myItems.value.main)
     const hasMainItems = computed(() => setup.myItems.value.main.length > 0)
-    for (const item of setup.myItems.value.main) {
-      if (item.type.toLowerCase() === 'list' || item.type.toLowerCase() === 'table') {
-        otherMainItems.value.push(item)
-      } else {
-        mainItems.value.push(item)
-      }
-    }
     return {
       mainItems,
-      otherMainItems,
       hasMainItems,
       ...setup
     }

@@ -11,7 +11,7 @@ class alpinejs_install{
     public static function jsForPreview() {
         return [
             'es'=>['alpinejs.es.js'=>'import Alpine'],
-//            'iife'=>['alpinejs.min.js']
+            'iife'=>['alpinejs-util.js']
         ];
     }
 }

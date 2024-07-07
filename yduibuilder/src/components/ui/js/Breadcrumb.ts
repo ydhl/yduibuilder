@@ -7,7 +7,7 @@ export default class Breadcrumb extends UIBase {
     const superSetup = super.setup()
     const values = computed(() => {
       if (!props.uiconfig.meta.values || props.uiconfig.meta.values.length === 0) {
-        return [{ text: 'Page A', value: '#1' }, { text: 'Page B', value: '#2' }]
+        return [{ name: 'Item 1', value: 'item 1', checked: true }, { name: 'Item 2', value: 'item 2' }]
       }
       return props.uiconfig.meta.values
     })

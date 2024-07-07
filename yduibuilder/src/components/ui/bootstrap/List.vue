@@ -3,7 +3,7 @@
       :style="uiStyle" :id="myId" :data-type="uiconfig.type"
       :data-pageid="pageid">
     <li :class="[{'active': item.checked},itemTheme, item.checked ? activeItemTheme : '']" v-for="(item, index) in values"
-        :key="index" :value="item.value" :style="`${itemStyle}; ${item.checked ? activeItemStyle : ''}`">{{item.text}}</li>
+        :key="index" :value="item.value" :style="`${itemStyle}; ${item.checked ? activeItemStyle : ''}`">{{item.name}}</li>
   </ul>
 </template>
 

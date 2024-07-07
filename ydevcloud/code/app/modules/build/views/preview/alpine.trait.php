@@ -20,15 +20,15 @@ trait Alpine {
             return $fragment;
         }
 
-        $isTopPage = !$this->find_parent($this->myid()) && !$this->build->is_subpage();
-
+        // 幻灯片，组件
+        $isTopPage = !$this->find_parent($this->myid());
         // 顶级元素构建alpine代码结构主体
         if ($isTopPage){
             $fragment->add_code(Html_Code_Fragment::SECTION_BEGIN,"Alpine.data('".$this->myid()."', () => ({");
             $this->build_page_data_code(1);
         }
 
-        $this->build_event_binding_code();
+        $this->build_event_code();
         foreach ((array)@$this->childViews as $view){
             $subPageId = $view->get_data('subPageId');
             // 子页或组件的js采用module的方式单独加载
@@ -61,32 +61,37 @@ trait Alpine {
             }
             // 当前页面的url
             $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, '$url: "'.$this->get_popup_page_url($this->build->get_page()).'",');
-            $fragment->add_code(Html_Code_Fragment::SECTION_END, '');
-            $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->indent(1, true).'init(){');
+
             $this->build_component_input(2);
-            $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->build->indent_code(2, $fragment->get_section_codes(Html_Code_Fragment::SECTION_INIT)));
+
             if (in_array($this->build->get_page()->page_type, ['popup', 'subpage'])){
-                $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->indent(2, true).'this.$data.$loadSubPages[this.$url] = encodeURIComponent("'.$this->data['meta']['title'].'")');
+                $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent(0, true).'this.$data.$loadSubPages[this.$url] = encodeURIComponent("'.$this->data['meta']['title'].'")');
             }
-            $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->indent(1, true).'}');
             $fragment->add_code(Html_Code_Fragment::SECTION_END, "}))");
             // 如果是子页、组件、Modal弹窗，则作为module加载，不调用Alpine.start（由主页面调用）
             if (!$this->build->is_subpage() && !in_array($this->build->get_page()->page_type, ['popup','subpage'])){
                 $fragment->add_code(Html_Code_Fragment::SECTION_END, PHP_EOL."Alpine.start()");
             }
+        }else{
+            $this->build_initialize_code();
         }
+
         return $fragment;
     }
     private function build_component_input($indent) {
         if (!$this->build->is_subpage()) return;
+        $inputCode = <<<INPITCONFIG
+if(inputConfig){
+    for(const myData in inputConfig){
+        this.\$watch(inputConfig[myData], (value, oldValue)=>{
+            this[myData] = value
+        })
+    }
+}
+INPITCONFIG;
+
         $fragment = $this->get_code_fragment();
-        $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->indent($indent, true).'if(inputConfig){');
-        $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->indent($indent+1, true).'for(const myData in inputConfig){');
-        $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->indent($indent+2, true).'this.$watch(inputConfig[myData], (value, oldValue)=>{');
-        $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->indent($indent+3, true).'this[myData] = value');
-        $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->indent($indent+2, true).'})');
-        $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->indent($indent+1, true).'}');
-        $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->indent($indent, true).'}');
+        $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->build->indent_code(0, $inputCode));
 
     }
     public function build_common_style(){
@@ -98,7 +103,7 @@ trait Alpine {
         return $style;
     }
 
-    protected function build_event_binding_code() {
+    protected function build_event_code() {
         $eventCodes = $this->get_event_action_codes();
         if (!$eventCodes) return;
 
@@ -121,12 +126,12 @@ trait Alpine {
             $lines[] = "}";
             $codeLines[] = join(PHP_EOL, $lines);
         }
-        $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_EVENT, join(','.PHP_EOL,$codeLines).','.PHP_EOL);
+        if($codeLines) $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_EVENT, join(','.PHP_EOL,$codeLines).','.PHP_EOL);
 
         // 如果是onchange事件，则在init中通过watch输入数据来触发，不再dom中绑定@change；自定义组件的onchange除外
         if (!$this->is_custom_ui() && $eventCodes['onchange']){
             $inputData = $this->get_input_data($inputDataName);
-            if (!$inputDataName) $inputDataName = $this->myid().'_temp';
+            if (!$inputDataName) $inputDataName = $this->myid().'_value';
 
             $initCodeLines = [];
             $initCodeLines[] = 'this.$watch("'.$inputDataName.'", (value, oldValue) => {';
@@ -158,24 +163,9 @@ trait Alpine {
     protected function build_data_input_bind(){
         // 表单组件绑定x-model
         if (!$this->is_input_ui()) return;
-        $inputData = $this->get_input_data($inputDataName);
-        $bindOutputs = $this->get_output_datas($outputDataName);
-        if (!$inputData) return;
-        $hasIteral = false;
-        $iterateData = null;
-        foreach ($bindOutputs as $outputAS => $bindOutput){
-            if ($this->need_iterate_ui($outputAS, $bindOutput)){
-                $iterateData = $bindOutput;
-                $hasIteral = true;
-                break;
-            }
-        }
-
-        // .fill的作用是绑定的数据没有内容时，显示html的value属性内容
-        if ($hasIteral && $this->is_array($inputData)) {// 循环输出ui并且绑定的输入数据也是数组
-            echo $this->wrap_output('x-model.fill', "{$inputDataName}[idxOf{$iterateData['name']}]");
-        }else{
-            echo $this->wrap_output('x-model.fill', $inputDataName);
+        $inputDataName = $this->get_input_data_name($inputIsArr);
+        if ($inputDataName){
+            echo $this->wrap_output('x-input', $inputDataName);
         }
     }
     protected function build_event_listen(){
@@ -199,6 +189,8 @@ trait Alpine {
         if ($hasIteral){//  迭代输出数据
             echo $this->indent();
             echo '<template x-for="(itemOf'.$iterateDataName.', idxOf'.$iterateDataName.') in '.$dataName.'" :key="idxOf'.$iterateDataName.'">'.PHP_EOL;
+            $this->set_iterator_index_name("idxOf{$iterateDataName}");
+            $this->set_iterator_data_name("itemOf{$iterateDataName}");
         }
 
         $this->build_ui();
@@ -358,7 +350,7 @@ trait Alpine {
     protected function build_popup_alert_code(Action_Model $action, &$codeLines){
         $expression = $action->get_expression();
         if ($expression->type == 'literal'){
-            $dataName = '"'.$expression->literal.'"';
+            $dataName = $expression->literal;
         }elseif ($expression->type == 'connect'){
             $dataName = $this->is_scale_type($expression->data->type) ? "{$expression->data->path}" : "JSON.stringify({$expression->data->path})";
         }else{
@@ -453,6 +445,80 @@ trait Alpine {
             return;
         }
         $codeLines[] = 'YDECloud.closeSelf(event.target)';
+    }
+
+    /**
+     * 当前UI组件是否会迭代输出
+     * @return bool
+     */
+    public function has_iterate() {
+        return $this->need_iterate_data($iterateOutputAs, $outputDataName, $iterateDataName);
+    }
+
+    /**
+     * 对表单组件或者值列表组件构建输入数据对初始化代码
+     *
+     * - 如果是表单ui并且没有绑定输入数据，则生成一个ID_value的数据进行绑定
+     * - 如果是值列表ui并且没有绑定输入数据，则生成一个ID_value的数据进行绑定；
+     * - 如果是值列表ui，则生成一个ID_checkedName的数据，表示当前选择值的名称；同时生成watch代码，观察绑定的输入数据以便自动更新checkName
+     *
+     * @return void
+     */
+    public function build_initialize_code() {
+        if (!is_a($this, Valuable_View::class)) return;
+
+        $fragment = $this->get_code_Fragment();
+        $this->get_input_data($inputDataName);
+        $this->get_output_datas($outputDataNames);
+        // 如果没有数据绑定的话，定义一个临时数据
+        if (!$inputDataName) {
+            $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, $this->myid() . '_value: '.json_encode($this->default_value()).',');
+        }
+        if (!is_a($this, ValueList_View::class) || in_array(strtolower($this->data['type']), ['carousel','collapse'])) return;
+
+        $valuesEvent = [$this->myid() . '_values(){'];
+        $valuesEvent[] = $this->indent(1, true)."return ".($outputDataNames['VALUELIST']
+                ? "this.".$outputDataNames['VALUELIST']
+                : json_encode($this->data['meta']['values']?:$this->demo_values(), JSON_UNESCAPED_UNICODE));
+        $valuesEvent[] = '},';
+        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $valuesEvent);
+    }
+
+    /**
+     * UI绑定的输入数据的访问名称，如果没有定义输入数据，则返回默认的ID_value
+     *
+     * 以下情况表示绑定的数据是数组，返回的输入数据名称会加上[-1], 其中-1需要前端通过循环输出的UI上面的data-index来动态构建访问路径
+     *
+     * 1. 明确绑定了数组数据
+     * 2. 未明确绑定数据时：UI被迭代了或则是checkbox，或者是multiple的select
+     *
+     * 前端可通过alpinejs_get_value,alpinejs_set_value来操作
+     *
+     * @param $inputIsArr boolean 当前绑定时输入数据是否是数组格式
+     * @return mixed|string
+     */
+    public function get_input_data_name(&$inputIsArr=false, &$inputDataConfig = null) {
+        $inputData = $this->get_input_data($inputDataName);
+        $myid = $this->myid();
+        $inputIsArr = false;
+        $inputDataConfig = $inputData;
+        $uiType = strtolower($this->data['type']);
+        $isArray = $this->has_iterate() || $uiType == 'checkbox' || ($uiType=='select' && $this->data['meta']['custom']['multiple']);
+
+        if ($inputDataName){
+            // 绑定数据输入的情况下，绑定的数据明确是数组时才输出为数组
+            if ($this->is_array($inputData)){
+                $inputIsArr = true;
+                return "{$inputDataName}[-1]";
+            }
+            return $inputDataName;
+        }
+
+        if ($isArray){
+            $inputIsArr = true;
+            return "{$myid}_value[-1]";
+        }
+        return "{$myid}_value";
     }
 
     private function build_api_input($formatVariables, $argName, $dataConfigs, &$codeLines=null){
@@ -590,4 +656,5 @@ trait Alpine {
         $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, "\$title: \"{$this->data['meta']['title']}\",");
         $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, "\$pageId: \"{$this->myid()}\",");
     }
+
 }

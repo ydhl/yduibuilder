@@ -5,7 +5,7 @@
     <div :class="['weui-cell', itemTheme]" v-for="(item, index) in values"
         :key="index" :value="item.value" :style="`${itemStyle}`">
       <span class="weui-cell__bd">
-        <span>{{item.text}}</span>
+        <span>{{item.name}}</span>
       </span>
       <span v-if="item.checked" class="weui-cell__ft"><i class="weui-icon-success"></i></span>
     </div>

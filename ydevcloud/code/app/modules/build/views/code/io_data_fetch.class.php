@@ -38,7 +38,7 @@ class Io_Data_Fetch{
      *
      *
      * boundDataName: 输出数据的访问路径
-     * 1. 如果上层有数组，该数组在输出绑定时为（itemUIID，indexUIID）in arrName的格式，其下的所有数据在绑定时都以itemUIID.foo.bar的格式，foo.bar为数据的路径
+     * 1. 如果上层有数组，该数组在输出绑定时为（itemOfUIID，idxOfUIID）in arrName的格式，其下的所有数据在绑定时都以itemUIID.foo.bar的格式，foo.bar为数据的路径
      * 2. 上层是对象，则按foo.bar的格式
      *
      * @param $uiid string  uiid

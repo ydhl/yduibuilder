@@ -15,7 +15,7 @@ class Checkbox_View extends Preview_View {
     public function build_ui()
     {
         $space =  $this->indent(2);
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'sample', "value"=> '1' ]];
+        $values = @$this->data['meta']['values']?:[[ "name"=> 'sample', "value"=> '1' ]];
         foreach ((array)@$values as $item){
             echo "{$space}<div ".($this->data['meta']['custom']['inline'] ? 'class="layui-d-inline-block"' : '').">\r\n";
             echo $this->indent(3);

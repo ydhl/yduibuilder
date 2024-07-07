@@ -13,7 +13,7 @@ class Radio_View extends Preview_Radio_View {
     public function build_ui()
     {
         $space =  $this->indent(4);
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'sample', "value"=> '1' ]];
+        $values = @$this->data['meta']['values']?:[[ "name"=> 'sample', "value"=> '1' ]];
         echo "\r\n{$space}<radio-group class='w-100 weui-cells_radio'>\r\n";
         foreach ((array)@$values as $index => $item){
             echo $this->indent(5)."<label";

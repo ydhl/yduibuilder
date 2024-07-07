@@ -50,7 +50,7 @@ class Container_View extends Preview_View {
     }
     protected function style_map($meta=null, $state = 'normal')
     {
-        $style = parent::style_map($meta);
+        $style = parent::style_map($meta, $state);
         $parent = $this->get_parent_UI($index);
         $gutter = intval($parent["meta"]['custom']['gutter']);
         if ($this->isCol() && $gutter){

@@ -1,52 +1,113 @@
 <?php
 namespace app\modules\build\views\preview\weui;
 
-use app\modules\build\views\preview\Html_Code_Helper;
+use app\modules\build\views\code\Base_Code_Fragment;
+use app\modules\build\views\preview\bootstrap\Select_View as Bootstrap_Select_View;
+use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Preview_View;
 
-class Select_View extends Preview_View {
-    use Weui_Popup, Html_Code_Helper;
-    public function check_master()
+class Select_View extends Bootstrap_Select_View {
+    protected function css_map()
     {
-        $this->master_view = new Formgroup_View($this->data, $this->build->get_controller(), $this->build);
-        return true;
-    }
-    protected function body_css()
-    {
-        $css = parent::css_map();
-        $style = parent::style_map();
-        $css[] = 'weui-select pl-0';
-        if ($style['background-color']){
-            unset($css['backgroundTheme']);
+        $map = Preview_View::css_map();
+        $css = ['weui-cell weui-cell_active weui-cell_select d-overflow-hidden'];
+        $styleInfo = Preview_View::style_map();
+        if ($this->data['meta']['custom']['borderless']){
+            $css[] = 'border-0';
         }
-        if ($style['color']){
-            unset($css['foregroundTheme']);
+        if ($this->data['meta']['form']['state'] == 'disabled'){
+            $css[] = 'disabled';
         }
-        return join(' ', $css);
-    }
-    protected function body_style()
-    {
-        $baseStyle = parent::style_map();
-        $style[] = 'border-top: 1px solid #e5e5e5;border-bottom: 1px solid #e5e5e5;';
-        $style[] = $baseStyle['color'];
-        return join(' ', $style);
+        if ($this->data['meta']['form']['state'] == 'readonly'){
+            $css[] = 'readonly';
+        }
+        if ($styleInfo['background-color']){
+            unset($map['backgroundTheme']);
+        }
+        $map['-'] = join(' ', $css);
+        return $map;
     }
 
-    public function build_ui()
+    private function front_class(){
+      $css = ['weui-select'];
+      $cssInfo = Preview_View::css_map();
+      $styleInfo = Preview_View::style_map();
+      if ($cssInfo['foregroundTheme'] && !$styleInfo['color']) $css[] = $cssInfo['foregroundTheme'];
+      return join(' ', $css);
+
+    }
+    private function front_style(){
+      $style = [];
+      $styleInfo = Preview_View::style_map();
+      if ($styleInfo['color']) $style[] = $styleInfo['color'];
+      return join(';', $style);
+    }
+
+    public function build_ui_begin($is2d = false, $outDataName = '')
     {
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'Sample 1', "value"=> '1' ], [ "text"=> 'Sample 2', "value"=> '2' ]];
-        $space =  $this->indent(2);
-        echo "{$space}<select";
-        echo $this->build_form_attrs();
-        echo $this->wrap_output('style', $this->body_style());
-        echo $this->wrap_output('class', $this->body_css());
-        echo ">\r\n";
+        $space =  $this->indent();
+        $myid = $this->myid();
 
-        foreach ((array)$values as $item){
-            echo $this->indent(3);
-            echo "<option value='{$item['value']}' ".(@$item['checked'] ? 'selected' : '').">{$item['text']}</option>\r\n";
+        echo "{$space}<div";
+        echo $this->build_main_attrs();
+        echo $this->wrap_output('@click', "open_{$myid}_menu");
+        echo ">".PHP_EOL;
+    }
+    public function build_ui_end($is2d = false, $outDataName = '')
+    {
+        $space =  $this->indent();
+        echo "{$space}</div>".PHP_EOL;
+    }
+
+    public function build_ui_static()
+    {
+        $this->build_ui_begin();
+
+        echo $this->indent(1);
+        echo '<div class="weui-cell__bd"><div'
+            .$this->wrap_output('class', $this->front_class())
+            .$this->wrap_output('style', $this->front_style())
+            .$this->wrap_output('x-text', $this->myid()."_checkedName")
+            .'></div></div>'.PHP_EOL;
+
+        $this->build_ui_end();
+    }
+    protected function build_select($bindOutput, $outDataName, $is2d){
+        $this->build_ui_static();
+    }
+
+    function build_code(): Base_Code_Fragment
+    {
+        $fragment = parent::build_code();
+        $myid = $this->myid();
+        $inputDataName = $this->get_input_data_name();
+
+        $trigger = <<<TRIGGER
+open_{$myid}_menu(){
+    const page = this
+    const menus = [];
+    for(const item of this.{$myid}_values()){
+        const menu = { label: "", value:"", disabled: false }
+        if (typeof item === "object"){
+            menu.label = item.hasOwnProperty("name") ? item.name : JSON.stringify(item)
+            menu.value = item.hasOwnProperty("value") ? item.value : JSON.stringify(item)
+        }else{
+            menu.label = item
+            menu.value = item
         }
+        menus.push(menu)
+    }
+    weui.picker(menus, {
+        defualtValue: [page.{$inputDataName}],
+        onConfirm: function (rst) {
+            page.{$inputDataName} = rst[0].value
+        },
+        id:"{$myid}"
+    });
+},
+TRIGGER;
+        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $this->build->indent_code(1, $trigger));
 
-        echo "{$space}</select>\r\n";
+        return $fragment;
     }
 }

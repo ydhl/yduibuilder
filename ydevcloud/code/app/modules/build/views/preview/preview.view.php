@@ -3,7 +3,6 @@ namespace app\modules\build\views\preview;
 use app\build\Build_Model;
 use app\modules\build\views\code\Base_Code_Fragment;
 use app\modules\build\views\code\Io_Data_Fetch;
-use app\modules\build\views\preview\bootstrap\ValueList_View;
 use app\project\Action_Model;
 use app\project\Page_Bind_Data_Model;
 use app\project\Page_Bind_Event_Model;
@@ -61,6 +60,8 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     private $_inputDataName;
     private $_boundData;
     private $_boundDataName;
+    private $_iteratorIndexName;
+    private $_iteratorDataName;
 
     public function __construct($data, $controller, Build_Model $build)
     {
@@ -472,7 +473,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         if ($this->data['subPageDeleted']){
             return $fragment;
         }
-        $this->build_event_binding_code();
+        $this->build_event_code();
         foreach ((array)@$this->childViews as $view){
             $view->build_code();
             $fragment->merge($view->get_code_fragment());
@@ -503,6 +504,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                 }
                 return '['.join(',',array_fill(0, rand(3,10), $mock)).']';
             case 'object':{
+                if ($data['defaultValue']) return $data['defaultValue'];
                 $propDefault = [];
                 foreach ($data['props'] as $prop){
                     $default = $this->data_default($prop);
@@ -511,7 +513,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                 if ($propDefault){
                     return "{".join(",", $propDefault)."}";
                 }else{
-                    return $data['defaultValue']?:"{}";
+                    return "{}";
                 }
             }
             case 'map':{
@@ -551,7 +553,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         }
         if ($data['defaultValue']) {
             if ($data['type']=='string'){
-                return '"'.$data['defaultValue'].'"';
+                return '"'.addslashes($data['defaultValue']).'"';
             }else{
                 return $data['defaultValue'];
             }
@@ -569,6 +571,13 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         }
     }
 
+    /**
+     * 返回UI的默认值（yduibuilder中设置的），不同类型的ui可能默认值不同，有可能是标量有可能是数组
+     * @return mixed|string
+     */
+    protected function default_value() {
+        return $this->data['meta']['value']??'';
+    }
     /**
      * 每个组件构建并输出组件的ui代码
      * @return mixed
@@ -685,24 +694,14 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         $tagName = strtoupper($this->data['type']);
         $tagName = $tagName=='RANGEINPUT'?'INPUT':$tagName;
 
-        if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])) {
-            $actionCodeLines[] = "const eventTarget = event.target.dataset?.bound ? event.target : event.target.closest('[data-bound]');";
-            $actionCodeLines[] = "const boundName = eventTarget?.dataset?.bound;";
-            $actionCodeLines[] = "const boundData = boundName ? eval('page.' + boundName) : null;";
-        }
-
         if (in_array('value', $this->usedVariableInEvent[$html_event_name])) {
             $actionCodeLines[] = "const target = event.target.tagName=='{$tagName}' ? event.target : event.target.querySelector('.input') || undefined";
             $actionCodeLines[] = "const value = target?.value";
         }
     }
     private function build_notiterate_prepare_event_code($html_event_name, &$actionCodeLines){
-        $actionCodeLines[] = "const eventTarget = (event.target.dataset?.bound || event.target.dataset?.value) ? event.target : (event.target.closest('[data-bound]') || event.target.closest('[data-value]'));";
+        $actionCodeLines[] = "const eventTarget = event.target.closest('[data-value]');";
 
-        if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])){
-            $actionCodeLines[] = "const boundName = eventTarget?.dataset?.bound;";
-            $actionCodeLines[] = "const boundData = boundName ? eval('page.' + boundName) : null;";
-        }
         if (in_array('value', $this->usedVariableInEvent[$html_event_name])) {
             $actionCodeLines[] = "const value = eventTarget?.dataset?.value;";
         }
@@ -802,7 +801,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     /**
      * 输出组件自己的事件绑定的代码, 并放入codefragment中
      */
-    protected function build_event_binding_code() {
+    protected function build_event_code() {
         $eventCodes = $this->get_event_action_codes();
 
         if (!$eventCodes) return;
@@ -913,8 +912,9 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     }
 
     public function is_input_ui() {
-        return in_array(strtolower($this->data['type']),['checkbox','input','radio','rangeinput','select','textarea','file']);
+        return is_a($this, Valuable_View::class);
     }
+
     /**
      * 添加属性, 属性是指会输出到对应ui元素的结构中的内容，比如<foo id='' style='' data-attr=''> 中的id，style data-attr
      * @param string $name 属性名
@@ -943,24 +943,23 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      */
     protected function build_main_attrs($includeEvent = true) {
         $this->build_css_attrs();
+        $myid = $this->myid();
         echo $this->wrap_output('data-uiid', $this->myid());
+        echo $this->wrap_output('x-id', "['{$myid}']");
+        echo $this->wrap_output('data-type', strtolower($this->data['type']));
+        echo $this->wrap_output(':data-index', $this->get_iterator_index_name());
         foreach ($this->_attrs as $name => $value){
             echo $this->wrap_output($name, $value);
         }
         $this->build_data_output_bind();
+        $this->build_data_input_bind();
         if (!is_a($this, ValueList_View::class)){
             $boundDataNames = [];
             $boundDatas = $this->get_bound_datas($boundDataNames);
             $outputDatas = $this->get_output_datas($outputDataNames);
 //            var_dump($outputDatas);
             $hasIterate = $this->need_iterate_data($iterateOutputAs, $dataName, $iterateDataName);
-            if(!$boundDatas){
-                // 没有明确有绑定输出，当前是循环输出的ui把当前的循环数据绑定到bound
-                if ($hasIterate){
-                    echo $this->wrap_output('data-bound', "itemOf{$iterateDataName}");
-                }
-            }else{
-                // 明确有bound输出的
+            if($boundDatas){
                 foreach ($boundDataNames as $boundType => $boundDataName){
                     if ($boundType === 'BOUND'){
                         echo $this->wrap_output("data-bound", $hasIterate && $boundDataName==$dataName ? "itemOf{$iterateDataName}" : $boundDataName);
@@ -1051,7 +1050,6 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @return void
      */
     protected abstract function build_data_input_bind();
-
     /**
      * 前端事件绑定
      * @return void
@@ -1064,8 +1062,11 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * <strong style="color:red">注意这部分内容只能在具体的表单元素的上进行调用输出，比如input，textarea等</strong>
      * @param false $notOutputId 默认输出表单元素id
      */
-    protected function build_form_attrs ($includeName = true, $includeBind=true) {
-        if ($includeName) echo $this->wrap_output('name', $this->myId(true));
+    protected function build_form_attrs ($includeName = true) {
+        $myid = $this->myid();
+        if ($includeName) {
+            echo $this->wrap_output(':name', "\$id('{$myid}')");
+        }
         echo $this->wrap_output('data-uiid', $this->myId().$this->data['type']);
 
         if (@$this->data['meta']['form']['state']=='disabled'){
@@ -1080,7 +1081,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         if (@$this->data['meta']['form']['placeholder']) {
             echo $this->wrap_output('placeholder', $this->data['meta']['form']['placeholder']);
         }
-        if($includeBind) $this->build_data_input_bind();
+        echo $this->wrap_output('data-root', $this->myid());
     }
 
     protected function wrap_icon($outputInner, $indent=null, $wrapTag='div', $iconTag='i') {
@@ -1330,7 +1331,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @return bool
      */
     protected function is_iteration_ui(){
-        return in_array(strtolower($this->data['type']),['breadcrumb','carousel','checkbox','collapse','dropdown','list','nav','pagination','radio','select']);
+        return in_array(strtolower($this->data['type']),['breadcrumb','carousel','checkbox','collapse','dropdown','list','nav','radio','select']);
     }
 
     /**
@@ -1354,9 +1355,9 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     }
     /**
      * 判断绑定dataconfig输出时，是否需要循环输出UI，
-     * 一下情况需要循环输出：
+     * 以下情况需要循环输出：
      * - 迭代类ui
-     *      - 二维数组并绑定value： 这时一维循环输出ui，二维循环输出内部list
+     *      - 除表格外：二维数组并绑定valuelist： 这时一维循环输出ui，二维循环输出内部list,表格只能绑定二维数组，并且不会导致ui迭代
      * - 非迭代类ui
      *      - 一维标量数组并绑定html：循环输出ui并绑定x-html
      *      - 一维标量数组并绑定text：循环输出ui并绑定x-text
@@ -1377,10 +1378,11 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         if (!$outputData) return false;
         $outputas = strtoupper($outputas);
         if ($this->is_iteration_ui()){
+            if(strtolower($this->data['type']) == 'table') return false;
             return $this->is_2d_array($outputData) && $outputas == 'VALUELIST';
         }else{
             if ($this->is_1d_any_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'NONE'])) return true;
-            if ($this->is_1d_scale_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'VALUELIST', 'NONE'])) return true;
+            if ($this->is_1d_scale_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'VALUE', 'NONE'])) return true;
             if ($this->is_1d_object_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'KEYVALUE', 'STYLE', 'NONE'])) return true;
             if ($this->is_2d_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'NONE'])) return true;
             if ($this->is_2d_scale_array($outputData) && in_array($outputas, ['STYLE', 'CSS', 'NONE'])) return true;
@@ -1396,7 +1398,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     protected function output_as_prop($outputAs, $outputData){
         if ($outputAs=='HTML'){
             return 'x-html';
-        }else if ($outputAs=='NONE'){
+        }else if ($outputAs=='NONE'||$outputAs=='VALUELIST'){
             return null;
         }else if($outputAs=='STYLE'){
             if ($this->is_scale($outputData)) return ":style";
@@ -1421,5 +1423,77 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         }
     }
 
+    /**
+     * 返回在遍历时用到的name，value
+     * - 对象数组，如果对象有name属性用之，没有JSON.stringify(数组项)
+     * - 对象数组，如果对象有value属性用之，没有返回数组索引
+     * - 对象，name和value都采用key:value都格式
+     *
+     * @param $bindOutput
+     * @param $itemName
+     * @return string[] [name, value, checked]
+     */
+    protected function get_bind_name_value($bindOutput, $itemName)
+    {
+        if (!$bindOutput || !$itemName) return ['name'=>null, 'value'=>null, 'checked'=>null];
+
+        $name = "itemOf{$itemName}";
+        $value = "itemOf{$itemName}";
+        $checked = null;
+
+        if ($bindOutput['type']=='array'){
+            if ($this->has_props($bindOutput['item'],'name')){//对象数组
+                $name = "itemOf{$itemName}.name";
+            }else if ($this->is_object($bindOutput['item'])){
+                $name = "JSON.stringify(itemOf{$itemName})";
+            }
+
+            if ($this->has_props($bindOutput['item'],'value')){
+                $value = "itemOf{$itemName}.value";
+            }else if ($this->is_object($bindOutput['item'])){
+                $value = "idxOf{$itemName}";
+            }
+
+            if ($this->has_props($bindOutput['item'],'checked')){
+                $checked = "itemOf{$itemName}.checked";
+            }
+
+        }else if ($this->is_object($bindOutput)){
+            $name = "idxOf{$itemName}";
+            $value = "itemOf{$itemName}";
+        }else if ($this->is_scale($bindOutput)){
+            $name = $itemName;
+            $value = $itemName;
+        }
+        return ['name'=>$name, 'value'=>$value, 'checked'=>$checked];
+    }
+
+    protected function set_iterator_data_name($dataName){
+        $this->_iteratorDataName = $dataName;
+        return $this;
+    }
+
+    /**
+     * 如果当前ui被迭代输出，该方法返回当前ui被迭代时的数据名，前端可以通过该数据名称获得动态的值
+     * @return mixed
+     */
+    protected function get_iterator_data_name(){
+        return $this->_iteratorDataName;
+    }
+    /**
+     * @return void
+     */
+    protected function set_iterator_index_name($indexName){
+        $this->_iteratorIndexName = $indexName;
+        return $this;
+    }
+
+    /**
+     * 如果当前ui被迭代输出，该方法返回当前ui被迭代时的索引数据名，前端可以通过该数据名称获得动态的索引值
+     * @return mixed
+     */
+    protected function get_iterator_index_name(){
+        return $this->_iteratorIndexName;
+    }
 
 }

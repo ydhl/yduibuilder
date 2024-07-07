@@ -43,7 +43,7 @@ export default {
     const store = useStore()
     const type = computed({
       get: () => {
-        return info.getMeta('type', 'custom') || ''
+        return info.getMeta('type', 'custom') || 'normal'
       },
       set: (v) => {
         info.setMeta('type', v, 'custom')

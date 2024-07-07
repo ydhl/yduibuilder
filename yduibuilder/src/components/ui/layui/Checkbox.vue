@@ -5,7 +5,7 @@
     <template v-for="(item, index) in values" :key="index" >
       <div :class="{'layui-d-inline-block': uiconfig.meta.custom?.inline}">
         <div :class="{'layui-unselect layui-form-checkbox':true, 'layui-form-checked':item.checked, 'layui-checkbox-disabled layui-disabled':uiconfig.meta?.form?.state==='disabled'}" lay-skin="primary">
-          <span>{{item.text}}</span>
+          <span>{{item.name}}</span>
           <i class="layui-icon layui-icon-ok"></i>
         </div>
       </div>

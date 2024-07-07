@@ -14,7 +14,7 @@ class Checkbox_View extends Preview_Checkbox_View {
     public function build_ui()
     {
         $space =  $this->indent(4);
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'sample', "value"=> '1' ]];
+        $values = @$this->data['meta']['values']?:[[ "name"=> 'sample', "value"=> '1' ]];
         echo "\r\n{$space}<checkbox-group class='w-100 weui-cells_checkbox'>\r\n";
         foreach ((array)@$values as $index => $item){
             echo $this->indent(5);

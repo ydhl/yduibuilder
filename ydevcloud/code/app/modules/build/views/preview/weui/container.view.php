@@ -1,22 +1,16 @@
 <?php
 namespace app\modules\build\views\preview\weui;
 
-use app\modules\build\views\preview\Html_Code_Helper;
-use app\modules\build\views\preview\Preview_View;
+use app\modules\build\views\preview\bootstrap\Container_View as Bootstrap_Container_View;
 
-class Container_View extends Preview_View {
-    use Weui_Popup,Html_Code_Helper;
-    public function build_ui()
+class Container_View extends Bootstrap_Container_View {
+    protected function style_map($meta = null, $state = 'normal')
     {
-        $space =  $this->indent();
-        echo "{$space}<div";
-        echo $this->build_main_attrs();
-        echo ">\r\n";
-
-        foreach ((array)@$this->childViews as $view){
-            $view->output();
+        $style = parent::style_map($meta, $state);
+        if (!$this->data['items']){
+            $style['min-height'] = "min-height:100px !important;";
+            $style['min-width'] = "min-width:100px !important;";
         }
-
-        echo "{$space}</div>\r\n";
+        return $style;
     }
 }

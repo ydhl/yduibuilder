@@ -2,7 +2,7 @@
     <ul :draggable='!inlineEditItemId' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
         :data-pageid="pageid" :class="['pagination', dragableCss, uiCss]">
       <li :class="{'page-item': true, [activeItemCss]: page===1}" v-for="page in totalPage" :key="page">
-        <a :class="{[activeLinkCss]: page===1, [linkCss]: page!==1, 'page-link': true}" :style="linkStyle" href="javascript:;">{{page}}</a>
+        <a :class="{[activeLinkCss]: page===1, [linkCss]: page!==1, 'page-link': true}" :style="page===1 ? activeLinkStyle : linkStyle" href="javascript:;">{{page}}</a>
       </li>
     </ul>
 </template>
@@ -51,7 +51,8 @@ export default {
     })
     const activeLinkCss = computed(() => {
       const cssMap = pagination.getUICss()
-      if (!cssMap.backgroundTheme) return ''
+      const style = pagination.getUIStyle()
+      if (!cssMap.backgroundTheme || style?.['background-color']) return ''
       const backgroundTheme = props.uiconfig.meta?.css?.backgroundTheme
       return cssMap.backgroundTheme + ' text-light ' + store.getters.translate('borderColorClass', backgroundTheme)
     })

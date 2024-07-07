@@ -403,7 +403,9 @@ class Bind_Controller extends YZE_Resource_Controller {
         };
         $saveHelper->valid_column_and_rules = [
             'name'=>function ($model, $value) {
-                if (!trim($value)) throw new YZE_FatalException(__('Please input name'));
+                $value = trim($value);
+                if (!$value) throw new YZE_FatalException(__('Please input name'));
+                if (in_array(strtolower($value), $this->words())) throw new YZE_FatalException(__('The data name cannot be a reserved keyword'));
                 $bind_data = Page_Bind_Data_Model::from()
                     ->where('name=:name and is_deleted=0 and id!=:id and page_id=:pid')
                     ->get_Single([':name'=>$value,':id'=>intval($model->id),':pid'=>$this->page->id]);
@@ -420,6 +422,60 @@ class Bind_Controller extends YZE_Resource_Controller {
         $post_data['enumValue'] = json_encode($post_data['enumValue'], JSON_UNESCAPED_UNICODE);
         $bind_data = $saveHelper->save($post_data);
         return YZE_JSON_View::success($this, ['uuid'=>$bind_data->uuid]);
+    }
+    private function words(){
+        return [
+            'break',
+            'case',
+            'catch',
+            'class',
+            'const',
+            'continue',
+            'debugger',
+            'default',
+            'delete',
+            'do',
+            'else',
+            'enum', // 保留字，但在ES中没有实际功能
+            'export',
+            'extends',
+            'finally',
+            'for',
+            'function',
+            'if',
+            'implements', // 保留字，但在ES中没有实际功能
+            'import',
+            'in',
+            'instanceof',
+            'interface', // 保留字，但在ES中没有实际功能
+            'let',
+            'new',
+            'package', // 保留字，但在ES中没有实际功能
+            'private', // 提案中的关键字，尚未在ES规范中正式定义
+            'protected', // 提案中的关键字，尚未在ES规范中正式定义
+            'public', // 提案中的关键字，尚未在ES规范中正式定义
+            'return',
+            'static',
+            'super',
+            'switch',
+            'this',
+            'throw',
+            'try',
+            'typeof',
+            'var',
+            'void',
+            'while',
+            'with',
+            'yield',
+            'async',
+            'await',
+            'true',
+            'false',
+            'null',
+            'undefined',
+            'NaN',
+            'Infinity'
+        ];
     }
     // 页面删除绑定api
     /**

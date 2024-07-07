@@ -3,7 +3,7 @@
        :data-pageid="pageid"
        :class="[dragableCss, myCss,{'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
     <div class="van-field__control van-field__control--custom">
-      <div class="van-slider">
+      <div class="van-slider" :style="sliderStyle">
         <!--背景条-->
         <div :style="bgStyle" :class="bgTheme">
           <!--滑块按钮-->
@@ -93,13 +93,24 @@ export default {
       const myStyle = rangeinput.getUIStyle()
       delete myStyle?.['background-color']
       delete myStyle?.['background-image']
+      delete myStyle?.border
+      delete myStyle?.height
       return rangeinput.appendImportant(myStyle)
+    })
+    const sliderStyle = computed(() => {
+      const _: any = {}
+      const myStyle = rangeinput.getUIStyle()
+      if (myStyle.height) {
+        _.height = myStyle?.height
+      }
+      return rangeinput.appendImportant(_)
     })
     return {
       ...rangeinput.setup(),
       myCss,
       myStyle,
       bgTheme,
+      sliderStyle,
       bgStyle,
       trackTheme,
       handleStyle,

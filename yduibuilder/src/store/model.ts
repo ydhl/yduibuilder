@@ -69,7 +69,7 @@ export interface UIMetaForm{
  * 元数据设置
  */
 export interface UIMetaValue{
-  text: string;
+  name: string;
   value: string;
   checked: boolean;
   /**

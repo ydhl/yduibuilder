@@ -3,7 +3,7 @@
       :style="uiStyle" :id="myId" :data-type="uiconfig.type"
       :data-pageid="pageid">
     <li :class="[{'layui-list-group-item': true}, itemClass]" :style="`${itemStyle};${item.checked ? activeItemStyle : ''}`" v-for="(item, index) in values"
-        :key="index" :value="item.value">{{item.text}}</li>
+        :key="index" :value="item.value">{{item.name}}</li>
   </ul>
 </template>
 

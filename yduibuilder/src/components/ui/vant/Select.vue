@@ -35,9 +35,9 @@ export default {
       const values = props.uiconfig.meta.values
       if (!values || values.length === 0) return 'Simple 1'
       for (const value of values) {
-        if (value.checked) return value.text
+        if (value.checked) return value.name
       }
-      return values[0].text
+      return values[0].name
     })
     return {
       ...select.setup(),

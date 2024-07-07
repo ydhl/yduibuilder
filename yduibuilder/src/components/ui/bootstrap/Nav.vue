@@ -9,7 +9,7 @@
       :data-isContainer="true"
       :data-pageid="pageid">
     <div :class="[{'nav-item pointer-event-none': true}]" v-for="(item, index) in values"
-        :key="index"><a :class="[{'nav-link':true,'active':item.checked}, (item.checked ? activeItemCss : itemCss)]" :style="item.checked ? activeItemStyle : itemStyle" href="#">{{item.text}}</a></div>
+        :key="index"><a :class="[{'nav-link':true,'active':item.checked}, (item.checked ? activeItemCss : itemCss)]" :style="item.checked ? activeItemStyle : itemStyle" href="#">{{item.name}}</a></div>
     <UIBase v-for="(item, index) in uiconfig.items" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
   </div>
 </template>

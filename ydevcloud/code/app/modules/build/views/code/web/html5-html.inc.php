@@ -78,6 +78,8 @@ echo PHP_EOL;
     }
     ?>
     import ydecloudRun from "<?=$relativePath.'assets/js/'.$page->get_export_file_name('html').'.js?api_env='.$_GET['api_env']?>";
+
+    alpinejs_init_directive(Alpine);
     if(document.readyState === "complete" ||(document.readyState !== "loading" && !document.documentElement.doScroll)) {
         ydecloudRun()
     } else {

@@ -10,7 +10,7 @@ class Image_View extends Preview_View {
 
     protected function style_map($meta=null, $state = 'normal')
     {
-        $style = parent::style_map($meta);
+        $style = parent::style_map($meta, $state);
         unset($style['object-fit'],$style['object-position']);
         if (!@$this->data['meta']['style']['width']){
             $style['width'] = "100%";

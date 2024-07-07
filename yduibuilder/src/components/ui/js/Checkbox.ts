@@ -8,7 +8,7 @@ export default class Checkbox extends UIBase {
     const superSetup = super.setup()
     const values = computed(() => {
       if (!props.uiconfig.meta.values || props.uiconfig.meta.values.length === 0) {
-        return [{ text: 'sample', value: '1' }]
+        return [{ name: 'Item 1', value: 'item 1' }, { name: 'Item 2', value: 'item 2' }]
       }
       return props.uiconfig.meta.values
     })

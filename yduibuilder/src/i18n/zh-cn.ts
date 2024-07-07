@@ -750,7 +750,7 @@ export default {
     success: '导出成功，你可以在左边的项目面板中编辑组件'
   },
   variable: {
-    bindInputInvalid: '只有表单和迭代类UI才能绑定数据的输入',
+    bindInputInvalid: '只有有值类UI才能绑定数据的输入',
     bound: '绑定数据',
     boundAsValue: '绑定为事件的「value」参数',
     boundAsBound: '绑定为事件的「boundData」参数',

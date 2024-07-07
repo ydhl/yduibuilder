@@ -61,7 +61,7 @@ wx.navigateTo({
     /**
      * 小程序事件绑定代码
      */
-    public function build_event_binding_code(){
+    public function build_event_code(){
         $events = @$this->data['events'];
         if (!$events){
             return ;

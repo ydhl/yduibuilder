@@ -15,8 +15,16 @@ export default class Select extends UIBase {
       if (!item) return ''
       return item.meta.custom?.size
     })
+    const values = computed(() => {
+      if (!props.uiconfig.meta.values || props.uiconfig.meta.values.length === 0) {
+        return [{ name: 'Item 1', value: 'item 1' }, { name: 'Item 2', value: 'item 2' }]
+      }
+      return props.uiconfig.meta.values
+    })
+
     return {
       isMultiple,
+      values,
       size,
       ...super.setup()
     }

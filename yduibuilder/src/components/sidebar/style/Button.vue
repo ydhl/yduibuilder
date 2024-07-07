@@ -1,23 +1,20 @@
 <template>
   <div class="style-header"><i class="iconfont icon-tree-close"></i> {{ t('ui.button') }}</div>
   <div class="style-body d-none">
-
-    <template>
-      <div class="row">
-        <label class="col-sm-3 col-form-label text-end">{{ t('style.button.type') }}</label>
-        <div class="col-sm-9">
-          <select class="form-select form-select-sm" v-model="currType">
-            <option :value="type" v-for="type in buttonTypes" :key="type">{{type}}</option>
-          </select>
-        </div>
+    <div class="row">
+      <label class="col-sm-3 col-form-label text-end">{{ t('style.button.type') }}</label>
+      <div class="col-sm-9">
+        <select class="form-select form-select-sm" v-model="currType">
+          <option :value="type" v-for="type in buttonTypes" :key="type">{{type}}</option>
+        </select>
       </div>
-      <div class="row" v-if="currType=='link'">
-        <label class="col-sm-3 col-form-label text-end">{{ t('style.button.linkHref') }}</label>
-        <div class="col-sm-9">
-          <input type="text" v-model="linkHref" :placeholder="t('style.button.linkHref')" class="form-control form-control-sm">
-        </div>
+    </div>
+    <div class="row" v-if="currType=='link'">
+      <label class="col-sm-3 col-form-label text-end">{{ t('style.button.linkHref') }}</label>
+      <div class="col-sm-9">
+        <input type="text" v-model="linkHref" :placeholder="t('style.button.linkHref')" class="form-control form-control-sm">
       </div>
-    </template>
+    </div>
     <div class="row">
       <label class="col-sm-3 col-form-label text-end">{{ t('style.form.size') }}</label>
       <div class="col-sm-9">

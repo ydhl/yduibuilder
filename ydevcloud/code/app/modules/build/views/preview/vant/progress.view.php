@@ -1,47 +1,20 @@
 <?php
 namespace app\modules\build\views\preview\vant;
 
-use app\modules\build\views\preview\Html_Code_Helper;
-use app\modules\build\views\preview\Preview_View;
+use app\modules\build\views\preview\bootstrap\Progress_View as Bootstrap_Progress_View;
 
 
-class Progress_View extends Preview_View {
-    use Vant_Popup,Html_Code_Helper;
-    protected function css_map()
-    {
-        $cssMap = parent::css_map();
-        unset($cssMap['foregroundTheme']);
-        $cssMap['-'] = 'van-progress';
-        return $cssMap;
-    }
-    protected function style_map($meta=null, $state = 'normal')
-    {
-        $styleArray = parent::style_map($meta);
-        unset($styleArray['color']);
-        return $styleArray;
-    }
+class Progress_View extends Bootstrap_Progress_View {
+    protected $cssPrefix = 'van-';
 
-    private function bar_css() {
-        $css = ['van-progress__portion'];
-        if (@$this->data['meta']['css']['foregroundTheme']){
-            $css[] = $this->cssTranslate['backgroundTheme'][$this->data['meta']['css']['foregroundTheme']];
+    protected function bar_css() {
+        $css[] = parent::bar_css();
+        $index = array_search('progress-bar', $css);
+        if ($index!==false) {
+            unset($css[$index]);
         }
-        if (@$this->data['meta']['custom']['striped']){
-            $css[] = "van-progress-bar-striped";
-        }
-        if (@$this->data['meta']['custom']['animatedStrip']){
-            $css[] = "van-progress-bar-animated";
-        }
-        return join(' ', $css);
-    }
-    private function bar_style() {
-        $value = $this->data['meta']['value']?:50;
-        $style = ["width: {$value}%"];
-        $styleMap = parent::style_map();
-        if ($styleMap['color']){
-            $style[] = "background-color:".$this->data['meta']['style']['color']." !important";
-        }
-        return join(';', $style);
+        $css[] = 'van-progress__portion';
+        return $css;
     }
 
     private function label_css() {
@@ -69,8 +42,8 @@ class Progress_View extends Preview_View {
         echo ">".PHP_EOL;
 
         echo $this->indent(1).'<span';
+        echo $this->wrap_output('role', 'progressbar');
         echo $this->wrap_output('class', $this->bar_css());
-        echo ' role="progressbar"';
         echo $this->wrap_output('style', $this->bar_style());
 
         $value = $this->data['meta']['value']?:50;

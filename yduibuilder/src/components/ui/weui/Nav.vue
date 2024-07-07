@@ -4,7 +4,7 @@
       :style="uiStyle" :id="myId" :data-type="uiconfig.type"
       :data-pageid="pageid">
     <div :class="['weui-navbar__item', item.checked ? activeItemCss : itemCss]" v-for="(item, index) in values"
-        :key="index" :style="item.checked ? activeItemStyle : itemStyle">{{item.text}}</div>
+        :key="index" :style="item.checked ? activeItemStyle : itemStyle">{{item.name}}</div>
   </div>
 </template>
 

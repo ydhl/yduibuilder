@@ -9,7 +9,7 @@ use function yangzie\__;
 /**
  * 该trait封装了使用alpine实现html的代码结构
  */
-class Alpine_Code_Fragment extends Html_Code_Fragment {
+class Alpinejs_Code_Fragment extends Html_Code_Fragment {
     private $codes=[];
     private $subPage_modules=[];
     public function add_code($section, $codes){

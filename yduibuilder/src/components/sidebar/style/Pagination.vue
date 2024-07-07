@@ -32,7 +32,7 @@ export default {
   setup (props: any, context: any) {
     const info = initUI()
     const { t } = useI18n()
-    const sizing = info.computedWrap('paginationSizing', 'css', '')
+    const sizing = info.computedWrap('paginationSizing', 'css', 'normal')
     const total = info.computedWrap('total', 'custom', '100')
     const pageSize = info.computedWrap('pageSize', 'custom', '10')
     return {

@@ -36,7 +36,7 @@ class Modal_View extends Preview_View {
     }
     protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map($meta);
+        $map = parent::style_map($meta, $state);
         $map['width'] = 'width:100%';
 
         foreach ($map as $name => $value){
@@ -77,64 +77,64 @@ class Modal_View extends Preview_View {
         echo $this->indent().'<div';
         echo $this->wrap_output('id', $pageid);
         echo $this->build_main_attrs();
-        echo ">\r\n";
+        echo ">".PHP_EOL;
 
         echo $this->indent(1);
-        echo "<div class='model-position'>\r\n";
+        echo "<div class='model-position'>".PHP_EOL;
 
         echo $this->indent(2);
-        echo "<div class='modal-dialog'>\r\n";
+        echo "<div class='modal-dialog'>".PHP_EOL;
         echo $this->indent(3);
-        echo "<div".$this->wrap_output('class', $this->body_Class()).$this->wrap_output('style', $this->body_style()).">\r\n";
+        echo "<div".$this->wrap_output('class', $this->body_Class()).$this->wrap_output('style', $this->body_style()).">".PHP_EOL;
 
         if (!@$this->data['meta']['custom']['headless']){
             echo $this->indent(4);
-            echo "<div class='modal-header align-items-center'>\r\n";
+            echo "<div class='modal-header align-items-center'>".PHP_EOL;
             echo $this->indent(5);
-            echo "<div class='d-flex  move-handler'>\r\n";
+            echo "<div class='d-flex  move-handler'>".PHP_EOL;
             foreach ($myItems['head'] as $view){
                 $view->increase_indent(6);
                 $view->output();
             }
             echo $this->indent(5);
-            echo "</div>\r\n";
+            echo "</div>".PHP_EOL;
             echo $this->indent(5);
-            echo '<button type="button" onclick="YDECloud.closeSelf(this)" class="close" ><span>×</span></button>'."\r\n";
+            echo '<button type="button" onclick="YDECloud.closeSelf(this)" class="close" ><span>×</span></button>'."".PHP_EOL;
 
             echo $this->indent(4);
-            echo "</div>\r\n";
+            echo "</div>".PHP_EOL;
         }
 
 
         echo $this->indent(4);
-        echo "<div class='modal-body'>\r\n";
+        echo "<div class='modal-body'>".PHP_EOL;
         foreach ($myItems['body'] as $view){
             $view->increase_indent(4);
             $view->output();
         }
         echo $this->indent(4);
-        echo "</div>\r\n";
+        echo "</div>".PHP_EOL;
 
 
         if (!@$this->data['meta']['custom']['footless']){
             echo $this->indent(4);
-            echo "<div class='modal-footer'>\r\n";
+            echo "<div class='modal-footer'>".PHP_EOL;
             foreach ($myItems['foot'] as $view){
                 $view->increase_indent(4);
                 $view->output();
             }
             echo $this->indent(4);
-            echo "</div>\r\n";
+            echo "</div>".PHP_EOL;
         }
 
 
         echo $this->indent(3);
-        echo "</div>\r\n";
+        echo "</div>".PHP_EOL;
         echo $this->indent(2);
-        echo "</div>\r\n";
+        echo "</div>".PHP_EOL;
         echo $this->indent(1);
-        echo $this->indent()."</div>\r\n";
+        echo $this->indent()."</div>".PHP_EOL;
 
-        echo $this->indent()."</div>\r\n";
+        echo $this->indent()."</div>".PHP_EOL;
     }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex align-items-center justify-content-end flex-grow-1">
-    <template v-if="myExpression.type == 'literal'">
+    <template v-if="myExpression?.type == 'literal'">
       ←
       <template v-if="leftValue?.enumValue">
         <AdvanceSelect :options="formatEnumValue" :default-text="myExpression.literal" @click="(option)=>changeEnumValue(option.literal)"></AdvanceSelect>
@@ -72,7 +72,7 @@ export default {
         // { name: 'invert', value: 'invert', desc: 'Reverse the current value' },
         // { name: '?:', value: '?:', desc: 'Ternary conditional operator: first ? second : third' }
       ]
-      if (myExpression.value.type) {
+      if (myExpression.value?.type) {
         menu.push({ name: '', value: '', desc: '' })
         menu.push({ name: t('common.remove'), value: 'remove', desc: t('expression.removeMutation') })
       }

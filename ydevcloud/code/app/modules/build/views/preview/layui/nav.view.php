@@ -8,7 +8,7 @@ use app\modules\build\views\preview\Preview_View;
 class Nav_View extends Preview_View {
     use Layui_Popup,Layui_Code_Helper;
     private function get_values () {
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'Sample 1', "value"=> '#' ], [ "text"=> 'Sample 2', "value"=> '#', 'checked'=> true ]];
+        $values = @$this->data['meta']['values']?:[[ "name"=> 'Sample 1', "value"=> '#' ], [ "name"=> 'Sample 2', "value"=> '#', 'checked'=> true ]];
         return $values;
     }
 
@@ -164,7 +164,7 @@ class Nav_View extends Preview_View {
 
     protected function style_map($meta=null, $state = 'normal')
     {
-        $style = parent::style_map($meta);
+        $style = parent::style_map($meta, $state);
         $type = $this->data['meta']['custom']['type'];
         if (!$type || $type=='normal') {
             $style['visibility'] = 'visibility: visible !important';

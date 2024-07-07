@@ -75,6 +75,7 @@
               <option value="solid">Solid</option>
               <option value="dotted">Dotted</option>
               <option value="dashed">Dashed</option>
+              <option value="dashed">Double</option>
             </select>
           </div>
           <div class="form-group">

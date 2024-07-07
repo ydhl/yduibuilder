@@ -1,77 +1,102 @@
 <?php
 namespace app\modules\build\views\preview;
 
+use app\modules\build\views\code\Base_Code_Fragment;
 use function yangzie\__;
 
 /**
  * 迭代类ui公共逻辑封装
  */
-abstract class ValueList_View extends Preview_View {
-
-    // 重载，数组不循环输出自己，循环输出自己的子项
-    protected function build_data_output_bind(){
-        $outputDatas = $this->get_output_datas($outputDataName);
-        if (!$outputDatas) return;
-        foreach ($outputDatas as $outputAs => $outputData){
-            $outputAs = strtoupper($outputAs);
-            // value为输出内部元素，在build_ui_array, build_ui_2d_array中处理
-            if ($outputAs=='VALUELIST') return;
-
-            echo $this->wrap_output($this->output_as_prop($outputAs, $outputData), $this->get_output_data_name($outputAs, $outputData, $outputDataName[$outputAs]));
-        }
-    }
+abstract class ValueList_View extends Preview_View implements Valuable_View{
 
     public function build_ui()
     {
         $bindOutputs = $this->get_output_datas($outDataName);
         if (!$bindOutputs){
-            $this->build_ui_static();
+            $this->build_valuelist_static();
             return;
         }
-        // 对于迭代类ui，循环输出ui时只有2d数组，并且绑定的是value
+        $valueListData = $bindOutputs['VALUELIST'];
         if ($this->need_iterate_ui('VALUELIST', $bindOutputs['VALUELIST'])){
-            $this->build_ui_2d_array($bindOutputs['VALUELIST'], $bindOutputs['VALUELIST']['name']);
-        }else if($bindOutputs['VALUELIST']){// 循环输出内部列表
-            $this->build_ui_array($bindOutputs['VALUELIST'], $outDataName['VALUELIST']);
+            // 二维数组，第二维迭代
+            $valueListDataName = $bindOutputs['VALUELIST']['name'];
+            $this->build_valuelist_iterator($valueListData, $outDataName['VALUELIST'],'itemOf'.$valueListDataName,$valueListDataName.'2', true, 'idxOf'.$valueListDataName);
+        }else if($bindOutputs['VALUELIST']){
+            // 一维数组迭代
+            $valueListDataName = $outDataName['VALUELIST'];
+            $this->build_valuelist_iterator($valueListData, $valueListDataName, $valueListDataName, $valueListData['name']);
         }else{
-            $this->build_ui_static();
+            $this->build_valuelist_static();
         }
+    }
+
+
+    protected function demo_values() {
+        return [[ "name"=> 'Item 1', "value"=> 'item 1' ], [ "name"=> 'Item 2', "value"=> 'item 2' ]];
+    }
+
+    protected function default_value() {
+        if (@!$this->data['meta']['values']){
+            return 'item 1';
+        }
+        $arr = [];
+        foreach($this->data['meta']['values'] as $value){
+            if($value['checked']) $arr[] = $value['value']?:$value['name'];
+        }
+        return $arr;
+    }
+    protected abstract function build_ui_begin();
+    protected abstract function build_ui_end();
+
+    /**
+     * 输出值列表项目
+     * @param $outputData array 值列表项目上绑定的数据
+     * @param $itemName string 迭代值列表项目是的数据名称
+     * @param $staticData array 静态数据
+     * @return mixed
+     */
+    protected abstract function build_valuelist($outputData, $itemName, $staticData=null);
+    protected function build_valuelist_static(){
+        $this->build_ui_begin();
+        $values = $this->data['meta']['values'] ?: $this->demo_values();
+        foreach ($values as $item){
+            $this->build_valuelist(null, null, $item);
+        }
+        $this->build_ui_end();
     }
 
     /**
-     * 返回在遍历时用到的name，value
-     * - 对象数组，如果对象有name属性用之，没有JSON.stringify(数组项)
-     * - 对象数组，如果对象有value属性用之，没有返回数组索引
-     * - 对象，name和value都采用key:value都格式
+     * 迭代输出值列表
      *
-     * @param $bindOutput
-     * @param $itemName
-     * @return string[] [name, value, item]
+     * 举例：
+     * <pre>
+     * <ol>
+     *  <template x-for="(itemOf[$itemName], idxOf[$itemName]) in [$iteratorName]" :key="idxOf[$itemName]">
+     *      值列表html元素
+     *  </template>
+     * </ol>
+     * </pre>
+     *
+     *
+     * @param $outputData array 绑定的数据
+     * @param $outDataName string 是绑定输出数据的从根开始的访问名称
+     * @param $iteratorName string 迭代数据名，如果是一维数组同outDataName，如果是二维数组，则是itemOf$outDataName
+     * @param $itemName string 数据项目名，如果是一维数组，则是绑定数据的名称，如果是二维数组，则是数据名加个2后缀
+     * @param $is2D boolean true表示该值列表是二维，那么在取outputData中的数据时可根据该参数区分，比如调用2维的情况下，get_bind_name_value中的第一个
+     *                      参数要取$outputData['item']:
+     *                      $this->get_bind_name_value($is2d ? $outputData['item'] : $outputData, $itemName);
+     *
+     * @param $firstIndex string 2维数组迭代UI时，该参数是第一位数组迭代的索引
+     * @return mixed
      */
-    protected function get_bind_name_value($bindOutput, $itemName)
-    {
-        $name = "itemOf{$itemName}";
-        $value = "itemOf{$itemName}";
+    protected function build_valuelist_iterator($outputData, $outDataName, $iteratorName, $itemName, $is2D=false, $firstIndex=''){
+        $this->build_ui_begin();
 
-        if ($bindOutput['type']=='array'){
-            if ($this->has_props($bindOutput['item'],'name')){//对象数组
-                $name = "itemOf{$itemName}.name";
-            }else if ($this->is_object($bindOutput['item'])){
-                $name = "JSON.stringify(itemOf{$itemName})";
-            }
+        echo $this->indent(1).'<template x-for="(itemOf'.$itemName.', idxOf'.$itemName.') in '
+            .$iteratorName.'" :key="idxOf'.$itemName.'">'.PHP_EOL;
+        $this->build_valuelist($is2D ? $outputData['item'] : $outputData, $itemName);
+        echo $this->indent(1).'</template>'.PHP_EOL;
 
-            if ($this->has_props($bindOutput['item'],'value')){
-                $value = "itemOf{$itemName}.value";
-            }else if ($this->is_object($bindOutput['item'])){
-                $value = "idxOf{$itemName}";
-            }
-        }else if ($this->is_object($bindOutput)){
-            $name = "idxOf{$itemName}";
-            $value = "itemOf{$itemName}";
-        }
-        return ['name'=>$name, 'value'=>$value];
+        $this->build_ui_end();
     }
-    protected abstract function build_ui_static();
-    protected abstract function build_ui_2d_array($bindOutput, $outDataName);
-    protected abstract function build_ui_array($bindOutput, $outDataName);
 }

@@ -1,15 +1,12 @@
 <?php
 namespace app\modules\build\views\preview\weui;
 
-use app\modules\build\views\preview\Html_Code_Helper;
-use app\modules\build\views\preview\Preview_View;
+use app\modules\build\views\preview\bootstrap\Image_View as Bootstrap_Image_View;
 
-class Image_View extends Preview_View {
-    use Weui_Popup,Html_Code_Helper;
-
+class Image_View extends Bootstrap_Image_View {
     protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map($meta);
+        $map = parent::style_map($meta, $state);
 
         // 默认情况下宽度撑满
         if (!@$map['width']){
@@ -17,17 +14,5 @@ class Image_View extends Preview_View {
         }
 
         return $map;
-    }
-
-    public function build_ui()
-    {
-        $space =  $this->indent();
-        $imgSrc = @$this->data['meta']['value']?:'/uibuilder.jpg';
-        $imgSrc = $this->get_Img_Src($imgSrc);
-        echo "{$space}<img";
-        echo $this->build_main_attrs();
-        echo ' alt="'.(@$this->data['meta']['title']).'"';
-        echo ' src="'.($imgSrc).'"';
-        echo "/>\r\n";
     }
 }

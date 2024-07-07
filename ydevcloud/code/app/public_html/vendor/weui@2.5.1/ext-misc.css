@@ -19,6 +19,7 @@
 
 .d-none{display: none !important;}
 .d-block{display: block !important;}
+.d-overflow-hidden{overflow: hidden !important;}
 
 .pointer-events-none{
     pointer-events: none !important;

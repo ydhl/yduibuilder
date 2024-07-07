@@ -5,17 +5,17 @@
     <table  :class="['table', dragableCss, tableCss]" :style="tableStyle">
       <thead v-if="!uiconfig.meta.custom?.headless" :class="headerCss" :style="headerStyle">
         <tr>
-          <th v-for="(item, index) in header" :class="[alignCss]" :key="index" v-html="item.text"></th>
+          <th v-for="(item, index) in header" :class="[alignCss]" :key="index" v-html="item.name"></th>
         </tr>
       </thead>
       <tbody>
       <tr v-for="(r, rindex) in row" :key="rindex">
-        <td v-for="(item, cindex) in r" :class="[alignCss]" :key="cindex" v-html="item.text"></td>
+        <td v-for="(item, cindex) in r" :class="[alignCss]" :key="cindex" v-html="item.name"></td>
       </tr>
       </tbody>
       <tfoot v-if="!uiconfig.meta.custom?.footless" :class="footerCss" :style="footerStyle">
       <tr>
-        <th v-for="(item, index) in footer" :class="[alignCss]" :key="index" v-html="item.text"></th>
+        <th v-for="(item, index) in footer" :class="[alignCss]" :key="index" v-html="item.name"></th>
       </tr>
       </tfoot>
     </table>
@@ -24,12 +24,8 @@
 
 <script lang="ts">
 import Table from '@/components/ui/js/Table'
-import { computed, onMounted, watch } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex'
-import { YDJSStatic } from '@/lib/ydjs'
-import ydhl from '@/lib/ydhl'
-import { useI18n } from 'vue-i18n'
-declare const YDJS: YDJSStatic
 
 export default {
   name: 'Bootstrap_Table',
@@ -44,64 +40,56 @@ export default {
   setup (props: any, context: any) {
     const store = useStore()
     const table = new Table(props, context, store)
-    const { t } = useI18n()
     const tableSetup = table.setup()
     const header = computed(() => {
-      const header = store.state.page.extraInfo[props.uiconfig?.meta?.id]?.header
+      const header = props.uiconfig.meta?.custom?.data?.header
       if (header && header.length > 0) return header
       // 非无头模式下，没有头部数据就用第一行作为头部
       const row = table.getMeta('row', 'custom')
       if (row && row.length > 0 && !props.uiconfig.meta?.custom?.headless) return row[0]
       return [
-        { text: 'Header 1' },
-        { text: 'Header 2' },
-        { text: 'Header 3' }
+        { name: 'Header 1' },
+        { name: 'Header 2' },
+        { name: 'Header 3' }
       ]
     })
     const footer = computed(() => {
-      const footer = store.state.page.extraInfo[props.uiconfig?.meta?.id]?.footer
+      const footer = props.uiconfig.meta?.custom?.data?.footer
       if (footer && footer.length > 0) return footer
       // 非无脚模式下，没有脚数据就用最后一行作为脚
       const row = table.getMeta('row', 'custom')
       if (row && row.length > 0 && !props.uiconfig.meta?.custom?.footless) return row[row.length - 1]
       return [
-        { text: 'Footer 1' },
-        { text: 'Footer 2' },
-        { text: 'Footer 3' }
+        { name: 'Footer 1' },
+        { name: 'Footer 2' },
+        { name: 'Footer 3' }
       ]
     })
     const row = computed(() => {
-      const row = store.state.page.extraInfo[props.uiconfig?.meta?.id]?.row
+      const row = props.uiconfig.meta?.custom?.data?.row
       // console.log(row)
       if (row && row.length > 0) {
-        const rowCopy = JSON.parse(JSON.stringify(row))
-        if (!props.uiconfig.meta?.custom?.headless) {
-          rowCopy.splice(0, 1)
-        }
-        if (!props.uiconfig.meta?.custom?.footless) {
-          rowCopy.splice(rowCopy.length - 1, 1)
-        }
-        return rowCopy
+        return row
       }
       return [[
-        { text: 'row 1 column 1' },
-        { text: 'row 1 column 2' },
-        { text: 'row 1 column 3' }
+        { name: 'row 1 column 1' },
+        { name: 'row 1 column 2' },
+        { name: 'row 1 column 3' }
       ],
       [
-        { text: 'row 2 column 1' },
-        { text: 'row 2 column 2' },
-        { text: 'row 2 column 3' }
+        { name: 'row 2 column 1' },
+        { name: 'row 2 column 2' },
+        { name: 'row 2 column 3' }
       ],
       [
-        { text: 'row 3 column 1' },
-        { text: 'row 3 column 2' },
-        { text: 'row 3 column 3' }
+        { name: 'row 3 column 1' },
+        { name: 'row 3 column 2' },
+        { name: 'row 3 column 3' }
       ],
       [
-        { text: 'row 4 column 1<br/> new line' },
-        { text: 'row 4 column 2' },
-        { text: 'row 4 column 3' }
+        { name: 'row 4 column 1<br/> new line' },
+        { name: 'row 4 column 2' },
+        { name: 'row 4 column 3' }
       ]
       ]
     })
@@ -216,35 +204,7 @@ export default {
       css.push(props.uiconfig.meta?.css?.footer && props.uiconfig.meta?.css?.footer !== 'default' ? 'table-' + props.uiconfig.meta.css.footer : '')
       return css.join(' ')
     })
-    const project = computed(() => store.state.page.project)
-    const currExcelID = computed(() => {
-      const files = table.getMeta('datasource', 'files') || []
-      return files[0]?.id
-    })
-    watch(currExcelID, (newV, oldV) => {
-      if (oldV !== newV) parseExcel(newV)
-    })
-    const parseExcel = (fid) => {
-      if (!fid) return
-      const loadingid = YDJS.loading(t('page.loading'))
-      ydhl.get('api/parseexcel', { pid: project.value.id, fid }, (rst) => {
-        YDJS.hide_dialog(loadingid)
-        if (!rst || !rst.success) {
-          YDJS.alert(rst?.msg || t('table.canNotParseExcel'), 'Oops')
-          return
-        }
-        const _props = {}
-        _props[props.uiconfig?.meta?.id] = {
-          header: rst.data.header || [],
-          footer: rst.data.footer || [],
-          row: rst.data.row || []
-        }
-        store.commit('updateExtraInfo', _props)
-      }, 'json')
-    }
-    onMounted(() => {
-      parseExcel(currExcelID.value)
-    })
+
     return {
       ...tableSetup,
       header,

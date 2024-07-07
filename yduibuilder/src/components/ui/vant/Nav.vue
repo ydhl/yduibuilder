@@ -7,7 +7,7 @@
       <div class="van-tabs__nav van-tabs__nav--card" :style="borderStyle">
         <div :class="['van-tab van-tab--card',item.checked ? activeItemCss : itemCss]" v-for="(item, index) in values"
             :key="index" :style="item.checked ? activeItemStyle : itemStyle">
-          <span class="van-tab__text van-tab__text--ellipsis">{{item.text}}</span>
+          <span class="van-tab__text van-tab__text--ellipsis">{{item.name}}</span>
         </div>
       </div>
     </div>

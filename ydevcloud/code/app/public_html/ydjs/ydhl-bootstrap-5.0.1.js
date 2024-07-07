@@ -1040,25 +1040,36 @@ $(function () {
         }
 
         var post = function(){
-            $.post(url, $(self).parents("form").serialize(), function (rst) {
-                _ydjs.spin_clear(self);
+            $.ajax({
+                url,
+                type: 'post',
+                data: $(self).parents("form").serialize(),
+                success: function (rst) {
+                    _ydjs.spin_clear(self);
 
-                if (rst.success) {
-                    _ydjs.toast("操作成功", YDJS.ICON_SUCCESS, function () {
-                        if (redirect) {
-                            if(redirect=="reload"){
-                                _window.location.reload();
-                            }else{
-                                _window.location.href = redirect;
+                    if (rst.success) {
+                        _ydjs.toast("操作成功", YDJS.ICON_SUCCESS, function () {
+                            if (redirect) {
+                                if(redirect=="reload"){
+                                    _window.location.reload();
+                                }else{
+                                    _window.location.href = redirect;
+                                }
+                            }else if(cb){
+                                invoke_cb(cb, [rst]);
                             }
-                        }else if(cb){
-                            invoke_cb(cb, [rst]);
-                        }
-                    });
-                } else {
-                    _ydjs.toast(rst.msg || "保存失败", YDJS.ICON_ERROR);
-                }
-            }, "json");
+                        });
+                    } else {
+                        _ydjs.toast(rst.msg || "保存失败", YDJS.ICON_ERROR);
+                    }
+                },
+                error: function (xhr,status,error){
+                    if(cb){
+                        invoke_cb(cb, [{ success:false, msg: xhr.responseText}]);
+                    }
+                },
+                dataType: "json"
+            });
         };
 
         if (msg){

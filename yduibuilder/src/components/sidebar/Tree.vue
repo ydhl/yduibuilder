@@ -49,12 +49,12 @@ export default {
       subIsOpen.value = v
     })
 
-    const { selectedUIItemIsInput } = info
+    const { selectedUIItemIsForm } = info
     const { t } = useI18n()
 
     return {
       t,
-      selectedUIItemIsInput,
+      selectedUIItemIsForm,
       subIsOpen,
       hover
     }

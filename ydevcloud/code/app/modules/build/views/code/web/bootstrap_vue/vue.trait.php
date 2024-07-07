@@ -158,7 +158,7 @@ trait Vue {
             $view->build_popup_ui($outputPopupIds);
         }
     }
-    public function build_event_binding_code(){
+    public function build_event_code(){
         $events = @$this->data['events'];
         if (!$events){
             return;

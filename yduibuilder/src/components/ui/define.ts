@@ -12,7 +12,11 @@ export interface UIDefine{
   /**
    * 是否是表单项
    */
-  isInput?: boolean,
+  isForm?: boolean,
+  /**
+   * 是否是有值类ui
+   */
+  isValuable?: boolean,
   /**
    * i18n的字符串
    */
@@ -31,6 +35,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     type: 'Breadcrumb',
     kind: ['mobile', 'pc'],
     isIterable: true,
+    isValuable: true,
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE'],
     name: 'ui.breadcrumb'
   },
@@ -53,13 +58,15 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     isContainer: false,
     name: 'ui.carousel',
     isIterable: true,
+    isValuable: true,
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Checkbox: {
     type: 'Checkbox',
     kind: ['mobile', 'pc'],
     isIterable: true,
-    isInput: true,
+    isForm: true,
+    isValuable: true,
     name: 'ui.checkbox',
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
   },
@@ -68,6 +75,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     kind: ['pc'],
     isIterable: true,
     isContainer: true,
+    isValuable: true,
     name: 'ui.collapse',
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },
@@ -83,12 +91,14 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     kind: ['pc', 'mobile'],
     name: 'ui.dropdown',
     isIterable: true,
+    isValuable: true,
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
   },
   File: {
     type: 'File',
     kind: ['mobile', 'pc'],
-    isInput: true,
+    isForm: true,
+    isValuable: true,
     name: 'ui.file',
     outputAs: ['STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
@@ -119,7 +129,8 @@ const baseUIDefines: Record<UIType, UIDefine> = {
   Input: {
     type: 'Input',
     kind: ['mobile', 'pc'],
-    isInput: true,
+    isForm: true,
+    isValuable: true,
     name: 'ui.input',
     outputAs: ['VALUE', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
@@ -128,6 +139,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     kind: ['mobile', 'pc'],
     name: 'ui.list',
     isIterable: true,
+    isValuable: true,
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
   },
   Modal: {
@@ -143,6 +155,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     kind: ['pc', 'mobile'],
     name: 'ui.nav',
     isIterable: true,
+    isValuable: true,
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Page: {
@@ -156,8 +169,8 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     type: 'Pagination',
     kind: ['pc'],
     name: 'ui.pagination',
-    isIterable: true,
-    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
+    isValuable: true,
+    outputAs: ['VALUE', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Progress: {
     type: 'Progress',
@@ -168,29 +181,31 @@ const baseUIDefines: Record<UIType, UIDefine> = {
   Radio: {
     type: 'Radio',
     kind: ['mobile', 'pc'],
-    isInput: true,
+    isForm: true,
     isIterable: true,
+    isValuable: true,
     name: 'ui.radio',
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
   },
   RangeInput: {
     type: 'RangeInput',
     kind: ['mobile', 'pc'],
-    isInput: true,
+    isForm: true,
+    isValuable: true,
     name: 'ui.rangeInput',
     outputAs: ['VALUE', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   RichText: {
     type: 'RichText',
     kind: ['mobile', 'pc'],
-    isInput: false,
     name: 'ui.richText',
     outputAs: ['VALUE', 'STYLE', 'CSS', 'KEYVALUE', 'NONE']
   },
   Select: {
     type: 'Select',
     kind: ['mobile', 'pc'],
-    isInput: true,
+    isForm: true,
+    isValuable: true,
     name: 'ui.select',
     isIterable: true,
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE']
@@ -200,6 +215,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     kind: ['pc'],
     name: 'ui.table',
     isIterable: true,
+    isValuable: true,
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Text: {
@@ -211,7 +227,8 @@ const baseUIDefines: Record<UIType, UIDefine> = {
   Textarea: {
     type: 'Textarea',
     kind: ['mobile', 'pc'],
-    isInput: true,
+    isForm: true,
+    isValuable: true,
     name: 'ui.textarea',
     outputAs: ['VALUE', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },

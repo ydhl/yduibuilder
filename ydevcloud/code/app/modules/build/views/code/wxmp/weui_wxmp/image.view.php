@@ -10,7 +10,7 @@ class Image_View extends Preview_View {
 
     protected function style_map($meta=null, $state = 'normal')
     {
-        $map = parent::style_map($meta);
+        $map = parent::style_map($meta, $state);
 
         if (strtolower(@$meta['style']['width']) == 'auto'){
             unset($map['width']);

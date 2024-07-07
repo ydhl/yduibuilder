@@ -165,8 +165,8 @@ trait Page_Model_Method{
             $allParents = [];
             $path = [];
             $bindData = $bindDataModel->find_data($info['io']->data_id, $bindDataModel->get_data_model(), $allParents, $path);
-            $path[] = $bindData['name'];
-            $path = array_reverse($path);
+            if($bindData['name'])array_unshift($path, $bindData['name']);
+            $path = array_reverse(array_filter($path));
             if ($info['io']->type == 'in') {
                 $dataBind['in'][$info['io']->uiid] = [
                     'path' => join('.', $path)
@@ -418,7 +418,7 @@ trait Page_Model_Method{
         return false;
     }
 
-    private function copy_bind_style($copyFromPage, $old2newIDs) {
+    private function copy_bind_style($copyFromPage, $old2newIDs, $renameUIID=true) {
         $dba = YZE_DBAImpl::get_instance();
         $models = Page_Bind_Style_Model::from()->where('page_id=:pid and is_deleted=0')->select([':pid'=>$copyFromPage->id]);
 
@@ -429,10 +429,10 @@ trait Page_Model_Method{
         $sql = "insert into page_bind_style(".join(',', $columns).") values ";
         $values = [];
         foreach ($models as $model){
-            if (!$old2newIDs[$model->uiid]) continue;
+            if ($renameUIID && !$old2newIDs[$model->uiid]) continue;
             $set = $model->get_records();
             unset($set['id'],$set['created_on'],$set['modified_on']);
-            $set['uiid'] = $old2newIDs[$model->uiid];
+            $set['uiid'] = $old2newIDs[$model->uiid]?:$model->uiid;
             $set = array_map(function($item){
                 return is_null($item) ? 'NULL' : "'{$item}'";
             }, $set);
@@ -498,13 +498,13 @@ trait Page_Model_Method{
             $oldClass2new[Page_Bind_Data_Model::CLASS_NAME][$model->uuid] = $newModel->uuid;
         }
     }
-    private function copy_bind_event($copyFromPage, $old2newIDs, $oldId2new, &$oldClass2new){
+    private function copy_bind_event($copyFromPage, $old2newIDs, $oldId2new, &$oldClass2new, $renameUIID=true){
         $models = Page_Bind_Event_Model::from()->where('page_id=:pid and is_deleted=0')->select([':pid'=>$copyFromPage->id]);
         foreach ($models as $model){
             $data = $model->get_records();
             unset($data['id'], $data['created_on'], $data['modified_on'], $data['uuid']);
             $data['uuid'] = Page_Bind_Event_Model::uuid();
-            $data['uiid'] = $old2newIDs[$model->uiid]?:'';
+            $data['uiid'] = $renameUIID ? ($old2newIDs[$model->uiid]?:'') : $model->uiid;
             $data['page_id'] = $this->id;
             $data['uicomponent_event_id'] = $oldId2new[Uicomponent_Event_Model::CLASS_NAME][$model->uicomponent_event_id] ?: $model->uicomponent_event_id;
             $newModel = new Page_Bind_Event_Model();
@@ -512,7 +512,7 @@ trait Page_Model_Method{
             $oldClass2new[Page_Bind_Event_Model::CLASS_NAME][$model->uuid] = $newModel->uuid;
         }
     }
-    private function copy_bind_io($copyFromPage, $old2newIDs, &$oldClass2new){
+    private function copy_bind_io($copyFromPage, $old2newIDs, &$oldClass2new, $renameUIID=true){
         $dba = YZE_DBAImpl::get_instance();
         $models = Page_Bind_Io_Model::from()->where('page_id=:pid and is_deleted=0')->select([':pid'=>$copyFromPage->id]);
 
@@ -523,7 +523,7 @@ trait Page_Model_Method{
         $sql = "insert into page_bind_io(".join(',', $columns).") values ";
         $values = [];
         foreach ($models as $model){
-            if (!$old2newIDs[$model->uiid]) continue;
+            if ($renameUIID && !$old2newIDs[$model->uiid]) continue;
             $from_uuid = $oldClass2new[$model->from_class][$model->from_uuid];
             if (!$from_uuid) continue;
 
@@ -532,7 +532,7 @@ trait Page_Model_Method{
             $set['from_uuid'] = $from_uuid;
             $set['data_id'] = $model->data_id == $model->from_uuid ? $from_uuid : $model->data_id;// 单纯一个数据，没有下级数据对情况
             $set['from_class'] = addslashes($model->from_class);// 对\转义成\\
-            $set['uiid'] = $old2newIDs[$model->uiid];
+            $set['uiid'] = $old2newIDs[$model->uiid] ?: $model->uiid;
             $set = array_map(function($item){
                 return is_null($item) ? 'NULL' : "'{$item}'";
             }, $set);
@@ -545,7 +545,7 @@ trait Page_Model_Method{
             $dba->exec($sql.join(',', $values));
         }
     }
-    private function copy_bind_state($copyFromPage, $old2newIDs, &$oldClass2new){
+    private function copy_bind_state($copyFromPage, $old2newIDs, &$oldClass2new, $renameUIID=true){
         $dba = YZE_DBAImpl::get_instance();
         $models = Page_Bind_State_Model::from()->where('page_id=:pid and is_deleted=0')->select([':pid'=>$copyFromPage->id]);
         $columns = Page_Bind_State_Model::$columns;
@@ -554,11 +554,11 @@ trait Page_Model_Method{
         $sql = "insert into page_bind_state(".join(',',$columns).") values ";
         $values = [];
         foreach ($models as $model){
-            if (!$old2newIDs[$model->uiid]) continue;
+            if ($renameUIID && !$old2newIDs[$model->uiid]) continue;
 
             $set = $model->get_records();
             unset($set['id'],$set['created_on'],$set['modified_on']);
-            $set['uiid'] = $old2newIDs[$model->uiid];
+            $set['uiid'] = $old2newIDs[$model->uiid] ?: $model->uiid;
             $set['style'] = html_entity_decode($model->style);
             $set['expression'] = html_entity_decode($model->expression);
             $set = array_map(function($item){
@@ -729,22 +729,23 @@ trait Page_Model_Method{
     }
 
     /**
-     * 赋值页面
-     * @param $copyFromPage Page_Model 要赋值的页面
+     * 复制页面
+     * @param $copyFromPage Page_Model 要复制的页面
      * @param $old2newIDs array uuid旧到新到映射
+     * @param $renameUIID boolean 是否要重命名UIID
      * @return void
      * @throws YZE_DBAException
      */
-    public function copy_bind_from($copyFromPage, $oldUI2new){
+    public function copy_bind_from($copyFromPage, $oldUI2new, $renameUIID=true){
         $oldUuid2new = [];
         $oldId2new = [];
-        $this->copy_bind_style($copyFromPage, $oldUI2new);
+        $this->copy_bind_style($copyFromPage, $oldUI2new, $renameUIID);
         $this->copy_uicomponent_instance($copyFromPage, $oldUI2new);
         $this->copy_uicomponent_event($copyFromPage, $oldId2new);
         $this->copy_bind_data($copyFromPage, $oldUuid2new);
-        $this->copy_bind_io($copyFromPage, $oldUI2new, $oldUuid2new);
-        $this->copy_bind_state($copyFromPage, $oldUI2new, $oldUuid2new);
-        $this->copy_bind_event($copyFromPage, $oldUI2new, $oldId2new, $oldUuid2new);
+        $this->copy_bind_io($copyFromPage, $oldUI2new, $oldUuid2new, $renameUIID);
+        $this->copy_bind_state($copyFromPage, $oldUI2new, $oldUuid2new, $renameUIID);
+        $this->copy_bind_event($copyFromPage, $oldUI2new, $oldId2new, $oldUuid2new, $renameUIID);
 
         $this->copy_bind_api_and_action($copyFromPage, $oldUuid2new, $oldId2new);
 

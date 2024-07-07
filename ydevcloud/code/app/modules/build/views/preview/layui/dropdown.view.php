@@ -191,7 +191,7 @@ class Dropdown_View extends Preview_View {
     }
     protected function style_map($meta=null, $state = 'normal')
     {
-        $style = parent::style_map($meta);
+        $style = parent::style_map($meta, $state);
         // 如果不是分体按钮，那么需要考虑属性的继承性；如果是分体按钮，属性的继承由btnStyle处理
         if ($this->data['meta']['custom']['isSplit']) {
             unset($style['background-color']);
@@ -262,7 +262,7 @@ class Dropdown_View extends Preview_View {
     public function build_code():Base_Code_Fragment
     {
         parent::build_code();
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'Sample 1', "value"=> 'value1', 'type'=>'action' ], [ "text"=> 'Sample 2', "value"=> 'value2', 'type'=>'action'  ]];
+        $values = @$this->data['meta']['values']?:[[ "name"=> 'Sample 1', "value"=> 'value1', 'type'=>'action' ], [ "name"=> 'Sample 2', "value"=> 'value2', 'type'=>'action'  ]];
         $dropdItems = [];
         foreach ($values as $index => $value) {
             $item = [

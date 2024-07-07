@@ -46,7 +46,7 @@ trait Page_Bind_Data_Model_Method{
             $rst = $this->find_data($data_id, $dataSource['item'],$allParents, $path);
             if ($rst) {
                 $allParents[] = $dataSource;
-                $path[] = $dataSource['name'];
+                $path[] = $dataSource['name'];// 注意如果数组没有name也需要加上
                 return $rst;
             }
         }else if ($dataSource['type'] == 'object') {

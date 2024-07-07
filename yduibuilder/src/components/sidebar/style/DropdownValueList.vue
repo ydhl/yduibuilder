@@ -10,8 +10,8 @@
                 <div><i class="iconfont icon-drag" style="cursor: move;"></i></div>
                 <label class="flex-grow-1 m-0 text-truncate">
                   <template v-if="item.type=='divider'"><hr class="m-3"/></template>
-                  <template v-if="item.type=='action'">{{item.text}} ({{item.value}})</template>
-                  <template v-if="item.type=='header' || item.type=='text'">{{item.text}}</template>
+                  <template v-if="item.type=='action'">{{item.name}} ({{item.value}})</template>
+                  <template v-if="item.type=='header' || item.type=='text'">{{item.name}}</template>
                 </label>
                 <div>
                   <button type="button" @click="openSetting(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-edit"></i></button>
@@ -51,7 +51,7 @@
         <div class="form-group mb-1 row" v-if="newItem.type!='divider'">
           <label for="form-text" class="col-sm-3 col-form-label">{{ t('style.form.text') }}</label>
           <div class="col-sm-9">
-            <input type="text" class="form-control form-control-sm" id="form-text" v-model="newItem.text">
+            <input type="text" class="form-control form-control-sm" id="form-text" v-model="newItem.name">
           </div>
         </div>
         <div class="form-group row" v-if="newItem.type=='action'">
@@ -85,7 +85,7 @@ export default {
     const initInfo = UIInit()
     const { t } = useI18n()
     const editValueIndex = ref(-1)
-    const newItem = ref({ text: '', value: '', checked: false, disabled: false, type: 'action' })
+    const newItem = ref({ name: '', value: '', checked: false, disabled: false, type: 'action' })
     const valueItems = ref<any>([])
 
     const remove = (index) => {
@@ -101,7 +101,7 @@ export default {
       if (editItemIndex > -1) {
         newItem.value = JSON.parse(JSON.stringify(valueItems.value[editItemIndex]))
       } else {
-        newItem.value = { text: '', value: '', checked: false, disabled: false, type: 'action' }
+        newItem.value = { name: '', value: '', checked: false, disabled: false, type: 'action' }
       }
 
       isOpenSetting.value = true

@@ -6,7 +6,7 @@
         <div :class="{'layui-unselect layui-form-radio': true, 'layui-form-radioed': item.checked, 'layui-radio-disabled layui-disabled':uiconfig.meta?.form?.state==='disabled'}">
           <i class="layui-anim layui-icon" v-if="!item.checked"></i>
           <i class="layui-anim layui-icon layui-anim-scaleSpring" v-if="item.checked"></i>
-          <span>{{item.text}}</span>
+          <span>{{item.name}}</span>
         </div>
       </div>
     </template>

@@ -7,7 +7,7 @@ use app\modules\build\views\preview\weui\Select_View as Preview_Select_View;
 class Select_View extends Preview_Select_View {
     use Wxmp;
     private function get_values(){
-        return @$this->data['meta']['values']?:[[ "text"=> 'Sample 1', "value"=> '1' ], [ "text"=> 'Sample 2', "value"=> '2' ]];
+        return @$this->data['meta']['values']?:[[ "name"=> 'Sample 1', "value"=> '1' ], [ "name"=> 'Sample 2', "value"=> '2' ]];
     }
     public function check_master()
     {

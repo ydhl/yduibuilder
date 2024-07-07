@@ -3,6 +3,7 @@ import UIBuilder from '../views/UIBuilder.vue'
 import SSO from '../views/SSO.vue'
 import Page from '../views/Page.vue'
 import Error from '../views/Error.vue'
+import Test from '../views/Test.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -24,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/page',
     name: 'Page',
     component: Page
+  },
+  {
+    path: '/test',
+    name: 'Test',
+    component: Test
   }
 ]
 

@@ -63,7 +63,7 @@ class Formgroup_View extends Preview_View {
     }
     protected function style_map($meta=null, $state = 'normal')
     {
-        $style = parent::style_map($meta);
+        $style = parent::style_map($meta, $state);
         $newStyle = [];
         foreach ($style as $name => $value){
             if (!preg_match("/^height/", $name)){

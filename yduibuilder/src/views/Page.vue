@@ -447,7 +447,7 @@ export default {
             const meta: any = {
               id: ydhl.uuid(5, 0, targetPageId),
               title: type,
-              form: baseUIDefines[type]?.isInput ? {} : undefined,
+              form: baseUIDefines[type]?.isForm ? {} : undefined,
               isContainer: baseUIDefines[type]?.isContainer || false,
             }
 

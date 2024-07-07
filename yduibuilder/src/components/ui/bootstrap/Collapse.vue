@@ -15,7 +15,7 @@
 
         <div :id="`${uiconfig.meta.id}collapse0`" class="collapse show" :aria-labelledby="uiconfig.meta.id+'heading0'" :data-parent="'#'+uiconfig.meta.id">
           <div class="card-body p-0">
-            According body, you can add item from Style Panel
+            According body, you can add item from Info Panel
           </div>
         </div>
       </div>

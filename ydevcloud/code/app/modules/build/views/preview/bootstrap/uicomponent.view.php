@@ -15,7 +15,7 @@ class UIComponent_View extends Preview_View {
         $space =  $this->indent();
         echo "{$space}<div";
         echo $this->build_main_attrs();
-        echo ">\r\n";
+        echo ">".PHP_EOL;
 
         foreach ((array)@$this->childViews as $view){
             $data = $view->get_datas();
@@ -26,6 +26,6 @@ class UIComponent_View extends Preview_View {
             }
         }
 
-        echo "{$space}</div>\r\n";
+        echo "{$space}</div>".PHP_EOL;
     }
 }

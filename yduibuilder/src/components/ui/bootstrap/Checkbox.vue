@@ -10,7 +10,7 @@
                :required="uiconfig.meta?.form?.required"
                :readonly="uiconfig.meta?.form?.state==='readonly'"
                :value="item.value" :name="uiconfig.meta?.form?.inputName">
-        <label class="form-check-label" :for="uiconfig.meta.id+item.value">{{item.text}}</label>
+        <label class="form-check-label" :for="uiconfig.meta.id+item.value">{{item.name}}</label>
       </div>
     </template>
   </div>

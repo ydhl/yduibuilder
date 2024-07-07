@@ -63,6 +63,7 @@ export default {
       }
       if (buttonMeta.value.custom?.isOutline) {
         delete myStyle['background-color']
+        delete myStyle['background-image']
       }
       return button.appendImportant(myStyle)
     })

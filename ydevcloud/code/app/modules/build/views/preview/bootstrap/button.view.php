@@ -7,20 +7,45 @@ use app\modules\build\views\preview\Preview_View;
 
 class Button_View extends Preview_View {
     use Bootstrap_Popup,Html_Code_Helper;
-    private function buttonMeta () {
-        $parentUI = $this->get_parent_UI();
-        $type = strtolower($parentUI['type']);
-        $parentIsNavbar = in_array($type, ['nav', 'navbar']);
-        if ($parentIsNavbar) {
-            return $parentUI['meta'];
+    public function build_ui()
+    {
+        $space =  $this->indent();
+        $meta = $this->data['meta'];
+        $type = $meta['custom']['type'] ?: "button";
+        // 一般按钮
+        echo $space;
+        if (@$meta['custom']['type']=='link'){
+            echo "<a";
+            echo $this->wrap_output('href', $this->data['meta']['custom']['linkHref']);
+            if (@$this->data['meta']['custom']['disabled']){
+                echo ' disabled ';
+            }
+            $this->build_main_attrs();
+            echo '>';
+            $this->wrap_icon(function(){
+                echo $this->data['meta']['title'] ?: $this->data['type'];
+            });
+            echo PHP_EOL;
+            echo $space."</a>".PHP_EOL;
+        }else{
+            echo "<button";
+            echo $this->wrap_output('type', $type);
+            echo $this->wrap_output('title', addslashes($this->data['meta']['title']));
+            if (@$this->data['meta']['custom']['disabled']){
+                echo ' disabled ';
+            }
+            $this->build_main_attrs();
+            echo '>';
+            $this->wrap_icon(function(){
+                echo $this->data['meta']['title'] ?: $this->data['type'];
+            });
+            echo PHP_EOL;
+            echo $space."</button>".PHP_EOL;
         }
-        return $this->data['meta'];
     }
     protected function css_map()
     {
         $cssMap = parent::css_map();
-        $parentUI = $this->get_parent_UI();
-        // 如果按钮有背景和前景则用按钮的，否则用上层的
         $myBackgruondTheme = $cssMap['backgroundTheme'] ? $this->data['meta']['css']['backgroundTheme'] : '';
         $myForegroundTheme = $cssMap['foregroundTheme'] ? $this->data['meta']['css']['foregroundTheme'] : '';
         unset($cssMap['backgroundTheme']);
@@ -59,8 +84,7 @@ class Button_View extends Preview_View {
     protected function style_map($meta=null, $state='normal')
     {
         $meta = $meta??$this->data['meta'];
-        $styleArray = parent::style_map($meta);
-
+        $styleArray = parent::style_map($meta, $state);
         $buttonMeta = $this->buttonMeta();
         $selfHasForeground = $meta['css']['foregroundTheme'] && $meta['css']['foregroundTheme'] !== 'default';
         $selfHasBackground = $meta['css']['backgroundTheme'] && $meta['css']['backgroundTheme'] !== 'default';
@@ -75,42 +99,18 @@ class Button_View extends Preview_View {
             $styleArray['border-color'] = "border-color: ${backgroundColor} !important";
         }
         if (@$buttonMeta['custom']['isOutline'] && $state=='normal') {
-            unset($styleArray['background-color']);
+            unset($styleArray['background-color'],$styleArray['background-image']);
         }
         return $styleArray;
     }
 
-    public function build_ui()
-    {
-        $space =  $this->indent();
-        $meta = $this->data['meta'];
-        $type = $meta['custom']['type'] ?: "button";
-        // 一般按钮
-        echo $space;
-        if (@$meta['custom']['type']=='link'){
-            echo "<a href='{$this->data['meta']['custom']['linkHref']}' ";
-            if (@$this->data['meta']['custom']['disabled']){
-                echo ' disabled ';
-            }
-            echo $this->build_main_attrs().'>';
-            $this->wrap_icon(function(){
-                echo $this->data['meta']['title'] ?: $this->data['type'];
-            });
-            echo PHP_EOL;
-            echo $this->indent();
-            echo "</a>".PHP_EOL;
-        }else{
-            echo "<button type='{$type}' title='".addslashes($this->data['meta']['title'])."'";
-            if (@$this->data['meta']['custom']['disabled']){
-                echo ' disabled ';
-            }
-            echo $this->build_main_attrs().'>';
-            $this->wrap_icon(function(){
-                echo $this->data['meta']['title'] ?: $this->data['type'];
-            });
-            echo "".PHP_EOL;
-            echo $this->indent();
-            echo "</button>".PHP_EOL;
+    private function buttonMeta () {
+        $parentUI = $this->get_parent_UI();
+        $type = strtolower($parentUI['type']);
+        $parentIsNavbar = in_array($type, ['nav']);
+        if ($parentIsNavbar) {
+            return $parentUI['meta'];
         }
+        return $this->data['meta'];
     }
 }

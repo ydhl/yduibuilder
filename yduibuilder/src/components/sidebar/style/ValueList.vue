@@ -11,7 +11,7 @@
               <label class="flex-grow-1 m-0 text-truncate">
                 <input type="radio" v-if="!isMultiple" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
                 <input type="checkbox" v-if="isMultiple" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
-                {{item.text}} ({{item.value}})</label>
+                {{item.name}} ({{item.value}})</label>
               <div>
                 <button type="button" @click="openSetting(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-edit"></i></button>
                 <button type="button" @click="remove(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-remove"></i></button>
@@ -40,7 +40,7 @@
         <div class="form-group row mt-2">
           <label for="form-text" class="col-sm-3 col-form-label">{{ t('style.form.text') }}</label>
           <div class="col-sm-9">
-            <input type="text" class="form-control form-control-sm" id="form-text" v-model="newItem.text">
+            <input type="text" class="form-control form-control-sm" id="form-text" v-model="newItem.name">
           </div>
         </div>
         <div class="form-group row mt-2">
@@ -87,7 +87,7 @@ export default {
     const { t } = useI18n()
     const editValueIndex = ref(-1)
     const valueInvalid = ref(false)
-    const newItem = ref({ text: '', value: '', checked: false, disabled: false })
+    const newItem = ref({ name: '', value: '', checked: false, disabled: false })
     const valueItems = ref<any>([])
 
     const remove = (index) => {
@@ -121,7 +121,7 @@ export default {
       if (editItemIndex > -1) {
         newItem.value = JSON.parse(JSON.stringify(valueItems.value[editItemIndex]))
       } else {
-        newItem.value = { text: '', value: '', checked: false, disabled: false }
+        newItem.value = { name: '', value: '', checked: false, disabled: false }
       }
       isOpenSetting.value = true
       nextTick(() => {

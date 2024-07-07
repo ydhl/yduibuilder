@@ -8,7 +8,7 @@ class Breadcrumb_View extends Preview_View {
     use Layui_Popup,Layui_Code_Helper;
     private function values() {
         if (@!$this->data['meta']['values']){
-            return [["text"=> 'Page A', "value"=> '#1' ], [ "text"=> 'Page B', "value"=> '#2' ]];
+            return [["name"=> 'Page A', "value"=> '#1' ], [ "name"=> 'Page B', "value"=> '#2' ]];
         }
         return $this->data['meta']['values'];
     }
@@ -54,7 +54,7 @@ class Breadcrumb_View extends Preview_View {
     }
     protected function style_map($meta=null, $state = 'normal')
     {
-        $style = parent::style_map($meta);
+        $style = parent::style_map($meta, $state);
         // 前景色放到item上
         unset($style['color']);
         $style['visibility'] = 'visibility:visible !important';

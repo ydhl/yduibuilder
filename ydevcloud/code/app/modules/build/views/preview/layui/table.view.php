@@ -191,7 +191,7 @@ class Table_View extends Preview_View {
     }
     protected function style_map($meta=null, $state = 'normal')
     {
-        $style = parent::style_map($meta);
+        $style = parent::style_map($meta, $state);
         foreach ($style as $name => $value) {
             if (preg_match("/^background/", $name)) unset($style[$name]);
             if (preg_match("/^color/", $name)) unset($style[$name]);

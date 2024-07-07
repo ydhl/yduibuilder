@@ -5,8 +5,8 @@
         :data-pageid="pageid">
       <li :class="{'van-breadcrumb-item': true, 'active':item.checked}"
           v-for="(item, index) in values" :key="index">
-        <span v-if="!item.checked" :class="foregroundCss" :style="foregroundStyle">{{item.text}}</span>
-        <template v-if="item.checked">{{item.text}}</template>
+        <span v-if="!item.checked" :class="foregroundCss" :style="foregroundStyle">{{item.name}}</span>
+        <template v-if="item.checked">{{item.name}}</template>
       </li>
     </ol>
 </template>

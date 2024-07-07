@@ -69,74 +69,68 @@ $env = Env::package();
         </table>
     </div>
 <?php }?>
-<h4 class="border-bottom p-3 text-muted d-flex justify-content-between align-items-center">
+<h4 class="p-3 text-muted d-flex justify-content-between align-items-center">
     <?= __('My Projects')?>
     <button data-url="/project/add" class="btn btn-primary yd-dialog"  data-title="<?= __("Add Project")?>"><?= __('Add Project')?></button>
 </h4>
-<table class="table-striped table table-borderless table-hover align-middle">
-    <thead>
-    <tr>
-        <th></th>
-        <th><?= __('Project Name')?></th>
-        <th><?= __('Type')?></th>
-        <th><?= __('Technology')?></th>
-        <th><?= __('Pages')?></th>
-        <th><?= __('Member')?></th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($members as $project_member){
-            $project = $project_member->get_project();
-            $members = $project->get_members();
+<div class="d-flex flex-wrap gap-2">
+<?php foreach ($members as $project_member){
+    $project = $project_member->get_project();
+    $members = $project->get_members();
 
-            $frontendFramework = $project->get_setting_value(Env::FRONTEND_FRAMEWORK);
-            $backendFramework = $project->get_setting_value(Env::FRAMEWORK);
-            $ui = $project->get_setting_value(Env::UI).'@'.$project->get_setting_value(Env::UI_VERSION);
-            $logo = $project->get_setting_value('logo');
-            ?>
-            <tr>
-                <td>
+    $frontendFramework = $project->get_setting_value(Env::FRONTEND_FRAMEWORK);
+    $backendFramework = $project->get_setting_value(Env::FRAMEWORK);
+    $ui = $project->get_setting_value(Env::UI).'@'.$project->get_setting_value(Env::UI_VERSION);
+    $logo = $project->get_setting_value('logo');
+    ?>
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
                     <?php if ($logo){?>
-                    <img src="<?= SITE_URI."image?file=".urlencode($logo)?>" class="rounded-circle" style="width: 30px;height: 30px;object-fit: cover"/>
+                        <img src="<?= SITE_URI."image?file=".urlencode($logo)?>" class="rounded-circle" style="width: 30px;height: 30px;object-fit: cover"/>
                     <?php }?>
-                </td>
-                <td><a href="/project/<?= $project->uuid?>"><?= $project->name?></a></td>
-                <td><?= __($project->end_kind)?></td>
-                <td>
-                    <?php
-                    if ($frontendFramework) echo "<small class='badge bg-success me-1'>{$env[$frontendFramework]['name']}</small>";
-                    if ($backendFramework) echo "<small class='badge bg-secondary me-1'>{$backendFramework}</small>";
-                    if ($ui) echo "<small class='badge bg-info'>{$ui}</small>";
-                    ?>
-                </td>
-                <td><?php
-                    echo sprintf(__('modules: %s items, pages: %s items, popup: %s items, ui component: %s items, api: %s items'),
+                    <a class="text-decoration-none" href="/project/<?= $project->uuid?>"><?= $project->name?></a>
+                </div>
+                <?php if (!$project_member->is_creater){?>
+                    <button class="btn btn-sm btn-outline-primary yd-confirm-post" data-redirect="reload"
+                            data-content="<?= __("Are you sure you want to quit this project?")?>" data-url="/project/quit.json?uuid=<?= $project->uuid?>">退出</button>
+                <?php }?>
+            </div>
+            <div class="d-flex align-items-center gap-2 fs-7">
+                <i class="iconfont icon-<?= strtolower($project->end_kind)?>"></i>
+                <?php
+                if ($frontendFramework) echo "<small class='text-success'>{$env[$frontendFramework]['name']}</small>";
+                if ($backendFramework) echo "<small class='text-secondary'>{$backendFramework}</small>";
+                if ($ui) echo "<small class='text-info'>{$ui}</small>";
+                ?>
+            </div>
+            <small class="text-muted"><?= $project->desc?>&nbsp;</small>
+
+            <div class="d-flex align-items-center gap-2 fs-7 mt-2">
+                <?php
+                $names = [];
+                foreach ($members as $member){
+                    $name = $member->get_user()->nickname;
+                    if ($project_member->is_creater){
+                        $name.='<span class="badge bg-secondary">'.__('Creater').'</span>';
+                    }
+                    $names[] = $name;
+                    echo join(',', $names);
+                }?>
+            </div>
+            <div class="fs-7 mt-1 text-muted">
+            <?php
+                echo sprintf(__('%s module, %s page, %s popup, %s ui component, %s api'),
                     $project->module_count(),
                     $project->page_count(),
                     $project->popup_count(),
                     $project->component_count(),
                     $project->api_count(),
-                    );
-                    ?></td>
-                <td class=" fs-7"><?php
-                    $names = [];
-                    foreach ($members as $member){
-                        $name = $member->get_user()->nickname;
-                        if ($project_member->is_creater){
-                            $name.='<span class="badge bg-secondary">'.__('Creater').'</span>';
-                        }
-                        $names[] = $name;
-                        echo join(',', $names);
-                    }?>
-                </td>
-                <th>
-                    <?php if (!$project_member->is_creater){?>
-                       <button class="btn btn-sm btn-outline-primary yd-confirm-post" data-redirect="reload"
-                               data-content="<?= __("Are you sure you want to quit this project?")?>" data-url="/project/quit.json?uuid=<?= $project->uuid?>">退出</button>
-                    <?php }?>
-                </th>
-            </tr>
-        <?php }?>
-    </tbody>
-</table>
+                );
+                ?>
+            </div>
+        </div>
+    </div>
+<?php }?>
+</div>

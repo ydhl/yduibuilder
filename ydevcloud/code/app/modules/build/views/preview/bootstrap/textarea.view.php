@@ -7,72 +7,54 @@ use app\modules\build\views\preview\Html_Code_Helper;
 
 use app\modules\build\views\preview\Preview_View;
 
+/**
+ * <div>
+ *  <textarea></textarea>
+ *  <div class='ml-1'><span class='word-count'></span></div>
+ *  <div>×</div>
+ * </div>
+ */
 class Textarea_View extends Input_View {
-    public function build_style($justSelf = true)
-    {
-        $style = parent::build_style($justSelf);
-        $style['[data-uiid='.$this->myid().$this->data['type'].']'] = 'font-style: inherit !important;color: inherit';
-        return $style;
-    }
-
-    protected function css_map() {
-        $css = parent::css_map();
-        $css[] = 'form-control d-flex justify-content-between align-items-end h-auto overflow-hidden';
-        if (@$this->data['meta']['css']['formSizing'] && $this->data['meta']['css']['formSizing']!='normal'){
-            $css[] = ' form-control-'.$this->data['meta']['css']['formSizing'];
-        }
-        if (@$this->data['meta']['form']['state']=='disabled'){
-            $css[] = ' disabled';
-        }
-        if (@$this->data['meta']['form']['state']=='readonly'){
-            $css[] = ' readonly';
-        }
-        return $css;
-    }
-
     public function build_ui()
     {
         $space =  $this->indent();
-        $inputData = $this->get_input_data($dataName);
+        $inputDataName = $this->get_input_data_name($isArr);
         $outputDatas = $this->get_output_datas($outputDataName);
         $hasIterate = $this->need_iterate_data($iterateOutputAs, $dataName, $iterateDataName);
         $wordCountVisible = $this->data['meta']['custom']['wordCountVisible'];
         $clearButtonVisible = $this->data['meta']['custom']['clearButtonVisible'];
+        $indexSuffix = '';
+        if ($this->get_iterator_index_name()){
+            $indexSuffix = "[-1]";
+        }
+        $iteratorDataName = $this->get_iterator_data_name();
+        $myid = $this->myid();
+
         echo "{$space}<div";
         echo $this->build_main_attrs();
-        $indexSuffix = '';
-        if ($hasIterate && $this->is_array($inputData)){
-            $indexSuffix = "[idxOf{$iterateDataName}]";
-            echo $this->wrap_output(':data-index', "idxOf{$iterateDataName}");
-        }
         echo ">".PHP_EOL;
         echo $this->indent(1);
         echo '<textarea class="w-100 border-0 bg-transparent input"';
-        if (@$this->data['meta']['custom']['autoRow']){
-            echo $this->wrap_output('style','resize: none');
-        }
-        if (@$this->data['meta']['custom']['maxLength']){
-            echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength']);
-        }
-        echo $this->build_form_attrs();
-
-        if(!$inputData){
-            echo $this->wrap_output('x-model.fill', $this->myid().'_temp');
-        }
-
-        if ($wordCountVisible || $clearButtonVisible){
-            echo $this->wrap_output('@keyup', $this->myid().'_keyup');
-        }
+        echo $this->wrap_output('style',$this->data['meta']['custom']['autoRow'] ? 'resize: none' : null);
+        echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength']?:NULL);
+        $this->build_form_attrs();
+        echo $this->wrap_output('@keyup', ($wordCountVisible || $clearButtonVisible) ? $this->myid().'_keyup' : null);
         echo $this->wrap_output('rows', @$this->data['meta']['custom']['row']);
-        if($outputDataName['VALUE']) echo $this->wrap_output('x-text', $outputDataName['VALUE']);
-        echo '>';
 
-        if(!$outputDataName['VALUE']) echo @$this->data['meta']['value'];
+        if ($inputDataName && !$outputDataName['VALUE']){
+            echo $this->wrap_output(':value', $inputDataName);
+        }elseif ($outputDataName['VALUE']){
+            echo $this->wrap_output(':value', $isArr ? $iteratorDataName : $outputDataName['VALUE']);
+        }else{
+            echo $this->wrap_output('value', @$this->data['meta']['value']);
+        }
+
+        echo '>';
         echo "</textarea>".PHP_EOL;
 
         if ($wordCountVisible){
             echo $this->indent(1);
-            echo "<div class='ml-3'><span class='word-count' x-text='".$this->myid()."_wordCount{$indexSuffix}'></span>";
+            echo "<div class='ml-1'><span class='word-count' x-text='alpinejs_get_value(\$el, \"{$myid}_wordCount{$indexSuffix}\")'></span>";
             if (@$this->data['meta']['custom']['maxLength']){
                 echo "/".$this->data['meta']['custom']['maxLength'];
             }
@@ -81,9 +63,15 @@ class Textarea_View extends Input_View {
 
         if ($clearButtonVisible){
             echo $this->indent(1);
-            echo "<div @click='".$this->myid()."_clear' class='cursor ml-3' x-show='".$this->myid()."_clearButtonVisible{$indexSuffix}'>×</div>".PHP_EOL;
+            echo "<div @click='{$myid}_clear' class='cursor ml-1' x-show='alpinejs_get_value(\$el, \"{$myid}_clearButtonVisible{$indexSuffix}\")'>×</div>".PHP_EOL;
         }
 
         echo "{$space}</div>".PHP_EOL;
+    }
+    protected function css_map() {
+        $css = parent::css_map();
+        $css['-'] = preg_replace('{align-items-\S+}', '', $css['-']);
+        $css['-'] .= ' align-items-end h-auto overflow-hidden';
+        return $css;
     }
 }

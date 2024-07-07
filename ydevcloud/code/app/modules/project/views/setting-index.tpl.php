@@ -61,6 +61,16 @@ $api_env_config = Project_Setting_Model::get_setting_value($project->id, 'api_en
     </div>
 </div>
 </form>
+
+<div class="card mb-3">
+    <div class="card-header"><?= __('Copy Project')?></div>
+    <div class="card-body">
+        <p>
+            <?= __("Copy all the contents of the project to the new project, but do not include members and their related activity information")?>
+        </p>
+        <button class="btn btn-secondary btn-sm yd-dialog"  data-title="<?= __("Copy")?>" type="button" data-url="/project/<?= $project->uuid?>/copy"><?= __('Copy')?></button>
+    </div>
+</div>
 <?php if ($project_member->is_creater){?>
     <div class="card mb-3">
         <div class="card-header"><?= __('Transfer Project')?></div>

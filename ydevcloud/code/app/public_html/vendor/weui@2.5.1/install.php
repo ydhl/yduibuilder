@@ -64,6 +64,8 @@ class weui_install{
      */
     public static function jsForPreview() {
         return [
+            'iife'=>['plugin/jquery-1.9.1.min.js','plugin/util.js','plugin/carousel.js','weui.min.js'],
+            'vendor'=>['alpinejs@3.x.x']
         ];
     }
 }

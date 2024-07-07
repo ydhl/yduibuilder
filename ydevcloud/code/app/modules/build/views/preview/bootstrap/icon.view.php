@@ -4,15 +4,13 @@ namespace app\modules\build\views\preview\bootstrap;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 
-
+/**
+ * <pre>
+ * <i></i>
+ * </pre>
+ */
 class Icon_View extends Preview_View {
     use Bootstrap_Popup,Html_Code_Helper;
-    protected function css_map()
-    {
-        $css =  parent::css_map();
-        $css['icon'] = $this->data['meta']['custom']['icon'];
-        return $css;
-    }
 
     public function build_ui()
     {
@@ -20,6 +18,15 @@ class Icon_View extends Preview_View {
         echo "{$space}<i";
         echo $this->build_main_attrs();
         echo "></i>".PHP_EOL;
+    }
+
+    protected function css_map()
+    {
+        $css =  parent::css_map();
+        $css['icon'] = $this->data['meta']['custom']['icon'];
+        if ($this->data['meta']['style']['color']) unset($css['foregroundTheme']);
+        if ($this->data['meta']['style']['background-color']) unset($css['backgroundTheme']);
+        return $css;
     }
 
     protected function output_as_prop($outputAs, $outputData){

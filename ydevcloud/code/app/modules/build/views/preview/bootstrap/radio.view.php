@@ -10,141 +10,78 @@ use function yangzie\__;
 
 
 class Radio_View extends ValueList_View {
-    use Bootstrap_Popup,Html_Code_Helper,Alpine {
-        Alpine::build_code as alpineBuildCode;
-    }
+    use Bootstrap_Popup,Html_Code_Helper;
 
     protected $type = 'radio';
-    protected function item_css() {
-        $css = ['form-check d-flex mr-3 align-items-center'];
-        return join(' ', $css);
+    protected function build_valuelist($outputData, $itemName, $staticData=null){
+        list('name'=>$name, 'value'=>$value, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+        $staticValue = $staticData['value']?:$staticData['name'];
+        $myid = $this->myid();
+        $inputDataName = $this->get_input_data_name($inputIsArr);
+
+        echo $this->indent(1)."<div";
+        echo $this->wrap_output('class', "form-check d-flex mr-3 align-items-center");
+        echo $this->wrap_output('x-id', "['{$myid}-item']");
+
+        if ($value){
+            echo $this->wrap_output(':data-value', $value);
+        }else{
+            echo $this->wrap_output('data-value',$staticValue );
+        }
+        echo ">".PHP_EOL;
+        echo $this->indent(2);
+        echo '<input';
+        echo $this->wrap_output('type', $this->type);
+        echo $this->wrap_output('class', "form-check-input mt-0");
+        echo $this->wrap_output(':id', "\$id('{$myid}-item')");
+        echo $this->build_form_attrs();
+        if ($value){
+            echo $this->wrap_output(':value', $value);
+            echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$value} : ''" : null);
+            echo $this->wrap_output(':checked', "alpinejs_in_array(\$el, '{$inputDataName}', {$value})");
+        }else{
+            echo $this->wrap_output('value', $staticValue);
+            echo $this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null);
+            echo $this->wrap_output(':checked', "alpinejs_in_array(\$el, '{$inputDataName}', '{$staticValue}')");
+        }
+        echo ">".PHP_EOL;
+
+        echo $this->indent(2).'<label';
+        echo $this->wrap_output('@click.stop', null, true);
+        if ($name){
+            echo $this->wrap_output('x-text', $name);
+        }
+        echo $this->wrap_output('class', "form-check-label");
+        echo $this->wrap_output(':for', "\$id('{$myid}-item')");
+        echo ">{$staticData['name']}</label>" . PHP_EOL;
+
+        echo $this->indent(1) . "</div>".PHP_EOL;
+    }
+    protected function build_ui_begin()
+    {
+        $space =  $this->indent();
+        echo "{$space}<div";
+        $this->build_main_attrs();
+        echo ">".PHP_EOL;
+    }
+    protected function build_ui_end()
+    {
+        $space =  $this->indent();
+        echo "{$space}</div>".PHP_EOL;
     }
     protected function css_map() {
         $arr = parent::css_map();
+        $style = parent::style_map();
         if ($this->data['meta']['custom']['inline']) {
             $arr[] = 'h-100 d-flex align-items-center';
         } else {
             $arr[] = 'h-auto';
         }
-
+        if ($style['background-color']) unset($arr['backgroundTheme']);
+        if ($style['color']) unset($arr['foregroundTheme']);
         if (@$this->data['meta']['css']['formSizing'] && $this->data['meta']['css']['formSizing']!='normal'){
             $arr[] = 'form-control-'.$this->data['meta']['css']['formSizing'];
         }
         return $arr;
-    }
-
-    protected function build_ui_static()
-    {
-        $space =  $this->indent();
-        $values = @$this->data['meta']['values']?:[[ "text"=> 'sample', "value"=> '1' ]];
-        echo "{$space}<div";
-        echo $this->build_main_attrs();
-        echo ">".PHP_EOL;
-        foreach ((array)@$values as $index => $item){
-            echo $this->indent(1)."<div";
-            echo $this->wrap_output('class', $this->item_css());
-            echo $this->wrap_output('data-value', $item['value']);
-            echo ">".PHP_EOL;
-            echo $this->indent(2);
-            echo "<input type='{$this->type}'";
-
-            if (@$item['checked']){
-                echo ' checked';
-            }
-            echo ' class="form-check-input" id="'.$this->myId(true).$item['value'].$index.'"';
-            echo $this->build_form_attrs();
-            $this->get_input_data($dataName);
-            // 如果没有数据绑定的话，定义一个临时数据
-            if (!$dataName) {
-                echo $this->wrap_output('x-model.fill', $this->myid() . '_temp');
-            }
-            echo ' value="'.@$item['value'].'"';
-            echo ">".PHP_EOL;
-
-            echo $this->indent(2);
-            echo "<label class='form-check-label' @click.stop for='".$this->myId(true).$item['value'].$index."'>";
-            echo $item['text'];
-            echo "</label>".PHP_EOL;
-
-            echo $this->indent(1);
-            echo "</div>".PHP_EOL;
-        }
-        echo "{$space}</div>".PHP_EOL;
-    }
-
-    protected function build_ui_2d_array($bindOutput, $outDataName)
-    {
-       $this->build_radio($bindOutput, $outDataName, true);
-    }
-
-    protected function build_ui_array($bindOutput, $outDataName)
-    {
-        $this->build_radio($bindOutput, $outDataName, false);
-    }
-    private function build_radio($bindOutput, $outDataName, $is2D)
-    {
-        $itemName = $bindOutput['name'];
-        if ($is2D) {
-            $itemNameTop = $itemName;
-            $itemName .= '2';
-        }
-        $space =  $this->indent();
-        echo "{$space}<div";
-        echo $this->build_main_attrs();
-        echo ">".PHP_EOL;
-
-        list('name'=>$name, 'value'=>$value) = $this->get_bind_name_value($is2D ? $bindOutput['item'] : $bindOutput, $itemName);
-        echo $this->indent(1).'<template x-for="(itemOf'.$itemName.', idxOf'.$itemName.') in '.($is2D?"itemOf":"").$outDataName.'" :key="idxOf'.$itemName.'">'.PHP_EOL;
-        echo $this->indent(1)."<div";
-        echo $this->wrap_output('class', $this->item_css());
-        echo $this->wrap_output(':data-bound', "'".($is2D?"itemOf":"").$outDataName."[\''+idxOf{$itemName}+'\']'");
-        echo $this->wrap_output(':data-value', $value);
-        echo ">".PHP_EOL;
-
-        $this->build_radio_input($is2D ? $bindOutput['item'] : $bindOutput, $itemName, $itemNameTop, $is2D);
-
-        echo $this->indent(1) . "</div>".PHP_EOL;
-        echo $this->indent(1) . "</template>" . PHP_EOL;
-
-        echo "{$space}</div>".PHP_EOL;
-    }
-    private function build_radio_input($bindOutput, $itemName, $itemNameTop, $is2D){
-        list('name'=>$name, 'value'=>$value) = $this->get_bind_name_value($bindOutput, $itemName);
-        $index = ($itemNameTop ? "idxOf{$itemNameTop} + '_'+" : '').'idxOf'.$itemName;
-
-        echo $this->indent(2);
-        echo '<input type="'.$this->type.'" class="form-check-input"';
-        echo $this->wrap_output(':id', "'" . $this->myId(true) . "'+{$index}");
-        echo $this->wrap_output(':value', $value);
-
-        echo $this->build_form_attrs();
-        $this->get_input_data($dataName);
-        // 如果没有数据绑定的话，定义一个临时数据
-        if (!$dataName) {
-            echo $this->wrap_output('x-model.fill', $this->myid() . '_temp'.($is2D ? "[idxOf{$itemNameTop}]" : ''));
-        }
-        if ($itemNameTop){
-            echo $this->wrap_output(':name', "'".$this->myId(true)."'+idxOf{$itemNameTop}");
-        }else{
-            echo $this->wrap_output('name', $this->myId(true));
-        }
-        echo ">".PHP_EOL;
-
-        echo $this->indent(2).'<label @click.stop x-text="' . $name . '" class="form-check-label"';
-        echo $this->wrap_output(':for', "'" . $this->myId(true) . "'+{$index}");
-        echo "></label>" . PHP_EOL;
-    }
-
-    function build_code(): Base_Code_Fragment
-    {
-        $this->alpineBuildCode();
-        $hasIterate = $this->need_iterate_data($iterateOutputAs, $outputDataName, $iterateDataName) || $this->type=='checkbox';
-        $codeFragment = $this->get_code_Fragment();
-        $inputData = $this->get_input_data($dataName);
-        // 如果没有数据绑定的话，定义一个临时数据
-        if (!$dataName) {
-            $codeFragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, $this->myid() . '_temp: '.($hasIterate?'[]':'""').',');
-        }
-        return $this->get_code_fragment();
     }
 }

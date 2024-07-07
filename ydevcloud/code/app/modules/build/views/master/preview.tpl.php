@@ -162,80 +162,83 @@ foreach ($subpages as $page){
     ];
 }
 ?>
-<div class="fixed-top d-flex align-items-center justify-content-between ps-3 pe-3 mt-1" style="margin-left: 315px">
-    <div class="d-flex align-items-center">
-        <div class="btn-group-sm btn-group">
-            <?php if ($project->end_kind == 'mobile'){
-                $myarg = $arg;
-                $myarg['device']='mobile';
-                $myarg['module']=$curr_module->uuid;
-                ?>
-                <a href="<?= yze_merge_query_string('/preview/'.$project->uuid,$myarg)?>" class="btn btn-outline-primary btn-sm <?= $type=='ui' ? 'active' : ''?>">
-                    <?= __('Preview')." <i class='iconfont icon-mobile'></i>"?>
-                </a>
-            <?php }else{?>
-            <div class="btn-group">
-                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle  <?= $type=='ui' ? 'active' : ''?>" data-bs-toggle="dropdown" aria-expanded="false">
-                    <?= __('Preview')." <i class='iconfont icon-".(@$_GET['device']?:'pc')."'></i>"?>
-                </button>
-                <ul class="dropdown-menu">
-                    <?php foreach (['pc'=>__('PC'),'tablet'=>__('Tablet'),'mobile'=>__('Portrait')] as $end_type=>$name){
-                        $myarg = $arg;
-                        $myarg['device']=$end_type;
-                        $myarg['module']=$curr_module->uuid;
-                        ?>
-                    <li><a class="dropdown-item" href="<?= yze_merge_query_string('/preview/'.$project->uuid,$myarg)?>"><i class="iconfont icon-<?= $end_type?>"></i> <?= $name?></a></li>
-                    <?php }?>
-                </ul>
-            </div>
-            <?php }?>
-            <a href="/code/<?= $project->uuid?>?module=<?= $curr_module->uuid?>&page=<?= $curr_page->uuid?>" class="btn btn-outline-primary <?= $type=='code' ? 'active' : ''?>"><?= __('Code')?></a>
-        </div>
-
-        <?php if ($has_api && $api_envs && $type!='code'){?>
-        <div class="btn-group ms-2">
-            <div class="btn-group">
-                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <?= $curr_api_env?:__('not specified')?>
-                </button>
-                <ul class="dropdown-menu">
-                    <?php foreach ((array)$api_envs as $name=>$path){
-                        $myarg = $arg;
-                        $myarg['api_env'] = $name;
-                        $myarg['module']=$curr_module->uuid;
-                        ?>
-                        <li><a class="dropdown-item"
-                               href="<?= yze_merge_query_string(($type=='code'?'/code':'/preview').'/'.$project->uuid,$myarg)?>"><?= $name?></a></li>
-                    <?php }?>
-                </ul>
-            </div>
-        </div>
-        <?php }?>
-        <?php if ($has_data_bound && $type!='code'){
-            $myarg = $arg;
-            $myarg['mock']=@$_GET['mock'] ? 0 : 1;
-            ?>
-            <label class="d-flex align-items-center ms-2">
-                <a class="text-decoration-none" href="<?= yze_merge_query_string('/preview/'.$project->uuid,$myarg)?>">
-                <input type="checkbox" <?= $_GET['mock'] ? "checked" : ""?>>&nbsp;<?= __('Mock data')?>
-                </a>
-            </label>
-        <?php }?>
-    </div>
-    <button type="button"  data-url="<?= Project_Model::get_ui_builder_url()?>"
-            data-uuid="<?= $curr_page->uuid?>" class="btn btn-outline-primary btn-sm ms-5 run-ui-builder">
-        <i class='iconfont icon-edit'></i> <?= __('Edit with UIBuilder')?>
-    </button>
-</div>
 <div class="preview">
     <div class="preview-menu">
-        <h4 class="text-center"><?= $project->name?></h4>
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/project/<?= $project->uuid?>" class="text-decoration-none flex-shrink-0 me-4"><i class="iconfont icon-arrowleft"></i><?= __('Back')?></a>
+            <h5 class="text-center text-truncate"><?= $project->name?></h5>
+        </div>
+
         <div class="card">
-            <div class="card-header p-1 d-flex justify-content-between">
-                <a href="/project/<?= $project->uuid?>" class="btn btn-sm btn-light"><i class="iconfont icon-arrowleft"></i><?= __('Back')?></a>
-                <button data-title="<?= __('Build Project')?>" data-size="large" data-url="/project/<?= $project->uuid?>/build.dlg" class="btn btn-sm btn-outline-primary yd-dialog"><?= __('Build Project')?></button>
+            <div class="card-header p-1">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="btn-group-sm btn-group">
+                        <?php if ($project->end_kind == 'mobile'){
+                            $myarg = $arg;
+                            $myarg['device']='mobile';
+                            $myarg['module']=$curr_module->uuid;
+                            ?>
+                            <a href="<?= yze_merge_query_string('/preview/'.$project->uuid,$myarg)?>" class="btn btn-outline-primary btn-sm <?= $type=='ui' ? 'active' : ''?>">
+                                <?= __('Preview')." <i class='iconfont icon-mobile'></i>"?>
+                            </a>
+                        <?php }else{?>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle  <?= $type=='ui' ? 'active' : ''?>" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <?= __('Preview')." <i class='iconfont icon-".(@$_GET['device']?:'pc')."'></i>"?>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <?php foreach (['pc'=>__('PC'),'tablet'=>__('Tablet'),'mobile'=>__('Portrait')] as $end_type=>$name){
+                                        $myarg = $arg;
+                                        $myarg['device']=$end_type;
+                                        $myarg['module']=$curr_module->uuid;
+                                        ?>
+                                        <li><a class="dropdown-item" href="<?= yze_merge_query_string('/preview/'.$project->uuid,$myarg)?>"><i class="iconfont icon-<?= $end_type?>"></i> <?= $name?></a></li>
+                                    <?php }?>
+                                </ul>
+                            </div>
+                        <?php }?>
+                        <a href="/code/<?= $project->uuid?>?module=<?= $curr_module->uuid?>&page=<?= $curr_page->uuid?>" class="btn btn-outline-primary <?= $type=='code' ? 'active' : ''?>"><?= __('Code')?></a>
+                    </div>
+                    <?php if ($has_api && $api_envs && $type!='code'){?>
+                        <div class="btn-group ms-2">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <?= $curr_api_env?:__('not specified')?>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <?php foreach ((array)$api_envs as $name=>$path){
+                                        $myarg = $arg;
+                                        $myarg['api_env'] = $name;
+                                        $myarg['module']=$curr_module->uuid;
+                                        ?>
+                                        <li><a class="dropdown-item"
+                                               href="<?= yze_merge_query_string(($type=='code'?'/code':'/preview').'/'.$project->uuid,$myarg)?>"><?= $name?></a></li>
+                                    <?php }?>
+                                </ul>
+                            </div>
+                        </div>
+                    <?php }?>
+                </div>
+                <div class="d-flex align-items-center mt-2 gap-2">
+                    <button type="button"  data-url="<?= Project_Model::get_ui_builder_url()?>"
+                            data-uuid="<?= $curr_page->uuid?>" class="btn btn-outline-primary btn-sm run-ui-builder">
+                        <?= __('Edit')?>
+                    </button>
+                    <button data-title="<?= __('Build Project')?>" data-size="large" data-url="/project/<?= $project->uuid?>/build.dlg" class="btn btn-sm btn-outline-primary yd-dialog"><?= __('Build')?></button>
+
+                    <?php if ($has_data_bound && $type!='code'){
+                        $myarg = $arg;
+                        $myarg['mock']=@$_GET['mock'] ? 0 : 1;
+                        ?>
+                        <label class="d-flex align-items-center ms-2">
+                            <a class="text-decoration-none" href="<?= yze_merge_query_string('/preview/'.$project->uuid,$myarg)?>">
+                                <input type="checkbox" <?= $_GET['mock'] ? "checked" : ""?>>&nbsp;<?= __('Mock data')?>
+                            </a>
+                        </label>
+                    <?php }?>
+                </div>
             </div>
-            <div id="page-tree" style="width: 100%;height:calc(100vh - 115px); overflow-x: hidden;"></div>
+            <div id="page-tree" style="width: 100%;height:calc(100vh - 150px); overflow-x: hidden;"></div>
         </div>
     </div>
     <div class="preview-body pt-4">

@@ -15,7 +15,7 @@ class Buttongroup_View extends Preview_View {
     }
     protected function style_map($meta=null, $state = 'normal')
     {
-        $styleArray = parent::style_map($meta);
+        $styleArray = parent::style_map($meta, $state);
         unset($styleArray['color'], $styleArray['background-color']);
         return $styleArray;
     }
