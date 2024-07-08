@@ -36,16 +36,17 @@ abstract class ValueList_View extends Preview_View implements Valuable_View{
     }
 
     protected function default_value() {
+        $isArr = $this->data['type'] == 'checkbox' || ($this->data['type']=='select' && $this->data['meta']['custom']['multiple']);
         if (@!$this->data['meta']['values']){
-            return 'item 1';
+            return $isArr ? ['item 1'] : 'item 1';
         }
         $arr = [];
         foreach($this->data['meta']['values'] as $value){
             if($value['checked']) $arr[] = $value['value']?:$value['name'];
         }
-        return $arr;
+        return $isArr ? $arr : $arr[0];// 多值返回数组，单值返回标量
     }
-    protected abstract function build_ui_begin();
+    protected abstract function build_ui_begin($iteratorName=null);
     protected abstract function build_ui_end();
 
     /**
@@ -90,7 +91,7 @@ abstract class ValueList_View extends Preview_View implements Valuable_View{
      * @return mixed
      */
     protected function build_valuelist_iterator($outputData, $outDataName, $iteratorName, $itemName, $is2D=false, $firstIndex=''){
-        $this->build_ui_begin();
+        $this->build_ui_begin($iteratorName);
 
         echo $this->indent(1).'<template x-for="(itemOf'.$itemName.', idxOf'.$itemName.') in '
             .$iteratorName.'" :key="idxOf'.$itemName.'">'.PHP_EOL;

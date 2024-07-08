@@ -48,40 +48,46 @@ class Dropdown_View extends ValueList_View {
     protected function build_valuelist($outputData, $itemName, $staticData=null)
     {
         echo $this->indent(2);
+        $myid = $this->myid();
+        $staticValue = $staticData['value']?:$staticData['name'];
         // 动态数据
         if($outputData){
-            list('name'=>$name, 'value'=>$value) = $this->get_bind_name_value($outputData, $itemName);
-            echo $this->indent(2).'<a href="javascript:void(0)"';
+            list('name'=>$name, 'value'=>$value, "checked"=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+            echo '<a href="javascript:void(0)"';
+            echo $this->wrap_output('data-root', $myid);
             echo $this->wrap_output(':data-value', $value);
-            echo $this->wrap_output('class', "dropdown-item");
+            echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$value} : ''" : null);
+            echo $this->wrap_output(':class', $this->itemCss($value));
             echo $this->wrap_output('x-text', $name);
             echo "></a>";
             echo PHP_EOL;
             return;
         }
-
         // 静态数据
         if (@$staticData['type']=='text'){
-            echo '<div class="pl-4 pr-4 text-muted"><p>'.$staticData['text'].'</p></div>';
+            echo '<div class="pl-4 pr-4 text-muted"><p>'.$staticData['name'].'</p></div>';
         }elseif (@$staticData['type']=='header'){
-            echo "<h6 class='dropdown-header'>{$staticData['text']}</h6>";
+            echo "<h6 class='dropdown-header'>{$staticData['name']}</h6>";
         }elseif (@$staticData['type']=='divider'){
             echo '<div class="dropdown-divider"></div>';
         }else{
             echo "<a href='javascript:;'";
-            echo $this->wrap_output("data-value", $staticData['value'] ?: $staticData['name']);
-            echo " class='dropdown-item'>{$staticData['name']}</a>";
+            echo $this->wrap_output('data-root', $myid);
+            echo $this->wrap_output("data-value", $staticValue);
+            echo $this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null);
+            echo $this->wrap_output(':class', $this->itemCss("'{$staticValue}'"));
+            echo ">{$staticData['name']}</a>";
         }
         echo PHP_EOL;
     }
 
-    protected function build_ui_begin(){
+    protected function build_ui_begin($iteratorName=null){
         $inputDataName = $this->get_input_data_name();
         $space =  $this->indent();
+        $myid = $this->myid();
         $isSplit = $this->data['meta']['custom']['isSplit'];
         echo "{$space}<div";
         echo $this->build_main_attrs(false);
-        echo $this->wrap_output("x-input", $inputDataName);
         echo ">".PHP_EOL;
 
         if ($isSplit){
@@ -108,16 +114,18 @@ class Dropdown_View extends ValueList_View {
             echo $this->wrap_output('class', 'dropdown-toggle '.$this->btnCss());
             echo $this->wrap_output('style', $this->btyStyle());
             echo '>';
-            $this->wrap_icon(function() use($inputDataName){
+            $this->wrap_icon(function() use($inputDataName, $iteratorName, $myid){
                 $text = ($this->data['meta']['title'] ?: $this->data['type']);
                 echo "<span";
-                if ($inputDataName) {
-                    echo $this->wrap_output('x-text', "`\${{$inputDataName}||'{$text}'}`");
+                if ($iteratorName) {
+                    echo $this->wrap_output('x-text', "alpinejs_checked_name(\$el, {$iteratorName}, '{$inputDataName}') || '{$text}'");
+                }else{
+                    echo $this->wrap_output('x-text', "alpinejs_checked_name(\$el, {$myid}_values(), '{$inputDataName}') || '{$text}'");
                 }
                 echo ">{$text}</span>";
             }, 2);
             echo PHP_EOL;
-            echo $this->indent(1)."</a>".PHP_EOL;
+            echo $this->indent(1)."</button>".PHP_EOL;
         }
 
         echo $this->indent(1) . '<div class="dropdown-menu';
@@ -171,7 +179,10 @@ class Dropdown_View extends ValueList_View {
         }
         return $this->data['meta'];
     }
-
+    private function itemCss($value){
+        $inputDataName = $this->get_input_data_name();
+        return "{'dropdown-item': true, 'bg-light': {$inputDataName} == $value}";
+    }
     /**
      * 背景主题,如果自己有背景和前景则用自己的，否则用上层的
      * @return mixed

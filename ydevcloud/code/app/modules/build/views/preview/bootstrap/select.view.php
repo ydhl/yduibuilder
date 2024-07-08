@@ -42,7 +42,7 @@ class Select_View extends ValueList_View {
         unset($map['background-color']);
         return $map;
     }
-    public function build_ui_begin(){
+    public function build_ui_begin($iteratorName=null){
         $space =  $this->indent();
         echo "{$space}<div";
         echo $this->build_main_attrs();

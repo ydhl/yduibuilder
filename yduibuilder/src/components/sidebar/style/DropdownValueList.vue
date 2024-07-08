@@ -10,7 +10,10 @@
                 <div><i class="iconfont icon-drag" style="cursor: move;"></i></div>
                 <label class="flex-grow-1 m-0 text-truncate">
                   <template v-if="item.type=='divider'"><hr class="m-3"/></template>
-                  <template v-if="item.type=='action'">{{item.name}} ({{item.value}})</template>
+                  <template v-if="item.type=='action'">
+                    <input type="radio" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
+                    {{item.name}} ({{item.value}})
+                  </template>
                   <template v-if="item.type=='header' || item.type=='text'">{{item.name}}</template>
                 </label>
                 <div>
@@ -54,12 +57,22 @@
             <input type="text" class="form-control form-control-sm" id="form-text" v-model="newItem.name">
           </div>
         </div>
-        <div class="form-group row" v-if="newItem.type=='action'">
-          <label for="form-value" class="col-sm-3 col-form-label">{{ t('style.value') }}</label>
-          <div class="col-sm-9">
-            <input type="text" :class="{'form-control form-control-sm': true}" id="form-value" v-model="newItem.value">
+        <template  v-if="newItem.type=='action'">
+          <div class="form-group row">
+            <label for="form-value" class="col-sm-3 col-form-label">{{ t('style.value') }}</label>
+            <div class="col-sm-9">
+              <input type="text" :class="{'form-control form-control-sm': true}" id="form-value" v-model="newItem.value">
+            </div>
           </div>
-        </div>
+          <div class="form-group row">
+            <div class="col-sm-9 offset-3">
+              <div class="form-check form-check-inline">
+                <input type="checkbox" class="form-check-input" id="form-default" :checked="newItem.checked" v-model="newItem.checked">
+                <label for="form-default" class=" form-check-label text-truncate">{{ t('style.form.default') }}</label>
+              </div>
+            </div>
+          </div>
+        </template>
         <div class="row mt-3">
           <div class="col-sm-9 offset-3">
             <button type="button" class="btn btn-primary btn-block" @click="updateValue">{{t('common.ok')}}</button>
@@ -120,6 +133,7 @@ export default {
 
       if (editValueIndex.value > -1) {
         valueItems.value[editValueIndex.value] = rawItem
+        if (rawItem.checked) _updateChecked(editValueIndex.value)
         const values = JSON.parse(JSON.stringify(valueItems.value))
         initInfo.setMeta('values', values)
       } else {
@@ -137,6 +151,18 @@ export default {
       const values = JSON.parse(JSON.stringify(valueItems.value))
       initInfo.setMeta('values', values)
     }
+
+    const _updateChecked = (index) => {
+      // 单选的话把其他的反过来
+      for (const valueIndex in valueItems.value) {
+        valueItems.value[valueIndex].checked = false
+      }
+      valueItems.value[index].checked = true
+    }
+    const updateChecked = (index) => {
+      _updateChecked(index)
+      initInfo.setMeta('values', JSON.parse(JSON.stringify(valueItems.value)))
+    }
     return {
       t,
       rightBackdropVisible,
@@ -145,6 +171,7 @@ export default {
       openSetting,
       closeSetting,
       updateValue,
+      updateChecked,
       valueItems,
       newItem,
       remove,

@@ -15,33 +15,37 @@ class List_View extends ValueList_View {
 
     protected function build_valuelist($outputData, $itemName, $staticData=null)
     {
-        list('name'=>$xText, 'value'=>$xValue) = $this->get_bind_name_value($outputData, $itemName);
+        $myid = $this->myid();
+        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
         // 动态数据
         if ($outputData){
             echo $this->indent(1) . "<a href='javascript:;'";
             echo $this->wrap_output(':class', $this->item_theme($xValue));
             echo $this->wrap_output(':style', $this->item_style($xValue));
             echo $this->wrap_output('x-text', $xText);
+            echo $this->wrap_output('data-root', $myid);
             echo $this->wrap_output(':data-value', $xValue);
+            echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
             echo "></a>".PHP_EOL;
             return;
         }
         // 静态数据
+        $staticValue = $staticData['value']?:$staticData['name'];
         echo $this->indent(1) . "<a href='javascript:;'"
-            .$this->wrap_output(':class', $this->item_theme(null, $staticData['value']?:$staticData['name']))
-            .$this->wrap_output(':style', $this->item_style(null, $staticData['value']?:$staticData['name']))
-            .$this->wrap_output('data-value', $staticData['value']?:$staticData['name'])
+            .$this->wrap_output(':class', $this->item_theme(null, $staticValue))
+            .$this->wrap_output(':style', $this->item_style(null, $staticValue))
+            .$this->wrap_output('data-root', $myid)
+            .$this->wrap_output("data-value", $staticValue)
+            .$this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null)
             .">".PHP_EOL;
         echo $this->indent(2) . ($staticData['name']).PHP_EOL;
         echo $this->indent(1) . "</a>".PHP_EOL;
     }
-    protected function build_ui_begin()
+    protected function build_ui_begin($iteratorName=null)
     {
         $space =  $this->indent();
-        $inputDataName = $this->get_input_data_name();
         echo "{$space}<div";
         $this->build_main_attrs();
-        echo $this->wrap_output('x-input', $inputDataName);
         echo ">".PHP_EOL;
     }
     protected function build_ui_end()

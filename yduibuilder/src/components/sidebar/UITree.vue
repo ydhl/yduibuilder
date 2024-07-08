@@ -1,11 +1,11 @@
 <template>
-  <div class="pt-1 ps-1 flex-grow-1">
+  <div class="text-muted p-2 d-flex justify-content-between align-items-center ui-sidebar-fixedtop">
+    <div class="fs-6">{{t("common.outline")}}</div>
+    <div v-if="!treeIsOpen" @click="expandAll"><i class="iconfont hover-primary icon-expandall"></i></div>
+    <div v-if="treeIsOpen" @click="collapseAll"><i class="iconfont hover-primary icon-collapseall"></i></div>
+  </div>
+  <div class="flex-grow-1 pt-1 ps-1" style="margin-top: 40px">
     <template v-if="currPage">
-      <div class="text-muted p-1 d-flex justify-content-between align-items-center">
-        <div class="fs-6">{{t("common.outline")}}</div>
-        <div v-if="!treeIsOpen" @click="expandAll"><i class="iconfont hover-primary icon-expandall"></i></div>
-        <div v-if="treeIsOpen" @click="collapseAll"><i class="iconfont hover-primary icon-collapseall"></i></div>
-      </div>
       <UITreeWrap :pageid="currPage.meta.id" :uiconfig="currPage" :index="1" :tab="0"></UITreeWrap>
     </template>
   </div>

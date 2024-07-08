@@ -52,12 +52,10 @@ class Input_View extends Preview_View implements Valuable_View {
             if (@$this->data['meta']['custom']['maxLength']){
                 echo ' maxlength='.$this->data['meta']['custom']['maxLength'];
             }
-            if ($inputDataName && !$outputDataName['VALUE']){
+            if (!$outputDataName['VALUE']){
                 echo $this->wrap_output(':value', $inputDataName);
-            }elseif ($outputDataName['VALUE']){
-                echo $this->wrap_output(':value', $isArr ? $iteratorDataName : $outputDataName['VALUE']);
             }else{
-                echo $this->wrap_output('value', @$this->data['meta']['value']);
+                echo $this->wrap_output(':value', $isArr ? $iteratorDataName : $outputDataName['VALUE']);
             }
             echo ">".PHP_EOL;
         },1);

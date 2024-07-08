@@ -58,7 +58,6 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     isContainer: false,
     name: 'ui.carousel',
     isIterable: true,
-    isValuable: true,
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Checkbox: {
@@ -75,7 +74,6 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     kind: ['pc'],
     isIterable: true,
     isContainer: true,
-    isValuable: true,
     name: 'ui.collapse',
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
   },

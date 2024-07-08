@@ -28,6 +28,9 @@ class Collapse_View extends ValueList_View {
         Alpine::build_code as alpineBuildCode;
     }
 
+    public function is_input_ui() {
+        return false;
+    }
     protected function build_valuelist_static()
     {
         $this->build_ui_begin();
@@ -79,16 +82,13 @@ class Collapse_View extends ValueList_View {
     {
         // 在build_value_static和build_valuelist_iterator中处理
     }
-    protected function build_ui_begin()
+    protected function build_ui_begin($iteratorName=null)
     {
         $space =  $this->indent();
         $myid = $this->myid();
-        $inputDataName = $this->get_input_data_name();
         echo "{$space}<div";
         echo $this->build_main_attrs(false);
-        echo $this->wrap_output('x-id', "['{$myid}']");
         echo $this->wrap_output(':id', "alpinejs_get_index(\$el, '{$myid}')");
-        echo $this->wrap_output('x-input', $inputDataName);
         echo ">".PHP_EOL;
     }
     protected function build_ui_end()

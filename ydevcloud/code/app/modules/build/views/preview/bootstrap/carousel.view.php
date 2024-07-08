@@ -5,6 +5,7 @@ use app\modules\build\views\code\Base_Code_Fragment;
 use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
+use app\modules\build\views\preview\Valuable_View;
 use function yangzie\__;
 use app\modules\build\views\preview\ValueList_View;
 
@@ -41,6 +42,10 @@ use app\modules\build\views\preview\ValueList_View;
 class Carousel_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper,Alpine {
         Alpine::build_code as alpineBuildCode;
+    }
+
+    public function is_input_ui() {
+        return false;
     }
 
     protected function build_valuelist_static()
@@ -174,17 +179,15 @@ TICK;
         $map['-'] = join(' ',$css);
         return $map;
     }
-    protected function build_ui_begin()
+    protected function build_ui_begin($iteratorName=null)
     {
         $space =  $this->indent();
         $myid = $this->myid();
-        $inputDataName = $this->get_input_data_name($inputIsArr, $inputData);
 
         echo "{$space}<div";
         echo $this->build_main_attrs(false);
         echo $this->wrap_output('data-ride', 'carousel');
         echo $this->wrap_output(':id', "alpinejs_get_index(\$el, '{$myid}')");
-        echo $this->wrap_output('x-input', $inputDataName);
         echo ">".PHP_EOL;
     }
     protected function build_ui_end()

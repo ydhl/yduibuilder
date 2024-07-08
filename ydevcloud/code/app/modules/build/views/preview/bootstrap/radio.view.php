@@ -57,7 +57,7 @@ class Radio_View extends ValueList_View {
 
         echo $this->indent(1) . "</div>".PHP_EOL;
     }
-    protected function build_ui_begin()
+    protected function build_ui_begin($iteratorName=null)
     {
         $space =  $this->indent();
         echo "{$space}<div";

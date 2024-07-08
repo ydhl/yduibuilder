@@ -12,9 +12,9 @@
                 <input type="radio" v-if="!isMultiple" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
                 <input type="checkbox" v-if="isMultiple" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
                 {{item.name}} ({{item.value}})</label>
-              <div>
+              <div class="d-flex align-items-center">
                 <button type="button" @click="openSetting(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-edit"></i></button>
-                <button type="button" @click="remove(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-remove"></i></button>
+                <ConfirmRemove @remove="remove(index)" icon="icon-remove"></ConfirmRemove>
               </div>
             </div>
             </transition-group>
@@ -73,10 +73,12 @@ import { useI18n } from 'vue-i18n'
 import { computed, nextTick, ref, onMounted } from 'vue'
 import UIInit from '@/components/Common'
 import { VueDraggableNext } from 'vue-draggable-next'
+import ConfirmRemove from "@/components/common/ConfirmRemove.vue"
 
 export default {
   name: 'StyleValueList',
   components: {
+    ConfirmRemove,
     draggable: VueDraggableNext
   },
   props: {
@@ -152,7 +154,6 @@ export default {
         const values = JSON.parse(JSON.stringify(valueItems.value))
         initInfo.setMeta('values', values)
       } else {
-        valueItems.value.push(rawItem)
         initInfo.setMeta('values', [rawItem], '', true)
       }
 

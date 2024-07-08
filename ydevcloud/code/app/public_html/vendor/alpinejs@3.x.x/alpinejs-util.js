@@ -236,6 +236,14 @@ function alpinejs_init_directive(Alpine){
         Alpine.nextTick(() => {
             alpinejs_init_bind_value(uiType, el, expression, evaluate, effect, evaluateLater, lastIsArray)
         })
+        const execExp = (exp, value) => {
+            if (!exp) return
+            if (lastIsArray){
+                evaluate(`${exp} = [value]`, { scope: { value } });
+            }else{
+                evaluate(`${exp} = value`, { scope: { value } });
+            }
+        }
 
         if (['checkbox', 'radio'].indexOf(uiType) !== -1){
             Alpine.bind(el, { '@click'(event) {
@@ -253,7 +261,6 @@ function alpinejs_init_directive(Alpine){
                 }else{// 单值，就用触发事件EL的值
                     values = event.target.checked ? event.target.value : '';
                 }
-
                 evaluate(`${exp} = values`, { scope: { values } });
             }})
         }else if (['input', 'textarea', 'rangeinput'].indexOf(uiType) !== -1){
@@ -262,17 +269,12 @@ function alpinejs_init_directive(Alpine){
             if (['color', 'date', 'range'].indexOf(subtype) !== -1){
                 Alpine.bind(inputEl, { '@input'(event) {
                     const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray)
-                    if (!exp) return;
-                    if (subtype == 'range') {
-                        evaluate(`${exp} = ${event.target.value}`);
-                    }else{
-                        evaluate(`${exp} = "${event.target.value}"`);
-                    }
+                    execExp(exp, event.target.value)
                 }})
             }else{
                 Alpine.bind(inputEl, { '@keyup'(event) {
                     const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray)
-                    if (exp) evaluate(`${exp} = "${event.target.value}"`);
+                    execExp(exp, event.target.value)
                 }})
             }
         }else if ('select' === uiType){
@@ -290,7 +292,7 @@ function alpinejs_init_directive(Alpine){
         }else if ('file' === uiType){
             Alpine.bind(el, { '@change'(event) {
                 const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray)
-                if (exp) evaluate(`${exp} = files`,{ scope: { files: event.target.files } });
+                execExp(exp, event.target.files)
             }})
         }else{
             // 其他迭代类元素
@@ -299,7 +301,7 @@ function alpinejs_init_directive(Alpine){
                 if (!eventTarget) return;
 
                 const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray)
-                if (exp) evaluate(`${exp} = "${eventTarget.dataset?.value}"`);
+                execExp(exp, eventTarget.dataset?.value)
             }})
         }
     });

@@ -9,6 +9,7 @@ $project = $this->get_data('project');
 $files = File_Model::get_files($_GET['q'], $project->id, $_GET['type'],$_GET['page']);
 $this->layout = '';
 $datas = [];
+
 foreach ($files as $file){
     $data = $file->get_records();
     $data['id'] = $data['uuid'];

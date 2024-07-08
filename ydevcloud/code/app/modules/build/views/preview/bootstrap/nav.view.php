@@ -12,7 +12,8 @@ class Nav_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper;
 
     protected function build_valuelist($outputData, $itemName, $staticData=null){
-        list('name'=>$xText, 'value'=>$xValue) = $this->get_bind_name_value($outputData, $itemName);
+        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+        $myid = $this->myid();
         $staticValue = $staticData ? $staticData['value']?:$staticData['name'] : null;
         echo $this->indent(1) . '<div class="nav-item">'.PHP_EOL;
         echo $this->indent(2) . "<a";
@@ -20,11 +21,16 @@ class Nav_View extends ValueList_View {
         echo $this->wrap_output(':style',$this->item_style($staticValue, $xValue));
         echo $this->wrap_output('href', 'javascript:;');
         echo $this->wrap_output('x-text', $xText);
+        echo $this->wrap_output('data-root', $myid);
         if ($outputData){
             echo $this->wrap_output(':data-value', $xValue);
+            echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
         }else{
             echo $this->wrap_output('data-value', $staticValue);
+            echo $this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null);
         }
+
+
         echo '>'.$staticData['name'].'</a>'.PHP_EOL;
         echo $this->indent(1) . "</div>".PHP_EOL;
     }
@@ -63,7 +69,7 @@ class Nav_View extends ValueList_View {
             $cssMap['-'] = join(' ', $arr);
             return $cssMap;
         }
-    protected function build_ui_begin()
+    protected function build_ui_begin($iteratorName=null)
     {
         $inputDataName = $this->get_input_data_name();
         $space =  $this->indent();

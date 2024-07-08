@@ -1,5 +1,5 @@
 <template>
-  <div class="ps-2 mt-2 mb-2 d-flex justify-content-between align-items-center">
+  <div class="p-2 text-muted d-flex justify-content-between align-items-center ui-sidebar-fixedtop">
     <div class="flex-grow-1">
       {{t('project.name')}}
     </div>
@@ -9,7 +9,7 @@
       <div v-if="openState" @click="collapseAll"><i class="iconfont icon-collapseall hover-primary"></i></div>
     </div>
   </div>
-  <div class="list-group list-group-flush ms-2">
+  <div class="list-group list-group-flush ms-2" style="margin-top: 40px">
     <div class="list-group-item-action d-flex justify-content-between align-items-center"
          @contextmenu="contextMenu($event, 'project', 'project')"
          @mouseleave="mouseleave($event, 'project', 'project')"

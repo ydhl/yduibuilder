@@ -465,7 +465,7 @@ INPITCONFIG;
      * @return void
      */
     public function build_initialize_code() {
-        if (!is_a($this, Valuable_View::class)) return;
+        if (!$this->is_input_ui()) return;
 
         $fragment = $this->get_code_Fragment();
         $this->get_input_data($inputDataName);
