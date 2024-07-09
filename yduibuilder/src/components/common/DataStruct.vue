@@ -54,7 +54,7 @@ export default {
   setup (props: any, context: any) {
     const { t } = useI18n()
     const dialogVisible = ref(false)
-    const currData = ref<any>({ type: 'string', uuid: ydhl.uuid() })
+    const currData = ref<any>({ type: 'string', uuid: ydhl.uuid(), isRoot: true })
     const myDatas = computed<any>(() => props.datas)
     const openState = ref(false)
     const buttons = ref([

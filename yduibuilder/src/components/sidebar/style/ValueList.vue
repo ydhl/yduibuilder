@@ -73,7 +73,7 @@ import { useI18n } from 'vue-i18n'
 import { computed, nextTick, ref, onMounted } from 'vue'
 import UIInit from '@/components/Common'
 import { VueDraggableNext } from 'vue-draggable-next'
-import ConfirmRemove from "@/components/common/ConfirmRemove.vue"
+import ConfirmRemove from '@/components/common/ConfirmRemove.vue'
 
 export default {
   name: 'StyleValueList',

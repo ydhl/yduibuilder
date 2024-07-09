@@ -26,7 +26,7 @@
 
     <div class="row mb-1" :key="index" v-for="(image, index) in backgroundImages">
       <div class="col-sm-9 offset-3">
-        <BackgroundImage :preview-model="previewMode" :index="index"></BackgroundImage>
+        <BackgroundImage :preview-mode="previewMode" :index="index"></BackgroundImage>
       </div>
     </div>
     <div class="row mt-2 mb-1">

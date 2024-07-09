@@ -211,6 +211,7 @@ export default {
     }
     const updateExpression = (expression) => {
       myExpression.value = expression
+      openExpressionVisible.value = false
       context.emit('updateExpression', myExpression.value, myExpressionDesc.value)
     }
 

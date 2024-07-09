@@ -30,7 +30,7 @@
         <span class="text-muted fs-7" :title="myModel.mock=='1' ? 'Has Mock' : ('Mock: '+ myModel.mock)" v-if="myModel.mock">M</span>
         <template v-if="myModel.defaultValue">
           <span v-if="['object','array','map','any'].indexOf(myModel.type)==-1" class="text-info ps-1 fs-7 text-truncate">{{myModel.defaultValue}}</span>
-          <span v-else @click.stop="viewDefaultValue(myModel.defaultValue)" class="text-info ps-1 fs-7 text-truncate">{{t('common.view')}}</span>
+          <span v-else @click.stop="openCodeEditor(myModel.defaultValue, 'view')" class="text-info ps-1 fs-7 text-truncate">{{t('common.view')}}</span>
         </template>
       </span>
       <span class="text-truncate ps-2 fs-7 pointer text-muted" @click="showComment()">
@@ -43,6 +43,8 @@
       {{myModel.title}}
     </div>
     <div class="model-action" v-if="canMutation">
+      <i class="iconfont icon-import pointer text-muted hover-primary" @click.stop="openCodeEditor('', 'import')" v-if="myModel.type=='object' || myModel.type=='array'"></i>
+      <i v-else style="width: 16px;height: 24px;">&nbsp;</i>
       <i class="iconfont icon-plus pointer text-muted hover-primary" @click.stop="add" v-if="myModel.type=='object'"></i>
       <i v-else style="width: 16px;height: 24px;">&nbsp;</i>
       <ConfirmRemove @remove="remove" v-if="!isArrayItem"></ConfirmRemove>
@@ -92,10 +94,10 @@
                  :can-mutation="canMutation" :key="index" :intent="intent+1" :model="item" :index="index"></Data>
     </template>
   </template>
-  <lay-layer v-model="editDlgVisible" :title="isAdd ? t('api.addData') : t('api.editData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
-    <AddData v-model="editModel" :has-default-value="path.length==0" :is-array-item="!isAdd && isArrayItem"/>
+  <lay-layer v-model="editDlgVisible" :title="isAddProps ? t('api.addData') : t('api.editData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
+    <AddData v-model="editModel" :has-default-value="path.length==0" :is-array-item="!isAddProps && isArrayItem"/>
   </lay-layer>
-  <CodeEditor :read-only="true" v-model="viewDefaultDlgVisible" :code="code"></CodeEditor>
+  <CodeEditor :read-only="codeType=='view'" :title="codeType=='view'?t('api.model.defaultValue'):t('api.model.import')" :tip="tip" v-model="codeEditorVisible" :code="code" @update="importData"></CodeEditor>
   <DataInfo :data="myModel" v-model="detailDlgVisible"></DataInfo>
 </template>
 
@@ -139,16 +141,18 @@ export default {
     const myModel = computed<any>(() => props.model)
     const { t } = useI18n()
     const editDlgVisible = ref(false)
+    const tip = ref('')
     const confirmRemove = ref(false)
     const showBoundPop = ref(false)
     const showOutputTypeMenu = ref(false)
     const detailDlgVisible = ref(false)
-    const viewDefaultDlgVisible = ref(false)
+    const codeEditorVisible = ref(false)
     const boundPop = ref()
     const outputTypeMenu = ref()
     const drawFromEl = ref()
     const currBindOutUI = ref()
-    const isAdd = ref(false)
+    const isAddProps = ref(false)
+    const codeType = ref<string>('view') // view || import
     const isOpen = ref(props.open)
     const showBoundType = ref('')
     const code = ref('')
@@ -238,12 +242,32 @@ export default {
         }
       }
       editDlgVisible.value = false
-      if (isAdd.value) { // object
+      if (isAddProps.value) { // 添加对象节点
         if (!myModel.value.props) myModel.value.props = []
         myModel.value.props.push(editModel.value)
         context.emit('update', index, JSON.parse(JSON.stringify(myModel.value)))
-      } else { // 数组
-        context.emit('update', index, JSON.parse(JSON.stringify(editModel.value)))
+      } else { // 修改
+        const data = JSON.parse(JSON.stringify(editModel.value))
+        if (index === -1) { // 复制时把绑定关系全部去掉，并重新生成所有的uuid
+          rebuildInOutUuid(data)
+        }
+        context.emit('update', index, data)
+      }
+    }
+    const rebuildInOutUuid = (data: any) => {
+      if (!data) return
+      data.uuid = ydhl.uuid()
+
+      if (data.in) data.in = null
+      if (data.out) data.out = null
+      if (data.bound) data.bound = null
+      if (data.item) {
+        rebuildInOutUuid(data.item)
+      }
+      if (data.props) {
+        for (const prop of data.props) {
+          rebuildInOutUuid(prop)
+        }
       }
     }
     const buttons = computed(() => {
@@ -264,7 +288,6 @@ export default {
           {
             text: t('common.copy'),
             callback: () => {
-              editModel.value.uuid = ydhl.uuid()
               save(-1)
             }
           })
@@ -428,12 +451,12 @@ export default {
     }
 
     const edit = () => {
-      isAdd.value = false
+      isAddProps.value = false
       editModel.value = JSON.parse(JSON.stringify(props.model))
       editDlgVisible.value = true
     }
     const add = () => {
-      isAdd.value = true
+      isAddProps.value = true
       editModel.value = { type: 'string', uuid: ydhl.uuid() }
       editDlgVisible.value = true
     }
@@ -600,9 +623,38 @@ export default {
       boundPop.value.querySelectorAll('.dropdown-toggle').forEach((el) => el.classList.remove('show'))
       boundPop.value.querySelectorAll('.dropdown-menu').forEach((el) => el.classList.remove('show'))
     }
-    const viewDefaultValue = (newCode) => {
-      viewDefaultDlgVisible.value = true
-      code.value = newCode
+    const openCodeEditor = (newCode, type) => {
+      codeEditorVisible.value = true
+      codeType.value = type
+      if (type === 'import') {
+        const mockJson = ydhl.mockJson(myModel.value)
+        code.value = JSON.stringify(mockJson[myModel.value.name])
+        tip.value = t('api.model.importTip')
+        editModel.value = JSON.parse(JSON.stringify(myModel.value))
+      } else {
+        tip.value = ''
+        code.value = newCode
+      }
+    }
+    const importData = (newCode) => {
+      let json
+      try {
+        json = JSON.parse(newCode)
+      } catch (e) {
+        ydhl.alert('Parse Error: ' + e.message, t('common.ok'))
+        return
+      }
+
+      const type = Object.prototype.toString.call(json).slice(8, -1).toLowerCase()
+      if (type !== myModel.value.type) {
+        ydhl.alert('Data type mismatch, please input type: ' + myModel.value.type + type, t('common.ok'))
+        return
+      }
+      codeEditorVisible.value = false
+      const oldUuid = editModel.value.uuid
+      editModel.value = ydhl.parseJsonData(myModel.value.name, myModel.value.isRoot, json)
+      editModel.value.uuid = oldUuid
+      save(props.index)
     }
 
     onMounted(() => {
@@ -614,7 +666,8 @@ export default {
     return {
       editModel,
       t,
-      viewDefaultDlgVisible,
+      codeEditorVisible,
+      codeType,
       enumValues,
       editDlgVisible,
       isOpen,
@@ -623,7 +676,7 @@ export default {
       dataInfo,
       myModel,
       buttons,
-      isAdd,
+      isAddProps,
       code,
       outputAsItems,
       outputAndBoundItems,
@@ -637,7 +690,7 @@ export default {
       showComment,
       highlight,
       offlight,
-      viewDefaultValue,
+      openCodeEditor,
       edit,
       add,
       remove,
@@ -648,6 +701,7 @@ export default {
       beginDraw,
       removeBind,
       viewDetail,
+      importData,
       showBoundType,
       showOutputTypeMenu,
       outputTypeStyle,
@@ -656,6 +710,7 @@ export default {
       boundPop,
       showBoundPop,
       outputTypeMenu,
+      tip,
       closeDropmenu,
       showBound,
       hasOutputAs,

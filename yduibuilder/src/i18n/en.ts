@@ -55,6 +55,8 @@ export default {
       defaultValue: 'Default Value',
       enumValue: 'Enum Value',
       isEnumValue: 'Is enum value',
+      import: 'Import Data Struct',
+      importTip: 'After importing, the IDs of all data nodes will be changed, and data binding will become invalid',
       initLength: 'Initial length',
       mock: 'Mock',
       name: 'Name',

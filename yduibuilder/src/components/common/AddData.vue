@@ -6,7 +6,7 @@
         <div class="dropdown">
           <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"><span :class="'param-'+myModel.type">{{myModel.type}}</span></button>
           <ul :class="{'dropdown-menu': true, 'show': show}" aria-labelledby="dropdownMenuLink">
-            <li v-for="(type, index) in types" :key="index"><a href="#" @click="changeType(type)" :class="'dropdown-item param-'+type">{{ type }}</a></li>
+            <li v-for="(type, index) in types" :key="index"><a href="javascript:;" @click="changeType(type)" :class="'dropdown-item param-'+type">{{ type }}</a></li>
           </ul>
         </div>
       </div>
@@ -24,7 +24,7 @@
             <div class="d-flex align-items-center">
               <div class="form-check form-switch me-5" @click="changeValueType()">
                 <input class="form-check-input" type="checkbox" role="switch" id="enum" :checked="valueType == 'enum'">
-                <label class="form-check-label" for="enum"><label>{{t("api.model.isEnumValue")}}</label></label>
+                <label class="form-check-label" for="enum">{{t("api.model.isEnumValue")}}</label>
               </div>
             </div>
             <table class="table table-sm table-borderless table-hover table-striped" v-if="valueType == 'enum'">
@@ -77,7 +77,7 @@
       <label class="col-sm-3 col-form-label text-end">{{ t('api.model.defaultValue') }}</label>
       <div class="col-sm-9">
         <input type="text" v-if="['object','array','map','any'].indexOf(myModel.type) == -1" class="form-control form-control-sm" v-model="myModel.defaultValue">
-        <button type="button" v-if="['object','array','map','any'].indexOf(myModel.type) !== -1" @click="openCodeDialog" class="btn btn-xs btn-light">{{myModel.defaultValue?t('common.view'):t('action.notSet')}}</button>
+        <button type="button" v-if="['object','array','map','any'].indexOf(myModel.type) !== -1" @click="openCodeDialog('default')" class="btn btn-xs btn-light">{{myModel.defaultValue?t('common.view'):t('action.notSet')}}</button>
       </div>
     </div>
     <div class="row">
@@ -165,8 +165,10 @@ export default {
       myModel.value.type = type
       if (type === 'array' && !myModel.value.item) {
         myModel.value.item = { type: 'string', uuid: ydhl.uuid() }
+        delete myModel.value.props
       } else if (type === 'object' && !myModel.value.props) {
         myModel.value.props = []
+        delete myModel.value.item
       } else if (type !== 'array' && type !== 'object') {
         delete myModel.value.item
         delete myModel.value.props
@@ -187,6 +189,7 @@ export default {
       context.emit('update:modelValue', JSON.parse(JSON.stringify(myModel.value)))
     }
     const updateCode = (newCode) => {
+      codeDialogVisible.value = true
       myModel.value.defaultValue = newCode
     }
     const openCodeDialog = () => {

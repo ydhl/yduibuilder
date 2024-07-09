@@ -55,6 +55,8 @@ export default {
       defaultValue: '默认值',
       enumValue: '枚举值',
       isEnumValue: '是枚举值',
+      import: '导入数据结构',
+      importTip: '导入后会改变所有数据节点的id，数据绑定等会失效',
       initLength: '初始长度',
       mock: 'Mock',
       name: '名称',

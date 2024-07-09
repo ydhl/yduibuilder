@@ -277,6 +277,7 @@ export default {
       codeDlgVisible.value = true
     }
     const updateCode = (code) => {
+      codeDlgVisible.value = false
       if (chooseDataType.value) {
         myExpression.value.literal = code
       }

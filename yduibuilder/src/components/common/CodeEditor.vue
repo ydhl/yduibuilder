@@ -1,6 +1,7 @@
 <template>
-  <lay-layer resize :resizeEnd="recomputed" v-model="myDlgVisible" :title="t('common.customCode')" :shade="true" :area="['520px', '400px']" :btn="buttons">
+  <lay-layer resize :resizeEnd="recomputed" v-model="myDlgVisible" :title="title || t('common.customCode')" :shade="true" :area="['680px', '400px']" :btn="buttons">
     <div class="p-3" ref="editorContainer">
+      <div class="text-danger p-1 m-1 fs-7">{{tip}}</div>
       <div ref="codeEditor" :style="editStyle"></div>
     </div>
   </lay-layer>
@@ -16,6 +17,8 @@ export default {
   name: 'CodeEditor',
   props: {
     code: String,
+    title: String,
+    tip: String,
     readOnly: {
       default: false,
       type: Boolean
@@ -60,6 +63,8 @@ export default {
         }
         editorInstance.setValue(myCode.value || '// write you code here')
         monaco.editor.setModelLanguage(editorInstance.getModel(), props.language || 'html')
+        editorInstance.getAction('editor.action.formatDocument').run()
+        editorInstance.setValue(editorInstance.getValue())
       })
     })
     const buttons = computed(() => {
@@ -77,7 +82,6 @@ export default {
           {
             text: t('common.ok'),
             callback: () => {
-              myDlgVisible.value = false
               context.emit('update', editorInstance.getValue())
             }
           },

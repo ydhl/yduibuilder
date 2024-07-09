@@ -451,5 +451,52 @@ export default {
       ret = this.copyValue({}, jsonData)
     }
     return this.isEmptyObject(ret) ? null : ret
+  },
+  parseJsonData (name: string, isRoot: boolean, json: any) {
+    let struct: any = null
+    if (Array.isArray(json)) {
+      struct = { name, uuid: this.uuid(), type: 'array', isRoot, item: { uuid: this.uuid(), type: 'string' } }
+      if (!json[0]) {
+        return struct
+      }
+      struct.item = this.parseJsonData('', false, json[0])
+    } else if (this.isPlainObject(json)) {
+      struct = { name, uuid: this.uuid(), type: 'object', isRoot, props: [] }
+      for (const item in json) {
+        struct.props.push(this.parseJsonData(item, false, json[item]))
+      }
+    } else {
+      struct = { name, uuid: this.uuid(), type: (typeof json), isRoot }
+    }
+    return struct
+  },
+  mockJson (jsonData: any) {
+    let ret = {}
+    if (jsonData.type === 'array') {
+      if (jsonData.name) { // 一个item, 如name=>[]
+        ret[jsonData.name] = [this.mockJson(jsonData.item)]
+      } else { // 是最顶级的array，如[]
+        ret = [this.mockJson(jsonData.item)]
+      }
+    } else if (jsonData.type === 'object') {
+      let props = {}
+      if (jsonData.props) {
+        for (const prop of jsonData.props) {
+          props = this.deepMerge(props, this.mockJson(prop))
+        }
+      }
+      if (jsonData.name) {
+        ret[jsonData.name] = props
+      } else {
+        ret = props
+      }
+    } else {
+      if (jsonData.name) {
+        ret[jsonData.name] = jsonData.type
+      } else {
+        ret = jsonData.type
+      }
+    }
+    return ret
   }
 }
