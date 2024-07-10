@@ -155,6 +155,7 @@ class State_Controller extends YZE_Resource_Controller {
                 ->set('uiid', $uiid)
                 ->set('state_type', in_array($state_type, ['activated','disabled','hidden', 'pseudo']) ? $state_type : 'custom')
                 ->set('state_name', $state_name?:$state_type)
+                ->set('expression', '')
                 ->save();
         }
         if($state_uuid && !(array)$style && !$bindState->expression){
