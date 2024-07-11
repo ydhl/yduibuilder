@@ -38,7 +38,7 @@ export default function (uiconfig: any = null) {
   const cssMap = computed(() => store.state.css)
   // console.log(cssMap)
   const selectedUIItemIsForm = computed(() => {
-    return selectedUIItem.value ? baseUIDefines[selectedUIItem.value.type]?.IsForm : false
+    return selectedUIItem.value ? baseUIDefines[selectedUIItem.value.type]?.isForm : false
   })
   /**
    * 设置一个ui元素的meta指，如果是meta中的普通元素，直接传入name，value，如果meta中的符合元素，需要传入complexTypeName，比如custom，css等
