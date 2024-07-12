@@ -247,19 +247,31 @@ function alpinejs_init_directive(Alpine){
 
         if (['checkbox', 'radio'].indexOf(uiType) !== -1){
             Alpine.bind(el, { '@click'(event) {
-                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray)
-                if (!exp) return
+                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray);
+                if (!exp) return;
+                const hasInput = el.querySelector('input[type]');
+                let eventTarget = event.target;
 
-                if (event.target.tagName != 'INPUT') return; // 只处理input元素上的click
-                const uiid = event.target.dataset.uiid
+                if (hasInput && eventTarget.tagName != 'INPUT') return; // 如果有input标签，则只处理input元素上的click；有些ui没有用input元素
+                if(!hasInput) eventTarget = eventTarget.closest(`[role='${uiType}']`)
+                const uiid = eventTarget?.dataset?.uiid
+
                 if (!uiid) return;
                 let values = lastIsArray ? [] : '';
                 if (lastIsArray){// 多值
                     el.querySelectorAll(`[data-uiid='${uiid}']`).forEach((el) => {
-                        if (el.checked) values.push(el.value);
+                        if(hasInput){
+                            if (el.checked) values.push(el.value);
+                        }else{
+                            if (el.dataset.checked) values.push(el.dataset.value);
+                        }
                     })
                 }else{// 单值，就用触发事件EL的值
-                    values = event.target.checked ? event.target.value : '';
+                    if(hasInput){
+                        values = eventTarget.checked ? eventTarget.value : '';
+                    }else{
+                        values = eventTarget.dataset.checked ? eventTarget.dataset.value : '';
+                    }
                 }
                 evaluate(`${exp} = values`, { scope: { values } });
             }})
@@ -307,7 +319,7 @@ function alpinejs_init_directive(Alpine){
     });
 }
 function alpinejs_input_keyup(page, el, uiid, inputName){
-    const value = page.alpinejs_get_value(el, inputName);
+    const value = el.value;
     const suffix = inputName.match(/[-1]/) ? '[-1]' : ''
     page.alpinejs_set_value(el,`${uiid}_wordCount${suffix}`, value?.length||'');
     if (value?.length>0){

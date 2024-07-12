@@ -10,7 +10,10 @@ class Card_View extends Preview_View {
     protected function css_map()
     {
         $map = parent::css_map();
+        $styleMap = parent::style_map();
         $map['-'] = 'van-card';
+        if ($styleMap['color']) unset($map['foregroundTheme']);
+        if ($styleMap['background-color']) unset($map['backgroundTheme']);
         return $map;
     }
 

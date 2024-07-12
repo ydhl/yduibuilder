@@ -15,15 +15,14 @@ class File_View extends Preview_View implements Valuable_View {
     public function build_ui()
     {
         $space =  $this->indent(0);
-        $inputDataName = $this->get_input_data_name($inputIsArr);
+
         echo "{$space}";
         echo "<div";
         echo $this->build_main_attrs();
         echo ">".PHP_EOL;
         echo $this->indent(1);
         echo '<input type="file" class="d-block"';
-        echo $this->build_form_attrs(true, false);
-        echo $this->wrap_output('x-input', $inputDataName);// file 组件总是用x-input，绑定的输入数据里面是FileList，而x-model得到的只是文件名
+        echo $this->build_form_attrs();
         echo $this->wrap_output('accept', $this->data['meta']['custom']['accept']?:null);
         echo $this->wrap_output('multiple', null, $this->data['meta']['custom']['multiple']?:null);
         echo ">".PHP_EOL;

@@ -54,14 +54,15 @@ abstract class ValueList_View extends Preview_View implements Valuable_View{
      * @param $outputData array 值列表项目上绑定的数据
      * @param $itemName string 迭代值列表项目是的数据名称
      * @param $staticData array 静态数据
+     * @param $staticDataIndex int 静态数据索引
      * @return mixed
      */
-    protected abstract function build_valuelist($outputData, $itemName, $staticData=null);
+    protected abstract function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null);
     protected function build_valuelist_static(){
         $this->build_ui_begin();
         $values = $this->data['meta']['values'] ?: $this->demo_values();
-        foreach ($values as $item){
-            $this->build_valuelist(null, null, $item);
+        foreach ($values as $index => $item){
+            $this->build_valuelist(null, null, $item, $index);
         }
         $this->build_ui_end();
     }

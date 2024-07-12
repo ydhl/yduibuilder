@@ -78,7 +78,7 @@ class Collapse_View extends ValueList_View {
 
         $this->build_ui_end();
     }
-    protected function build_valuelist($outputData, $itemName, $staticData = null)
+    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null)
     {
         // 在build_value_static和build_valuelist_iterator中处理
     }

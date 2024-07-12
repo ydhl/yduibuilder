@@ -11,13 +11,13 @@ use app\modules\build\views\preview\ValueList_View;
 class Nav_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper;
 
-    protected function build_valuelist($outputData, $itemName, $staticData=null){
+    protected function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null){
         list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
         $myid = $this->myid();
         $staticValue = $staticData ? $staticData['value']?:$staticData['name'] : null;
         echo $this->indent(1) . '<div class="nav-item">'.PHP_EOL;
         echo $this->indent(2) . "<a";
-        echo $this->wrap_output(':class',$this->item_css($staticValue, $xText));
+        echo $this->wrap_output(':class',$this->item_css($staticValue, $xValue));
         echo $this->wrap_output(':style',$this->item_style($staticValue, $xValue));
         echo $this->wrap_output('href', 'javascript:;');
         echo $this->wrap_output('x-text', $xText);

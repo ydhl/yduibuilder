@@ -1,6 +1,6 @@
 <template>
   <div :draggable='draggable'
-       :class="[dragableCss, uiCss, 'van-divider van-divider--hairline van-divider--content-center']"
+       :class="[dragableCss, uiCss]"
        :style="uiStyle" :id="myId" :data-type="uiconfig.type"
        :data-pageid="pageid">
     {{uiconfig.meta.value}}
@@ -27,8 +27,13 @@ export default {
     const setup = hr.setup()
     const uiStyle = computed(() => {
       const myStyle = hr.getUIStyle()
-      // delete myStyle?.height
-
+      delete myStyle?.height
+      let height = props.uiconfig?.meta.style?.height || '1px'
+      const style = props.uiconfig.meta?.custom?.style || 'solid'
+      if (style === 'double' && parseInt(height) < 3) {
+        height = '3px'
+      }
+      myStyle['--border-width'] = height
       // 背景色是边框颜色
       if (myStyle?.['background-color']) {
         myStyle['border-color'] = myStyle?.['background-color']
@@ -46,6 +51,22 @@ export default {
       delete css.backgroundTheme
       delete css.foregroundTheme
       const _ = Object.values(css) || []
+      _.push('van-divider van-divider--content-center')
+      switch (props.uiconfig.meta?.custom?.style) {
+        case 'dotted':
+          _.push('van-divider--dotted')
+          break
+        case 'dashed':
+          _.push('van-divider--dashed')
+          break
+        case 'double':
+          _.push('van-divider--double')
+          break
+        case 'solid':
+        default:
+          _.push('van-divider--hairline')
+          break
+      }
       // 前景色是文字颜色
       // 背景色是边框颜色
       if (props.uiconfig.meta?.css?.backgroundTheme) {

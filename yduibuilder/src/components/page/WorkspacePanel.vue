@@ -592,6 +592,7 @@ export default {
     const closePage = (pageUuid) => {
       if (pageSaved.value[pageUuid] === 0) {
         ydhl.confirm(t('common.notSaveInfo'), t('common.close'), t('common.cancel')).then((dialogId) => {
+          ydhl.closeLoading(dialogId)
           store.commit('closePage', pageUuid)
         })
       } else {

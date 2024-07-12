@@ -57,14 +57,15 @@ alpinejs_checked_name(el, values, valueName){
 },
 alpinejs_get_value(el, valueName){
     const name = alpinejs_get_input_data_name(el, valueName);
-    return Alpine.evaluate(el, `\${name}`) || undefined;
+    const value = Alpine.evaluate(el, `\${name}`);
+    return value != undefined ? value : undefined;
 },
 alpinejs_in_array(el, valueName, check){
     const name = alpinejs_get_input_data_name(el, valueName);
     const value = Alpine.evaluate(el, `\${name}`) || undefined;
 
     if (value == undefined) return false
-    if (value instanceof Array) return value.indexOf(check) !== -1
+    if (value instanceof Array) return value.findIndex(item => item == check) !== -1
     if (value instanceof String) return value.split(',').indexOf(check) !== -1
     return value == check
 },

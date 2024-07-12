@@ -2,34 +2,50 @@
 namespace app\modules\build\views\preview\vant;
 
 use app\modules\build\views\preview\Html_Code_Helper;
-use app\modules\build\views\preview\Preview_View;
+use app\modules\build\views\preview\ValueList_View;
 
 
-class Breadcrumb_View extends Preview_View {
+class Breadcrumb_View extends ValueList_View {
     use  Vant_Popup, Html_Code_Helper;
-    protected function values() {
-        if (@!$this->data['meta']['values']){
-            return [["name"=> 'Page A', "value"=> '#1' ], [ "name"=> 'Page B', "value"=> '#2' ]];
-        }
-        return $this->data['meta']['values'];
+
+    protected function build_ui_begin($iteratorName = null)
+    {
+
+        $space =  $this->indent();
+        echo "{$space}<ol";
+        echo $this->build_main_attrs();
+        echo ">".PHP_EOL;
     }
 
-    protected function foregroundCss(){
-        $css = [];
-        $cssMap = parent::css_map();
-        if ($cssMap['foregroundTheme']){
-            $css[] = $cssMap['foregroundTheme'];
-        }
-        return join(' ', $css);
+    protected function build_ui_end()
+    {
+        $space =  $this->indent();
+        echo $space;
+        echo "</ol>".PHP_EOL;
     }
-    protected function foregroundStyle() {
-        $styleMap = parent::style_map();
-        $style = [];
-        if ($styleMap['color']) {
-            $style[] = $styleMap['color'];
+
+    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null)
+    {
+        if ($outputData){
+            list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+        }else{
+            $staticValue = $staticData['value']?:$staticData['name'];
+            $staticName = $staticData['name'];
+            $xValue = "'{$staticValue}'";
         }
-        return join(";", $style);
+        $inputDataName = $this->get_input_data_name($isArr);
+        $inputDataNameString = $isArr ? "alpinejs_get_value(\$el, '{$inputDataName}')" : $inputDataName;
+
+        echo $this->indent(1) . '<li';
+        echo $this->wrap_output(':class', "{'van-breadcrumb-item': true, 'active':{$inputDataNameString}=={$xValue}}");
+        echo '>' . PHP_EOL;
+
+        $this->normal_item($outputData, $staticData, $inputDataNameString, $staticValue, $staticName, $xValue, $xText, $checked);
+        $this->active_item($outputData, $staticData, $inputDataNameString, $staticValue, $staticName, $xValue, $xText, $checked);
+
+        echo $this->indent(1)."</li>".PHP_EOL;
     }
+
     protected function css_map()
     {
         $cssArray = parent::css_map();
@@ -44,32 +60,59 @@ class Breadcrumb_View extends Preview_View {
         return $map;
     }
 
-    public function build_ui()
-    {
-        $space =  $this->indent();
-        echo "{$space}<ol";
-        echo $this->build_main_attrs();
-        echo ">".PHP_EOL;
-
-        foreach ($this->values() as $item){
-            echo $this->indent();
-            echo "<li class='van-breadcrumb-item";
-            echo @$item['checked'] ? ' active' : '';
-            echo "'>".PHP_EOL;
-            if (!@$item['checked']){
-                echo $this->indent();
-                echo "<span"
-                    .$this->wrap_output('class', $this->foregroundCss())
-                    .$this->wrap_output('style', $this->foregroundStyle()).">{$item['text']}</span>".PHP_EOL;
-            }else{
-                echo $this->indent(2);
-                echo "{$item['text']}".PHP_EOL;
-            }
-            echo $this->indent(1);
-            echo "</li>".PHP_EOL;
+    private function foregroundCss(){
+        $css = [];
+        $cssMap = parent::css_map();
+        if ($cssMap['foregroundTheme']){
+            $css[] = $cssMap['foregroundTheme'];
+        }
+        return join(' ', $css)?:NULL;
+    }
+    private function foregroundStyle() {
+        $styleMap = parent::style_map();
+        $style = [];
+        if ($styleMap['color']) {
+            $style[] = $styleMap['color'];
+        }
+        return join(";", $style)?:NULL;
+    }
+    private function active_item($outputData, $staticData, $inputDataNameString, $staticValue, $staticName, $xValue, $xText, $checked){
+        $myid = $this->myid();
+        echo $this->indent(2) . '<template';
+        echo $this->wrap_output("x-if", "{$inputDataNameString} == {$xValue}");
+        echo '>' . PHP_EOL;
+        echo $this->indent(2) . "<span";
+        echo $this->wrap_output('data-root', $myid);
+        if ($outputData) {
+            echo $this->wrap_output(':data-value', $xValue);
+            echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
+            echo $this->wrap_output('x-text', $xText);
+        }else{
+            echo $this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null);
+            echo $this->wrap_output('data-value', $staticValue);
+        }
+        echo ">{$staticName}</span>" . PHP_EOL;
+        echo $this->indent(2) . "</template>" . PHP_EOL;
+    }
+    private function normal_item($outputData, $staticData, $inputDataNameString, $staticValue, $staticName, $xValue, $xText, $checked){
+        $myid = $this->myid();
+        echo $this->indent(2) . '<template';
+        echo $this->wrap_output("x-if", "{$inputDataNameString} != {$xValue}");
+        echo '>' . PHP_EOL;
+        echo $this->indent(2) . "<span";
+        echo $this->wrap_output('class', $this->foregroundCss());
+        echo $this->wrap_output('style', $this->foregroundStyle());
+        echo $this->wrap_output('data-root', $myid);
+        if ($outputData) {
+            echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
+            echo $this->wrap_output(':data-value', $xValue);
+            echo $this->wrap_output('x-text', $xText);
+        }else{
+            echo $this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null);
+            echo $this->wrap_output('data-value', $staticValue);
         }
 
-        echo $space;
-        echo "</ol>".PHP_EOL;
+        echo ">{$staticName}</span>" . PHP_EOL;
+        echo $this->indent(2) . "</template>" . PHP_EOL;
     }
 }

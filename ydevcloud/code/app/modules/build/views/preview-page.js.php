@@ -53,7 +53,8 @@ alpinejs_checked_name(el, values, valueName){
 },
 alpinejs_get_value(el, valueName){
     const name = alpinejs_get_input_data_name(el, valueName);
-    return Alpine.evaluate(el, `\${name}`) || undefined;
+    const value = Alpine.evaluate(el, `\${name}`);
+    return value != undefined ? value : undefined;
 },
 alpinejs_in_array(el, valueName, check){
     const name = alpinejs_get_input_data_name(el, valueName);

@@ -12,7 +12,7 @@ class Holder_View extends Preview_View {
         $space =  $this->indent();
         echo "{$space}<div";
         echo $this->build_main_attrs();
-        echo ">\r\n";
-        echo "{$space}</div>\r\n";
+        echo ">".PHP_EOL;
+        echo "{$space}</div>".PHP_EOL;
     }
 }

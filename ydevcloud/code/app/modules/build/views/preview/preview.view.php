@@ -148,6 +148,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         if ($selector){
             $cssArray['__selector__'] = join(" ", $selector);
         }
+        $styleMap = $this->style_map();
         return $cssArray;
     }
     /**

@@ -6,26 +6,18 @@ use app\modules\build\views\preview\Preview_View;
 
 class Container_View extends Preview_View {
     use  Vant_Popup,Html_Code_Helper;
-    private function isRow(){
-        $parentConfig = $this->get_parent_UI();
-        if (!$parentConfig) return false;
-        if ($this->get_endKind() == "mobile") {
-            if ($parentConfig['type'] != "Container") return true;
-            return false;
+    public function build_ui()
+    {
+        $space =  $this->indent();
+        echo "{$space}<div";
+        echo $this->build_main_attrs();
+        echo ">".PHP_EOL;
+
+        foreach ((array)@$this->childViews as $view){
+            $view->output();
         }
-        if ($parentConfig['type'] == "Container") return true;
-        return false;
-    }
-    private function isCol(){
-        $parentConfig = $this->get_parent_UI();
-        if (!$parentConfig) return false;
-        $parentOfParent = $this->find_parent($parentConfig['meta']['id']);
-        if ($this->get_endKind() == "mobile") {
-            if ($parentConfig['type'] == "Container" && $parentOfParent['type'] != "Container") return true;
-            return false;
-        }
-        if ($parentConfig['type'] != "Container") return false;
-        if ($parentOfParent['type'] == "Container") return true;
+
+        echo "{$space}</div>".PHP_EOL;
     }
     protected function css_map()
     {
@@ -72,18 +64,25 @@ class Container_View extends Preview_View {
         }
         return $style;
     }
-
-    public function build_ui()
-    {
-        $space =  $this->indent();
-        echo "{$space}<div";
-        echo $this->build_main_attrs();
-        echo ">\r\n";
-
-        foreach ((array)@$this->childViews as $view){
-            $view->output();
+    private function isRow(){
+        $parentConfig = $this->get_parent_UI();
+        if (!$parentConfig) return false;
+        if ($this->get_endKind() == "mobile") {
+            if ($parentConfig['type'] != "Container") return true;
+            return false;
         }
-
-        echo "{$space}</div>\r\n";
+        if ($parentConfig['type'] == "Container") return true;
+        return false;
+    }
+    private function isCol(){
+        $parentConfig = $this->get_parent_UI();
+        if (!$parentConfig) return false;
+        $parentOfParent = $this->find_parent($parentConfig['meta']['id']);
+        if ($this->get_endKind() == "mobile") {
+            if ($parentConfig['type'] == "Container" && $parentOfParent['type'] != "Container") return true;
+            return false;
+        }
+        if ($parentConfig['type'] != "Container") return false;
+        if ($parentOfParent['type'] == "Container") return true;
     }
 }

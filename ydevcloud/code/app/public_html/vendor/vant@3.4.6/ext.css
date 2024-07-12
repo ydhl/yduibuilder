@@ -20,14 +20,14 @@
 .van-font-weight-light{font-weight: 300;}
 .van-font-weight-lighter{font-weight: lighter;}
 
-.van-bg-primary{ background-color:var(--van-primary-color); }
-.van-bg-secondary{ background-color: var(--van-gray-6); }
-.van-bg-success{ background-color: var(--van-success-color); }
-.van-bg-danger{ background-color: var(--van-danger-color); }
-.van-bg-warning{ background-color: var(--van-warning-color); }
-.van-bg-info{ background-color: var(--van-text-link-color); }
-.van-bg-light{ background-color: var(--van-gray-3); }
-.van-bg-dark{ background-color: var(--van-gray-8); }
+.van-bg-primary{ background-color:var(--van-primary-color) !important;}
+.van-bg-secondary{ background-color: var(--van-gray-6) !important; }
+.van-bg-success{ background-color: var(--van-success-color) !important; }
+.van-bg-danger{ background-color: var(--van-danger-color) !important; }
+.van-bg-warning{ background-color: var(--van-warning-color) !important; }
+.van-bg-info{ background-color: var(--van-text-link-color) !important; }
+.van-bg-light{ background-color: var(--van-gray-3) !important; }
+.van-bg-dark{ background-color: var(--van-gray-8) !important; }
 
 .van-col{ background-clip: content-box !important; }
 .van-row--align-start{align-items:flex-start;}
@@ -199,3 +199,13 @@
 .van-carousel-indicators .active{opacity:1}
 .van-carousel-caption{position:absolute;right:15%;bottom:20px;left:15%;z-index:10;padding-top:20px;padding-bottom:20px;color:#fff;text-align:center}
 .van-user-select-none{user-select: none;}
+.van-divider--dotted {border-style: dotted;}
+.van-divider--double {border-style: double;}
+.van-divider:before, .van-divider:after{
+    border-width: 0px;
+    border-top-color: inherit !important;
+    border-top-style: inherit !important;
+}
+.van-divider.ui:before, .van-divider.ui:after{
+    border-top-width: var(--border-width);
+}

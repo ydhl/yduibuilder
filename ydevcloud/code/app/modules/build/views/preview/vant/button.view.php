@@ -6,15 +6,30 @@ use app\modules\build\views\preview\Preview_View;
 
 
 class Button_View extends Preview_View {
-    use  Vant_Popup,Html_Code_Helper;
-    private function buttonMeta () {
-        $parentUI = $this->get_parent_UI();
-        $type = strtolower($parentUI['type']);
-        $parentIsNavbar = in_array($type, ['nav', 'navbar']);
-        if ($parentIsNavbar) {
-            return $parentUI['meta'];
+    use Vant_Popup,Html_Code_Helper;
+
+    public function build_ui()
+    {
+        $space =  $this->indent();
+        $meta = $this->data['meta'];
+        $type = $meta['custom']['type'] ?: "button";
+        // 一般按钮
+        echo $space;
+        $tag = @$meta['custom']['type']=='link' ? "a" : "button";
+        echo "<{$tag} type='{$type}'";
+        if (@$this->data['meta']['custom']['disabled']){
+            echo ' disabled ';
         }
-        return $this->data['meta'];
+        if (@$meta['custom']['type']=='link'){
+            echo $this->wrap_output('href', $this->data['meta']['custom']['linkHref']);
+        }
+        echo $this->build_main_attrs().'>';
+        $this->wrap_icon(function(){
+            echo $this->data['meta']['title'] ?: $this->data['type'];
+        });
+        echo PHP_EOL;
+        echo $this->indent();
+        echo "</{$tag}>".PHP_EOL;
     }
     protected function css_map()
     {
@@ -74,28 +89,13 @@ class Button_View extends Preview_View {
         return $styleArray;
     }
 
-    public function build_ui()
-    {
-        $space =  $this->indent();
+    private function buttonMeta () {
         $parentUI = $this->get_parent_UI();
-        $meta = $this->data['meta'];
-        $type = $meta['custom']['type'] ?: "button";
-        // 一般按钮
-        echo $space;
-        $tag = @$meta['custom']['type']=='link' ? "a" : "button";
-        echo "<{$tag} type='{$type}'";
-        if (@$this->data['meta']['custom']['disabled']){
-            echo ' disabled ';
+        $type = strtolower($parentUI['type']);
+        $parentIsNavbar = in_array($type, ['nav', 'navbar']);
+        if ($parentIsNavbar) {
+            return $parentUI['meta'];
         }
-        if (@$meta['custom']['type']=='link'){
-            echo $this->wrap_output('href', $this->data['meta']['custom']['linkHref']);
-        }
-        echo $this->build_main_attrs().'>';
-        $this->wrap_icon(function(){
-            echo $this->data['meta']['title'] ?: $this->data['type'];
-        });
-        echo PHP_EOL;
-        echo $this->indent();
-        echo "</{$tag}>".PHP_EOL;
+        return $this->data['meta'];
     }
 }

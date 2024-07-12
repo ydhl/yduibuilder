@@ -10,7 +10,7 @@ use app\modules\build\views\preview\ValueList_View;
 class Breadcrumb_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper;
 
-    protected function build_valuelist($outputData, $itemName, $staticData=null){
+    protected function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null){
         if ($outputData){
             list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
         }else{

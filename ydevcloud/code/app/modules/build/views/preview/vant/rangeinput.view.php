@@ -6,11 +6,108 @@ use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
+use app\modules\build\views\preview\Valuable_View;
 
 
-class Rangeinput_View extends Preview_View {
+class Rangeinput_View extends Preview_View implements Valuable_View {
     use Vant_Popup,Html_Code_Helper,Alpine{
         Alpine::build_code as alpineBuildCode;
+    }
+
+    public function build_ui()
+    {
+        $space =  $this->indent();
+        echo "{$space}";
+        echo "<div";
+        $this->build_main_attrs();
+        echo ">".PHP_EOL;
+
+        echo $this->indent(1).'<div class="van-field__control van-field__control--custom">'.PHP_EOL;
+        echo $this->indent(2).'<div class="van-slider" @click="'.$this->myid().'_click($el)"';
+        echo $this->wrap_output('style', $this->slider_style());
+        echo '>'.PHP_EOL;
+        // 背景条
+        echo $this->indent(3).'<div';
+        echo $this->wrap_output(':style', $this->bg_style());
+        echo $this->wrap_output('class', $this->bg_class());
+        echo '>'.PHP_EOL;
+        // 滑块
+        echo $this->indent(4).'<div @mousedown="'.$this->myid().'_mousedown($el)"';
+        echo $this->wrap_output('class', 'van-slider__button-wrapper van-slider__button-wrapper--right');
+        echo '>'.PHP_EOL;
+
+        echo $this->indent(5).'<div';
+        echo $this->wrap_output('style', $this->handle_style());
+        echo $this->wrap_output('class', $this->handle_class());
+        echo $this->wrap_output('x-text', $this->myid().'_value');
+        echo "></div>".PHP_EOL;
+
+
+        echo $this->indent(4).'</div>'.PHP_EOL;
+        echo $this->indent(3).'</div>'.PHP_EOL;
+        echo $this->indent(2).'</div>'.PHP_EOL;
+        echo $this->indent(1).'</div>'.PHP_EOL;
+
+
+        echo "{$space}</div>".PHP_EOL;
+    }
+    public function build_code():Base_Code_Fragment
+    {
+        $this->alpineBuildCode();
+        $fragment = $this->get_code_fragment();
+        $min = @$this->data['meta']['custom']['min']??0;
+        $max = @$this->data['meta']['custom']['max']??100;
+        $step = @$this->data['meta']['custom']['step']??1;
+        $myid = $this->myid();
+
+        $inputDataName = $this->get_input_data_name($isArr);
+        $suffix = '';
+        if($isArr){
+            $suffix = '[-1]';
+        }
+        $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, $this->myid().'_moving'.$suffix.': false,');
+
+        $click = <<<CLICK
+{$myid}_click(el){
+    const { x, width } = el.getBoundingClientRect(), clientX = event.clientX;
+    const value = Math.ceil(Math.max(clientX - x, 0) / width * 100)
+    this.alpinejs_set_value(el, '{$inputDataName}', value > {$max} ? {$max} : (value < {$min} ? {$min} : value));
+},
+CLICK;
+
+        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $this->build->indent_code(0,$click));
+
+        $mousedown = <<< MOUSEDOWN
+{$myid}_mousedown(event){
+    this.alpinejs_set_value(this.\$el, '{$myid}_moving{$suffix}', true);
+    document.addEventListener("mousemove", (event) => this.{$myid}_mousemove.call(this, event));
+    document.addEventListener("mouseup", (event) => this.{$myid}_mouseup.call(this, event));
+},
+MOUSEDOWN;
+
+        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $this->build->indent_code(0,$mousedown));
+
+        $mousemove = <<< MOUSEMOVE
+{$myid}_mousemove(event){
+    if(!this.alpinejs_get_value(this.\$el, '{$myid}_moving{$suffix}')) return;
+    const { x, width } = document.querySelector("[data-uiid={$myid}]").getBoundingClientRect(), clientX = event.clientX;
+    const value = Math.ceil(Math.max(clientX - x, 0) / width * 100);
+    this.alpinejs_set_value(this.\$el, '{$inputDataName}', value > {$max} ? {$max} : (value < {$min} ? {$min} : value));
+},
+MOUSEMOVE;
+
+        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $this->build->indent_code(0,$mousemove));
+
+        $mouseup = <<< MOUSEUP
+{$myid}_mouseup(event){
+    this.alpinejs_set_value(this.\$el, '{$myid}_moving{$suffix}', false);
+    document.removeEventListener("mousemove", (event) => this.{$myid}_mousemove.call(this, event));
+    document.removeEventListener("mouseup", (event) => this.{$myid}_mouseup.call(this, event));
+},
+MOUSEUP;
+
+        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $this->build->indent_code(0,$mouseup));
+        return $fragment;
     }
     protected function style_map($meta = null, $state = 'normal')
     {
@@ -18,14 +115,6 @@ class Rangeinput_View extends Preview_View {
         unset($styles['background-color']);
         unset($styles['height']);
         return $styles;
-    }
-
-    protected function slider_style()
-    {
-        $styles = parent::style_map();
-        $_ = [];
-        if ($styles['height']) $_[] = $styles['height'];
-        return join(';', $_);
     }
 
     protected function css_map() {
@@ -37,87 +126,13 @@ class Rangeinput_View extends Preview_View {
         }
         return $map;
     }
-    public function build_ui()
+
+    private function slider_style()
     {
-        $space =  $this->indent(2);
-        echo "{$space}";
-        echo "<div";
-        $this->build_main_attrs();
-        echo ">".PHP_EOL;
-
-        echo $this->indent(3).'<div class="van-field__control van-field__control--custom">'.PHP_EOL;
-        echo $this->indent(4).'<div class="van-slider" @click="'.$this->myid().'_click($el)"';
-        echo $this->wrap_output('style', $this->slider_style());
-        echo '>'.PHP_EOL;
-        // 背景条
-        echo $this->indent(5).'<div';
-        echo $this->wrap_output(':style', $this->bg_style());
-        echo $this->wrap_output('class', $this->bg_class());
-        echo '>'.PHP_EOL;
-        // 滑块
-        echo $this->indent(6).'<div @mousedown="'.$this->myid().'_mousedown($el)"';
-        echo $this->wrap_output('class', 'van-slider__button-wrapper van-slider__button-wrapper--right');
-        echo '>'.PHP_EOL;
-
-        echo $this->indent(7).'<div';
-        echo $this->wrap_output('style', $this->handle_style());
-        echo $this->wrap_output('class', $this->handle_class());
-        echo $this->wrap_output('x-text', $this->myid().'_value');
-        echo '>';
-        echo "</div>";
-
-
-        echo $this->indent(6).'</div>';
-        echo $this->indent(5).'</div>';
-        echo $this->indent(4).'</div>';
-        echo $this->indent(3).'</div>';
-
-
-        echo "{$space}</div>".PHP_EOL;
-    }
-    public function build_code():Base_Code_Fragment
-    {
-        $this->alpineBuildCode();
-        $fragment = $this->get_code_fragment();
-        $min = @$this->data['meta']['custom']['min']??1;
-        $max = @$this->data['meta']['custom']['max']??100;
-        $step = @$this->data['meta']['custom']['step']??1;
-
-        $this->get_input_data($inputDataName);
-        if (!$inputDataName){
-            $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, $this->myid().'_value: '.(floatval($this->data['meta']['value']) ?: 50).',');
-        }
-
-        $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, $this->myid().'_moving: false,');
-
-        $click[] = $this->myid().'_click(el){';
-        $click[] = $this->indent(1, true).'const { x, width } = el.getBoundingClientRect(), clientX = event.clientX;';
-        $click[] = $this->indent(1, true).'this.'.$this->myid().'_value = Math.ceil(Math.max(clientX - x, 0) / width * 100);';
-        $click[] = '},';
-        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $click);
-
-        $mousedown[] = $this->myid().'_mousedown(el){';
-        $mousedown[] = $this->indent(1, true).'this.'.$this->myid().'_moving = true;';
-        $mousedown[] = $this->indent(1, true).'document.addEventListener("mousemove", (event) => this.'.$this->myid().'_mousemove.call(this, event));';
-        $mousedown[] = $this->indent(1, true).'document.addEventListener("mouseup", (event) => this.'.$this->myid().'_mouseup.call(this, event));';
-        $mousedown[] = '},';
-        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $mousedown);
-
-        $mousemove[] = $this->myid().'_mousemove(event){';
-        $mousemove[] = $this->indent(1, true).'if(!this.'.$this->myid().'_moving) return;';
-        $mousemove[] = $this->indent(1, true).'const { x, width } = document.querySelector("[data-uiid='.$this->myid().']").getBoundingClientRect(), clientX = event.clientX;';
-        $mousemove[] = $this->indent(1, true).'const value = Math.ceil(Math.max(clientX - x, 0) / width * 100);';
-        $mousemove[] = $this->indent(1, true).'this.'.$this->myid().'_value = value > '.$max.' ? '.$max.' : (value < '.$min.' ? '.$min.' : value);';
-        $mousemove[] = '},';
-        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $mousemove);
-
-        $mouseup[] = $this->myid().'_mouseup(event){';
-        $mouseup[] = $this->indent(1, true).'this.'.$this->myid().'_moving = false;';
-        $mouseup[] = $this->indent(1, true).'document.removeEventListener("mousemove", (event) => this.'.$this->myid().'_mousemove.call(this, event));';
-        $mouseup[] = $this->indent(1, true).'document.removeEventListener("mouseup", (event) => this.'.$this->myid().'_mouseup.call(this, event));';
-        $mouseup[] =  '},';
-        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $mouseup);
-        return $fragment;
+        $styles = parent::style_map();
+        $_ = [];
+        if ($styles['height']) $_[] = $styles['height'];
+        return join(';', $_);
     }
 
     // 滑块
@@ -126,13 +141,14 @@ class Rangeinput_View extends Preview_View {
         $meta = $this->data['meta'];
         if ($meta['style']['color']){
             $style[] = 'background-color:'.($meta['style']['color']).';important;';
+            $style[] = 'color:#efefef;important;';
         }
         return join(';', $style);
     }
     private function handle_class(){
         $class = ['van-slider__button van-text-center van-user-select-none'];
         $meta = $this->data['meta'];
-        if ($meta['css']['foregroundTheme'] && $meta['css']['foregroundTheme'] != 'default'){
+        if (!$meta['style']['color'] && $meta['css']['foregroundTheme'] && $meta['css']['foregroundTheme'] != 'default'){
             $class[] = $this->cssTranslate['backgroundTheme'][$meta['css']['foregroundTheme']];
             $class[] = $this->cssTranslate['foregroundTheme']['light'];
         }
@@ -146,7 +162,7 @@ class Rangeinput_View extends Preview_View {
     private function bg_class(){
         $class = ['van-slider__bar'];
         $meta = $this->data['meta'];
-        if ($meta['css']['backgroundTheme'] && $meta['css']['backgroundTheme'] != 'default'){
+        if (!$meta['style']['background-color'] && $meta['css']['backgroundTheme'] && $meta['css']['backgroundTheme'] != 'default'){
             $class[] = $this->cssTranslate['backgroundTheme'][$meta['css']['backgroundTheme']];
         }
         return join(' ', $class);

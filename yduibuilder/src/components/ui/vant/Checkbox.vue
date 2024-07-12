@@ -5,7 +5,7 @@
     <div class="van-checkbox-group van-checkbox-group--horizontal" v-for="(item, index) in values" :key="index">
       <div class="van-checkbox van-checkbox--horizontal">
         <div :class="{'van-checkbox__icon van-checkbox__icon--square': true, 'van-radio__icon--checked':item.checked}">
-          <i class="van-badge__wrapper van-icon van-icon-success" :style="item.checked ? disabledStyle : ''"></i>
+          <i :class="['van-badge__wrapper van-icon van-icon-success', item.checked ? checkedTheme : uncheckedTheme]" :style="item.checked ? checkedStyle : uncheckedStyle"></i>
         </div>
         <span class="van-radio__label">{{item.name}}</span>
       </div>
@@ -30,9 +30,46 @@ export default {
   },
   setup (props: any, context: any) {
     const checkbox = new Checkbox(props, context, useStore())
-    const disabledStyle = computed(() => {
+
+    const store = useStore()
+    const checkedStyle = computed(() => {
       if (props.uiconfig.meta?.form?.state === 'readonly' || props.uiconfig.meta?.form?.state === 'disabled') {
         return 'border-color:var(--van-gray-6);background-color:var(--van-gray-6)'
+      }
+      const uistyle = checkbox.getUIStyle()
+      if (uistyle.color) {
+        return `border-color:${uistyle.color};background-color:${uistyle.color}`
+      }
+      return ''
+    })
+    const uncheckedStyle = computed(() => {
+      const uistyle = checkbox.getUIStyle()
+      if (props.uiconfig.meta?.form?.state === 'readonly' || props.uiconfig.meta?.form?.state === 'disabled') {
+        return 'border-color:var(--van-gray-6);'
+      }
+      if (uistyle.color) {
+        return `border-color:${uistyle.color};`
+      }
+      return ''
+    })
+    const checkedTheme = computed(() => {
+      const style = checkbox.getUIStyle()
+      const css = checkbox.getUICss()
+      if (!style.color && css.foregroundTheme) {
+        const css: any = []
+        css.push(store.getters.translate('backgroundTheme', props.uiconfig.meta?.css?.foregroundTheme))
+        css.push(store.getters.translate('borderColorClass', props.uiconfig.meta?.css?.foregroundTheme))
+        return css.join(' ')
+      }
+      return ''
+    })
+    const uncheckedTheme = computed(() => {
+      const style = checkbox.getUIStyle()
+      const css = checkbox.getUICss()
+      if (!style.color && css.foregroundTheme) {
+        const css: any = []
+        css.push(store.getters.translate('borderColorClass', props.uiconfig.meta?.css?.foregroundTheme))
+        return css.join(' ')
       }
       return ''
     })
@@ -46,7 +83,10 @@ export default {
     return {
       ...checkbox.setup(),
       bodyCss,
-      disabledStyle
+      checkedTheme,
+      uncheckedTheme,
+      uncheckedStyle,
+      checkedStyle
     }
   }
 }

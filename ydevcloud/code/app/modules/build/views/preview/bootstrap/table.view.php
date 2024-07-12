@@ -351,7 +351,7 @@ class Table_View extends ValueList_View {
         }
     }
 
-    protected function build_valuelist($outputData, $itemName, $staticData = null)
+    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null)
     {
         // build_valuelist_static 和 build_valuelist_iterator中实现
     }

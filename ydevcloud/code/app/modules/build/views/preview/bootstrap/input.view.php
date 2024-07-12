@@ -41,16 +41,12 @@ class Input_View extends Preview_View implements Valuable_View {
         $this->wrap_icon(function() use($iteratorDataName, $isArr, $outputDataName, $inputDataName){
             echo '<input'.$this->wrap_output('type', @$this->data['meta']['custom']['inputType'] ?: 'text');
             echo ' class="w-100 border-0 bg-transparent input" ';// input 用于前端jas处理时找input元素
-            if (@$this->data['meta']['custom']['autocomplete']){
-                echo " autocomplete='".$this->data['meta']['custom']['autocomplete']."'";
-            }
+            echo $this->wrap_output("autocomplete", $this->data['meta']['custom']['autocomplete']?:NULL);
+            echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength']?:NULL);
             echo $this->build_form_attrs();
 
             if ($this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
                 echo $this->wrap_output('@keyup', $this->myid().'_keyup');
-            }
-            if (@$this->data['meta']['custom']['maxLength']){
-                echo ' maxlength='.$this->data['meta']['custom']['maxLength'];
             }
             if (!$outputDataName['VALUE']){
                 echo $this->wrap_output(':value', $inputDataName);
@@ -108,10 +104,7 @@ class Input_View extends Preview_View implements Valuable_View {
                 $codeFragment->add_code(Html_Code_Fragment::SECTION_INIT, "this.{$myId}_clearButtonVisible = this.{$inputDataName}.length > 0;");
             }
         }
-        $indexSuffix = '';
-        if ($hasIterate && $inputIsArr) {
-            $indexSuffix = '[-1]';
-        }
+
         // keyup事件
         if ($wordCountVisible || $clearButtonVisible){
             $codeLines[] = "{$myId}_keyup (event) {";
