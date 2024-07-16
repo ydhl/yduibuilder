@@ -1,9 +1,9 @@
 <template>
   <div :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
        :data-pageid="pageid"
-       :class="[dragableCss, uiCss,{'overflow-hidden w-100 weui-cells_radio':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
+       :class="[dragableCss, uiCss,{'overflow-hidden w-100 weui-cells weui-cells_radio':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
     <template v-for="(item, index) in values" :key="index" >
-      <div class="weui-cell weui-cell_active weui-check__label" :for="uiconfig.meta.id+item.value">
+      <div class="weui-cell weui-cell_active weui-check__label" style="color: inherit !important;"  :for="uiconfig.meta.id+item.value">
         <div class="weui-cell__bd">
           <p>{{item.name}}</p>
         </div>

@@ -13,16 +13,14 @@
         <label class=" form-check-label text-truncate d-block"><input type="checkbox" v-model="isSplitBtn" value="1"> {{ t('style.dropdown.splitBtn') }}</label>
       </div>
     </div>
-    <div class="row">
+    <div class="row" v-if="!isMobile">
       <label for="dropdown-title" class="col-sm-3 col-form-label text-end">{{ t('style.dropdown.direction') }}</label>
       <div class="col-sm-9">
         <select class="form-select form-select-sm" v-model="direction">
           <option value="dropup">{{ t('style.dropdown.directionUp') }}</option>
           <option value="dropdown">{{ t('style.dropdown.directionDown') }}</option>
-          <template v-if="!isMobile">
-            <option value="dropleft">{{ t('style.dropdown.directionLeft') }}</option>
-            <option value="dropright">{{ t('style.dropdown.directionRight') }}</option>
-          </template>
+          <option value="dropleft">{{ t('style.dropdown.directionLeft') }}</option>
+          <option value="dropright">{{ t('style.dropdown.directionRight') }}</option>
         </select>
       </div>
     </div>

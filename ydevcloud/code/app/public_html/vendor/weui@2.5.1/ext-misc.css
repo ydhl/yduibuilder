@@ -16,10 +16,12 @@
 .align-items-start{ align-items: flex-start  !important;}
 .align-items-end{ align-items: flex-end !important; }
 .align-items-center{ align-items: center !important; }
+.justify-content-end{justify-content: flex-end !important;}
 
 .d-none{display: none !important;}
 .d-block{display: block !important;}
 .d-overflow-hidden{overflow: hidden !important;}
+.w-100{width: 100%;}
 
 .pointer-events-none{
     pointer-events: none !important;

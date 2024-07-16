@@ -12,7 +12,7 @@ use function yangzie\__;
 class Select_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper;
 
-    protected function build_valuelist($bindOutput=null, $itemName=null, $staticData=null, $staticDataIndex=null){
+    protected function build_valuelist($bindOutput=null, $itemName=null, $staticData=null, $staticDataIndex=null, $iteratorName=''){
         list('name'=>$name, 'value'=>$value, 'checked'=>$checked) = $this->get_bind_name_value($bindOutput, $itemName);
         $inputDataName = $this->get_input_data_name($inputIsArr);
         $staticValue = $staticData['value'] ?: $staticData['name'];

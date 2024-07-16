@@ -24,7 +24,7 @@ class Breadcrumb_View extends ValueList_View {
         echo "</ol>".PHP_EOL;
     }
 
-    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null)
+    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null, $iteratorName='')
     {
         if ($outputData){
             list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);

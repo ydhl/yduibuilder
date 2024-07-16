@@ -11,7 +11,7 @@ use app\modules\build\views\preview\ValueList_View;
 class Nav_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper;
 
-    protected function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null){
+    protected function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null, $iteratorName=''){
         list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
         $myid = $this->myid();
         $staticValue = $staticData ? $staticData['value']?:$staticData['name'] : null;

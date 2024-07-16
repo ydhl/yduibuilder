@@ -45,9 +45,9 @@ export default {
       return progress.appendImportant(style)
     })
     const bgCss = computed(() => {
-      const css = []
+      const css: any = []
       if (props.uiconfig.meta?.css?.backgroundTheme) {
-        store.getters.translate('backgroundTheme', props.uiconfig.meta?.css?.backgroundTheme)
+        css.push(store.getters.translate('backgroundTheme', props.uiconfig.meta?.css?.backgroundTheme))
       }
       return css.join(' ')
     })

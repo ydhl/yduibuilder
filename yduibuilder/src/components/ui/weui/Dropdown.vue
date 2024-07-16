@@ -1,11 +1,10 @@
 <template>
-  <div :class="['weui-cell weui-cell_active weui-cell_access',dragableCss,uiCss]"
+  <div :class="['weui-dropdown',dragableCss,uiCss]"
        :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
        :data-pageid="pageid" @dblclick="inlineEditItemId=uiconfig.meta.id" @keyup.enter="inlineEditItemId=''">
-    <div class="weui-cell__bd">
-      <p>{{uiconfig.meta.title || 'Dropdown'}}</p>
-    </div>
-    <div class="weui-cell__ft"></div>
+    <span class="weui-dropdown-title">
+      <div>{{uiconfig.meta.title || 'Dropdown'}}</div>
+    </span>
   </div>
 </template>
 

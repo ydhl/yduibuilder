@@ -26,6 +26,7 @@ export default {
   setup (props: any, context: any) {
     const hr = new Hr(props, context, useStore())
     const setup = hr.setup()
+    const store = useStore()
     const uiStyle = computed(() => {
       const myStyle = hr.getUIStyle()
       delete myStyle?.height
@@ -48,29 +49,31 @@ export default {
     const lineStyle = computed(() => {
       const myStyle = hr.getUIStyle()
       const newStyle: any = {}
-      if (!myStyle?.height) {
-        newStyle.height = '1px'
-      } else {
-        newStyle.height = myStyle?.height
+      let height = myStyle?.height || '1px'
+      const style = props.uiconfig.meta?.custom?.style || 'solid'
+      if (style === 'double' && parseInt(height) < 3) {
+        height = '3px'
       }
+      newStyle['border-top-width'] = height
+      newStyle['border-top-style'] = style
 
       if (!myStyle?.['background-color'] && !props.uiconfig.meta?.css?.backgroundTheme) {
-        newStyle['background-color'] = 'rgba(0,0,0,.1)'
+        newStyle['border-top-color'] = 'rgba(0,0,0,.1)'
       } else if (myStyle?.['background-color']) {
-        newStyle['background-color'] = myStyle?.['background-color']
+        newStyle['border-top-color'] = myStyle?.['background-color']
       }
       return hr.appendImportant(newStyle)
     })
     const lineCss = computed(() => {
       const css = hr.getUICss()
-      return css?.backgroundTheme
+      if (!props.uiconfig.meta?.style?.['background-color'] && css?.backgroundTheme) {
+        return store.getters.translate('borderColorClass', props.uiconfig.meta?.css?.backgroundTheme)
+      }
+      return ''
     })
     const textStyle = computed(() => {
       const myStyle = hr.getUIStyle()
       const newStyle: any = {}
-      if (myStyle?.height) {
-        newStyle['line-height'] = myStyle.height
-      }
 
       if (myStyle?.color) {
         newStyle.color = myStyle?.color
@@ -79,7 +82,7 @@ export default {
     })
     const textCss = computed(() => {
       const css = hr.getUICss()
-      return css?.foregroundTheme
+      return props.uiconfig.meta?.style?.color ? '' : css?.foregroundTheme
     })
     return {
       ...setup,

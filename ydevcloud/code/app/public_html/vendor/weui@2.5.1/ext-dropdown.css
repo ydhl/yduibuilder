@@ -1,0 +1,73 @@
+.weui-dropdown{
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    justify-content: center;
+    color: var(--weui-FG-0);
+}
+.weui-dropdown-body{
+    position: fixed;
+    right: 0;
+    left: 0;
+    z-index: 10;
+    overflow: hidden;
+}
+.weui-dropdown-overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2005;
+    width: 100%;
+    height: 100%;
+    animation-duration: 0.2s;
+    background: var(--weui-BG-4);
+    opacity: 0.7;
+}
+.weui-dropdown-menu{
+    position: absolute;
+    overflow-y: auto;
+    background: var(--weui-BG-3);
+    -webkit-overflow-scrolling: touch;
+    max-height: 80%;
+    z-index: 2006;
+}
+
+.weui-dropdown-title{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.weui-dropdown-title:after{
+    position: relative;
+    top: 50%;
+    right: -4px;
+    margin-top: -5px;
+    border: 3px solid;
+    border-color: transparent transparent var(--weui-BG-4) var(--weui-BG-4);
+    transform: rotate(-45deg);
+    opacity: .8;
+    content: "";
+}
+.weui-dropdown-title--active:after{
+    margin-top: 1px;
+    transform: rotate(135deg) !important;
+}
+.weui-dropdown-menu--top{
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+.weui-dropdown-menu--bottom{
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+.weui-dropdown-checked{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-image: url(data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M8.657%2018.435L3%2012.778l1.414-1.414%204.95%204.95L20.678%205l1.414%201.414-12.02%2012.021a1%201%200%2001-1.415%200z%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E);
+}

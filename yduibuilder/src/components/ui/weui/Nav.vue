@@ -35,6 +35,7 @@ export default {
     const uiStyle = computed(() => {
       const style = nav.getUIStyle()
       delete style.color
+      style['z-index'] = '0'
       return nav.appendImportant(style)
     })
 

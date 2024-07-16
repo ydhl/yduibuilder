@@ -69,6 +69,12 @@ class Card_View extends Preview_View {
     {
         $map = parent::css_map();
         $map['-'] = 'card';
+        if($this->data['meta']['style']['color']){
+           unset($map['foregroundTheme']);
+        }
+        if($this->data['meta']['style']['background-color']){
+           unset($map['backgroundTheme']);
+        }
         return $map;
     }
 

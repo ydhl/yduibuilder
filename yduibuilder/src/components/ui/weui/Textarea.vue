@@ -1,13 +1,18 @@
 <template>
   <div :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
        :data-pageid="pageid"
-       :class="[dragableCss, bodyCss, uiCss,{'overflow-hidden':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
-    <textarea class="weui-textarea" :style="uiconfig.meta.custom?.autoRow ? 'resize: none' : ''" :id="uiconfig.meta.id+uiconfig.type" :name="uiconfig.meta?.form?.inputName"
-              :disabled="uiconfig.meta?.form?.state==='disabled'"
-              :placeholder="uiconfig.meta?.form?.placeholder" :rows="uiconfig.meta.custom?.row" v-model="defaultValue"></textarea>
-    <div class="weui-textarea-counter" v-if="uiconfig.meta?.custom?.wordCountVisible">0{{uiconfig.meta?.custom?.maxLength ? '/' + uiconfig.meta?.custom?.maxLength : ''}}</div>
-    <div v-if="uiconfig.meta?.custom?.clearButtonVisible">
-      <i class="weui-icon-clear"></i>
+       :class="[dragableCss, bodyCss, uiCss,{'overflow-hidden weui-cell flex-column':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
+    <div class="weui-cell__hd w-100"><label class="weui-label">{{ uiconfig.meta.title }}</label></div>
+    <div class="weui-cell__bd w-100">
+      <textarea class="weui-textarea" :style="uiconfig.meta.custom?.autoRow ? 'resize: none' : ''" :id="uiconfig.meta.id+uiconfig.type" :name="uiconfig.meta?.form?.inputName"
+                :disabled="uiconfig.meta?.form?.state==='disabled'" readonly
+                :placeholder="uiconfig.meta?.form?.placeholder" :rows="uiconfig.meta.custom?.row" v-model="defaultValue"></textarea>
+      <div class="weui-flex align-items-center justify-content-end">
+        <div class="weui-textarea-counter" v-if="uiconfig.meta?.custom?.wordCountVisible">0{{uiconfig.meta?.custom?.maxLength ? '/' + uiconfig.meta?.custom?.maxLength : ''}}</div>
+        <button type="button" class="weui-btn_reset weui-btn_icon ml-2" v-if="uiconfig.meta?.custom?.clearButtonVisible">
+          <i class="weui-icon-clear"></i>
+        </button>
+      </div>
     </div>
   </div>
 </template>

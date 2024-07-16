@@ -53,7 +53,7 @@ class Select_View extends ValueList_View {
         echo $space.'</div>'.PHP_EOL;
     }
 
-    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null)
+    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null, $iteratorName='')
     {
         $myid = $this->myid();
         list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);

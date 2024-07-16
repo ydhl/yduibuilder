@@ -20,7 +20,6 @@ class Textarea_View extends Input_View {
         $space =  $this->indent();
         $inputDataName = $this->get_input_data_name($isArr);
         $outputDatas = $this->get_output_datas($outputDataName);
-        $hasIterate = $this->need_iterate_data($iterateOutputAs, $dataName, $iterateDataName);
         $wordCountVisible = $this->data['meta']['custom']['wordCountVisible'];
         $clearButtonVisible = $this->data['meta']['custom']['clearButtonVisible'];
         $indexSuffix = '';

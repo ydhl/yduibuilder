@@ -22,6 +22,6 @@ class Richtext_View extends Preview_View {
         echo ">".PHP_EOL;
         echo $this->indent(1);
         echo @$this->data['meta']['value'] ?: @$this->data['meta']['title'];
-        echo "\r\n{$space}</div>".PHP_EOL;
+        echo PHP_EOL."{$space}</div>".PHP_EOL;
     }
 }

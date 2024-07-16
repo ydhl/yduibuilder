@@ -96,4 +96,5 @@
 }
 .weui-btn_group>.weui-btn_group:not(:first-child),.weui-btn_group>.weui-btn:not(:first-child){margin-left:-1px}
 .weui-btn_group>.weui-btn_group:not(:first-child)>.weui-btn,.weui-btn_group>.weui-btn:not(:first-child){border-top-left-radius:0;border-bottom-left-radius:0}
+.weui-btn+.weui-btn{margin-top: 0px;}
 

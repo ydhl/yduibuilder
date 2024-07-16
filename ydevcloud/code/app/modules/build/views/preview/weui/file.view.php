@@ -5,11 +5,10 @@ use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\bootstrap\Bootstrap_Popup;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
+use app\modules\build\views\preview\Valuable_View;
 
-class File_View extends Preview_View {
-    use Bootstrap_Popup,Html_Code_Helper,Alpine {
-        Alpine::build_code as alpineBuildCode;
-    }
+class File_View extends Preview_View implements Valuable_View{
+    use Bootstrap_Popup,Html_Code_Helper;
     protected function css_map() {
         $css = parent::css_map();
         $css[] = 'd-flex align-items-center overflow-hidden';

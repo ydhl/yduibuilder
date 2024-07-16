@@ -13,7 +13,7 @@ use function yangzie\__;
 class List_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper;
 
-    protected function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null)
+    protected function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null, $iteratorName='')
     {
         $myid = $this->myid();
         list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
@@ -77,10 +77,10 @@ class List_View extends ValueList_View {
 
     private function item_theme($valueName, $staticValue='') {
         $inputDataName = $this->get_input_data_name($isArr);
-        $styleMap = parent::style_map();
+        $styleMap = Preview_View::style_map();
+        $cssMap = Preview_View::css_map();
         $inputDataNameString = $isArr ? "alpinejs_get_value(\$el, '{$inputDataName}')" : $inputDataName;
         $backgroundTheme = $this->data['meta']['css']['backgroundTheme'];
-        $cssMap = parent::css_map();
         $value = $valueName?:"'{$staticValue}'";
 
         $css = ["'list-group-item list-group-item-action': true"];
@@ -89,7 +89,7 @@ class List_View extends ValueList_View {
             $css[] = "'{$this->cssTranslate['backgroundTheme'][$backgroundTheme]} {$this->cssTranslate['borderColorClass'][$backgroundTheme]}':{$inputDataNameString}=={$value}";
             $css[] = "'list-group-item-{$backgroundTheme}': true";
         }
-        if (@$cssMap['foregroundTheme']) {
+        if (!$styleMap['color'] && @$cssMap['foregroundTheme']) {
             $css[] = "'{$cssMap['foregroundTheme']}': true";
         }
         return "{".join(', ', $css)."}";

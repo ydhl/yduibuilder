@@ -34,23 +34,21 @@ export default {
     // 如果上层是按钮，那么继承他的outline，size属性
     const buttonMeta = computed(() => myButtonSetup.parentIsNavbar.value ? myButtonSetup.parentUi.value.meta : props.uiconfig.meta)
 
-    const selfHasForeground = computed(() => props.uiconfig.meta?.css?.foregroundTheme && props.uiconfig.meta?.css?.foregroundTheme !== 'default')
-    const selfHasBackground = computed(() => props.uiconfig.meta?.css?.backgroundTheme && props.uiconfig.meta?.css?.backgroundTheme !== 'default')
-
     const btnStyle = computed(() => {
       const myStyle = button.getUIStyle()
       // 如果按钮有背景和前景则用按钮的，否则用上层的
       const color = myStyle?.color || buttonMeta.value?.style?.color
       const backgroundColor = myStyle?.['background-color'] || buttonMeta.value?.style?.['background-color']
-      if (!selfHasForeground.value && color) {
+      if (color) {
         myStyle.color = color
       }
-      if (!selfHasBackground.value && backgroundColor) {
+      if (backgroundColor) {
         myStyle['background-color'] = backgroundColor
         myStyle['border-color'] = backgroundColor
       }
       if (buttonMeta.value.custom?.isOutline) {
         delete myStyle['background-color']
+        delete myStyle['background-image']
       }
       return button.appendImportant(myStyle)
     })

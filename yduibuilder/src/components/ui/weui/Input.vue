@@ -1,18 +1,22 @@
 <template>
-  <div :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
+  <label :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
        :data-pageid="pageid"
-       :class="[dragableCss, bodyCss, uiCss,{'overflow-hidden':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
-    <IconWrapper :uiconfig="uiconfig">
-      <input :type="uiconfig.meta?.custom?.inputType || 'Text'" :id="uiconfig.meta.id+uiconfig.type" class="weui-input"
-           :name="uiconfig.meta?.form?.inputName" :placeholder="uiconfig.meta?.form?.placeholder"
-           :disabled="uiconfig.meta?.form?.state==='disabled'"
-           :value="uiconfig.meta.value">
-    </IconWrapper>
-    <div v-if="uiconfig.meta?.custom?.wordCountVisible" class="ml-3">0{{uiconfig.meta?.custom?.maxLength ? '/' + uiconfig.meta?.custom?.maxLength : ''}}</div>
-    <div v-if="uiconfig.meta?.custom?.clearButtonVisible">
-      <i class="weui-icon-clear"></i>
+       :for="uiconfig.meta.id+uiconfig.type"
+       :class="[dragableCss, bodyCss, uiCss,{'overflow-hidden weui-cell':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
+    <div class="weui-cell__hd"><span class="weui-label">{{uiconfig.meta.title}}</span></div>
+    <div class="weui-cell__bd weui-flex align-items-center">
+      <IconWrapper :uiconfig="uiconfig">
+        <input :type="uiconfig.meta?.custom?.inputType || 'Text'" :id="uiconfig.meta.id+uiconfig.type" class="weui-input"
+             :name="uiconfig.meta?.form?.inputName" :placeholder="uiconfig.meta?.form?.placeholder"
+             :disabled="uiconfig.meta?.form?.state==='disabled'" readonly
+             :value="uiconfig.meta.value">
+      </IconWrapper>
+      <div v-if="uiconfig.meta?.custom?.wordCountVisible" class="ml-3">0{{uiconfig.meta?.custom?.maxLength ? '/' + uiconfig.meta?.custom?.maxLength : ''}}</div>
+      <button type="button" class="weui-btn_reset weui-btn_icon ml-2" v-if="uiconfig.meta?.custom?.clearButtonVisible">
+        <i class="weui-icon-clear"></i>
+      </button>
     </div>
-  </div>
+  </label>
 </template>
 
 <script lang="ts">

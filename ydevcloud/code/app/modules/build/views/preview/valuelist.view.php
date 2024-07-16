@@ -36,7 +36,8 @@ abstract class ValueList_View extends Preview_View implements Valuable_View{
     }
 
     protected function default_value() {
-        $isArr = $this->data['type'] == 'checkbox' || ($this->data['type']=='select' && $this->data['meta']['custom']['multiple']);
+        $uiType = strtolower($this->data['type']);
+        $isArr = $uiType == 'checkbox' || ($uiType=='select' && $this->data['meta']['custom']['multiple']);
         if (@!$this->data['meta']['values']){
             return $isArr ? ['item 1'] : 'item 1';
         }
@@ -57,7 +58,7 @@ abstract class ValueList_View extends Preview_View implements Valuable_View{
      * @param $staticDataIndex int 静态数据索引
      * @return mixed
      */
-    protected abstract function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null);
+    protected abstract function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null, $iteratorName='');
     protected function build_valuelist_static(){
         $this->build_ui_begin();
         $values = $this->data['meta']['values'] ?: $this->demo_values();

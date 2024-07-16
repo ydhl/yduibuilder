@@ -40,7 +40,7 @@ class Radio_View extends ValueList_View {
         $space =  $this->indent();
         echo "{$space}</div>".PHP_EOL;
     }
-    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null)
+    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null, $iteratorName='')
     {
         list('name'=>$name, 'value'=>$value, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
         $staticValue = $staticData['value']?:$staticData['name'];

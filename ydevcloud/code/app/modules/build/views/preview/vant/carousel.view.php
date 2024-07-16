@@ -116,7 +116,7 @@ class Carousel_View extends ValueList_View {
         $this->build_prev_next();
         echo $this->indent()."</div>".PHP_EOL;
     }
-    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null)
+    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null, $iteratorName='')
     {
         // 在build_value_static和build_valuelist_iterator中处理
     }

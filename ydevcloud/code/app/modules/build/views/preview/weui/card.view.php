@@ -4,12 +4,28 @@ namespace app\modules\build\views\preview\weui;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 
+/**
+ * <pre>
+ *  <div class="weui-panel weui-panel_access">
+ *      <div class="weui-panel__hd">图文组合列表</div>
+ *      <div class="weui-panel__bd"></div>
+ *      <div class="weui-panel__ft"></div>
+ *  </div>
+ * </pre>
+ */
 class Card_View extends Preview_View {
     use Weui_Popup,Html_Code_Helper;
     protected function css_map()
     {
         $map = parent::css_map();
         $map['-'] = 'weui-panel weui-panel_access';
+
+        if($this->data['meta']['style']['color']){
+            unset($map['foregroundTheme']);
+        }
+        if($this->data['meta']['style']['background-color']){
+            unset($map['backgroundTheme']);
+        }
         return $map;
     }
 
@@ -34,7 +50,7 @@ class Card_View extends Preview_View {
         if (!@$this->data['meta']['custom']['headless']){
             echo $this->indent(1) . "<div class='weui-panel__hd'>".PHP_EOL;
             foreach ($myItems['head'] as $view){
-                $view->increase_indent(2);
+                $view->increase_indent(1);
                 $view->output();
             }
             echo $this->indent(1) . "</div>".PHP_EOL;
@@ -44,7 +60,7 @@ class Card_View extends Preview_View {
             echo $this->indent(1) . "<div class='weui-panel__bd'>".PHP_EOL;
 
             foreach ($myItems['inBody'] as $view){
-                $view->increase_indent(2);
+                $view->increase_indent(1);
                 $view->output();
             }
             echo $this->indent(1) . "</div>".PHP_EOL;
@@ -59,7 +75,7 @@ class Card_View extends Preview_View {
         if (!@$this->data['meta']['custom']['footless']){
             echo $this->indent(1) . "<div class='weui-panel__ft'>".PHP_EOL;
             foreach ($myItems['foot'] as $view){
-                $view->increase_indent(2);
+                $view->increase_indent(1);
                 $view->output();
             }
             echo $this->indent(1) . "</div>".PHP_EOL;
@@ -67,4 +83,5 @@ class Card_View extends Preview_View {
 
         echo "{$space}</div>".PHP_EOL;
     }
+
 }
