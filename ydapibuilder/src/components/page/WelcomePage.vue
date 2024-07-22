@@ -13,7 +13,9 @@ import { useStore } from 'vuex'
 export default {
   name: 'WelcomePage',
   setup (props: any, context: any) {
+    const router = useRouter()
     const store = useStore()
+    const project = computed(() => store.state.design.project)
     const addTab = (page) => {
       store.commit('putTab', { page: page, name: 'common.loading' })
     }

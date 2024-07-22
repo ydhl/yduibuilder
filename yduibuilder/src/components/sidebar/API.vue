@@ -99,7 +99,6 @@ export default {
       const rst = JSON.parse(JSON.stringify(api.output[currOutputIndex.value[apiIndex]].body))
       if (rst) {
         rst.name = 'rst'
-        rst.title = api.name
       }
       return rst || {}
     }

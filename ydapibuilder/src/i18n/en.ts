@@ -49,6 +49,7 @@ export default {
       title: 'Title',
       type: 'Type'
     },
+    editFolder: 'Edit Folder',
     folder: 'Folder',
     folderName: 'Name',
     folderParent: 'Parent Folder',

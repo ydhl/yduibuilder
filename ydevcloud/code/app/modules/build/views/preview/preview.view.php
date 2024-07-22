@@ -631,6 +631,14 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     protected abstract function build_redirect_code(Action_Model $action, &$actionCodeLines);
 
     /**
+     * 构建定时器事件代码
+     * @param Action_Model $action
+     * @param $actionCodeLines
+     * @return mixed
+     */
+    protected abstract function build_interval_code(Action_Model $action, &$actionCodeLines);
+
+    /**
      * 构建触发内部事件的代码
      * @param Action_Model $action
      * @param $actionCodeLines
@@ -731,7 +739,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             if ($argNames) $actionCodeLines[] = "const { ".join(', ', $argNames)." } = event.detail";
             return;
         }
-        if (!$this->is_custom_ui() && $html_event_name=='onchange'){
+        if (!$this->is_custom_ui() && $html_event_name=='change'){
             $eventCodes[$html_event_name]['args'] = ['value', 'oldValue'];
             return;
         }
@@ -789,6 +797,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                     case 'emit': $this->build_emit_code($action, $actionCodeLines);break;
                     case 'mutation': $this->build_mutation_code($action, $actionCodeLines);break;
                     case 'closepopup': $this->build_closepopup_code($action, $actionCodeLines);break;
+                    case 'interval': $this->build_interval_code($action, $actionCodeLines);break;
                     default: $actionCodeLines = [];
                 }
             }

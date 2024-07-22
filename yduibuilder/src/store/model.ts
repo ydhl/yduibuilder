@@ -6,7 +6,7 @@ export declare type UIKind = 'pc' | 'mobile'
  * 对于非表单和迭代类元素，用来知道数据绑定为元素的value还是bound，便于在事件内知道ui上的数据信息
  */
 export declare type BoundAsType = 'value' | 'bound'
-export declare type DataType = 'string' | 'integer' | 'number' | 'array' | 'map' | 'boolean' | 'object' | 'any' // 数据结构那类型
+export declare type DataType = 'string' | 'integer' | 'number' | 'array' | 'map' | 'boolean' | 'object' | 'any' | 'blob' // 数据结构那类型
 export declare type UIType = 'Breadcrumb' | 'Button'
   | 'Card' | 'Carousel' | 'Checkbox' | 'Collapse' | 'Container'
   | 'Dropdown'
@@ -335,6 +335,7 @@ export interface Expression{
     literal?: string,
     type?: string
   }
+  literal?: string,
   rightData?:{
     fromUuid?: string,
     id?: string,
@@ -345,14 +346,23 @@ export interface Expression{
     literal?: string,
     type?: string
   }
+  rightExpression?: Expression,
   /**
    * 操作符
    */
   operator?: string,
-  literal?: string,
+  /**
+   * 分组表达式中分组表达式的修饰符
+   */
+  modifier?: string,
+  /**
+   * 分组的下级表达式
+   */
   subexpression?: Array<Expression>,
+  /**
+   * 三元操作符的判断条件表达式或者左值表达式
+   */
   expression?: Expression,
-  rightExpression?: Expression,
   trueExpression?: Expression,
   falseExpression?: Expression
 }

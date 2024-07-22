@@ -3,16 +3,18 @@
     <div class="row align-items-center">
       <label class="col-sm-3 p-1 col-form-label text-start text-truncate">{{ t('action.redirectType') }}</label>
       <div class="col-sm-9 p-1">
-        <AdvanceSelect :options="redirectTypes" :default-text="myAction.redirect_type" @click="(option)=>chnageRedirectType(option.value)"></AdvanceSelect>
+        <template v-if="readonly">{{myAction.redirect_type}}</template>
+        <AdvanceSelect v-else :options="redirectTypes" :default-text="myAction.redirect_type" @change="(option)=>chnageRedirectType(option.value)"></AdvanceSelect>
       </div>
     </div>
     <template v-if="myAction.redirect_type=='outside'">
       <div class="row">
         <label class="col-sm-12 p-1 col-form-label text-start text-truncate">{{ t('action.redirectUrl') }}</label>
         <div class="col-sm-12 p-1">
-          <textarea v-model="myAction.redirect" placeholder="/foo/bar/{data}" class="form-control form-control-sm"></textarea>
+          <template v-if="readonly">{{myAction.redirect}}</template>
+          <textarea v-else v-model="myAction.redirect" placeholder="/foo/bar/{data}" class="form-control form-control-sm"></textarea>
           <DataConnect v-for="(item, index) in tplDatas" @updateConnectData="updateConnectData"
-                       connect="to"
+                       connect="to" :readonly="readonly"
                        :bound-data="myAction.input" :variables="variables" path="" :root-uuid="item.uuid"
                        :key="index" :intent="0" :model="item" :index="0">
           </DataConnect>
@@ -23,13 +25,14 @@
     <div class="row">
       <label class="col-sm-3 p-1 col-form-label text-start text-truncate">{{ t('action.redirectPage') }}</label>
       <div class="col-sm-9 p-1">
-        <button class="btn btn-light btn-xs" type="button" @click="pagePickDialogVisible=true">
+        <template v-if="readonly">{{myAction.popup_page_type=='page' && myAction.popupPageTitle ? myAction.popupPageTitle : t('action.notSet')}}</template>
+        <button v-else class="btn btn-light btn-xs" type="button" @click="pagePickDialogVisible=true">
           {{myAction.popup_page_type=='page' && myAction.popupPageTitle ? myAction.popupPageTitle : t('action.notSet')}}
         </button>
       </div>
       <div class="col-sm-12 p-0">
         <DataConnect v-for="(item, index) in pageDatas" @updateConnectData="updateConnectData"
-                     connect="to"
+                     connect="to" :readonly="readonly"
                      :bound-data="myAction.input" :variables="variables" path="" :root-uuid="item.uuid"
                      :key="index" :intent="0" :model="item" :index="0">
         </DataConnect>
@@ -45,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch, toRef } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import ydhl from '@/lib/ydhl'
@@ -60,6 +63,7 @@ export default {
   components: { AdvanceSelect, DataConnect, PagePicker },
   props: {
     modelValue: Object,
+    readonly: Boolean,
     variables: Array,
     autosave: {
       default: true,
@@ -75,7 +79,7 @@ export default {
     const pageDatas = ref<any>([])
     const tplDatas = ref<any>([])
     const project = computed(() => store.state.design.project)
-    const myAction = ref(props.modelValue)
+    const myAction = toRef(props, 'modelValue')
     const pickedPageInfo = ref<any>({ // 用于缓存pickPage中的数据
       popupPageId: myAction.value.popupPageId,
       popupPageTitle: myAction.value.popupPageTitle

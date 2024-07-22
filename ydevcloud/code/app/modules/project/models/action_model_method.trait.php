@@ -38,7 +38,7 @@ trait Action_Model_Method{
      */
     public function get_expression(){
         if (!$this->expressionModel){
-            $exp = json_decode(html_entity_decode($this->input), true);
+            $exp = json_decode(html_entity_decode($this->input), true) ?: [];
             if ($this->type=='popup' && $this->popup_type=='alert'){
                 if($exp['expression']) $this->expressionModel = new Expression($exp['expression']);
             }else{
@@ -69,7 +69,7 @@ trait Action_Model_Method{
     }
     public function get_action_data(){
         $action_records = $this->get_records();
-        unset($action_records['id'],$action_records['is_deleted'],$action_records['created_on'],$action_records['modified_on']);
+        unset($action_records['is_deleted'],$action_records['created_on'],$action_records['modified_on']);
         if ($this->get_popup_page()) {
             $action_records['popupPageTitle'] = $this->get_popup_page()->name;
         }
@@ -88,15 +88,44 @@ trait Action_Model_Method{
                 $mutationData[$mutation->mutation_data_id] = $mutation->get_muation_data();
             }
             $action_records['mutations'] = $mutationData?:new \stdClass();
-        }
-        $emit = $this->get_emit_event();
-        if ($emit){
-            $emitData = [
-                'event' => $emit->name,
-                'desc' =>$emit->desc,
-                'args' => json_decode(html_entity_decode($emit->args)),
+        }else if($this->type == 'emit'){
+            $emit = $this->get_emit_event();
+            if ($emit){
+                $emitData = [
+                    'event' => $emit->name,
+                    'desc' =>$emit->desc,
+                    'args' => json_decode(html_entity_decode($emit->args)),
+                ];
+                $action_records['emit'] = $emitData?:null;
+            }
+        }else if($this->type == 'interval'){
+            $action_ids = array_filter(explode(',', $action_records['interval_action']));
+            $complete_ids = array_filter(explode(',', $action_records['interval_complete']));
+            $ids = array_filter(array_merge($action_ids, $complete_ids));
+
+            $subActions = $ids ? Action_Model::from()->where('is_deleted = 0 and id in ('.join(',',$ids).')')->select() : [];
+            $action_records['interval'] = [
+                'duration' => $action_records['interval_duration'],
+                'delay' => $action_records['interval_delay']
             ];
-            $action_records['emit'] = $emitData?:null;
+            $action = [];
+            $complete = [];
+            foreach ($subActions as $subAction){
+                if (in_array($subAction->id, $action_ids)){
+                    $action[] = $subAction->get_action_data();
+                }
+                if (in_array($subAction->id, $complete_ids)){
+                    $complete[] = $subAction->get_action_data();
+                }
+            }
+            if ($action) {
+                $action_records['interval']['action'] = $action;
+            }
+            if ($complete) {
+                $action_records['interval']['complete'] = $complete;
+            }
+
+            unset($action_records['interval_duration'], $action_records['interval_delay'], $action_records['interval_action'], $action_records['interval_complete']);
         }
 
         return $action_records;

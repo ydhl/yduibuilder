@@ -49,6 +49,7 @@ export default {
       title: '标题',
       type: '类型'
     },
+    editFolder: '修改目录',
     folder: '目录',
     folderName: '目录名',
     folderParent: '上级目录',

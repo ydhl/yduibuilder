@@ -1,33 +1,33 @@
 <template>
   <div class="d-flex align-items-center justify-content-end mb-2">
-    <button class="btn btn-sm ps-1 pe-1 pt-0 pb-0 btn-primary" type="button" @click="addBindAction()">{{t('action.add')}}</button>
+    <button class="btn btn-sm ps-1 pe-1 pt-0 pb-0 btn-primary" type="button" @click="addBindApiAction()">{{t('action.add')}}</button>
   </div>
-  <div v-for="(bindAction,index) in bindActions" :key="index" class="p-1">
+  <div v-for="(bindApiAction,index) in bindApiActions" :key="index" class="p-1">
     <div class="d-flex align-items-center ps-1 pe-1 bg-light ">
       <div class="flex-grow-1 text-truncate">
-        <template v-if="bindAction.mode=='setting'">
-          <template v-if="bindAction.expression_desc">
-            <div class="text-truncate text-success mb-1">{{bindAction.expression_desc}}</div>
+        <template v-if="bindApiAction.mode=='setting'">
+          <template v-if="bindApiAction.expression_desc">
+            <div class="text-truncate text-success mb-1">{{bindApiAction.expression_desc}}</div>
           </template>
           <div v-else class="text-info mb-1">{{ t('action.notSet') }}</div>
         </template>
         <template v-else>
-          <div class="text-secondary mb-1 pointer" @click="showCode(bindAction)">{{ t('common.customCode') }}</div>
+          <div class="text-secondary mb-1 pointer" @click="showCode(bindApiAction)">{{ t('common.customCode') }}</div>
         </template>
       </div>
 
-      <i  @click="modifyBindAction(bindAction)" class="iconfont icon-edit pointer"></i>
-      <ConfirmRemove @remove="removeBindAction(bindAction)"></ConfirmRemove>
+      <i  @click="modifyBindApiAction(bindApiAction)" class="iconfont icon-edit pointer"></i>
+      <ConfirmRemove @remove="removeBindApiAction(bindApiAction)"></ConfirmRemove>
     </div>
-    <div v-if="!bindAction.actions || bindAction.actions.length==0" class="text-muted">{{t('action.noActionDefined')}}</div>
+    <div v-if="!bindApiAction.actions || bindApiAction.actions.length==0" class="text-muted">{{t('action.noActionDefined')}}</div>
     <div v-else class="list-group list-group-flush">
-      <draggable :list="bindAction.actions" handle=".icon-drag"  @change="(n) => sortEventAction(bindAction, n)">
+      <draggable :list="bindApiAction.actions" handle=".icon-drag"  @change="(n) => sortEventAction(bindApiAction, n)">
         <transition-group>
-          <div class="list-group-item border-0 list-group-item-action p-1 d-flex align-items-center" v-for="(action, idx) in bindAction.actions" :key="action.uuid">
+          <div class="list-group-item border-0 list-group-item-action p-1 d-flex align-items-center" v-for="(action, idx) in bindApiAction.actions" :key="action.uuid">
             <div class="me-1"><i class="iconfont icon-drag text-muted" style="cursor: move"></i></div>
-            <EventAction bind-type="bind_action" :bind-uuid="bindAction.uuid" :action="action"
-                         :variables="getLocalArgs(bindAction)" @beforeCreatePopupBind="(callback) => beforeCreatePopupBind(idx, callback)"></EventAction>
-            <ConfirmRemove @remove="postRemoveAction(bindAction, idx)"></ConfirmRemove>
+            <EventAction bind-type="bind_action" :bind-uuid="bindApiAction.uuid" :action="action"
+                         :variables="getLocalArgs(bindApiAction)" @beforeCreatePopupBind="(callback) => beforeCreatePopupBind(idx, callback)"></EventAction>
+            <ConfirmRemove @remove="postRemoveAction(bindApiAction, idx)"></ConfirmRemove>
           </div>
         </transition-group>
       </draggable>
@@ -38,8 +38,8 @@
       <div class="card w-50 me-2">
         <div class="card-header d-flex justify-content-between align-items-center">{{t('action.condition')}}
           <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-            <button type="button" @click="editBindActionModel.mode = 'setting'" :class="{'btn': true,' btn-outline-secondary': editBindActionModel.mode != 'setting', 'btn-secondary': editBindActionModel.mode == 'setting'}">{{ t('action.settingMode') }}</button>
-            <button type="button" @click="switchToCode()" :class="{'btn': true, 'btn-outline-secondary': editBindActionModel.mode != 'code', 'btn-secondary': editBindActionModel.mode == 'code'}">{{ t('action.codeMode') }}</button>
+            <button type="button" @click="editBindApiActionModel.mode = 'setting'" :class="{'btn': true,' btn-outline-secondary': editBindApiActionModel.mode != 'setting', 'btn-secondary': editBindApiActionModel.mode == 'setting'}">{{ t('action.settingMode') }}</button>
+            <button type="button" @click="switchToCode()" :class="{'btn': true, 'btn-outline-secondary': editBindApiActionModel.mode != 'code', 'btn-secondary': editBindApiActionModel.mode == 'code'}">{{ t('action.codeMode') }}</button>
           </div>
         </div>
         <div class="card-body">
@@ -50,15 +50,15 @@
                 <input type="radio" :checked="outputIndex==currOutputIndex">&nbsp;{{myApi.output[outputIndex].name}}
               </label>
             </div>
-            <template v-if="editBindActionModel.mode=='code'">
+            <template v-if="editBindApiActionModel.mode=='code'">
               <div class="text-muted p-1">{{t('action.codeModeDesc')}}</div>
               <div><span style="color: blue">new </span><span style="color: #51a8a8">Promise</span>((resolve)=>{</div>
               <div id="codeeditor" style="height: 300px"></div>
               <div>})</div>
             </template>
-            <template v-if="editBindActionModel.mode=='setting'">
+            <template v-if="editBindApiActionModel.mode=='setting'">
               <div class="d-flex justify-content-start">
-                <Expression :variables="editBindActionVariable" :expression="editBindActionExpression"></Expression>
+                <Expression :variables="editBindApiActionVariable" :expression="editBindApiActionExpression"></Expression>
               </div>
             </template>
           </template>
@@ -67,19 +67,19 @@
       <div class="w-50">
         <div class="text-muted">
           {{t('action.conditionDesc')}}
-          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="t('action.add')" @click="(option)=>addAction(option.value)"></AdvanceSelect>
+          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="t('action.add')" @change="(option)=>addAction(option.value)"></AdvanceSelect>
         </div>
-        <draggable :list="editBindActionModel.actions" handle=".card-header"  @change="(n) => sortEventAction(editBindActionModel, n)">
+        <draggable :list="editBindApiActionModel.actions" handle=".card-header"  @change="(n) => sortEventAction(editBindApiActionModel, n)">
           <transition-group>
-            <div class="card mt-2" v-for="(action, index) in editBindActionModel.actions" :key="action.uuid">
+            <div class="card mt-2" v-for="(action, index) in editBindApiActionModel.actions" :key="action.uuid">
               <div class="card-header justify-content-between" style="cursor: move">
                 <i class="iconfont icon-drag text-muted"></i>
                 {{t('action.' + action.type)}}
                 <ConfirmRemove @remove="removeAction(index)"></ConfirmRemove>
               </div>
               <div class="card-body">
-                <EventAction :autosave="false" bind-type="bind_action" :bind-uuid="editBindActionModel.uuid" :popup-page-data-inline="true" :action="action"
-                             :variables="editBindActionVariable" @beforeCreatePopupBind="(callback) => beforeCreatePopupBind(index, callback)">
+                <EventAction :autosave="false" bind-type="bind_action" :bind-uuid="editBindApiActionModel.uuid" :popup-page-data-inline="true" :action="action"
+                             :variables="editBindApiActionVariable" @beforeCreatePopupBind="(callback) => beforeCreatePopupBind(index, callback)">
                 </EventAction>
               </div>
             </div>
@@ -143,7 +143,7 @@ export default {
     const pageDatas = ref<any>([])
     const tplDatas = ref<any>([])
     const selectedPage = computed(() => store.state.design.page)
-    const editBindActionModel = ref<any>({ mode: 'setting', code: '', actions: [] })
+    const editBindApiActionModel = ref<any>({ mode: 'setting', code: '', actions: [] })
     const currAction = ref<any>({})
     const actionTypes = computed(() => {
       const types = [
@@ -151,16 +151,17 @@ export default {
         { name: t('action.redirect'), value: 'redirect', desc: t('action.redirectDesc') },
         { name: t('action.mutation'), value: 'mutation', desc: t('action.mutationDesc') },
         { name: t('action.popup'), value: 'popup', desc: t('action.popupDesc') },
-        { name: t('action.webapi'), value: 'webapi', desc: t('action.webapiDesc') }
+        { name: t('action.webapi'), value: 'webapi', desc: t('action.webapiDesc') },
+        { name: t('action.interval'), value: 'interval', desc: t('action.intervalDesc') }
       ]
       if (selectedPage.value.pageType === 'component') {
         types.push({ name: t('action.emit'), value: 'emit', desc: t('action.emitDesc') })
       }
       return types
     })
-    const bindActions = ref([])
+    const bindApiActions = ref([])
     const currOutputIndex = ref(0)
-    const editBindActionExpression = ref()
+    const editBindApiActionExpression = ref()
     let editorInstance
     const createEditor = (id, readOnly, needWrap = false) => {
       editorInstance = monaco.editor.create(document.getElementById(id) as HTMLElement, {
@@ -169,7 +170,7 @@ export default {
         readOnly,
         language: 'javascript'
       })
-      let code = editBindActionModel.value.code || '// write your code, Try entering rst\r\n'
+      let code = editBindApiActionModel.value.code || '// write your code, Try entering rst\r\n'
       if (needWrap) {
         code = `new Promise((resolve) => {
 ${code}
@@ -184,7 +185,7 @@ ${code}
     const loadAction = () => {
       ydhl.get('api/action.json', { uuid: myApi.value.uuid }, (rst: any) => {
         if (rst.success) {
-          bindActions.value = rst.data.bind_actions
+          bindApiActions.value = rst.data.bind_actions
           // 代码提示
           // // monaco.languages.typescript.javascriptDefaults.addExtraLib()
           // monaco.languages.registerCompletionItemProvider('javascript', {
@@ -201,9 +202,9 @@ ${code}
         ydhl.alert(rst.msg || t('common.operationFail'))
       })
     }
-    const removeBindAction = (bindAction) => {
+    const removeBindApiAction = (bindApiAction) => {
       ydhl.loading(t('common.pleaseWait')).then((dialogId: any) => {
-        ydhl.post('api/action/remove.json', { uuid: bindAction.uuid }, [], (rst: any) => {
+        ydhl.post('api/action/removeapiaction.json', { uuid: bindApiAction.uuid }, [], (rst: any) => {
           ydhl.closeLoading(dialogId)
           if (rst.success) {
             loadAction()
@@ -214,33 +215,33 @@ ${code}
       })
     }
     const switchToCode = () => {
-      editBindActionModel.value.mode = 'code'
+      editBindApiActionModel.value.mode = 'code'
       nextTick(() => {
         createEditor('codeeditor', false)
       })
     }
-    const showCode = (bindAction) => {
-      editBindActionModel.value = JSON.parse(JSON.stringify(bindAction))
-      editBindActionExpression.value = editBindActionModel.value.expression || {}
+    const showCode = (bindApiAction) => {
+      editBindApiActionModel.value = JSON.parse(JSON.stringify(bindApiAction))
+      editBindApiActionExpression.value = editBindApiActionModel.value.expression || {}
 
       codeDialogVisible.value = true
       nextTick(() => {
         createEditor('previeweditor', true, true)
       })
     }
-    const addBindAction = () => {
-      editBindActionModel.value = { mode: 'setting', code: '', actions: [] }
-      editBindActionExpression.value = {}
+    const addBindApiAction = () => {
+      editBindApiActionModel.value = { mode: 'setting', code: '', actions: [] }
+      editBindApiActionExpression.value = {}
       addDialogVisible.value = true
     }
     const addAction = (type) => {
-      editBindActionModel.value.actions.push({ type })
+      editBindApiActionModel.value.actions.push({ type })
     }
     const removeAction = (index) => {
-      editBindActionModel.value.actions.splice(index, 1)
+      editBindApiActionModel.value.actions.splice(index, 1)
     }
-    const postRemoveAction = (bindAction, index) => {
-      const actionUuid = bindAction.actions[index].uuid
+    const postRemoveAction = (bindApiAction, index) => {
+      const actionUuid = bindApiAction.actions[index].uuid
 
       ydhl.post('api/action/deleteaction.json', { page_uuid: selectedPageId.value, action_uuid: actionUuid }, [], (rst) => {
         if (!rst.success) {
@@ -248,39 +249,39 @@ ${code}
           return
         }
 
-        bindAction.actions.splice(index, 1)
+        bindApiAction.actions.splice(index, 1)
       })
     }
-    const modifyBindAction = (bindAction) => {
-      editBindActionModel.value = JSON.parse(JSON.stringify(bindAction))
-      editBindActionExpression.value = editBindActionModel.value.expression || {}
+    const modifyBindApiAction = (bindApiAction) => {
+      editBindApiActionModel.value = JSON.parse(JSON.stringify(bindApiAction))
+      editBindApiActionExpression.value = editBindApiActionModel.value.expression || {}
       addDialogVisible.value = true
       if (myApi.value.output) {
         currOutputIndex.value = myApi.value.output.findIndex((item) => {
-          return item.uuid === bindAction.output_data_id
+          return item.uuid === bindApiAction.output_data_id
         })
         if (currOutputIndex.value < 0) currOutputIndex.value = 0
       } else {
         currOutputIndex.value = 0
       }
-      if (editBindActionModel.value.mode === 'code') {
+      if (editBindApiActionModel.value.mode === 'code') {
         switchToCode()
       }
     }
     const save = (callback:any) => {
       ydhl.loading(t('common.pleaseWait')).then((dialogId: any) => {
-        const data: any = JSON.parse(JSON.stringify(editBindActionModel.value))
+        const data: any = JSON.parse(JSON.stringify(editBindApiActionModel.value))
         data.page_uuid = selectedPage.value.meta.id
         data.type = 'bind_api'
         data.code = editorInstance ? editorInstance.getValue() : ''
-        data.expression = editBindActionExpression.value
+        data.expression = editBindApiActionExpression.value
         data.from_uuid = myApi.value.uuid
         data.output_data_id = myApi.value.output[currOutputIndex.value].uuid
-        ydhl.postJson('api/action/save.json', data).then((rst: any) => {
+        ydhl.postJson('api/action/saveapiaction.json', data).then((rst: any) => {
           ydhl.closeLoading(dialogId)
           if (rst.success) {
-            editBindActionModel.value = rst.data
-            editBindActionExpression.value = editBindActionModel.value.expression || {}
+            editBindApiActionModel.value = rst.data
+            editBindApiActionExpression.value = editBindApiActionModel.value.expression || {}
             if (callback) callback()
             return
           }
@@ -314,13 +315,13 @@ ${code}
 
     const beforeCreatePopupBind = (index, callback) => {
       save(() => {
-        callback(editBindActionModel.value.actions[index])
+        callback(editBindApiActionModel.value.actions[index])
       })
     }
     const changeOutputIndex = (outputIndex) => {
       currOutputIndex.value = outputIndex
       // 改变输出结构后，action绑定的本地变量需要清空
-      for (const action of editBindActionModel.value.actions) {
+      for (const action of editBindApiActionModel.value.actions) {
         action.input = {}
       }
     }
@@ -354,8 +355,8 @@ ${code}
         }, 'json')
       }
     }
-    const getLocalArgs = (bindAction) => {
-      const rst = myApi.value.output?.find((item) => item.uuid === bindAction.output_data_id)
+    const getLocalArgs = (bindApiAction) => {
+      const rst = myApi.value.output?.find((item) => item.uuid === bindApiAction.output_data_id)
       if (rst) {
         const data = JSON.parse(JSON.stringify(rst.body))
         data.name = 'rst'
@@ -364,7 +365,7 @@ ${code}
       }
       return []
     }
-    const editBindActionVariable = computed(() => {
+    const editBindApiActionVariable = computed(() => {
       const rst = JSON.parse(JSON.stringify(myApi.value.output[currOutputIndex.value]?.body))
       rst.name = 'rst'
       rst.title = myApi.value.name
@@ -372,7 +373,7 @@ ${code}
       if (myApi.value.localVariables) {
         v.unshift(...myApi.value.localVariables)
       }
-      console.log(v)
+      // console.log(v)
       return v
     })
 
@@ -390,9 +391,9 @@ ${code}
       actionTypes,
       selectedPage,
       myApi,
-      bindActions,
-      editBindActionModel,
-      editBindActionVariable,
+      bindApiActions,
+      editBindApiActionModel,
+      editBindApiActionVariable,
       currAction,
       removeAction,
       currOutputIndex,
@@ -403,7 +404,7 @@ ${code}
       buttons,
       pageDatas,
       tplDatas,
-      editBindActionExpression,
+      editBindApiActionExpression,
       sortEventAction,
       postRemoveAction,
       getLocalArgs,
@@ -412,9 +413,9 @@ ${code}
       beforeCreatePopupBind,
       switchToCode,
       showCode,
-      removeBindAction,
-      addBindAction,
-      modifyBindAction,
+      removeBindApiAction,
+      addBindApiAction,
+      modifyBindApiAction,
       showRedirect,
       showPageData
     }

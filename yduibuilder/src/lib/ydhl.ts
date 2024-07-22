@@ -3,6 +3,7 @@ import { createPopper, Placement, VirtualElement } from '@popperjs/core'
 import { nextTick } from 'vue'
 import { YDJSStatic } from './ydjs'
 import { layer } from '@layui/layer-vue'
+import { Expression } from '@/store/model'
 declare const YDJS: YDJSStatic
 export default {
   version: '1.0.16-220207',
@@ -498,5 +499,71 @@ export default {
       }
     }
     return ret
+  },
+  /**
+   * 返回给定定字符串定数据定类型，比如'124' 是number，'[12]' 是array
+   * @param string value
+   */
+  getDataType (value) {
+    try {
+      const data = JSON.parse(value)
+      return Object.prototype.toString.call(data).slice(8, -1).toLowerCase()
+    } catch (e) {
+      return 'undefined'
+    }
+  },
+  getModifier (modifier: string, data: string) {
+    if (!modifier?.match(/@/)) return data
+    return modifier.replace(/@/, data)
+  },
+  getConditionExpression (expression: any) {
+    const rst: any = []
+    if (expression.data) {
+      rst.push(this.getModifier(expression.data.modifier, expression.data.path || expression.data.literal))
+    } else if (expression.expression) {
+      rst.push(this.getExpressionDesc(expression.expression))
+    }
+    if (expression.operator) rst.push(expression.operator)
+    if (expression.rightData) {
+      rst.push(this.getModifier(expression.rightData.modifier, expression.rightData.path || expression.rightData.literal))
+    } else if (expression.rightExpression) {
+      rst.push(this.getExpressionDesc(expression.rightExpression))
+    }
+    return rst.join(' ')
+  },
+  getExpressionDesc (expression: Expression) {
+    if (!expression) return ''
+    if (expression.type === 'expression_group') {
+      if (!expression.subexpression || expression.subexpression.length <= 0) return ''
+      const rst: any = []
+      if (expression.modifier) rst.push(this.getModifier(expression.modifier, ''))
+      rst.push('(')
+      for (const sub of expression.subexpression) {
+        rst.push(this.getExpressionDesc(sub))
+      }
+      rst.push(')')
+      return rst.join(' ')
+    } else if (expression.type === 'expression') {
+      return this.getConditionExpression(expression)
+    } else if (expression.type === 'literal') {
+      return expression.literal
+    } else if (expression.type === 'ternary') {
+      const rst: any = []
+      if (expression.expression) {
+        rst.push(this.getExpressionDesc(expression.expression))
+      } else {
+        rst.push(this.getConditionExpression(expression))
+      }
+      rst.push('?')
+      rst.push(this.getExpressionDesc(expression.trueExpression))
+      rst.push(':')
+      rst.push(this.getExpressionDesc(expression.falseExpression))
+      return rst.join(' ')
+    } else if (expression.type === 'connect') {
+      return expression.data?.path
+    } else if (expression.type === 'operator') {
+      return expression.operator
+    }
+    return ''
   }
 }

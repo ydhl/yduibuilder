@@ -9,6 +9,7 @@ import layer from '@layui/layer-vue'
 import '@layui/layer-vue/lib/index.css'
 import DataConnect from '@/components/common/DataConnect.vue'
 import DataCheckPanel from '@/components/common/DataCheckPanel.vue'
+import EventAction from '@/components/common/EventAction.vue'
 
 if (window.top === window) {
   if (navigator.userAgent.indexOf('Firefox') > -1) {
@@ -33,4 +34,5 @@ const app = createApp(App)
 app.use(store).use(router).use(layer).use(i18n)
   .component('DataConnect', DataConnect)
   .component('DataCheckPanel', DataCheckPanel)
+  .component('EventAction', EventAction)
   .mount('#app')

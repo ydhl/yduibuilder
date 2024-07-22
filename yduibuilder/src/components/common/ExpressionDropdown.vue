@@ -2,14 +2,17 @@
   <div class="d-flex align-items-center justify-content-end flex-grow-1">
     <template v-if="myExpression?.type == 'literal'">
       ←
-      <template v-if="leftValue?.enumValue">
-        <AdvanceSelect :options="formatEnumValue" :default-text="myExpression.literal" @click="(option)=>changeEnumValue(option.literal)"></AdvanceSelect>
-      </template>
+      <div class="text-success text-truncate" v-if="readonly">{{myExpression.literal}}</div>
       <template v-else>
-        <button type="button" @click="openCodeEditor" class="btn btn-xs text-success me-1 btn-light text-truncate">{{myExpression?.literal || t('action.notSet')}}</button>
+        <template v-if="leftValue?.enumValue">
+          <AdvanceSelect :options="formatEnumValue" :default-text="myExpression.literal" @change="(option)=>changeEnumValue(option.value)"></AdvanceSelect>
+        </template>
+        <template v-else>
+          <button type="button" @click="openCodeEditor" class="btn btn-xs text-success me-1 btn-light text-truncate">{{myExpression?.literal || t('action.notSet')}}</button>
+        </template>
       </template>
     </template>
-    <div v-else-if="myExpression?.type == 'connect'" :title="myExpression.data?.path ? myExpression.data?.path : ''" @click="connectDataDialogVisible=true" class="pointer text-danger text-truncate">
+    <div v-else-if="myExpression?.type == 'connect'" :title="myExpression.data?.path ? myExpression.data?.path : ''" @click="!readonly ? connectDataDialogVisible=true : ''" class="pointer text-danger text-truncate">
       <template v-if="myExpression.data?.name">
         ← {{myExpression.data.name}}
       </template>
@@ -19,10 +22,11 @@
     </div>
     <template v-else-if="myExpression?.type">
       ←
-      <span @click="openExpressionVisible = true" style="width: 100px" class="text-primary me-1 text-truncate" :title="myExpressionDesc">{{myExpressionDesc || t('action.notSet')}}</span>
+      <span @click="!readonly ? openExpressionVisible = true : ''" class="text-primary me-1" :title="myExpressionDesc">{{myExpressionDesc || t('action.notSet')}}</span>
     </template>
-    <div class="flex-shrink-0">
-      <AdvanceSelect :options="mutationTypes" :default-text="myExpression?.type ? t('expression.'+myExpression?.type)  : ''" @click="(option) => changeMutationType(option.value)"></AdvanceSelect>
+    <div v-if="!readonly" class="flex-shrink-0 d-flex align-items-center bg-light text-muted">&nbsp;{
+      <AdvanceSelect :options="mutationTypes" :default-text="myExpression?.type ? t('expression.'+myExpression?.type)  : ''" @change="(option) => changeMutationType(option.value)"></AdvanceSelect>
+      }&nbsp;
     </div>
   </div>
   <lay-layer v-model="connectDataDialogVisible" :title="t('variable.bound')" resize :shade="true" :area="['500px', '500px']"
@@ -52,6 +56,7 @@ export default {
   name: 'ExpressionDropdown',
   props: {
     variables: Object, // 本地变量
+    readonly: Boolean,
     expression: Object,
     leftValue: Object, // 左值
     leftValuePath: String // 左值访问路径
@@ -69,8 +74,6 @@ export default {
         { name: t('variable.literal'), value: 'literal', desc: t('variable.literalTip') },
         { name: t('expression.connect'), value: 'connect', desc: t('expression.connectTip') },
         { name: t('expression.expression'), value: 'expression', desc: t('expression.expressionTip') }
-        // { name: 'invert', value: 'invert', desc: 'Reverse the current value' },
-        // { name: '?:', value: '?:', desc: 'Ternary conditional operator: first ? second : third' }
       ]
       if (myExpression.value?.type) {
         menu.push({ name: '', value: '', desc: '' })
@@ -90,7 +93,7 @@ export default {
     const store = useStore()
     const code = ref('')
     const myExpressionDesc = computed(() => {
-      return getExpression(myExpression.value)
+      return ydhl.getExpressionDesc(myExpression.value)
     })
     const formatEnumValue = computed(() => {
       if (!props.leftValue || !props.leftValue.enumValue) return []
@@ -102,62 +105,12 @@ export default {
     })
     const selectedPageId = computed(() => store.state.design.page?.meta?.id)
 
-    const getExpression = (expression: any) => {
-      if (expression.type === 'expression_group') {
-        const rst: any = []
-        const hasSubexpression = expression.subexpression.length > 0
-        if (hasSubexpression) rst.push('(')
-        for (const sub of expression.subexpression) {
-          rst.push(getExpression(sub))
-        }
-        if (hasSubexpression) rst.push(')')
-        return rst.join(' ')
-      } else if (expression.type === 'expression') {
-        return getConditionExpression(expression)
-      } else if (expression.type === 'ternary') {
-        const rst: any = []
-        if (expression.expression) {
-          rst.push(getExpression(expression.expression))
-        } else {
-          rst.push(getConditionExpression(expression))
-        }
-        rst.push('?')
-        rst.push(getExpression(expression.trueExpression))
-        rst.push(':')
-        rst.push(getExpression(expression.falseExpression))
-        return rst.join(' ')
-      } else if (expression.type === 'literal') {
-        return expression.literal
-      } else if (expression.type === 'connect') {
-        return expression.data?.path
-      } else if (expression.type === 'operator') {
-        return expression.operator
-      }
-      return ''
-    }
-    const getConditionExpression = (expression: any) => {
-      const modifier = { not: '!' }
-      const rst: any = []
-      if (expression.data) {
-        if (expression.data.modifier)rst.push(modifier[expression.data.modifier])
-        rst.push(expression.data.path || expression.data.literal)
-      } else if (expression.expression) {
-        rst.push(getExpression(expression.expression))
-      }
-      if (expression.rightData) {
-        rst.push(expression.operator)
-        if (expression.rightData.modifier)rst.push(modifier[expression.rightData.modifier])
-        rst.push(expression.rightData.path || expression.rightData.literal)
-      } else if (expression.rightExpression) {
-        rst.push(getExpression(expression.rightExpression))
-      }
-      return rst.join(' ')
-    }
     const openCodeEditor = () => {
       code.value = myExpression.value.literal as string
       codeDlgVisible.value = true
     }
     const changeEnumValue = (value) => {
+      if (!myExpression.value.data) myExpression.value.data = {}
       myExpression.value.literal = value
       context.emit('updateExpression', myExpression.value, myExpressionDesc.value)
     }
@@ -176,6 +129,8 @@ export default {
       context.emit('updateExpression', myExpression.value, myExpressionDesc.value)
     }
     const updateCode = (code) => {
+      codeDlgVisible.value = false
+      if (!myExpression.value.data) myExpression.value.data = {}
       myExpression.value.literal = code
       context.emit('updateExpression', myExpression.value, myExpressionDesc.value)
     }
@@ -185,8 +140,8 @@ export default {
       delete expression.data
       delete expression.rightData
       delete expression.operator
-      delete expression.literal
       delete expression.desc
+      delete expression.literal
       delete expression.expression
       delete expression.subexpression
       delete expression.rightExpression
@@ -202,7 +157,7 @@ export default {
       clearExpression(myExpression.value)
       myExpression.value.type = type
       if (type === 'literal') {
-        openCodeEditor()
+        if (!props.leftValue?.enumValue) openCodeEditor() // 不是枚举的字面量则弹出编辑器
       } else if (type === 'connect') {
         connectDataDialogVisible.value = true
       } else if (type === 'expression') {

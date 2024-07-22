@@ -1,14 +1,12 @@
 <template>
-  <div @click="openDialog" class="pointer d-flex align-items-center text-truncate">
+  <div @click="!readonly ? openDialog() : ''" class="pointer">
     <template v-if="hasMutation" >
-      <div>
-        <div v-for="(mutation, index) in myAction.mutations" :key="index" class="d-flex align-items-center text-truncate">
+        <div v-for="(mutation, index) in myAction.mutations" :key="index" class="d-flex align-items-center w-100">
           <span>{{mutation.data_name}}</span>
           <template v-if="mutation.expression_code">&nbsp;=&nbsp;
-            <span class="text-success">{{mutation.expression_code}}</span>
+            <span class="text-success text-truncate">{{mutation.expression_code}}</span>
           </template>
         </div>
-      </div>
     </template>
     <div v-else>{{ t('action.notSet') }}</div>
   </div>
@@ -23,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { ref, computed } from 'vue'
+import { ref, toRef, computed } from 'vue'
 import ydhl from '@/lib/ydhl'
 import { useI18n } from 'vue-i18n'
 import DataMutation from '@/components/common/DataMutation.vue'
@@ -33,6 +31,7 @@ export default {
   name: 'MutationSetting',
   components: { DataMutation },
   props: {
+    readonly: Boolean,
     modelValue: Object,
     variables: Object,
     autosave: {
@@ -45,7 +44,7 @@ export default {
     const dialogVisible = ref(false)
     const pageDatas = ref([])
     const queryDatas = ref([])
-    const myAction = ref(props.modelValue)
+    const myAction = toRef(props, 'modelValue')
     const mutationDefault = ref(JSON.parse(JSON.stringify(myAction.value.mutations || {})))
     const hasMutation = computed(() => myAction.value.mutations && Object.keys(myAction.value.mutations).length > 0)
     const { t } = useI18n()

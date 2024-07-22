@@ -119,7 +119,7 @@ export default {
         , undefined
         , (rst) => {
           YDJS.hide_dialog(dialogid)
-          console.log(rst)
+          // console.log(rst)
           if (!rst || !rst.success) {
             YDJS.toast(rst?.msg || t('common.operationFail'), YDJS.ICON_ERROR)
           } else {

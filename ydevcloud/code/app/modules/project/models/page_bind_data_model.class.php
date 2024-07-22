@@ -12,15 +12,6 @@ use \app\project\Page_Model;
 class Page_Bind_Data_Model extends YZE_Model{
     use Page_Bind_Data_Model_Method;
     
-    const TYPE_STRING = 'string';
-    const TYPE_INTEGER = 'integer';
-    const TYPE_NUMBER = 'number';
-    const TYPE_ARRAY = 'array';
-    const TYPE_BOOLEAN = 'boolean';
-    const TYPE_OBJECT = 'object';
-    const TYPE_NULL = 'null';
-    const TYPE_ANY = 'any';
-    const TYPE_MAP = 'map';
     const DATA_FROM_PAGE = 'page';
     const DATA_FROM_PATH = 'path';
     const DATA_FROM_QUERY = 'query';
@@ -69,7 +60,7 @@ class Page_Bind_Data_Model extends YZE_Model{
     const F_PAGE_ID = "page_id";
     /**
      * 
-     * @var enum
+     * @var string
      */
     const F_TYPE = "type";
     /**
@@ -164,7 +155,7 @@ class Page_Bind_Data_Model extends YZE_Model{
       'is_deleted' => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '0'],
       'uuid'       => ['type' => 'string', 'null' => false,'length' => '45','default'	=> ''],
       'page_id'    => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
-      'type'       => ['type' => 'enum', 'null' => false,'length' => '','default'	=> 'string'],
+      'type'       => ['type' => 'string', 'null' => false,'length' => '45','default'	=> 'string'],
       'name'       => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
       'title'      => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
       'comment'    => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
@@ -222,9 +213,6 @@ class Page_Bind_Data_Model extends YZE_Model{
 	}
 
 	
-	public static function get_type(){
-		return ['string','integer','number','array','boolean','object','null','any','map'];
-	}
 	public static function get_data_from(){
 		return ['page','path','query'];
 	}

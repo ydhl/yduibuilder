@@ -1,7 +1,7 @@
 <template>
   <div class="row mb-3">
     <div class="col-3 d-flex align-items-center">
-      <div>{{t('api.response.contentName')}}:</div>
+      <div class="text-truncate flex-shrink-0">{{t('api.response.contentName')}}:</div>
       <input type="text" class="form-control-sm form-control ms-2" v-model="myResponse.name">
     </div>
     <div class="col-2 d-flex align-items-center">
@@ -28,9 +28,10 @@
 
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import DataJSON from '@/components/request/DataJSON.vue'
 import { APIResponse, ResponseCode, ResponseFormat } from '@/store/model'
+import ydhl from '@/lib/ydhl'
 
 export default {
   name: 'ResponseData',
@@ -45,6 +46,19 @@ export default {
     const myResponse = computed<APIResponse>(() => props.response)
     const codes = ResponseCode
     const formats = ResponseFormat
+    watch(() => myResponse.value.contentType, (type: string) => {
+      switch (type) {
+        case 'Binary': {
+          myResponse.value.body = { uuid: ydhl.uuid(), type: 'blob', isRoot: true }
+          break
+        }
+        case 'HTML':
+        case 'Raw': {
+          myResponse.value.body = { uuid: ydhl.uuid(), type: 'string', isRoot: true }
+          break
+        }
+      }
+    })
 
     const updateBody = (info) => {
       myResponse.value.body = info

@@ -1,29 +1,31 @@
 <template>
   <div class="ps-2 mt-2">
+    <button type="button" style="text-align: left" class="btn w-100 btn-sm btn-white"><i class="iconfont icon-graphql"></i>
+      {{t('common.graphql')}}</button>
     <div  @click="apiIsOpen = !apiIsOpen" class="justify-content-between d-flex btn btn-sm btn-white w-100 align-items-center">
       <div><i class="iconfont icon-api"></i> {{t('common.apiManage')}}<i :class="{'iconfont': true, 'icon-tree-open': apiIsOpen, 'icon-tree-close': !apiIsOpen}"></i></div>
-      <div class="btn-group btn-group-sm">
-        <button type="button" class="btn btn-white btn-xs" @click.stop="folder={},showAddFolder=true"><i class="iconfont icon-plus"></i></button>
-        <button class="btn btn-white btn-xs" type="button" v-if="!openState" @click.stop="expandAll"><i class="iconfont icon-expandall"></i></button>
-        <button class="btn btn-white btn-xs" type="button" v-if="openState" @click.stop="collapseAll"><i class="iconfont icon-collapseall"></i></button>
+      <div class="d-flex gap-2 align-items-center">
+        <div class="pointer" @click.stop="folder={},showAddFolder=true"><i class="iconfont hover-primary icon-plus"></i></div>
+        <div class="pointer" v-if="!openState" @click.stop="expandAll"><i class="iconfont hover-primary icon-expandall"></i></div>
+        <div class="pointer" v-if="openState" @click.stop="collapseAll"><i class="iconfont hover-primary icon-collapseall"></i></div>
       </div>
     </div>
     <ul class="tree" v-if="apiIsOpen">
       <FolderTree :tree="tree" v-for="(tree, index) in folders" :open="openState" :indent="1" :key="index">
-      <template #leaf="{data}">
+      <template #leaf="{data, hover}">
         <div class="dropdown pe-1" @click.stop>
-          <div type="button" class="pointer" data-bs-toggle="dropdown" aria-expanded="false"><i class="iconfont icon-more"></i></div>
-          <ul class="dropdown-menu dropdown-menu-end">
+          <div type="button" class="pointer" data-bs-toggle="dropdown" aria-expanded="false"><i :class="{'iconfont icon-more': true, 'invisible': !hover}"></i></div>
+          <ul class="dropdown-menu ">
             <li><a href="#" class="dropdown-item" @click="editApi(data)"><i class="iconfont icon-edit"></i> {{t('common.edit')}}</a></li>
             <li><a href="#" class="dropdown-item" @click="copyApi(data)"><i class="iconfont icon-copy"></i> {{t('common.copy')}}</a></li>
             <li><a href="#" class="dropdown-item text-danger" @click="removeApi(data)"><i class="iconfont icon-remove"></i>{{ t('common.delete') }}</a></li>
           </ul>
         </div>
       </template>
-      <template #trunk="{data}">
+      <template #trunk="{data, hover}">
         <div class="btn-group btn-group-sm pe-1">
           <div class="btn-group" @click.stop>
-            <div type="button" class="pointer" data-bs-toggle="dropdown" aria-expanded="false"><i class="iconfont icon-more"></i></div>
+            <div type="button" class="pointer" data-bs-toggle="dropdown" aria-expanded="false"><i :class="{'iconfont icon-more': true, 'invisible': !hover}"></i></div>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a href="#" class="dropdown-item" @click="addApi"><i class="iconfont icon-plus"></i> {{t('common.addAPI')}}</a></li>
               <li><a href="#" class="dropdown-item" @click="addSubFolder(data)"><i class="iconfont icon-plus"></i> {{t('common.addFolder')}}</a></li>

@@ -195,19 +195,32 @@ class Copy_Controller extends YZE_Resource_Controller {
         }
     }
     private function copy_api_info($oldProject, $newProject, &$oldId2new){
-        foreach ([Api_Folder_Model::class, Label_Model::class] as $class){
-            $models = $class::from()->where('project_id=:pid and is_deleted=0')->select([':pid'=>$oldProject->id]);
-            foreach ($models as $model){
-                $data = $model->get_records();
-                unset($data['id'], $data['uuid']);
-                $data['uuid'] = $class::uuid();
-                $data['project_id'] = $newProject->id;
-                $newModel = new $class();
-                $newModel->save_from_data($data);
-                $oldId2new[$class::CLASS_NAME][$model->id] = $newModel->id;
-            }
+        $models = Api_Folder_Model::from()->where('project_id=:pid and is_deleted=0')->select([':pid'=>$oldProject->id]);
+        $newModels = [];
+        foreach ($models as $model){
+            $data = $model->get_records();
+            unset($data['id'], $data['uuid']);
+            $data['uuid'] = Api_Folder_Model::uuid();
+            $data['project_id'] = $newProject->id;
+            $newModel = new Api_Folder_Model();
+            $newModel->save_from_data($data);
+            $newModels[] = $newModel;
+            $oldId2new[Api_Folder_Model::CLASS_NAME][$model->id] = $newModel->id;
+        }
+        foreach ($newModels as $newModel){
+            $newModel->set('api_folder_id', $oldId2new[Api_Folder_Model::CLASS_NAME][$newModel->api_folder_id] ?: null)->save();
         }
 
+        $models = Label_Model::from()->where('project_id=:pid and is_deleted=0')->select([':pid'=>$oldProject->id]);
+        foreach ($models as $model){
+            $data = $model->get_records();
+            unset($data['id'], $data['uuid']);
+            $data['uuid'] = Label_Model::uuid();
+            $data['project_id'] = $newProject->id;
+            $newModel = new Label_Model();
+            $newModel->save_from_data($data);
+            $oldId2new[Label_Model::CLASS_NAME][$model->id] = $newModel->id;
+        }
         $models = Web_Api_Model::from()
             ->where('project_id=:pid and is_deleted=0')->select([':pid'=>$oldProject->id]);
         foreach ($models as $model){

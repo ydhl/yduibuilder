@@ -34,12 +34,13 @@ export default {
   setup (props: any, context: any) {
     const store = useStore()
     const rangeinput = new RangeInput(props, context, store)
+    const defaultValue = computed(() => props.uiconfig.meta.value === undefined ? 50 : props.uiconfig.meta.value)
     /**
      * 滑块主题样式
      */
     const handleStyle = computed(() => {
       const style: any = []
-      style.push(`left: ${props.uiconfig.meta.value || 50}%; !important;`)
+      style.push(`left: ${defaultValue.value || 50}%; !important;`)
       if (props.uiconfig.meta?.style?.color) {
         style.push('background-color:' + props.uiconfig.meta?.style?.color + ' !important;')
       }
@@ -76,7 +77,7 @@ export default {
       return css.join(' ')
     })
     const bgStyle = computed(() => {
-      const style: any = [`width: ${props.uiconfig.meta.value || 50}% !important;`]
+      const style: any = [`width: ${defaultValue.value || 50}% !important;`]
       if (props.uiconfig.meta?.style?.['background-color']) {
         style.push('background-color:' + props.uiconfig.meta?.style?.['background-color'] + ' !important;')
       }

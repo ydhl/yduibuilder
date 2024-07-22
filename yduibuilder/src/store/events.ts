@@ -1,22 +1,20 @@
 export default {
-  'life cycle': [
+  lifeCycle: [
     'onLoad',
-    'onReady',
-    'onShow',
-    'onHide',
     'onBeforeUnload',
-    'onUnload',
-    'onResize',
-    'onScroll'
+    'onUnload'
   ],
   form: [
     'onChange',
+    'onInput',
     'onBlur',
     'onFocus'
   ],
   interactive: [
     'onPullDown',
-    'onReachBottom'
+    'onReachBottom',
+    'onResize',
+    'onScroll'
   ],
   keyboard: [
     'onKeyUp',

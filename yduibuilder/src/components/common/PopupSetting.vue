@@ -1,11 +1,11 @@
 <template>
   <template v-if="myAction.popupPageId">
     <div class="d-flex align-items-center">
-      <div @click="viewPopup()" class="d-flex align-items-center pointer hover-text">
+      <div @click="!readonly ? viewPopup() : ''" class="d-flex align-items-center pointer hover-text">
         {{myAction.popupPageTitle}}
-        <ConfirmRemove icon="icon-remove" @remove="removePopup"></ConfirmRemove>
+        <ConfirmRemove v-if="!readonly" icon="icon-remove" @remove="removePopup"></ConfirmRemove>
       </div>
-      <div v-if="!pageDataInline" class="pointer fs-7 ms-3 d-flex align-items-center" @click="openBindPageDataDlg()">
+      <div v-if="!pageDataInline" class="pointer fs-7 ms-3 d-flex align-items-center" @click="!readonly ? openBindPageDataDlg() : ''">
         <div v-if="boundCount>0" class="text-danger fw-bold">
           <i class="iconfont icon-connect fs-7 hover-primary"></i>{{boundCount}}
         </div>
@@ -16,19 +16,23 @@
     </div>
   </template>
   <template v-else-if="myAction.popup_type=='alert'">
-    <div class="d-flex align-items-center">
-      Alert
-      <ConfirmRemove icon="icon-remove" @remove="removePopup"></ConfirmRemove>
-      <ExpressionDropdown :variables="variables" @updateExpression="updateBoundAlert" :expression="alertExpression.expression"></ExpressionDropdown>
+    <div class="d-inline-flex align-items-center justify-content-start">
+      Alert(&nbsp;
+      <ExpressionDropdown :readonly="readonly" :variables="variables" @updateExpression="updateBoundAlert" :expression="alertExpression.expression"></ExpressionDropdown>
+      <ConfirmRemove icon="icon-remove" v-if="!readonly" @remove="removePopup"></ConfirmRemove>
+      &nbsp;)
     </div>
   </template>
+  <template v-else-if="!readonly">
+    <AdvanceSelect :options="popupTypes" @change="(option)=>clickPopupType(option.value)" :default-text="t('event.error.notDefined')"></AdvanceSelect>
+  </template>
   <template v-else>
-    <AdvanceSelect :options="popupTypes" @click="(option)=>clickPopupType(option.value)" :default-text="t('event.error.notDefined')"></AdvanceSelect>
+    {{t('event.error.notDefined')}}
   </template>
 
   <div class="flex-grow-1" v-if="pageDataInline">
     <DataConnect v-for="(item, index) in pageDatas" @updateConnectData="updateConnectData"
-                 connect="to"
+                 connect="to" :readonly="readonly"
                  :bound-data="myAction.input" :variables="variables" path="" :root-uuid="item.uuid"
                  :key="index" :intent="0" :model="item" :index="0">
     </DataConnect>
@@ -54,7 +58,7 @@
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
 import ydhl from '@/lib/ydhl'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, toRef } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import ConfirmRemove from '@/components/common/ConfirmRemove.vue'
@@ -71,6 +75,7 @@ export default {
     modelValue: Object, // Action
     pageDataInline: Boolean, // true 页面数据绑定直接展示，false 弹窗展示, 弹窗在关闭时会调用api保存
     variables: Array, // 当前弹窗可以关联的局部变量定义
+    readonly: Boolean,
     autosave: {
       default: true,
       type: Boolean
@@ -79,7 +84,7 @@ export default {
   emits: ['update:modelValue', 'beforeCreatePopupBind'],
   setup (props: any, context: any) {
     const { t } = useI18n()
-    const myAction = ref(props.modelValue)
+    const myAction = toRef(props, 'modelValue')
     const myAutosave = ref(props.autosave)
     const pageDataBindDlgVisible = ref(false)
     const pagePickDialogVisible = ref(false)

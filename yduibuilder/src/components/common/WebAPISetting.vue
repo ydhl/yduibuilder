@@ -1,5 +1,5 @@
 <template>
-  <div @click="openApiDialog" class="text-start pointer hover-text text-truncate">
+  <div @click="!readonly ? openApiDialog() : ''" class="text-start pointer hover-text text-truncate">
     <template v-if="myAction.bindApi">
       <WebAPIBasicInfo :web-api="myAction.bindApi"></WebAPIBasicInfo>
     </template>
@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ydhl from '@/lib/ydhl'
 import { useStore } from 'vuex'
@@ -28,6 +28,7 @@ export default {
   components: { WebAPIBasicInfo, ImportAPI },
   props: {
     modelValue: Object,
+    readonly: Boolean,
     // 绑定api的类型（谁绑定的api） bind_action bind_event
     bindType: String,
     // 绑定的api的绑定对象uuid（谁绑定的api）
@@ -39,7 +40,7 @@ export default {
   },
   emits: ['update:modelValue'],
   setup (props: any, context: any) {
-    const myAction = computed(() => props.modelValue)
+    const myAction = toRef(props, 'modelValue')
     const { t } = useI18n()
     const store = useStore()
     const addApiDialogVisible = ref<any>(false)

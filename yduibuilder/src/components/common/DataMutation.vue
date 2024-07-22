@@ -1,6 +1,6 @@
 <template>
   <div class="model-item pt-1 pb-1" @click="toggle">
-    <div class="model-field text-truncate" :style="'width:0px;padding-left: ' + (intent * 16) + 'px'">
+    <div class="model-field text-truncate" :style="'padding-left: ' + (intent * 16) + 'px'">
       <i v-if="myModel.type=='object' && (myModel.props && myModel.props.length>0 && !defaultMutation?.[myModel.uuid]?.expression)" :class="{'iconfont':true, 'icon-tree-close': !isOpen, 'icon-tree-open': isOpen}"></i>
       <i v-else style="width: 16px;height: 24px;">&nbsp;</i>
       <div class="pointer hover-text-primary" @click.stop="viewDetail">{{myModel.name}}</div>

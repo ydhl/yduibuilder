@@ -1,4 +1,4 @@
-export declare type DataType = 'string' | 'integer' | 'number' | 'array' | 'boolean' | 'object' | 'null' | 'any' | 'file' // 数据结构那类型
+export declare type DataType = 'string' | 'integer' | 'number' | 'array' | 'boolean' | 'object' | 'null' | 'any' | 'file' | 'blob' // 数据结构那类型
 export declare type APIStatus = 'develop' | 'test' | 'deprecated' | 'released'
 export declare type RequestBodyType = 'none' | 'form-data' | 'x-www-form-urlencoded' | 'json' | 'xml' | 'raw' | 'binary' | 'GraphQL' | 'msgpack'
 export declare type AuthType = 'NoAuth' | 'APIKey' | 'BearerToken' | 'BasicAuth' | 'DigestAuth' | 'OAuth1' | 'OAuth2' | 'HawkAuth' | 'AWSSignature' | 'NTLMAuth' | 'AkamaiEdgeGrid'
@@ -23,12 +23,12 @@ export const ResponseCode = {
   503: 'Service Unavailable'
 }
 export const ResponseFormat = {
-  JSON: 'application/json'
+  JSON: 'application/json',
   // ,
   // XML: 'application/xml',
-  // HTML: 'text/plain',
-  // Raw: 'text/plain',
-  // Binary: 'application/octet-stream',
+  HTML: 'text/plain',
+  Raw: 'text/plain',
+  Binary: 'application/octet-stream'
   // MsgPack: 'text/msgpack'
 }
 export interface KeyValue{

@@ -30,6 +30,7 @@ class Expression extends YZE_Object {
      */
     public $rightData;
     public $operator;
+    public $modifier;
     public $literal;
     public $desc;
     /**
@@ -84,6 +85,7 @@ class Expression extends YZE_Object {
             case 'expression':return $this->get_condition_expression_code($hidePrefix);
             case 'expression_group':{
                 $code = [];
+                if ($this->modifier) $code[] = preg_replace("/@/", '', $this->modifier);
                 if ($this->subexpression) $code[] = '(';
 
                 foreach ($this->subexpression as $sub){
@@ -106,23 +108,29 @@ class Expression extends YZE_Object {
         }
         return null;
     }
-    private function remove_prefix($data, $hidePrefix){
-        if (!$hidePrefix) return $data;
-        return preg_replace('/^page\./','', $data);
+    private function remove_prefix($data, $hidePrefix, $modifier=''){
+        $rst = '';
+        if (!$hidePrefix) {
+            $rst = $data;
+        }else{
+            $rst = preg_replace('/^page\./','', $data);
+        }
+        if ($modifier && preg_match("/@/", $modifier)){
+            return preg_replace("/@/", $rst, $modifier);
+        }else{
+            return $rst;
+        }
     }
     private function get_condition_expression_code($hidePrefix) {
         $code = [];
-        $modifier = ['not'=> '!'];
         if ($this->data){
-            if ($this->data->modifier) $code[] = $modifier[$this->data->modifier];
-            $code[] = $this->remove_prefix($this->data->path, $hidePrefix) ?: $this->data->literal;
+            $code[] = $this->remove_prefix($this->data->path, $hidePrefix, $this->data->modifier) ?: $this->data->literal;
         }else if ($this->expression) {
             $code[] = $this->expression->get_expression_code();
         }
         if ($this->rightData){
             $code[] = $this->operator;
-            if ($this->rightData->modifier) $code[] = $modifier[$this->rightData->modifier];
-            $code[] = $this->remove_prefix($this->rightData->path, $hidePrefix) ?: $this->rightData->literal;
+            $code[] = $this->remove_prefix($this->rightData->path, $hidePrefix, $this->rightData->modifier) ?: $this->rightData->literal;
         }else if ($this->rightExpression) {
             $code[] = $this->rightExpression->get_expression_code();
         }

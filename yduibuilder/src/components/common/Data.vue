@@ -14,7 +14,7 @@
          @mouseover="highlight('out')" @mouseleave="offlight()"
          :class="{'iconfont icon-data-output bind-icon': true, 'bound-out': myModel.out}"></i>
     </div>
-    <div class="model-field text-truncate" @click="isOpen = !isOpen" :style="'width:0px;padding-left: ' + (intent * 16) + 'px'">
+    <div class="model-field text-truncate" @click="isOpen = !isOpen" :style="'padding-left: ' + (intent * 16) + 'px'">
       <i v-if="myModel.type=='array' || myModel.type=='object'" :class="{'iconfont':true, 'icon-tree-close': !isOpen, 'icon-tree-open': isOpen}"></i>
       <i v-if="myModel.type!='array' && myModel.type!='object'" class="flex-shrink-0" style="width: 16px;height: 24px;">&nbsp;</i>
       <div :class="{'pointer hover-text-primary': true, 'fw-bolder':intent==0}" @click.stop="viewDetail">
@@ -25,22 +25,23 @@
           {{myModel.name}}
         </template>
       </div>
-      <span :class="'ps-1 param-' + myModel.type">
-        {{myModel.type}}
-        <span class="text-muted fs-7" :title="myModel.mock=='1' ? 'Has Mock' : ('Mock: '+ myModel.mock)" v-if="myModel.mock">M</span>
+      <span class="ps-1 text-truncate fs-7">
+        <span :class="'param-' + myModel.type">
+          {{myModel.type}}
+        </span>
+        <!--title-->
+        <span class="text-info" v-if="myModel.title">
+          &nbsp;{{myModel.title}}
+        </span>
+        <span class="text-muted" :title="myModel.mock=='1' ? 'Has Mock' : ('Mock: '+ myModel.mock)" v-if="myModel.mock">&nbsp;M</span>
         <template v-if="myModel.defaultValue">
-          <span v-if="['object','array','map','any'].indexOf(myModel.type)==-1" class="text-info ps-1 fs-7 text-truncate">{{myModel.defaultValue}}</span>
-          <span v-else @click.stop="openCodeEditor(myModel.defaultValue, 'view')" class="text-info ps-1 fs-7 text-truncate">{{t('common.view')}}</span>
+          <span v-if="['object','array','map','any'].indexOf(myModel.type)==-1">&nbsp;{{myModel.defaultValue}}</span>
+          <span v-else @click.stop="openCodeEditor(myModel.defaultValue, 'view')">&nbsp;{{t('common.view')}}</span>
         </template>
       </span>
-      <span class="text-truncate ps-2 fs-7 pointer text-muted" @click="showComment()">
+      <span class="ps-1 fs-7 pointer text-muted" @click="showComment()">
         {{enumValues}}
-        {{myModel.comment}}
       </span>
-    </div>
-    <!--title-->
-    <div class="model-title fs-7">
-      {{myModel.title}}
     </div>
     <div class="model-action" v-if="canMutation">
       <i class="iconfont icon-import pointer text-muted hover-primary" @click.stop="openCodeEditor('', 'import')" v-if="myModel.type=='object' || myModel.type=='array'"></i>
@@ -56,7 +57,7 @@
   <teleport to="#app">
     <div>
       <div class="shadow-sm" ref="outputTypeMenu" v-if="showOutputTypeMenu" :style="outputTypeStyle" @click.stop.prevent>
-        <AdvanceSelect :options="outputAndBoundItems(currBindOutUI)" :hide-toggle="true" @click="(option) => changeOutputOrBound(currBindOutUI, option)"></AdvanceSelect>
+        <AdvanceSelect :options="outputAndBoundItems(currBindOutUI)" :hide-toggle="true" @change="(option) => changeOutputOrBound(currBindOutUI, option)"></AdvanceSelect>
       </div>
     </div>
   </teleport>
@@ -72,11 +73,11 @@
       <div class="text-muted" v-if="!hasOutputAs(item.type) && showBoundType==='out'"> as data output</div>
       <div class="input-group flex-grow-1 flex-nowrap input-group-sm ms-2 me-2" v-if="hasOutputAs(item.type)">
         <div class="input-group-text border-0 fs-7 p-0 bg-white">{{t('api.outputAS')}}&nbsp;</div>
-        <AdvanceSelect :options="outputAsItems(item)" @click="(option) => changeOutputAs(item, option.value, showBoundType)" :default-text="myModel.out[item.meta.id] || ''"></AdvanceSelect>
+        <AdvanceSelect :options="outputAsItems(item)" @change="(option) => changeOutputAs(item, option.value, showBoundType)" :default-text="myModel.out[item.meta.id] || ''"></AdvanceSelect>
       </div>
       <div class="input-group flex-grow-1 flex-nowrap input-group-sm me-2" v-if="hasBoundAs(item.type)">
         <div class="input-group-text border-0 fs-7 p-0 bg-white">{{t('api.boundAS')}}&nbsp;</div>
-        <AdvanceSelect :options="boundAsItems" @click="(option) => changeBoundAs(item, option.value)" :default-text="myModel.bound?.[item.meta.id] || 'none'"></AdvanceSelect>
+        <AdvanceSelect :options="boundAsItems" @change="(option) => changeBoundAs(item, option.value)" :default-text="myModel.bound?.[item.meta.id] || 'none'"></AdvanceSelect>
       </div>
       <i class="iconfont icon-remove text-danger" @click.stop.prevent="removeBind(item, showBoundType)" ></i>
     </div>

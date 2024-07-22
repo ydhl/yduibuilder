@@ -17,8 +17,8 @@
           <span>{{tree.title}}</span>
         </div>
       </label>
-      <slot v-if="hover && !tree.isApi" name="trunk" :data="tree"></slot>
-      <slot v-if="hover && tree.isApi" name="leaf" :data="tree"></slot>
+      <slot v-if="!tree.isApi" name="trunk" :data="tree" :hover="hover"></slot>
+      <slot v-if="tree.isApi" name="leaf" :data="tree" :hover="hover"></slot>
     </div>
     <template v-if="tree.children?.length > 0">
       <ul :class="{'tree':true, 'd-none':!subIsOpen}">

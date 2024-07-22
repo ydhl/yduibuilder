@@ -77,7 +77,7 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 6. yduibuilder不要直接访问，他是通过后端ydecloud进入
 
 ### 安装ydecloud 管理后端
-1. 初始化数据库: 导入`db_init.sql`创建数据库
+1. 初始化数据库: 导入`db_init.sql`创建数据库, `db_update.sql` 执行数据库更新
 2. 修改`ydevcloud/code/app/__config__.php`中的配置, 在config方法中配置数据库信息
    1. `default_db`： 你的数据库名称
    2. `db_host`： 访问地址

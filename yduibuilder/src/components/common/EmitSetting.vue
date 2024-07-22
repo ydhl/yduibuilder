@@ -1,7 +1,8 @@
 <template>
   <div class="d-flex align-items-center">
-    <AdvanceSelect :options="events" @click="(option)=>updateEmit(option.value)" :default-text="modelValue.emit?.event || t('action.notSet')"></AdvanceSelect>
-    <div v-if="!pageDataInline && modelValue.emit?.event" class="pointer fs-7 ms-3 d-flex align-items-center" @click="openBindPageDataDlg()">
+    <template v-if="readonly">{{modelValue.emit?.event || t('action.notSet')}}</template>
+    <AdvanceSelect v-else :options="events" @change="(option)=>updateEmit(option.value)" :default-text="modelValue.emit?.event || t('action.notSet')"></AdvanceSelect>
+    <div v-if="!pageDataInline && modelValue.emit?.event" class="pointer fs-7 ms-3 d-flex align-items-center" @click="!readonly ? openBindPageDataDlg() : ''">
       <div v-if="boundCount>0" class="text-danger fw-bold">
         <i class="iconfont icon-connect fs-7 hover-primary"></i>{{boundCount}}
       </div>
@@ -13,7 +14,7 @@
 
   <div class="flex-grow-1" v-if="pageDataInline && modelValue.emit?.event">
     <DataConnect v-for="(item, index) in myAction.emit?.args" @updateConnectData="updateConnectData"
-                 connect="to"
+                 connect="to" :readonly="readonly"
                  :bound-data="myAction.input" :variables="variables" path="" :root-uuid="item.uuid"
                  :key="index" :intent="0" :model="item" :index="0">
     </DataConnect>
@@ -33,7 +34,7 @@
 
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, toRef } from 'vue'
 import ydhl from '@/lib/ydhl'
 import { useStore } from 'vuex'
 import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
@@ -45,6 +46,7 @@ export default {
   components: { DataConnect, AdvanceSelect },
   props: {
     modelValue: Object,
+    readonly: Boolean,
     variables: Object,
     pageDataInline: Boolean, // true 页面数据绑定直接展示，false 弹窗展示, 弹窗在关闭时会调用api保存
     autosave: {
@@ -56,7 +58,7 @@ export default {
   setup (props: any, context: any) {
     const { t } = useI18n()// 自定义的事件
     const store = useStore()
-    const myAction = ref(props.modelValue)
+    const myAction = toRef(props, 'modelValue')
     const pageDataBindDlgVisible = ref(false)
     const boundData = ref(props.modelValue.input || {})
     const selectedPage = computed(() => store.state.design.page)

@@ -1,0 +1,3 @@
+ALTER TABLE `page_bind_data` CHANGE `type` `type` VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'string';
+ALTER TABLE `action` CHANGE `type` `type` ENUM('output','redirect','popup','call','webapi','emit','mutation','closepopup','interval') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'output';
+ALTER TABLE `action` ADD `interval_duration` SMALLINT UNSIGNED NULL DEFAULT '0' AFTER `index`, ADD `interval_delay` SMALLINT NULL DEFAULT '0' AFTER `interval_duration`, ADD `interval_action` VARCHAR(145) NOT NULL AFTER `interval_delay`, ADD `interval_complete` VARCHAR(145) NOT NULL AFTER `interval_action`;

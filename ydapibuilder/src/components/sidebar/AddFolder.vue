@@ -1,5 +1,5 @@
 <template>
-  <lay-layer :title="t('api.addFolder')" v-model="showAddFolder" :shade="true" :btn="buttons">
+  <lay-layer :title="folder.id ? t('api.editFolder') : t('api.addFolder')" v-model="showAddFolder" :shade="true" :btn="buttons">
     <div class="p-3">
       <div class="mb-3">
         <label>{{t("api.folderParent")}}</label>
@@ -7,7 +7,7 @@
       </div>
       <div class="mb-3">
         <label>{{t("api.folderName")}}</label>
-        <input type="text" class="form-control" v-model="folder.name">
+        <input type="text" class="form-control" v-model="folder.title">
       </div>
       <div>
         <label>{{t("common.desc")}}</label>
@@ -34,6 +34,9 @@ export default {
     const showAddFolder = ref(true)
     const folder = ref(props.modelValue)
     const folderSelector = ref([])
+    watch(showAddFolder, (v) => {
+      if (!v) context.emit('close', null)
+    })
 
     const loadFolder = () => {
       ydhl.get('/api/folder.json?projectId=' + props.projectId).then((rst: any) => {
@@ -45,7 +48,7 @@ export default {
     })
     const buttons = ref([
       {
-        text: t('common.addFolder'),
+        text: folder.value.id ? t('common.save') : t('common.addFolder'),
         callback: () => {
           ydhl.post('/api/folder/add.json',
             { project_uuid: props.projectId, name: folder.value.name || '', comment: folder.value.comment || '', uuid: folder.value.id || '', parent: folder.value.parent || '' },

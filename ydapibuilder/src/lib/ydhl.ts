@@ -163,6 +163,7 @@ export default {
   confirm (msg, okLabel, cancelLabel) {
     return new Promise((resolve, reject) => {
       layer.confirm(msg, {
+        title: 'YDAPIBox',
         btn: [
           {
             text: okLabel,

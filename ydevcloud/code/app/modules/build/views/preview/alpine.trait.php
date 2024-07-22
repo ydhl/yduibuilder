@@ -106,6 +106,7 @@ INPITCONFIG;
     protected function build_event_code() {
         $eventCodes = $this->get_event_action_codes();
         if (!$eventCodes) return;
+        $myid = $this->myid();
 
         $codeLines = [];
         foreach ($eventCodes as $html_event_name => $eventInfo){
@@ -118,7 +119,7 @@ INPITCONFIG;
                 $lines[] = " * ".join(PHP_EOL." * ", $comments);
                 $lines[] = " */";
             }
-            $lines[] = $this->myId(true)."_".$html_event_name."(".join(', ', $args).") {";
+            $lines[] = "{$myid}_{$html_event_name}(".join(', ', $args).") {";
             $lines[] = $this->indent(1, true)."const page = this";
             foreach ($codeBlocks as $codes){
                 $lines = array_merge($lines, $this->build->indent_code(1, $codes));
@@ -128,18 +129,12 @@ INPITCONFIG;
         }
         if($codeLines) $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_EVENT, join(','.PHP_EOL,$codeLines).','.PHP_EOL);
 
-        // 如果是onchange事件，则在init中通过watch输入数据来触发，不再dom中绑定@change；自定义组件的onchange除外
-        if (!$this->is_custom_ui() && $eventCodes['onchange']){
-            $inputData = $this->get_input_data($inputDataName);
-            if (!$inputDataName) $inputDataName = $this->myid().'_value';
-
-            $initCodeLines = [];
-            $initCodeLines[] = 'this.$watch("'.$inputDataName.'", (value, oldValue) => {';
-//            $initCodeLines[] = $this->indent(1, true)."console.log('{$inputDataName}',value,oldValue)";
-            $initCodeLines[] = $this->indent(1, true)."this.".$this->myId(true)."_onchange(".join(', ', $eventCodes['onchange']['args']).");";
-            $initCodeLines[] = '})';
-            $initCodeLines[] = '';
-            $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_INIT, $initCodeLines);
+        // page life cycle 事件
+        foreach($this->lifeCycleEvent() as $eventName){
+            if (!$eventCodes[$eventName]) continue;
+            $_event = preg_replace("/^on/",'',$eventName);
+            $line = "window.addEventListener('{$_event}', (event)=>this.{$myid}_{$eventName}(".join(', ', (array)$eventCodes[$eventName]['args'])."))";
+            $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_INIT, $line);
         }
     }
     protected function build_data_output_bind(){
@@ -168,17 +163,23 @@ INPITCONFIG;
             echo $this->wrap_output('x-input', $inputDataName);
         }
     }
+
     protected function build_event_listen(){
         $events = $this->build->get_events($this->myid());
         $eventHandlers = [];
+        $myid = $this->myid();
         foreach ($events as $event){
+            if(!$event->uicomponent_event_id && $this->isLifeCycleEvent($event->event)) continue;
             $name = strtolower($event->uicomponent_event_id ? $event->event : $this->eventMap($event->event));
-            if (!$this->is_custom_ui() && $name=='onchange') continue;
-            $eventHandlers[] = $name;
+            if (!$this->is_custom_ui() && $name=='change') {
+                $inputDataName = $this->get_input_data_name();
+                $eventHandlers['x-init'] = "\$watch(alpinejs_get_input_data_name(\$el, '{$inputDataName}'), (value, oldValue) => {$myid}_change(value, oldValue))";
+            }else{
+                $eventHandlers['@'.$name] = $this->myid().'_'.$name;
+            }
         }
-        $eventHandlers = array_unique($eventHandlers);
-        foreach ($eventHandlers as $name){
-            echo $this->wrap_output('@'.$name, $this->myid().'_'.$name);
+        foreach ($eventHandlers as $name => $func){
+            echo $this->wrap_output($name, $func);
         }
     }
     protected function output_component(){
@@ -207,19 +208,39 @@ INPITCONFIG;
      */
     protected function eventMap($eventName){
         return [
-            'onload' => 'load',
-            'onready' => 'ready',
-            'onshow' =>'show',
-            'onhide'=>'hide',
-            'onbeforeunload'=>'beforeunload',
-            'onunload'=>'unload',
-            'onresize'=>'resize',
-            'onscroll'=>'scroll',
+            'onchange'=>'change',
+            'oninput'=>'input',
+            'onblur'=>'blur',
+            'onfocus'=>'focus',
+            'onkeyup'=>'keyup',
+            'onkeydown'=>'keydown',
+            'onkeypress'=>'keypress',
             'onclick'=>'click',
             'ondblclick'=>'dblclick',
-            'onpulldown'=>'pulldown',
-            'onreachbottom'=>'reachbottom'
+            'onmousedown'=>'mousedown',
+            'onmouseup'=>'mouseup',
+            'onmouseover'=>'mouseover',
+            'onmouseout'=>'mouseout',
+            'onmousemove'=>'mousemove',
+            'onmouseenter'=>'mouseenter',
+            'onmouseleave'=>'mouseleave'
         ][strtolower($eventName)] ?: $eventName;
+    }
+    private function lifeCycleEvent(){
+        return [
+            'onload',
+            'onready',
+            'onshow',
+            'onhide',
+            'onbeforeunload',
+            'onunload',
+            'onpulldown',
+            'onreachbottom',
+            'onresize',
+        ];
+    }
+    protected function isLifeCycleEvent($eventName){
+        return in_array(strtolower($eventName), $this->lifeCycleEvent());
     }
 
     /**
@@ -259,6 +280,53 @@ INPITCONFIG;
 
             $codeLines[] = 'document.location.href=`'.$this->get_popup_page_url($popupPage).'?'.join('&', $args).'`';
         }
+    }
+    protected function build_interval_code(Action_Model $action, &$codeLines){
+        if ($action->type != 'interval') return;
+        $myid = $this->myid();
+        $delay = intval($action->interval_delay)?:1000;
+        $duration = intval($action->interval_duration)?:1000;
+
+        $action_ids = array_filter(explode(',', $action->interval_action));
+        $complete_ids = array_filter(explode(',', $action->interval_complete));
+        $ids = array_filter(array_merge($action_ids, $complete_ids));
+
+        $subActions = $ids ? Action_Model::from()->where('is_deleted = 0 and id in ('.join(',',$ids).')')->select() : [];
+        $actionCodes = [];
+        $completeCodes = [];
+        foreach ($subActions as $subAction){
+            if (in_array($subAction->id, $action_ids)){
+                $this->get_action_code(1, $subAction, $actionCodes);
+            }
+            if (in_array($subAction->id, $complete_ids)){
+                $this->get_action_code(2, $subAction, $completeCodes);
+            }
+        }
+        $actionCodes = $actionCodes ? join(PHP_EOL, $actionCodes).PHP_EOL : '';
+        $completeCodes = $completeCodes ? join(PHP_EOL, $completeCodes).PHP_EOL : '';
+
+        $interval = <<< INTERVAL
+if (page.{$myid}_interval) return;
+page.{$myid}_remainTime = {$duration};
+event.target.setAttribute('disabled', true)
+page.{$myid}_interval = setInterval(() => {
+    if(page.{$myid}_remainTime<=0){
+        clearInterval(page.{$myid}_interval);
+        page.{$myid}_interval = null;
+        event.target.removeAttribute('disabled')
+        page.{$myid}_remainTime = 0
+
+{$completeCodes}
+        return;
+    }
+    
+    page.{$myid}_remainTime -= {$delay};
+    const remainTime = page.{$myid}_remainTime;
+{$actionCodes}
+}, {$delay})
+INTERVAL;
+
+        $codeLines[] = $interval;
     }
     private function build_api_body_data(Page_Bind_Api_Model $bind_api, $formatVariables, $inputBody, &$codeLines) {
 
@@ -565,42 +633,55 @@ INPITCONFIG;
             $codeLines[] = $bindVariable->to_data_path.' = '.$expression->get_expression_code();
         }
     }
+
+    /**
+     * @param $indent
+     * @param $action
+     * @param $bodyLines
+     * @param $bind_api Page_Bind_Api_Model 触发该action的 bind api
+     * @return void
+     */
+    private function get_action_code($indent, $action, &$bodyLines=[], $bind_api=null){
+        if ($action->type=='output'){
+            $codes = [];
+            $this->build_api_output($bind_api, $action, $codes);
+            $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $codes));
+        }else if ($action->type=='redirect'){
+            $codes = [];
+            $this->build_redirect_code($action, $codes);
+            $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $codes));
+        }else if ($action->type=='popup'){
+            $codes = [];
+            $this->build_popup_event_code($action, $codes);
+            $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $codes));
+        }else if ($action->type=='mutation'){
+            $codes = [];
+            $this->build_mutation_code($action, $codes);
+            $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $codes));
+        }else if ($action->type=='interval'){
+            $codes = [];
+            $this->build_interval_code($action, $codes);
+            $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $codes));
+        }else if ($action->type=='webapi'){
+            // api 主体单独生成一个方法
+            $innerMethod = "call_api_inner";
+            $bodyLines[] = $this->indent($indent, true).'page.'.$this->myId(true)."_{$innerMethod}(rst)";
+
+            $apicCodes = ['const page = this;'];
+            $this->build_webapi_code($action, $apicCodes);
+            $apicCodes = $this->build->indent_code(1, $apicCodes);
+            array_unshift($apicCodes,$this->myId(true)."_{$innerMethod}(rst) {");
+            array_unshift($apicCodes,'');
+            $apicCodes[] = '},';
+            $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_EVENT, $apicCodes);
+        }else{
+            $bodyLines[] = $this->indent($indent, true).'// NOT DEFINED ACTION TYPE '.$action->type;
+        }
+    }
     private function get_post_processor_body($indent, Page_Bind_API_Action_Model $bindAction, Io_Data_Fetch $io_data_fetch, Page_Bind_Api_Model $bind_api, &$bodyLines){
         $actions = $bindAction->get_actions();
         foreach ($actions as $action){
-            if ($action->type=='output'){
-                $codes = [];
-                $this->build_api_output($bind_api, $action, $codes);
-                $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $codes));
-            }else if ($action->type=='redirect'){
-                $codes = [];
-                $this->build_redirect_code($action, $codes);
-                $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $codes));
-            }else if ($action->type=='popup'){
-                $codes = [];
-                $this->build_popup_event_code($action, $codes);
-                $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $codes));
-            }else if ($action->type=='mutation'){
-                $codes = [];
-                $this->build_mutation_code($action, $codes);
-                $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $codes));
-            }else if ($action->type=='webapi'){
-                // api 主体单独生成一个方法
-                $innerMethod = "call_api_inner";
-                $bodyLines[] = $this->indent($indent, true).'page.'.$this->myId(true)."_{$innerMethod}(rst)";
-
-                $apicCodes = ['const page = this;'];
-                $this->build_webapi_code($action, $apicCodes);
-                $apicCodes = $this->build->indent_code(1, $apicCodes);
-                array_unshift($apicCodes,$this->myId(true)."_{$innerMethod}(rst) {");
-                array_unshift($apicCodes,'');
-                $apicCodes[] = '},';
-                $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_EVENT, $apicCodes);
-
-                break;
-            }else{
-                $bodyLines[] = $this->indent($indent, true).'// NOT DEFINED ACTION TYPE '.$action->type;
-            }
+            $this->get_action_code($indent, $action, $bodyLines, $bind_api);
         }
     }
     private function get_post_processor($bindActions, Io_Data_Fetch $io_data_fetch, Page_Bind_Api_Model $bind_api){

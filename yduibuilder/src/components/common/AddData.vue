@@ -109,7 +109,7 @@ export default {
     modelValue: Object,
     types: {
       type: Array,
-      default: () => ['string', 'integer', 'number', 'boolean', 'object', 'array', 'map', 'null', 'any']
+      default: () => ['string', 'integer', 'number', 'boolean', 'object', 'array', 'map', 'null', 'any', 'blob']
     },
     isArrayItem: Boolean, // 数组结点标识, 数组结点则只能修改type和comment
     hasDefaultValue: {

@@ -7,8 +7,10 @@
         <i class="iconfont icon-uicomponent"></i>
       </div>
       <div class="flex-grow-1 text-truncate" @click="isInEditPageTitle=true">
-        <input type="text" :readonly="!isInEditPageTitle"
-               :class="{'text-secondary user-select-none': !isInEditPageTitle,'form-control-sm form-control border-0 bg-transparent shadow-none': true}" v-model="title"
+        <div v-if="!isInEditPageTitle" class="text-secondary user-select-none form-control-sm form-control border-0">{{title}}</div>
+        <input type="text" v-else
+               class="form-control-sm form-control border-0 bg-transparent shadow-none" v-model="title"
+               @keyup.enter="isInEditPageTitle=false"
                @blur="isInEditPageTitle=false" :title="t('page.editPage')">
       </div>
       <div class="bg-light text-truncate active ps-1 pe-1 text-muted rounded user-select-none" data-bs-toggle="tooltip" :title="t('page.boxModelTip')"><i class="iconfont icon-boxmodel"></i> <small>{{t('page.boxModel')}}</small></div>

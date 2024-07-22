@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex align-items-center justify-content-between mb-2 pt-2">
-    <div class="fs-6 text-muted"><i class="iconfont icon-event"></i>&nbsp;{{t('event.pageEvent')}}</div>
+    <div class="fs-6 text-muted user-select-none"><i class="iconfont icon-event"></i>&nbsp;{{t('event.pageEvent')}}</div>
     <button type="button" class="btn btn-primary btn-xs" @click.stop="openEventBindDlg">{{t('event.bind')}}</button>
   </div>
   <div v-if="loading" class="vh-100 d-flex align-items-center justify-content-center">
@@ -49,35 +49,33 @@
         </div>
       </template>
     </div>
-  </template>
-  <!--组件自定义事件-->
-  <template  v-if="selectedPage?.pageType == 'component'">
-    <div class="d-flex align-items-center justify-content-between mb-2 pt-2">
-      <div class="fs-6 text-muted"><i class="iconfont icon-event"></i>&nbsp;{{t('event.declareEvent')}}</div>
-      <button type="button" class="btn btn-primary btn-xs" @click.stop="openDeclareDialog">{{t('event.defineEvent')}}</button>
-    </div>
-    <div class="style-panel pt-1">
-      <template v-for="(event, key) in declaredEvents" :key="key">
-        <div class="style-header d-flex align-items-center">
-          <div class="flex-grow-1 text-truncate">
-            <i class="iconfont icon-tree-close"></i> {{event.name}}
+    <!--组件自定义事件-->
+    <template  v-if="selectedPage?.pageType == 'component'">
+      <div class="d-flex align-items-center justify-content-between mb-2 pt-2">
+        <div class="fs-6 text-muted"><i class="iconfont icon-event"></i>&nbsp;{{t('event.declareEvent')}}</div>
+        <button type="button" class="btn btn-primary btn-xs" @click.stop="openDeclareDialog">{{t('event.defineEvent')}}</button>
+      </div>
+      <div class="style-panel pt-1">
+        <template v-for="(event, key) in declaredEvents" :key="key">
+          <div class="style-header d-flex align-items-center">
+            <div class="flex-grow-1 text-truncate">
+              <i class="iconfont icon-tree-close"></i> {{event.name}}
+            </div>
+            <ConfirmRemove @remove="removeDeclareEvent(event)"></ConfirmRemove>
+            <i class="iconfont icon-edit pointer text-muted hover-primary" @click.stop="editDeclareEvent(event)"></i>
           </div>
-          <ConfirmRemove @remove="removeDeclareEvent(event)"></ConfirmRemove>
-          <i class="iconfont icon-edit pointer text-muted hover-primary" @click.stop="editDeclareEvent(event)"></i>
-        </div>
-        <div class="style-body d-none">
-          <div class="fs-7 text-muted p-1" v-if="event.desc">{{event.desc}}</div>
-          <template v-if="!event.args || event.args.length == 0">{{t('event.noArgs')}}</template>
-          <template v-for="(arg, index) in event.args" :key="index">
-            <Data :model="arg" :index="index" :can-input="false" :can-output="false" :can-mutation="false" :intent="0"></Data>
-          </template>
-        </div>
-      </template>
-    </div>
-  </template>
-
-  <!--注册组件的自定义事件-->
-  <template  v-if="selectedUIItem?.type == 'UIComponent'">
+          <div class="style-body d-none">
+            <div class="fs-7 text-muted p-1" v-if="event.desc">{{event.desc}}</div>
+            <template v-if="!event.args || event.args.length == 0">{{t('event.noArgs')}}</template>
+            <template v-for="(arg, index) in event.args" :key="index">
+              <Data :model="arg" :index="index" :can-input="false" :can-output="false" :can-mutation="false" :intent="0"></Data>
+            </template>
+          </div>
+        </template>
+      </div>
+    </template>
+    <!--注册组件的自定义事件-->
+    <template  v-if="selectedUIItem?.type == 'UIComponent'">
     <div class="d-flex align-items-center justify-content-between mb-2 pt-2 mt-3">
       <div class="fs-6 text-muted"><i class="iconfont icon-event"></i>&nbsp;{{t('event.componentEvent', [componentName])}}</div>
     </div>
@@ -112,7 +110,7 @@
       </div>
     </template>
   </template>
-
+  </template>
   <!--绑定的元素菜单-->
   <div class="list-group shadow-sm" ref="boundPop" v-if="boundUIDialogVisible">
     <a href="javascript:void(0)" class="list-group-item list-group-item-action justify-content-between d-flex align-items-center"
@@ -152,7 +150,7 @@
           <label>{{t('common.action')}}</label>
         </div>
         <div class="col-sm-10">
-          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="bindAction || t('action.add')" @click="(option)=>bindAction = option.value"></AdvanceSelect>
+          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
         </div>
       </div>
     </div>
@@ -165,7 +163,7 @@
           <label>{{t('common.action')}}</label>
         </div>
         <div class="col-auto">
-          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="bindAction || t('action.add')" @click="(option)=>bindAction = option.value"></AdvanceSelect>
+          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
         </div>
       </div>
     </div>
@@ -190,7 +188,7 @@
       <div class="row g-3 mt-1 align-items-center">
         <div class="col-sm-2">{{t('common.action')}}</div>
         <div class="col-auto">
-          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="bindAction || t('action.add')" @click="(option)=>bindAction = option.value"></AdvanceSelect>
+          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
         </div>
       </div>
     </div>
@@ -272,7 +270,8 @@ export default {
         { name: t('action.redirect'), value: 'redirect', desc: t('action.redirectDesc') },
         { name: t('action.mutation'), value: 'mutation', desc: t('action.mutationDesc') },
         { name: t('action.popup'), value: 'popup', desc: t('action.popupDesc') },
-        { name: t('action.webapi'), value: 'webapi', desc: t('action.webapiDesc') }
+        { name: t('action.webapi'), value: 'webapi', desc: t('action.webapiDesc') },
+        { name: t('action.interval'), value: 'interval', desc: t('action.intervalDesc') }
       ]
       if (selectedPage.value.pageType === 'component') {
         types.push({ name: t('action.emit'), value: 'emit', desc: t('action.emitDesc') })
@@ -307,7 +306,7 @@ export default {
     const boundUIDialogVisible = ref(false)
     const currCustomEvent = ref<any>({})
     const currBoundEvent = ref<any>({})
-    const bindAction = ref('popup')
+    const bindAction = ref({ value: 'popup', name: t('action.popup') })
     const declareEvent = ref<Record<string, any>>({ uuid: '', name: '', desc: '', args: [] })
     // 自定义的事件
     const declaredEvents = ref([])
@@ -543,7 +542,7 @@ export default {
 
     // 添加自定义事件绑定
     const addCustomBind = () => {
-      ydhl.post('api/event/add.json', { page_uuid: selectedPageId.value, custom_event_uuid: currCustomEvent.value.uuid, type: bindAction.value, uiid: info.selectedUIItemId.value }, [], (rst) => {
+      ydhl.post('api/event/add.json', { page_uuid: selectedPageId.value, custom_event_uuid: currCustomEvent.value.uuid, type: bindAction.value.value, uiid: info.selectedUIItemId.value }, [], (rst) => {
         if (!rst.success) {
           ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
           return
@@ -558,7 +557,7 @@ export default {
         ydhl.alert(t('event.error.bindEventEmpty'), t('common.ok'))
         return
       }
-      if (!bindAction.value) {
+      if (!bindAction.value?.value) {
         ydhl.alert(t('event.error.bindActionEmpty'), t('common.ok'))
         return
       }
@@ -568,7 +567,7 @@ export default {
           uuid: currBoundEvent.value.uuid || '',
           uiid: info.selectedUIItemId.value || '',
           event: currBoundEvent.value.event,
-          type: bindAction.value,
+          type: bindAction.value.value,
           desc: currBoundEvent.value.desc || ''
         }, [], (rst) => {
           ydhl.closeLoading(dialodId)
@@ -588,12 +587,12 @@ export default {
       })
     }
     const addActionBind = () => {
-      if (!bindAction.value) {
+      if (!bindAction.value?.value) {
         ydhl.alert(t('event.error.bindActionEmpty'), t('common.ok'))
         return
       }
       ydhl.loading(t('common.pleaseWait')).then((dialodId) => {
-        ydhl.post('api/event/addaction.json', { page_uuid: selectedPageId.value, event_uuid: currBoundEvent.value.uuid, type: bindAction.value }, [], (rst) => {
+        ydhl.post('api/event/addaction.json', { page_uuid: selectedPageId.value, event_uuid: currBoundEvent.value.uuid, type: bindAction.value.value }, [], (rst) => {
           ydhl.closeLoading(dialodId)
           if (!rst.success) {
             ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))

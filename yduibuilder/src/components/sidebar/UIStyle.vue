@@ -4,10 +4,10 @@
     <div class="pe-2">{{t('common.pleaseSelectUIItem')}}</div>
   </div>
   <div v-if="selectedUIItemId" class="d-flex flex-column h-100">
-    <div class="pt-2 d-flex align-items-center"><i :class="`iconfont text-primary icon-${selectedUIItem.type.toLowerCase()}`"></i>&nbsp;{{selectedUIItem.meta.title || selectedUIItem.type}}&nbsp;<small class="text-muted">#{{uiID}}</small></div>
+    <div class="pt-2 d-flex align-items-center user-select-none"><i :class="`iconfont text-primary icon-${selectedUIItem.type.toLowerCase()}`"></i>&nbsp;{{selectedUIItem.meta.title || selectedUIItem.type}}&nbsp;<small class="text-muted">#{{uiID}}</small></div>
 
     <div class="d-flex  flex-grow-1 border-top border-light border-start">
-      <div class="vertical-tab">
+      <div class="vertical-tab user-select-none">
         <a :class="{'vertical-tab-item': true, 'active': activeStyleState.type=='normal'}" @click="switchStyleState('normal', 'normal')" href="javascript:void(0)">&nbsp;Normal
           <i v-if="styleStates?.normal?.style" class="iconfont icon-point text-danger fs-7"></i>
         </a>

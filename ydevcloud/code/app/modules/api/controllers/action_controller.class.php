@@ -94,7 +94,7 @@ class Action_Controller extends YZE_Resource_Controller {
         }
         return YZE_JSON_View::success($this, ['bind_actions'=>$datas,'suggestions'=>$suggestions]);
     }
-    public function post_remove(){
+    public function post_removeapiaction(){
         $request = $this->request;
         $this->layout = '';
         $uuid = trim($request->get_from_post("uuid"));
@@ -120,6 +120,39 @@ class Action_Controller extends YZE_Resource_Controller {
 
         return YZE_JSON_View::success($this);
     }
+    // 行为里面的行为
+    public function post_addaction() {
+        $request = $this->request;
+        $action_uuid = trim($request->get_from_post("action_uuid"));
+        $page_uuid = trim($request->get_from_post("page_uuid"));
+        $name = trim($request->get_from_post("name"));// 行为名称
+        $type = trim($request->get_from_post("type"));//行为分类
+
+        $this->valid($page_uuid);
+
+        $action = Action_Model::find_by_uuid($action_uuid);
+        if(!$action) throw new YZE_FatalException(__('event not found'));
+
+        $subAction = new Action_Model();
+        $subAction->set('uuid', Action_Model::uuid())
+            ->set('type', $name)
+            ->set('page_id', $this->page->id)
+            ->set('bind_class', Action_Model::CLASS_NAME)
+            ->set('bind_uuid', $action->uuid)
+            ->save();
+
+        if ($action->type == Action_Model::TYPE_INTERVAL){
+            $field = "interval_{$type}";
+            if ($action->has_column($field)){
+                $old_value = $action->get($field);
+                $old_value = explode(",", $old_value);
+                $old_value[] = $subAction->id;
+                $action->set($field, join(",", $old_value))->save();
+            }
+        }
+
+        return YZE_JSON_View::success($this, $subAction->get_records());
+    }
     // 删除行为
     public function post_deleteaction() {
         $request = $this->request;
@@ -133,13 +166,14 @@ class Action_Controller extends YZE_Resource_Controller {
         $action->remove();
         return YZE_JSON_View::success($this);
     }
+
     /**
      * 保存接口的post process
      * @return YZE_JSON_View
      * @throws YZE_FatalException
      * @throws \yangzie\YZE_DBAException
      */
-    public function post_save(){
+    public function post_saveapiaction(){
         $request = $this->request;
         $this->layout = '';
         $json = json_decode(file_get_contents("php://input"), true);
@@ -278,6 +312,33 @@ class Action_Controller extends YZE_Resource_Controller {
         $action_records = $action->get_records();
         unset($action_records['id'],$action_records['is_deleted'],$action_records['created_on'],$action_records['modified_on']);
         $action_records['popupPageTitle'] = $popupPage->name;
+        return YZE_JSON_View::success($this,$action_records);
+    }
+
+    // 更新interval事件内容
+    public function post_interval() {
+        $request = $this->request;
+        $loginUser = YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
+        $postData = json_decode(file_get_contents("php://input"), true);
+        $page_uuid = trim($postData["page_uuid"]);
+        $action_uuid = trim($postData["action_uuid"]);
+        $duration = intval($postData["duration"])?:1000;
+        $delay = intval($postData["delay"])?:1000;
+        $actionIds = $postData["action"]?:[];
+        $completeIds = $postData["complete"]?:[];
+        $this->valid($page_uuid);
+        $action = $action_uuid ? find_by_uuid(Action_Model::CLASS_NAME, $action_uuid) : null;
+
+        if(!$action) throw new YZE_FatalException(__('action not found'));
+
+        $action->set('type', Action_Model::TYPE_INTERVAL)
+            ->set('interval_duration', $duration)
+            ->set('interval_delay', $delay)
+            ->set('interval_action', join(",", $actionIds))
+            ->set('interval_complete', join(",", $completeIds))
+            ->save();
+        $action_records = $action->get_records();
+        unset($action_records['id'],$action_records['is_deleted'],$action_records['created_on'],$action_records['modified_on']);
         return YZE_JSON_View::success($this,$action_records);
     }
 

@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "34452950",
+      "name": "interval",
+      "font_class": "interval",
+      "unicode": "e834",
+      "unicode_decimal": 59444
+    },
+    {
       "icon_id": "6244963",
       "name": "导入",
       "font_class": "import",

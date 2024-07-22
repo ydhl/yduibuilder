@@ -31,6 +31,9 @@
 .param-any{
   color: #dd8efd;
 }
+.param-blob{
+  color: #9d9d00;
+}
 .api-method-get{
   color: #22a100;
 }
@@ -78,6 +81,9 @@
   .model-field{
     display: flex;
     align-items: center;
+    flex-grow: 1;
+  }
+  .model-title{
     flex-grow: 1;
   }
   .model-action{
@@ -146,6 +152,7 @@
 }
 .expression-group{
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
 }
 .expression-group:before{

@@ -21,6 +21,7 @@ class Action_Model extends YZE_Model{
     const TYPE_EMIT = 'emit';
     const TYPE_MUTATION = 'mutation';
     const TYPE_CLOSEPOPUP = 'closepopup';
+    const TYPE_INTERVAL = 'interval';
     const REDIRECT_TYPE_INSIDE = 'inside';
     const REDIRECT_TYPE_OUTSIDE = 'outside';
     const REDIRECT_TYPE_UNSET = 'unset';
@@ -140,6 +141,26 @@ class Action_Model extends YZE_Model{
      * @var integer
      */
     const F_INDEX = "index";
+    /**
+     * 
+     * @var integer
+     */
+    const F_INTERVAL_DURATION = "interval_duration";
+    /**
+     * 
+     * @var integer
+     */
+    const F_INTERVAL_DELAY = "interval_delay";
+    /**
+     * 
+     * @var string
+     */
+    const F_INTERVAL_ACTION = "interval_action";
+    /**
+     * 
+     * @var string
+     */
+    const F_INTERVAL_COMPLETE = "interval_complete";
     public static $columns = [
     'id'         => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
       'created_on' => ['type' => 'date', 'null' => false,'length' => '','default'	=> 'CURRENT_TIMESTAMP'],
@@ -161,6 +182,10 @@ class Action_Model extends YZE_Model{
       'page_id'    => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
       'emit_event_id' => ['type' => 'integer', 'null' => true,'length' => '','default'	=> ''],
       'index'      => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '0'],
+      'interval_duration' => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '1'],
+      'interval_delay' => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '1000'],
+      'interval_action' => ['type' => 'string', 'null' => true,'length' => '145','default'	=> ''],
+      'interval_complete' => ['type' => 'string', 'null' => true,'length' => '145','default'	=> ''],
     ];
     /**
      * @see YZE_Model::$unique_key
@@ -227,7 +252,7 @@ class Action_Model extends YZE_Model{
 
 	
 	public static function get_type(){
-		return ['output','redirect','popup','call','webapi','emit','mutation','closepopup'];
+		return ['output','redirect','popup','call','webapi','emit','mutation','closepopup','interval'];
 	}
 	public static function get_redirect_type(){
 		return ['inside','outside','unset'];
