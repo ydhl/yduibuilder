@@ -787,10 +787,10 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                     case 'webapi': {
                         // api 主体单独生成一个方法
                         $innerMethod = "call_api_in_{$html_event_name}";
-                        $actionCodeLines[] = 'page.'.$this->myId(true)."_{$innerMethod}()";
+                        $actionCodeLines[] = 'page.'.$this->myId(true)."_{$innerMethod}(event)";
                         $apicCodes = [];
                         $this->build_webapi_code($action, $apicCodes);
-                        $eventCodes[$innerMethod] = ['code'=>$apicCodes,'args'=>[],'comment'=>''];
+                        $eventCodes[$innerMethod] = ['code'=>$apicCodes,'args'=>['event'],'comment'=>''];
                         break;
                     }
                     case 'redirect': $this->build_redirect_code($action, $actionCodeLines);break;
