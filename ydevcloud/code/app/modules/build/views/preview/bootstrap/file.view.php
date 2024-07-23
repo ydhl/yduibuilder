@@ -15,6 +15,7 @@ class File_View extends Preview_View implements Valuable_View {
     public function build_ui()
     {
         $space =  $this->indent(0);
+        $accept = $this->data['meta']['custom']['accept'];
 
         echo "{$space}";
         echo "<div";
@@ -23,7 +24,11 @@ class File_View extends Preview_View implements Valuable_View {
         echo $this->indent(1);
         echo '<input type="file" class="d-block"';
         echo $this->build_form_attrs();
-        echo $this->wrap_output('accept', $this->data['meta']['custom']['accept']?:null);
+        if ($accept){
+            echo $this->wrap_output('accept', join(',',array_map(function($item){
+                return 'text/'.trim($item);
+            }, explode(',', $accept))));
+        }
         echo $this->wrap_output('multiple', null, $this->data['meta']['custom']['multiple']?:null);
         echo ">".PHP_EOL;
         echo "{$space}";

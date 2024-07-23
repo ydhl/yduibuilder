@@ -56,7 +56,8 @@
                    class="list-group-item border-0 list-group-item-action p-1 pe-0 ps-3 d-flex align-items-center">
                 <i class="iconfont icon-drag text-muted" style="cursor: move"></i>
                 <i :class="'iconfont text-danger me-1 icon-' + action.type"></i>
-                <EventAction :action="action" bind-type="bind_event" :bind-uuid="editInterval.uuid" :key="actionIndex"
+                <EventAction :action="action" bind-type="bind_event"
+                             :bind-uuid="editInterval.uuid" :key="actionIndex"
                              :variables="myVariables"></EventAction>
                 <ConfirmRemove @remove="deleteAction(actionIndex, action, 'action')"></ConfirmRemove>
               </div>
@@ -74,7 +75,8 @@
                    class="list-group-item border-0 list-group-item-action p-1 pe-0 ps-3 d-flex align-items-center">
                 <i class="iconfont icon-drag text-muted" style="cursor: move"></i>
                 <i :class="'iconfont text-danger me-1 icon-' + action.type"></i>
-                <EventAction :action="action" bind-type="bind_event" :bind-uuid="editInterval.uuid" :key="actionIndex"
+                <EventAction :action="action" bind-type="bind_event"
+                             :bind-uuid="editInterval.uuid" :key="actionIndex"
                              :variables="myVariables"></EventAction>
                 <ConfirmRemove @remove="deleteAction(actionIndex, action, 'complete')"></ConfirmRemove>
               </div>
@@ -86,7 +88,7 @@
   </lay-layer>
 
   <!-- bind action Dialog -->
-  <lay-layer v-model="addActionDlgVisible" skin="layui-layer-content-overflow"  :title="t('event.bind')" :shade="true" :area="['420px', '250px']" :btn="addActionButtons">
+  <lay-layer v-model="addActionDlgVisible" skin="layui-layer-content-overflow"  :title="t('common.action')" :shade="true" :area="['420px', '250px']" :btn="addActionButtons">
     <div class="ps-4 pe-4 pt-2 pb-2">
       <div class="row g-3 mt-1 align-items-center">
         <div class="col-sm-2">
@@ -101,7 +103,7 @@
 </template>
 
 <script lang="ts">
-import { ref, toRef, computed } from 'vue'
+import { ref, toRef, computed, nextTick } from 'vue'
 import ydhl from '@/lib/ydhl'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
@@ -120,7 +122,7 @@ export default {
       type: Boolean
     } // 是否自动提交接口保存
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'beforeSave'],
   components: {
     AdvanceSelect,
     ConfirmRemove,
@@ -236,9 +238,21 @@ export default {
         ydhl.alert(t('event.error.bindActionEmpty'), t('common.ok'))
         return
       }
+
       addActionDlgVisible.value = false
+      if (!myAction.value.uuid) { // 对应的action不存在，这时先通知上层组件先把action在后端保存起来; 主要时bindApiPostprocessor在对话框整体保存数据的情况
+        context.emit('beforeSave', (newAction) => {
+          nextTick(() => {
+            saveAction()
+          })
+        })
+      } else {
+        saveAction()
+      }
+    }
+    const saveAction = (actionUuid = '') => {
       ydhl.loading(t('common.pleaseWait')).then((dialodId) => {
-        ydhl.post('api/action/addaction.json', { page_uuid: selectedPageId.value, type: addActionType, action_uuid: myAction.value.uuid, name: bindAction.value.value }, [], (rst) => {
+        ydhl.post('api/action/addaction.json', { page_uuid: selectedPageId.value, type: addActionType, action_uuid: myAction.value.uuid || actionUuid, name: bindAction.value.value }, [], (rst) => {
           ydhl.closeLoading(dialodId)
           if (!rst.success) {
             ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))

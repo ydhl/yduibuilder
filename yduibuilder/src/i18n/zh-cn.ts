@@ -481,8 +481,8 @@ export default {
     empty: '无内容',
     existingClasses: '存在的样式',
     file: {
-      accept: '文件类型',
-      acceptTip: '例如 image/*',
+      accept: '文件名后缀',
+      acceptTip: '例如 jpg,png',
       multiple: '多文件上传'
     },
     form: {

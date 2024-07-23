@@ -1,7 +1,7 @@
 <template>
   <div :class="{'flex-grow-1': true,'text-truncate':['popup','redirect','emit'].indexOf(myAction.type)==-1}">
     <template v-if="myAction.type==='popup'">
-      <PopupSetting :readonly="readonly" :variables="variables" @beforeCreatePopupBind="beforeCreatePopupBind" :autosave="autosave"
+      <PopupSetting :readonly="readonly" :variables="variables" @beforeSave="beforeSave" :autosave="autosave"
                     :page-data-inline="popupPageDataInline" v-model="myAction"></PopupSetting>
     </template>
     <template v-else-if="myAction.type==='mutation'">
@@ -23,7 +23,7 @@
       {{t('action.closepopupDesc')}}
     </template>
     <template v-else-if="myAction.type=='interval'">
-      <IntervalSetting :readonly="readonly" :variables="variables" :autosave="autosave" v-model="myAction"></IntervalSetting>
+      <IntervalSetting :readonly="readonly" :variables="variables" :autosave="autosave" @beforeSave="beforeSave" v-model="myAction"></IntervalSetting>
     </template>
   </div>
 </template>
@@ -55,17 +55,17 @@ export default {
     // 是否自动提交接口保存
     popupPageDataInline: Boolean
   },
-  emits: ['beforeCreatePopupBind'],
+  emits: ['beforeSave'],
   setup (props: any, context: any) {
     // 对象引用传入下级组件，在autosave为false时，上级会自动更新（没有用update:modelValue）
     const myAction = toRef(props, 'action')
     const { t } = useI18n()
-    const beforeCreatePopupBind = (callback) => {
-      context.emit('beforeCreatePopupBind', callback)
+    const beforeSave = (callback) => {
+      context.emit('beforeSave', callback)
     }
 
     return {
-      beforeCreatePopupBind,
+      beforeSave,
       myAction,
       t
     }

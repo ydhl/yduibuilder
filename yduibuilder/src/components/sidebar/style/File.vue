@@ -4,14 +4,13 @@
     <div class="row">
       <label class="col-sm-3 col-form-label text-end text-truncate">{{ t('style.file.accept') }}</label>
       <div class="col-sm-9">
-        <input type="text" class="form-control form-control-sm" :placeholder="t('style.file.acceptTip')" v-model="accept">
+        <input type="text" class="form-control form-control-sm" :placeholder="t('style.file.acceptTip')" v-model.trim="accept">
       </div>
     </div>
     <div class="row">
-      <label class="col-sm-3 col-form-label text-end text-truncate">{{ t('style.file.multiple') }}</label>
-      <div class="col-sm-9 d-flex align-items-center">
-        <input type="checkbox" v-model="multiple">
-      </div>
+      <label class="col-sm-9 offset-sm-3 d-flex align-items-center">
+        <input type="checkbox" v-model="multiple"> {{ t('style.file.multiple') }}
+      </label>
     </div>
   </div>
 </template>

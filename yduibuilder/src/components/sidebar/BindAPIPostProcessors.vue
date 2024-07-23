@@ -23,10 +23,10 @@
     <div v-else class="list-group list-group-flush">
       <draggable :list="bindApiAction.actions" handle=".icon-drag"  @change="(n) => sortEventAction(bindApiAction, n)">
         <transition-group>
-          <div class="list-group-item border-0 list-group-item-action p-1 d-flex align-items-center" v-for="(action, idx) in bindApiAction.actions" :key="action.uuid">
+          <div class="list-group-item border-0 list-group-item-action p-1 d-flex align-items-center" v-for="(action, idx) in bindApiAction.actions" :key="idx">
             <div class="me-1"><i class="iconfont icon-drag text-muted" style="cursor: move"></i></div>
             <EventAction bind-type="bind_action" :bind-uuid="bindApiAction.uuid" :action="action"
-                         :variables="getLocalArgs(bindApiAction)" @beforeCreatePopupBind="(callback) => beforeCreatePopupBind(idx, callback)"></EventAction>
+                         :variables="getLocalArgs(bindApiAction)" @beforeSave="(callback) => beforeSave(idx, callback)"></EventAction>
             <ConfirmRemove @remove="postRemoveAction(bindApiAction, idx)"></ConfirmRemove>
           </div>
         </transition-group>
@@ -71,7 +71,7 @@
         </div>
         <draggable :list="editBindApiActionModel.actions" handle=".card-header"  @change="(n) => sortEventAction(editBindApiActionModel, n)">
           <transition-group>
-            <div class="card mt-2" v-for="(action, index) in editBindApiActionModel.actions" :key="action.uuid">
+            <div class="card mt-2" v-for="(action, index) in editBindApiActionModel.actions" :key="index">
               <div class="card-header justify-content-between" style="cursor: move">
                 <i class="iconfont icon-drag text-muted"></i>
                 {{t('action.' + action.type)}}
@@ -79,7 +79,7 @@
               </div>
               <div class="card-body">
                 <EventAction :autosave="false" bind-type="bind_action" :bind-uuid="editBindApiActionModel.uuid" :popup-page-data-inline="true" :action="action"
-                             :variables="editBindApiActionVariable" @beforeCreatePopupBind="(callback) => beforeCreatePopupBind(index, callback)">
+                             :variables="editBindApiActionVariable" @beforeSave="(callback) => beforeSave(index, callback)">
                 </EventAction>
               </div>
             </div>
@@ -313,9 +313,9 @@ ${code}
       loadAction()
     })
 
-    const beforeCreatePopupBind = (index, callback) => {
+    const beforeSave = (index, callback) => {
       save(() => {
-        callback(editBindApiActionModel.value.actions[index])
+        callback(JSON.parse(JSON.stringify(editBindApiActionModel.value.actions[index])))
       })
     }
     const changeOutputIndex = (outputIndex) => {
@@ -410,7 +410,7 @@ ${code}
       getLocalArgs,
       addAction,
       changeOutputIndex,
-      beforeCreatePopupBind,
+      beforeSave,
       switchToCode,
       showCode,
       removeBindApiAction,

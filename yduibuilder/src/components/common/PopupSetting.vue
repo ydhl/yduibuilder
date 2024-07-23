@@ -81,7 +81,7 @@ export default {
       type: Boolean
     } // 是否自动提交接口保存
   },
-  emits: ['update:modelValue', 'beforeCreatePopupBind'],
+  emits: ['update:modelValue', 'beforeSave'],
   setup (props: any, context: any) {
     const { t } = useI18n()
     const myAction = toRef(props, 'modelValue')
@@ -175,8 +175,7 @@ export default {
       context.emit('update:modelValue', myAction.value)
       if (!myAction.value.uuid) { // 对应的action不存在，这时先通知上层组件先把action在后端保存起来; 主要时bindApiPostprocessor在对话框整体保存数据的情况
         myAutosave.value = true
-        context.emit('beforeCreatePopupBind', (newAction) => {
-          myAction.value = newAction
+        context.emit('beforeSave', (newAction) => {
           createPopupBind()
         })
       } else {

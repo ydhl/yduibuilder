@@ -310,6 +310,8 @@ if (page.{$myid}_interval) return;
 page.{$myid}_remainTime = {$duration};
 event.target.setAttribute('disabled', true)
 page.{$myid}_interval = setInterval(() => {
+    page.{$myid}_remainTime -= {$delay};
+
     if(page.{$myid}_remainTime<=0){
         clearInterval(page.{$myid}_interval);
         page.{$myid}_interval = null;
@@ -320,7 +322,6 @@ page.{$myid}_interval = setInterval(() => {
         return;
     }
     
-    page.{$myid}_remainTime -= {$delay};
     const remainTime = page.{$myid}_remainTime;
 {$actionCodes}
 }, {$delay})

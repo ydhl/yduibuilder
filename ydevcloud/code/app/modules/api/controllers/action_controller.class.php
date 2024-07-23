@@ -178,18 +178,18 @@ class Action_Controller extends YZE_Resource_Controller {
         $this->layout = '';
         $json = json_decode(file_get_contents("php://input"), true);
         if (!$json) return YZE_JSON_View::error($this, __('Invalid data'));
-        $bindAction = find_by_uuid(Page_Bind_API_Action_Model::CLASS_NAME, $json['uuid']);
+        $bindApiAction = find_by_uuid(Page_Bind_API_Action_Model::CLASS_NAME, $json['uuid']);
         $this->valid($json['page_uuid']);
-        if (!$bindAction){
-            $bindAction = new Page_Bind_API_Action_Model();
-            $bindAction->set('uuid', Page_Bind_API_Action_Model::uuid());
+        if (!$bindApiAction){
+            $bindApiAction = new Page_Bind_API_Action_Model();
+            $bindApiAction->set('uuid', Page_Bind_API_Action_Model::uuid());
         }else{
             foreach (Action_Model::from()->where("page_id=:pid and bind_class=:cls and bind_uuid=:uuid")
-                ->select([':pid'=>$this->page->id, ':cls'=>Page_Bind_API_Action_Model::CLASS_NAME,':uuid'=>$bindAction->uuid]) as $action){
+                ->select([':pid'=>$this->page->id, ':cls'=>Page_Bind_API_Action_Model::CLASS_NAME,':uuid'=>$bindApiAction->uuid]) as $action){
                 $action->remove();
             }
         }
-        $bindAction->set('page_id', $this->page->id)
+        $bindApiAction->set('page_id', $this->page->id)
             ->set('from_class', $json['type']=='bind_api' ? Page_Bind_API_Model::CLASS_NAME : '')// 目前仅和web api有关联
             ->set('from_uuid', $json['from_uuid'])
             ->set('output_data_id', $json['output_data_id'])
@@ -208,28 +208,45 @@ class Action_Controller extends YZE_Resource_Controller {
                     ->get_Single([':pid'=>$this->page->id, ':name'=>$action['emit']['event']]);
                 $action['emit_event_id'] = $emitEvent->id ?: NULL;
             }
+            if ($action['type']=='interval'){
+                $intervalActionIDs = $intervalCompleteIDs = [];
+                foreach ((array)$action['interval']['action'] as $_item){
+                    if (!$_item['id']) continue;
+                    $intervalActionIDs[] = $_item['id'];
+                }
+                foreach ((array)$action['interval']['complete'] as $_item){
+                    if (!$_item['id']) continue;
+                    $intervalCompleteIDs[] = $_item['id'];
+                }
+                $action['interval_duration'] = intval($action['interval']['duration']);
+                $action['interval_delay'] = intval($action['interval']['delay']);
+                $action['interval_action'] = join(',', $intervalActionIDs);
+                $action['interval_complete'] = join(',', $intervalCompleteIDs);
+                unset($action['interval']);
+            }
             $action['input'] = $action['input'] ? json_encode($action['input']) : '';
             $action['output'] = $action['output'] ? json_encode($action['output']) : '';
 
             $web_api = $action['bindApi']['apiUuid'] ? find_by_uuid(Web_Api_Model::CLASS_NAME, $action['bindApi']['apiUuid']) : null;
             if($web_api) {
-                $bind_api = Page_Bind_Api_Model::save_from_web_api($this->page, $web_api, Page_Bind_API_Action_Model::CLASS_NAME, $bindAction->uuid);
+                $bind_api = Page_Bind_Api_Model::save_from_web_api($this->page, $web_api, Page_Bind_API_Action_Model::CLASS_NAME, $bindApiAction->uuid);
                 $action['bind_api_id'] = $bind_api->id;
             }else{
                 $action['bind_api_id'] = 0;
             }
+            unset($action['uuid'],$action['id'],$action['page_id'],$action['bind_class'],$action['bind_uuid']);
             $actionModel = new Action_Model();
             $actionModel->set('uuid', Action_Model::uuid())
                 ->set('page_id', $this->page->id)
                 ->set('bind_class', Page_Bind_API_Action_Model::CLASS_NAME)
-                ->set('bind_uuid', $bindAction->uuid);
+                ->set('bind_uuid', $bindApiAction->uuid);
             $actionModel->save_from_data($action);
 
             if ($action['type']=='mutation'){
                 Mutation_Model::save_mutation($actionModel->id, $action['mutations']);
             }
         }
-        return YZE_JSON_View::success($this,$bindAction->get_action_data());
+        return YZE_JSON_View::success($this,$bindApiAction->get_action_data());
     }
     // 更新弹窗事件内容
     public function post_popup() {

@@ -481,8 +481,8 @@ export default {
     empty: 'No Setting',
     existingClasses: 'Existing Classes',
     file: {
-      accept: 'Accept',
-      acceptTip: 'Such as image/*',
+      accept: 'File extension',
+      acceptTip: 'Such as jpg,png',
       multiple: 'Multiple'
     },
     form: {
