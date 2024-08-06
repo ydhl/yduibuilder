@@ -1,16 +1,5 @@
 <template>
-  <template v-if="modifierPosition == 'left'">
-    {{modiferValue}}{{dataName}}
-  </template>
-  <template v-else-if="modifierPosition == 'right'">
-    {{dataName}}{{modiferValue}}
-  </template>
-  <template v-else-if="modifierPosition=='around'">
-    {{modiferValue}}({{dataName}})
-  </template>
-  <template v-else>
-    {{dataName}}
-  </template>
+  {{ modiferValue }}
 </template>
 
 <script lang="ts">
@@ -29,7 +18,7 @@ export default {
     const modifierPosition = computed<'right'|'left'|'around'|'none'>(() => {
       if (!props.modifier) {
         return 'none'
-      } else if (props.modifier?.match(/^.+@/)) {
+      } else if (props.modifier?.match(/^.+@$/)) {
         return 'left'
       } else if (props.modifier?.match(/^@.+/)) {
         return 'right'
@@ -38,14 +27,10 @@ export default {
       }
     })
     const modiferValue = computed(() => {
-      if (!props.modifier) {
-        return ''
-      } else if (props.modifier?.match(/^.+@/)) {
-        return props.modifier?.replace(/@/, '')
-      } else if (props.modifier?.match(/^@.+/)) {
-        return props.modifier?.replace(/@/, '')
+      if (props.modifier?.match(/@/)) {
+        return props.modifier?.replace(/@/, props.dataName)
       } else {
-        return props.modifier?.replace(/^\(.+\)/, '')
+        return props.dataName
       }
     })
     return {

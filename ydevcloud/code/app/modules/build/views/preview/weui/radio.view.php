@@ -39,7 +39,7 @@ class Radio_View extends ValueList_View {
 
     protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex = null, $iteratorName='')
     {
-        list('name'=>$name, 'value'=>$value, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+        list('name'=>$name, 'value'=>$value, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
         $staticValue = $staticData['value']?:$staticData['name'];
         $myid = $this->myid();
         $inputDataName = $this->get_input_data_name($inputIsArr);
@@ -64,6 +64,7 @@ class Radio_View extends ValueList_View {
         $this->build_form_attrs();
         if ($value){
             echo $this->wrap_output(':value', $value);
+            echo $this->wrap_output('data-bound', $boundData);
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$value} : ''" : null);
             echo $this->wrap_output(':checked', "alpinejs_in_array(\$el, '{$inputDataName}', {$value})");
         }else{

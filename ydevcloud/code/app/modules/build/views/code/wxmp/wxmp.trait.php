@@ -43,7 +43,7 @@ trait Wxmp {
         // 小程序的事件绑定
         $events = @$this->data['events'];
         foreach((array)$events as $eventName => $eventBinds){
-            $sortEventName = $this->eventMap($eventName);
+            $sortEventName = $this->eventName($eventName);
             echo ' bind'.$sortEventName.'="'.$this->myId().ucfirst($sortEventName).'"';
         }
     }

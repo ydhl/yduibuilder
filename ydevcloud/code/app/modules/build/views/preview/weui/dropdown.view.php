@@ -57,7 +57,7 @@ class Dropdown_View extends ValueList_View {
     protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex = null, $iteratorName='')
     {
         $myid = $this->myid();
-        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
         if (!$outputData){
             $staticValue = $staticData['value']?:$staticData['name'];
             $xText = "'{$staticData['name']}'";
@@ -98,6 +98,7 @@ class Dropdown_View extends ValueList_View {
         echo $this->indent(4).'<div role="button"'
             .$this->wrap_output('@click', "alpinejs_set_value(\$el, '{$myid}MenuVisible{$suffix}', false)")
             .$this->wrap_output('data-value', $xValue)
+            .$this->wrap_output('data-bound', $boundData)
             .$this->wrap_output('data-root', $myid)
             .$this->wrap_output(':data-default', $checked ? "{$checked} ? $xValue : ''" : null)
             .$this->wrap_output('class', "weui-cell  weui-cell_active")

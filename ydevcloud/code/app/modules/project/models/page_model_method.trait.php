@@ -36,10 +36,11 @@ trait Page_Model_Method{
         return $this->versions;
     }
     public function remove_gone_uiid(){
-        Page_Bind_Event_Model::remove_gone_uiid($this);// 连带删除bind api，bind api action，bind variable，action，mutation
+        Page_Bind_Event_Model::remove_gone_uiid($this);// 连带删除关联的bind api，bind api action，bind variable，action，mutation
         Page_Bind_Io_Model::remove_gone_uiid($this);
         Page_Bind_Style_Model::remove_gone_uiid($this);
         Uicomponent_Instance_Model::remove_gone_uiid($this);
+        Page_Bind_Api_Model::remove_gone_uiid($this);
     }
     public function remove() {
         Page_User_Model::from()->where('page_id=:pid')->delete([':pid'=>$this->id]);

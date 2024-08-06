@@ -1,12 +1,12 @@
 <template>
   <li :class="{'tree-item': true}">
-    <div :style="`padding-left:${indent*15}px`"
+    <label :style="`padding-left:${indent*15}px`"
          class="tree-node d-flex align-items-center align-content-center"
          @click.stop="subIsOpen = !subIsOpen">
       <i v-if="tree.children.length > 0" :class="{'iconfont': true, 'icon-tree-open': subIsOpen, 'icon-tree-close': !subIsOpen}"></i>
       <i v-else class="iconfont icon-placeholder"></i>
       <i v-if="!tree.isApi" class="iconfont icon-folder"></i>
-      <label class="d-flex m-0 flex-grow-1 justify-content-start overflow-hidden">
+      <div class="d-flex m-0 flex-grow-1 justify-content-start overflow-hidden">
         <template v-if="tree.isApi">
           <div class="text-truncate d-flex align-items-center pointer" @click.stop="viewDetail(tree)">
             <span :class="'api-status api-status-'+tree.status"></span>
@@ -21,10 +21,10 @@
             <span class="text-muted ps-2">{{tree.comment}}</span>
           </div>
         </template>
-      </label>
+      </div>
       <slot v-if="!tree.isApi" name="trunk" :data="tree"></slot>
       <slot v-if="tree.isApi" name="leaf" :data="tree"></slot>
-    </div>
+    </label>
     <template v-if="tree.children.length > 0">
       <ul :class="{'tree':true, 'd-none':!subIsOpen}">
         <APITree :key="index" v-for="(subitem, index) in tree.children" :open="open" :tree="subitem" :indent="indent+1" :path="path+'/'+tree.title">

@@ -67,7 +67,7 @@
       <div class="w-50">
         <div class="text-muted">
           {{t('action.conditionDesc')}}
-          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="t('action.add')" @change="(option)=>addAction(option.value)"></AdvanceSelect>
+          <AdvanceSelect btn-size="btn-sm btn-light" :options="actionTypes" :default-text="t('action.add')" @change="(option)=>addAction(option.value)"></AdvanceSelect>
         </div>
         <draggable :list="editBindApiActionModel.actions" handle=".card-header"  @change="(n) => sortEventAction(editBindApiActionModel, n)">
           <transition-group>

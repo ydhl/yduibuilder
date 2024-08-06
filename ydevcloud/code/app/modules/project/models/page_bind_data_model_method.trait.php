@@ -19,7 +19,7 @@ trait Page_Bind_Data_Model_Method{
         unset($record['created_on'],$record['id'],$record['modified_on'],$record['is_deleted'],$record['page_id'],$record['data_from'],$record['content']);
         if ($this->type == 'array'){
             $record['item'] = json_decode(html_entity_decode($this->content), true);
-        }else if ($this->type == 'object'){
+        }else if ($this->type == 'object' || $this->type == 'file' || $this->type == 'blob'){
             $record['props'] = json_decode(html_entity_decode($this->content), true);
         }
         $record['defaultValue'] = html_entity_decode($this->defaultValue);

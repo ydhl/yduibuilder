@@ -314,7 +314,7 @@ trait Project_Model_Method{
             ->left_join(Module_Model::CLASS_NAME, 'm', 'm.id = p.module_id')
             ->where('p.is_deleted=1 and m.project_id=:pid and p.page_type="page"')->count('id', [':pid'=>$this->id]);
     }
-    private function get_package_libs($relativePath, $package, &$cssLib=[], &$jsLib=[], &$jsModule=[]){
+    public static function get_package_libs($relativePath, $package, &$cssLib=[], &$jsLib=[], &$jsModule=[]){
         if (! file_exists(YZE_PUBLIC_HTML."vendor/{$package}/install.php")) return;
 
         include_once YZE_PUBLIC_HTML."vendor/{$package}/install.php";
@@ -332,7 +332,7 @@ trait Project_Model_Method{
             $jsLib[] = "<script defer src='{$relativePath}vendor/{$package}/{$js}'></script>";
         }
         foreach ((array)$jsForPreview['vendor'] as $vendor) {
-            $this->get_package_libs($relativePath, $vendor, $cssLib, $jsLib, $jsModule);
+            self::get_package_libs($relativePath, $vendor, $cssLib, $jsLib, $jsModule);
         }
     }
     public function fetch_css_js_libs($relativePath, &$cssLib=[], &$jsLib=[], &$jsModule=[]) {
@@ -340,7 +340,7 @@ trait Project_Model_Method{
         $packages = array_merge($packages['system'], $packages['user']);
 
         foreach ($packages as $package){
-            $this->get_package_libs($relativePath, $package, $cssLib, $jsLib, $jsModule);
+            self::get_package_libs($relativePath, $package, $cssLib, $jsLib, $jsModule);
         }
     }
     public function module_count(){

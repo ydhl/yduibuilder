@@ -223,7 +223,6 @@ export default {
             return
           }
           nextTick(() => {
-            // editor.getAction('editor.action.formatDocument').run()
             editorInstance = monaco.editor.create(document.getElementById('styleEditor') as HTMLElement, {
               roundedSelection: true,
               scrollBeyondLastLine: false,

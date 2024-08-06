@@ -1,10 +1,10 @@
 <template>
   <div class="model-item pt-1 pb-1" @click="toggle">
-    <div class="model-field text-truncate" :style="'padding-left: ' + (intent * 16) + 'px'">
+    <div class="model-field text-truncate w-50" :style="'min-width: 200px;padding-left: ' + (intent * 16) + 'px'">
       <i v-if="myModel.type=='object' && (myModel.props && myModel.props.length>0 && !defaultMutation?.[myModel.uuid]?.expression)" :class="{'iconfont':true, 'icon-tree-close': !isOpen, 'icon-tree-open': isOpen}"></i>
       <i v-else style="width: 16px;height: 24px;">&nbsp;</i>
       <div class="pointer hover-text-primary" @click.stop="viewDetail">{{myModel.name}}</div>
-      <span :class="'ps-1 param-' + myModel.type">
+      <span :class="'ps-1 fs-7 param-' + myModel.type">
         {{myModel.type}}
       </span>
       <span class="text-truncate ps-2 pointer text-muted fs-7" @click.stop="showComment()">
@@ -12,8 +12,10 @@
       </span>
     </div>
     <!--title-->
-    <div class="model-title d-flex flex-nowrap">
-      <ExpressionDropdown :variables="variables" :expression="expression" @updateExpression="updateExpression" :leftValue="myModel" :leftValuePath="path"></ExpressionDropdown>
+    <div class="model-title d-flex flex-nowrap justify-content-end flex-grow-1 w-50">
+      <ExpressionDropdown :variables="variables" :hide-arrow="true" :expression="expression" :has-mutation-operator="true"
+                          :default-mutation-operator="mutationOperator" @updateMutationOperator="updateMutationOperator"
+                          @updateExpression="updateExpression" :leftValue="myModel" :leftValuePath="path"></ExpressionDropdown>
     </div>
   </div>
   <template v-if="myModel.type=='object' && isOpen && !defaultMutation?.[myModel.uuid]?.expression">
@@ -27,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { layer } from '@layui/layer-vue'
 import DataInfo from '@/components/common/DataInfo.vue'
@@ -53,24 +55,19 @@ export default {
     const codeDlgVisible = ref(false)
     const detailDlgVisible = ref(false)
     const connectDataDialogVisible = ref(false)
+    const { t } = useI18n()
     const expression = computed<Expression>(() => {
       return defaultMutation.value?.[myModel.value.uuid]?.expression || {}
     })
+    const mutationOperator = computed<string>(() => {
+      return defaultMutation.value?.[myModel.value.uuid]?.mutation_operator || ''
+    })
     const code = ref('')
-    const { t } = useI18n()
     const isOpen = ref(true)
 
     const showComment = () => {
       layer.confirm(props.model.comment || 'no doc', { title: 'YDUIBuilder' })
     }
-
-    onMounted(() => {
-      // 初始结构，并让defaultMutation只包含自己
-      if (!defaultMutation.value?.[myModel.value.uuid]) {
-        const name = props.path ? props.path + '.' + myModel.value.name : myModel.value.name
-        defaultMutation.value[myModel.value.uuid] = { from_uuid: props.fromUuid, data_name: name, data_type: myModel.value.type }
-      }
-    })
 
     const viewDetail = () => {
       detailDlgVisible.value = true
@@ -85,6 +82,9 @@ export default {
       defaultMutation.value[myModel.value.uuid].expression = expression
       defaultMutation.value[myModel.value.uuid].expression_code = expDesc
     }
+    const updateMutationOperator = (operator) => {
+      defaultMutation.value[myModel.value.uuid].mutation_operator = operator
+    }
 
     return {
       t,
@@ -96,10 +96,12 @@ export default {
       code,
       expression,
       defaultMutation,
+      mutationOperator,
       viewDetail,
       toggle,
       showComment,
-      updateExpression
+      updateExpression,
+      updateMutationOperator
     }
   }
 }

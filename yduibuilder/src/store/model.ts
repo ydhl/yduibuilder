@@ -6,7 +6,7 @@ export declare type UIKind = 'pc' | 'mobile'
  * 对于非表单和迭代类元素，用来知道数据绑定为元素的value还是bound，便于在事件内知道ui上的数据信息
  */
 export declare type BoundAsType = 'value' | 'bound'
-export declare type DataType = 'string' | 'integer' | 'number' | 'array' | 'map' | 'boolean' | 'object' | 'any' | 'blob' // 数据结构那类型
+export declare type DataType = 'string' | 'integer' | 'number' | 'array' | 'map' | 'boolean' | 'object' | 'any' | 'blob' | 'file' // 数据结构那类型
 export declare type UIType = 'Breadcrumb' | 'Button'
   | 'Card' | 'Carousel' | 'Checkbox' | 'Collapse' | 'Container'
   | 'Dropdown'
@@ -177,6 +177,7 @@ export interface DataStruct{
    */
   required?: boolean;
   action?: string;
+  readonly?: boolean;
   /**
    * 提供数据的ui uuid数组
    */
@@ -201,7 +202,7 @@ export interface DataStructString extends DataStruct{
    */
   enumValue?: Record<string, string>;
 }
-export interface DataStructInteger extends DataStruct{
+export interface DataStructNumber extends DataStruct{
   min?: number;
   max?: number;
   format?:string;
@@ -209,13 +210,7 @@ export interface DataStructInteger extends DataStruct{
   mock?: string;
   enumValue?: Record<string, string>;
 }
-export interface DataStructNumber extends DataStruct{
-  min?: number;
-  max?: number;
-  numberFormat?:string;
-  defaultValue?: number;
-  mock?: string;
-  enumValue?: Record<string, string>;
+export interface DataStructInteger extends DataStructNumber{
 }
 export interface DataStructBoolean extends DataStruct{
   defaultValue?: boolean;
@@ -240,6 +235,50 @@ export interface DataStructObject extends DataStruct{
    * 有多个，表示object里面的组成内容
    */
   props?: Array<DataStruct>;
+}
+export interface DataStructBlob extends DataStructObject{
+  props:[
+    {
+      uuid: 'blobSize';
+      type: 'number';
+      name: 'size';
+      readonly : true;
+    },
+    {
+      uuid: 'blobType';
+      type: 'string';
+      name: 'type';
+      readonly : true;
+    },
+  ];
+}
+export interface DataStructFile extends DataStructObject{
+  props:[
+    {
+      uuid: 'fileSize';
+      type: 'number';
+      name: 'size';
+      readonly : true;
+    },
+    {
+      uuid: 'fileType';
+      type: 'string';
+      name: 'type';
+      readonly : true;
+    },
+    {
+      uuid: 'fileName';
+      type: 'string';
+      name: 'name';
+      readonly : true;
+    },
+    {
+      uuid: 'fileLastModified';
+      type: 'string';
+      name: 'lastModified';
+      readonly : true;
+    },
+  ];
 }
 
 /**
@@ -324,7 +363,7 @@ export interface UIActionWebAPI extends UIAction{
 }
 
 export interface Expression{
-  type?: 'literal' | 'connect' | 'expression' | 'expression_group' | 'operator' | 'ternary',
+  type?: 'literal' | 'connect' | 'expression' | 'expression_group' | 'operator' | 'ternary' | 'code',
   data?:{
     fromUuid?: string,
     id?: string,
@@ -336,6 +375,7 @@ export interface Expression{
     type?: string
   }
   literal?: string,
+  code?: string,
   rightData?:{
     fromUuid?: string,
     id?: string,
@@ -378,6 +418,8 @@ export interface Mutation{
   expression?: Expression;
   // eslint-disable-next-line camelcase
   expression_code?: string
+  // eslint-disable-next-line camelcase
+  mutation_operator?: string
 }
 /**
  * 数据赋值行为

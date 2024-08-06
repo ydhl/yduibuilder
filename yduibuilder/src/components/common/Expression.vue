@@ -101,7 +101,7 @@
       <DataCheckPanel :local-variables="variables" @updateChecked="chooseData" :checked-uuid="checkUuid" :page-uuid="selectedPageId"></DataCheckPanel>
     </div>
   </lay-layer>
-  <CodeEditor v-model="codeDlgVisible" :title="t('expression.literal')" language="javascript" :code="code" @update="updateCode"></CodeEditor>
+  <CodeEditor v-model="codeDlgVisible" :title="t('expression.literal')" :variables="variables" language="javascript" :code="code" @update="updateCode"></CodeEditor>
 </template>
 
 <script lang="ts">
@@ -139,7 +139,7 @@ export default {
     const leftOrRightData = ref('left')
     const binaryOperators = computed(() => {
       const _: any = []
-      _.push({ name: t('expression.operator'), disabled: true })
+      _.push({ header: t('expression.operator') })
       _.push({ name: '&&', value: '&&', desc: t('expression.&&') })
       _.push({ name: '||', value: '||', desc: t('expression.||') })
       _.push({ name: '' })
@@ -231,7 +231,9 @@ export default {
     }])
     const canAddData = computed(() => {
       if (myExpression.value.type && myExpression.value.type !== 'expression') return false
-      return !myExpression.value.data || !myExpression.value.rightData
+      const hasLeft = myExpression.value.expression || myExpression.value.data
+      const hasRight = myExpression.value.rightExpression || myExpression.value.rightData
+      return !hasLeft || !hasRight
     })
     const myExpressionDesc = computed(() => {
       return ydhl.getExpressionDesc(myExpression.value)

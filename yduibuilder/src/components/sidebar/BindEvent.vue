@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex align-items-center justify-content-between mb-2 pt-2">
-    <div class="fs-6 text-muted user-select-none"><i class="iconfont icon-event"></i>&nbsp;{{t('event.pageEvent')}}</div>
+    <div class="fs-6 text-muted user-select-none"><i class="iconfont icon-event"></i>&nbsp;{{t('common.event')}}</div>
     <button type="button" class="btn btn-primary btn-xs" @click.stop="openEventBindDlg">{{t('event.bind')}}</button>
   </div>
   <div v-if="loading" class="vh-100 d-flex align-items-center justify-content-center">
@@ -21,9 +21,9 @@
           <template  v-for="(event, index) in events" :key="index">
             <div class="d-flex align-items-center">
               <i @mousedown="startDrag(true)" @mouseup="startDrag(false)" @click.stop.prevent="showBoundUI($event, event)" @mousemove="beginDraw($event, event)" @mouseover="highlight(event.uiid)" @mouseleave="offlight()"
-                 :class="{'iconfont icon-data-input bind-icon': true, 'bound': event.uiid.length>0}"
+                 :class="{'iconfont icon-data-input bind-icon flex-shrink-0': true, 'bound': event.uiid.length>0}"
                  data-bs-toggle="tooltip" :title="t('event.bindTip')"></i>
-              <div class="flex-shrink-0 flex-grow-1 fw-bold">&nbsp;{{event.event}}
+              <div class="flex-grow-1 fw-bold text-truncate">&nbsp;{{event.event}}<span class="text-muted fs-7 fw-light">{{getEventArgName(key, event.event)}}</span>
                 <span class="fs-7 text-muted ms-1 fw-light" v-if="event.actions && event.actions.length>0 && !openState[key]">{{event.actions.length}} Action</span>
                 <span class="fs-7 text-muted ms-1" v-if="event.desc">{{event.desc}}</span>
               </div>
@@ -39,7 +39,7 @@
                   <div v-for="(action, actIdx) in event.actions" :key="action.uuid"
                        class="list-group-item p-1 pe-0 ps-3 list-group-item-action d-flex align-items-center border-0">
                     <div class="me-1"><i class="iconfont icon-drag text-muted" style="cursor: move"></i><i :class="'iconfont text-danger icon-' + action.type"></i></div>
-                    <EventAction :action="action" :variables="eventVariables" bind-type="bind_event" :bind-uuid="event.uuid"></EventAction>
+                    <EventAction :event-name="event.event" :action="action" :variables="allEvents[key]?.[event.event]?.args" bind-type="bind_event" :bind-uuid="event.uuid"></EventAction>
                     <ConfirmRemove icon=" icon-remove" @remove="deleteAction(event, actIdx, action)"></ConfirmRemove>
                   </div>
                 </transition-group>
@@ -99,7 +99,7 @@
               <i class="iconfont icon-drag text-muted" style="cursor: move"></i>
               <i :class="'iconfont text-danger me-1 icon-' + action.type"></i>
               <EventAction :action="action" bind-type="bind_event" :bind-uuid="customEvent.bind.uuid"
-                           :variables="customEvent.args"></EventAction>
+                          :event-name="customEvent.name" :variables="customEvent.args"></EventAction>
               <ConfirmRemove @remove="deleteAction(customEvent.bind, actionIndex, action)"></ConfirmRemove>
             </div>
           </transition-group>
@@ -123,7 +123,7 @@
     </a>
   </div>
   <!-- bind event Dialog -->
-  <lay-layer v-model="addEventBindDlgVisible" skin="layui-layer-content-overflow"  :title="t('event.bind')" :shade="true" :area="['420px', '300px']" :btn="addEventBindButtons">
+  <lay-layer v-model="addEventBindDlgVisible" layer-classes="layui-layer-content-overflow"  :title="t('event.bind')" :shade="true" :area="['420px', '300px']" :btn="addEventBindButtons">
     <div class="ps-4 pe-4 pt-2 pb-2">
       <div class="row g-3 mt-1 align-items-center">
         <div class="col-sm-2">
@@ -131,9 +131,11 @@
         </div>
         <div class="col-sm-10">
           <select class="form-select form-select-sm" v-model="currBoundEvent.event">
-            <optgroup :label="t('event.'+key)" v-for="(subEvents, key) in allEvents" :key="key">
-              <option v-for="(event, index) in subEvents" :key="index" :value="event">{{event}}</option>
-            </optgroup>
+            <template v-for="(subEvents, key) in allEvents" :key="key">
+              <optgroup :label="t('event.'+key)" v-if="Object.keys(subEvents).length > 0">
+                <option v-for="(index, event) in subEvents" :key="index" :value="event">{{event}}</option>
+              </optgroup>
+            </template>
           </select>
         </div>
       </div>
@@ -150,26 +152,26 @@
           <label>{{t('common.action')}}</label>
         </div>
         <div class="col-sm-10">
-          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
+          <AdvanceSelect btn-size="btn-sm btn-light" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
         </div>
       </div>
     </div>
   </lay-layer>
   <!-- bind action Dialog -->
-  <lay-layer v-model="addActionDlgVisible" skin="layui-layer-content-overflow"  :title="t('event.bind')" :shade="true" :area="['420px', '250px']" :btn="addActionButtons">
+  <lay-layer v-model="addActionDlgVisible" layer-classes="layui-layer-content-overflow"  :title="t('event.bind')" :shade="true" :area="['420px', '250px']" :btn="addActionButtons">
     <div class="ps-4 pe-4 pt-2 pb-2">
       <div class="row g-3 mt-1 align-items-center">
         <div class="col-sm-2">
           <label>{{t('common.action')}}</label>
         </div>
         <div class="col-auto">
-          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
+          <AdvanceSelect btn-size="btn-sm btn-light" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
         </div>
       </div>
     </div>
   </lay-layer>
   <!-- bind custom event Dialog -->
-  <lay-layer v-model="addCustomBindDlgVisible" skin="layui-layer-content-overflow" :title="t('event.bind')" :shade="true" :area="['520px', '300px']" :btn="addCustomBindButtons">
+  <lay-layer v-model="addCustomBindDlgVisible" layer-classes="layui-layer-content-overflow" :title="t('event.bind')" :shade="true" :area="['520px', '300px']" :btn="addCustomBindButtons">
     <div class="p-2">
       <label class="fw-bold">{{currCustomEvent.name}}</label>
       <div class="mb-2 text-muted">{{currCustomEvent.desc}}</div>
@@ -181,14 +183,14 @@
             <div class="text-muted">{{t('event.noArgs')}}</div>
           </template>
           <template v-for="(arg, index) in currCustomEvent.args" :key="index">
-            <Data :model="arg" :index="index" :can-input="false" :can-output="false" :can-mutation="false" :intent="0"></Data>
+            <DataComp :model="arg" :index="index" :can-input="false" :can-output="false" :can-mutation="false" :intent="0"></DataComp>
           </template>
         </div>
       </div>
       <div class="row g-3 mt-1 align-items-center">
         <div class="col-sm-2">{{t('common.action')}}</div>
         <div class="col-auto">
-          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
+          <AdvanceSelect btn-size="btn-sm btn-light" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
         </div>
       </div>
     </div>
@@ -205,7 +207,7 @@
           <div class="text-muted">{{t('event.noArgs')}}</div>
         </template>
         <template v-for="(arg, index) in currCustomEvent.args" :key="index">
-          <Data :model="arg" :index="index" :can-input="false" :can-output="false" :can-mutation="false" :intent="0"></Data>
+          <DataComp :model="arg" :index="index" :can-input="false" :can-output="false" :can-mutation="false" :intent="0"></DataComp>
         </template>
       </div>
     </div>
@@ -227,7 +229,8 @@
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
 import initUI from '@/components/Common'
-import eventMap from '@/store/events'
+import eventMap, { hasEvent, getEvents } from '@/store/events'
+import baseUIDefines from '@/components/ui/define'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 import ydhl from '@/lib/ydhl'
@@ -248,7 +251,7 @@ export default {
   components: {
     AdvanceSelect,
     EventAction,
-    Data,
+    DataComp: Data,
     DataStruct,
     ConfirmRemove,
     draggable: VueDraggableNext
@@ -282,19 +285,15 @@ export default {
       return types
     })
     const types = {}
-    const hoverUIItemId = computed({
-      get: () => store.state.design?.hoverUIItemId || undefined,
-      set: (v) => {
-        store.commit('updatePageState', { hoverUIItemId: v })
-      }
-    })
-    const selectedUIItemId = computed(() => store.state.design?.selectedUIItemId || undefined)
     const componentName = computed(() => {
       if (!info.selectedUIItem.value) return ''
       return info.selectedUIItem.value.meta.title
     })
 
-    const allEvents = eventMap
+    const allEvents = computed(() => {
+      if (!info.selectedUIItem.value) return eventMap
+      return getEvents(baseUIDefines[info.selectedUIItem.value?.type])
+    })
     const imgSite = ydhl.api
     const boundEvents = ref({})
     // console.log(events)
@@ -377,13 +376,6 @@ export default {
         }
       }
     ])
-    const eventVariables = computed(() => {
-      return [
-        { type: 'string', name: 'value', uuid: 'value', comment: '' },
-        { type: 'string', name: 'oldValue', uuid: 'oldValue', comment: 'Only valid in onchange events' },
-        { type: 'any', name: 'boundData', uuid: 'boundData', comment: 'Bound output data, invalid in onchange event' }
-      ]
-    })
 
     const loadDeclaredEvent = () => {
       declaredEvents.value = []
@@ -432,7 +424,7 @@ export default {
       for (const key in eventMap) {
         boundEvents.value[key] = []
         openState.value[key] = true
-        for (const type of eventMap[key]) {
+        for (const type in eventMap[key]) {
           types[type] = key
         }
       }
@@ -453,12 +445,16 @@ export default {
     })
     watch(mouseupInFrame, (v) => {
       if (!canvas.isDrawline() || canvas.getDrawFromId() !== currBoundEvent.value?.uuid) return
+      if (!hasEvent(baseUIDefines[info.hoverUIItem.value.type], currBoundEvent.value?.event)) {
+        ydhl.alert(t('event.uiNotSupportEvent', [info.hoverUIItem.value.type, currBoundEvent.value?.event]))
+        return
+      }
       // 点击某个ui后结束画线,并设置绑定关系
       canvas.stopDrawline()
       ydhl.post('api/event/bindui.json', {
         event_id: currBoundEvent.value.uuid,
         page_uuid: selectedPageId.value,
-        ui_id: hoverUIItemId.value
+        ui_id: info.hoverUIItemId.value
       }, [], (rst) => {
         loadEventData()
         if (!rst.success) {
@@ -466,7 +462,7 @@ export default {
           return
         }
         store.commit('addUIEventBind', {
-          itemid: hoverUIItemId.value,
+          itemid: info.hoverUIItemId.value,
           pageId: selectedPageId.value,
           eventId: rst.data.uuid
         })
@@ -577,7 +573,7 @@ export default {
           }
 
           store.commit('addUIEventBind', {
-            itemid: selectedUIItemId.value,
+            itemid: info.selectedUIItemId.value,
             pageId: selectedPageId.value,
             eventId: rst.data.uuid
           })
@@ -685,6 +681,15 @@ export default {
         page_uuid: selectedPageId.value, index
       })
     }
+    const getEventArgName = (type, event) => {
+      const names: any = []
+
+      if (!allEvents.value[type]?.[event]?.args) return ''
+      for (const arg of allEvents.value[type]?.[event]?.args) {
+        names.push(arg.name)
+      }
+      return names.length > 0 ? '(' + names.join(', ') + ')' : ''
+    }
     return {
       t,
       ...info,
@@ -715,7 +720,6 @@ export default {
       customEvents,
       declaredEvents,
       openState,
-      eventVariables,
       loadDeclaredEvent,
       addEventBind,
       loadEventData,
@@ -739,7 +743,8 @@ export default {
       deleteEventBound,
       editDeclareEvent,
       removeDeclareEvent,
-      sortEventAction
+      sortEventAction,
+      getEventArgName
     }
   }
 }

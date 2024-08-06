@@ -10,7 +10,7 @@ class Breadcrumb_View extends ValueList_View {
 
     protected function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null, $iteratorName=''){
         if ($outputData){
-            list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+            list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
         }else{
             $staticValue = $staticData['value']?:$staticData['name'];
             $staticName = $staticData['name'];
@@ -33,6 +33,7 @@ class Breadcrumb_View extends ValueList_View {
         if ($outputData) {
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
             echo $this->wrap_output(':data-value', $xValue);
+            echo $this->wrap_output('data-bound', $boundData);
             echo $this->wrap_output('x-text', $xText);
         }else{
             echo $this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null);

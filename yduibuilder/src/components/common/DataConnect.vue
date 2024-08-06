@@ -4,7 +4,7 @@
       <i v-if="myModel.type=='object' && !hasBound" :class="{'iconfont':true, 'icon-tree-close': !isOpen, 'icon-tree-open': isOpen}"></i>
       <i v-if="myModel.type!='object' || hasBound" style="width: 16px;height: 24px;">&nbsp;</i>
       <div class="pointer hover-text-primary" @click.stop="viewDetail">{{myModel.name || 'ROOT'}}</div>
-      <span :class="'ps-1 param-' + myModel.type">
+      <span :class="'ps-1 fs-7 param-' + myModel.type">
         {{myModel.type}}
       </span>
       <span class="text-truncate ps-2 pointer text-muted fs-7">
@@ -13,20 +13,22 @@
     </div>
     <span class="text-muted fs-7" @click.stop="showComment()">
         {{myModel.comment}}
-      </span>
+    </span>
     <div v-if="isCheck" class="pe-2" @click.stop="check" >
       <i :class="{'iconfont': true, 'icon-checked text-primary fw-bold': checkedUuid==myModel.uuid, 'icon-unchecked':checkedUuid!=myModel.uuid}"></i>
     </div>
-    <div v-else-if="readonly" class="flex-grow-1">
+    <div v-else-if="readonly" class="flex-shrink-0">
       <span v-if="hasBound" class="text-muted pe-2">
         <template v-if="connect=='to'">←</template>
         <template v-if="connect=='from'">→</template>
         {{boundExpression.desc}}
       </span>
     </div>
-    <div v-else class="d-flex flex-nowrap flex-grow-1 align-items-center justify-content-end">
+    <div v-else class="d-flex flex-nowrap flex-shrink-0 align-items-center justify-content-end">
       <template v-if="connect=='to'">
-        <ExpressionDropdown :variables="variables" @updateExpression="updateExpression" :expression="boundExpression.expression" :left-value="myModel" :left-value-path="path"></ExpressionDropdown>
+        <ExpressionDropdown :variables="variables" @updateExpression="updateExpression" :has-mutation-operator="false"
+                            :expression="boundExpression.expression" :left-value="myModel"
+                            :left-value-path="path"></ExpressionDropdown>
       </template>
       <template v-else>
         <span class="pointer" @click="openBoundDialog"><span class="text-success" v-if="boundExpression.desc"> → {{boundExpression.desc}} </span><i v-else class="iconfont icon-connect"></i></span>

@@ -101,6 +101,7 @@ trait Mutation_Model_Method{
 			'from_uuid' => $this->mutation_from_uuid,
 			'data_id' => $this->mutation_data_id,
 			'data_name' => $this->mutation_data_name,
+			'mutation_operator' => $this->mutation_operator,
 			'data_type' => $this->mutation_data_type
 		];
 	}
@@ -117,6 +118,7 @@ trait Mutation_Model_Method{
 				->set('uuid', Mutation_Model::uuid())
 				->set('action_id', $action_id)
 				->set('expression', json_encode($mutation['expression']))
+				->set('mutation_operator', $mutation['mutation_operator']?:'=')
 				->save();
 		}
 	}

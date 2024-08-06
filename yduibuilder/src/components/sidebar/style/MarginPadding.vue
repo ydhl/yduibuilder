@@ -230,7 +230,7 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-@import 'src/assets/bootstrap/bootstrap.scss';
+@import '@/assets/bootstrap/bootstrap.scss';
 
   ._margin{
     cursor: pointer;

@@ -10,7 +10,7 @@ class Progress_View extends Preview_View {
 
     public function build_ui()
     {
-        $outputDatas = $this->get_output_datas($outputDataName);
+        $outputDatas = $this->get_output_datas($outputDataNames);
 
         $space =  $this->indent();
         echo "{$space}<div";
@@ -23,12 +23,21 @@ class Progress_View extends Preview_View {
 
         $value = $this->data['meta']['value']?:50;
         if ($outputDatas['VALUE']){
-            $outputDataName = $this->get_output_data_name('VALUE', $outputDatas['VALUE'], $outputDataName['VALUE']);
-            echo $this->wrap_output(':aria-valuenow', $outputDataName);
-            echo $this->wrap_output(':style', "`width:\${{$outputDataName}}%`");
-            echo $this->wrap_output('x-text', "`\${{$outputDataName}}%`");
+            $valueDataName = $this->get_output_data_name('VALUE', $outputDatas['VALUE'], $outputDataNames['VALUE']);
+            echo $this->wrap_output(':aria-valuenow', $valueDataName);
+            echo $this->wrap_output(':style', "`width:\${{$valueDataName}}%`");
         }else{
             echo $this->wrap_output('aria-valuenow', $value);
+        }
+        if (@$this->data['meta']['custom']['label']) {
+            $textDataName = $this->get_output_data_name('TEXT', $outputDatas['TEXT'], $outputDataNames['TEXT']);
+            if ($textDataName && $valueDataName){
+                echo $this->wrap_output('x-text', "`\${{$textDataName}}:\${{$valueDataName}}%`");
+            }else if ($textDataName){
+                echo $this->wrap_output('x-text', $textDataName);
+            }else if ($valueDataName){
+                echo $this->wrap_output('x-text', "`\${{$valueDataName}}%`");
+            }
         }
         echo $this->wrap_output('aria-valuemin', @$this->data['meta']['custom']['min'] ?? 0);
         echo $this->wrap_output('aria-valuemax', @$this->data['meta']['custom']['max'] ?? 100);
@@ -75,7 +84,7 @@ class Progress_View extends Preview_View {
         return $styleArray;
     }
     protected function output_as_prop($outputAs, $outputData){
-        if (!strcasecmp($outputAs,'value')){
+        if (!strcasecmp($outputAs,'value') || !strcasecmp($outputAs,'text') ){
             return ;// value 不再主元素上输出，在progressbar上输出，所以这里返回null
         }
         return parent::output_as_prop($outputAs, $outputData);

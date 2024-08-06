@@ -4,6 +4,7 @@ use app\build\Build_Model;
 use app\modules\build\views\code\Base_Code_Fragment;
 use app\modules\build\views\code\Io_Data_Fetch;
 use app\project\Action_Model;
+use app\project\Page_Bind_Api_Model;
 use app\project\Page_Bind_Data_Model;
 use app\project\Page_Bind_Event_Model;
 use app\project\Page_Model;
@@ -44,10 +45,10 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      */
     protected $childViews = [];
     /**
-     * 在具体某个事件中使用到到变量名称，格式[事件名=>[变量]]
+     * 在具体某个事件中使用到到变量名称，格式[变量]
      * @var array
      */
-    protected $usedVariableInEvent = [];
+    protected $usedVariables = [];
     /**
      * 元素上的属性数组 [属性名=>属性值1]
      * @var array
@@ -62,6 +63,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     private $_boundDataName;
     private $_iteratorIndexName;
     private $_iteratorDataName;
+    private $_events = [];
 
     public function __construct($data, $controller, Build_Model $build)
     {
@@ -592,11 +594,11 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     public abstract function get_code_fragment(): Base_Code_Fragment;
 
     /**
-     * ydecloud事件在各终端上的对应名称
+     * ydecloud事件在各终端上的对应名称, 如果返回null，则不在html 元素上注册事件
      * @param $eventName
      * @return mixed
      */
-    protected abstract function eventMap($eventName);
+    protected abstract function eventName($eventName);
 
     /**
      * 构建弹窗事件代码
@@ -659,62 +661,55 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      */
     public abstract function build_popup_ui(&$outputPopupIds=[]);
 
-    private function build_select_prepare_event_code($html_event_name, &$actionCodeLines){
+    private function build_select_prepare_event_code(&$actionCodeLines){
         if ($this->data['meta']['custom']['multiple']) {
-            if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const boundData = []";
-            if (in_array('value', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const value = []";
+            if (in_array('boundData', $this->usedVariables)) $actionCodeLines[] = "const boundData = []";
+            if (in_array('value', $this->usedVariables)) $actionCodeLines[] = "const value = []";
 
             $actionCodeLines[] = "for(var opt of event.target.selectedOptions) {";
 //                $actionCodeLines[] = $this->indent(1, true)."console.log(opt,opt.innerText,opt.dataset?.bound)";
-            if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])){
+            if (in_array('boundData', $this->usedVariables)){
                 $actionCodeLines[] = $this->indent(1, true) . "const boundName = opt.dataset?.bound;";
-                $actionCodeLines[] = $this->indent(1, true) . "if(boundName) boundData.push(eval('page.' + boundName));";
+                $actionCodeLines[] = $this->indent(1, true) . "if(boundName) boundData.push(Alpine.evaluate(eventTarget, boundName));";
             }
-            if (in_array('value', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = $this->indent(1, true) . "value.push(opt.value);";
+            if (in_array('value', $this->usedVariables)) $actionCodeLines[] = $this->indent(1, true) . "value.push(opt.value);";
             $actionCodeLines[] = "}";
         } else {
             $actionCodeLines[] = "const opt = event.target.selectedOptions?.[0]";
-            if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])){
+            if (in_array('boundData', $this->usedVariables)){
                 $actionCodeLines[] = "const boundName = opt?.dataset?.bound;";
-                $actionCodeLines[] = "const boundData = boundName ? eval('page.' + boundName) : null;";
+                $actionCodeLines[] = "const boundData = boundName ? Alpine.evaluate(eventTarget, boundName) : null;";
             }
-            if (in_array('value', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const value = opt ? opt?.value : null;";
+            if (in_array('value', $this->usedVariables)) $actionCodeLines[] = "const value = opt ? opt?.value : null;";
         }
     }
-    private function build_other_prepare_event_code($html_event_name, &$actionCodeLines){
-        $actionCodeLines[] = "const eventTarget = event.target.dataset?.value ? event.target : event.target.closest('[data-value]');";
-        if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const boundName = eventTarget?.dataset?.bound;";
+    private function build_other_prepare_event_code(&$actionCodeLines){
+        $actionCodeLines[] = "const eventTarget = event.target.closest('[data-value]') || event.target.closest('[data-bound]');";
+        if (in_array('boundData', $this->usedVariables)) $actionCodeLines[] = "const boundName = eventTarget?.dataset?.bound;";
         // x-for 的数据直接可以通过page.boundName访问
         if (strtolower($this->data['type']) == 'checkbox'){
             $actionCodeLines[] = 'const checked = eventTarget.querySelector("[type=\'checkbox\']")?.checked';
-            if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])){
-                $actionCodeLines[] = "const boundData = checked ? eval('page.' + boundName) : undefined;";
+            if (in_array('boundData', $this->usedVariables)){
+                $actionCodeLines[] = "const boundData = checked ? Alpine.evaluate(eventTarget, boundName) : undefined;";
             }
-            if (in_array('value', $this->usedVariableInEvent[$html_event_name])) {
+            if (in_array('value', $this->usedVariables)) {
                 $actionCodeLines[] = 'const value = checked ? eventTarget.dataset?.value : null';
             }
         }else{
-            if (in_array('boundData', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const boundData = boundName ? eval('page.' + boundName) : undefined;";
-            if (in_array('value', $this->usedVariableInEvent[$html_event_name])) $actionCodeLines[] = "const value = eventTarget?.dataset?.value;";
+            if (in_array('boundData', $this->usedVariables)) $actionCodeLines[] = "const boundData = boundName ? Alpine.evaluate(eventTarget, boundName) : undefined;";
+            if (in_array('value', $this->usedVariables)) $actionCodeLines[] = "const value = eventTarget?.dataset?.value;";
         }
-//            $actionCodeLines[] = "console.log('page.' + boundName)";
     }
-    private function build_input_prepare_event_code($html_event_name, &$actionCodeLines){
+    private function build_input_prepare_event_code(&$actionCodeLines){
         $tagName = strtoupper($this->data['type']);
         $tagName = $tagName=='RANGEINPUT'?'INPUT':$tagName;
 
-        if (in_array('value', $this->usedVariableInEvent[$html_event_name])) {
+        if (in_array('value', $this->usedVariables)) {
             $actionCodeLines[] = "const target = event.target.tagName=='{$tagName}' ? event.target : event.target.querySelector('.input') || undefined";
             $actionCodeLines[] = "const value = target?.value";
         }
     }
-    private function build_notiterate_prepare_event_code($html_event_name, &$actionCodeLines){
-        $actionCodeLines[] = "const eventTarget = event.target.closest('[data-value]');";
 
-        if (in_array('value', $this->usedVariableInEvent[$html_event_name])) {
-            $actionCodeLines[] = "const value = eventTarget?.dataset?.value;";
-        }
-    }
     /**
      * 构建事件代码中使用的基础数据，比如bind的value，事件参数等
      * @param $eventModel
@@ -724,39 +719,36 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @return void
      */
     private function build_prepare_event_code($eventModel, $html_event_name, &$eventCodes, &$actionCodeLines){
-        $eventCodes[$html_event_name]['args'] = ['event'];
+        $eventCodes[$html_event_name]['args'] = $this->get_event_arg_names($html_event_name);
+        $codes = [];
         // 提取自定义事件的自定义参数
         if ($eventModel->uicomponent_event_id){
             $customEvent = $eventModel->get_uicomponent_event();
             $args = json_decode(html_entity_decode($customEvent->args), true);
             $argNames = [];
             foreach ($args as $arg){
-                if (!$this->usedVariableInEvent[$html_event_name] || !in_array($arg['name'], $this->usedVariableInEvent[$html_event_name])){
+                if (!$this->usedVariables || !in_array($arg['name'], $this->usedVariables)){
                     continue;
                 }
                 $argNames[] = $arg['name'];
             }
-            if ($argNames) $actionCodeLines[] = "const { ".join(', ', $argNames)." } = event.detail";
-            return;
-        }
-        if (!$this->is_custom_ui() && $html_event_name=='change'){
-            $eventCodes[$html_event_name]['args'] = ['value', 'oldValue'];
+            if ($argNames) $codes[] = "const { ".join(', ', $argNames)." } = event.detail";
+            array_unshift($actionCodeLines, ...$codes);
             return;
         }
 
-        if (!$this->usedVariableInEvent[$html_event_name] || !array_intersect(['value','boundData'], $this->usedVariableInEvent[$html_event_name])) return;
+        if (!$this->usedVariables || !array_intersect(['value','boundData'], $this->usedVariables)) return;
 
         // 数据值和绑定对数据
-        if( ! $this->is_input_ui() && ! $this->is_iteration_ui()){
-            $this->build_notiterate_prepare_event_code($html_event_name, $actionCodeLines);
-        }elseif (strtolower($this->data['type']) == 'select'){
-            $this->build_select_prepare_event_code($html_event_name, $actionCodeLines);
+        if (strtolower($this->data['type']) == 'select'){
+            $this->build_select_prepare_event_code($codes);
         }elseif (in_array(strtolower($this->data['type']), ['input', 'textarea', 'rangeinput'])){
-            $this->build_input_prepare_event_code($html_event_name, $actionCodeLines);
+            $this->build_input_prepare_event_code($codes);
         }else{
-            $this->build_other_prepare_event_code($html_event_name, $actionCodeLines);
+            $this->build_other_prepare_event_code($codes);
         }
-        $actionCodeLines[] = "";
+        $codes[] = "";
+        array_unshift($actionCodeLines, ...$codes);
     }
     /**
      * 获取事件的action代码
@@ -770,7 +762,13 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
 
         foreach($eventModels as $eventModel) {
             $actionCodeLines = [];
-            $html_event_name = strtolower($eventModel->uicomponent_event_id ? $eventModel->event : $this->eventMap($eventModel->event));
+            $this->usedVariables = [];
+            if ($eventModel->uicomponent_event_id){
+                $html_event_name = $eventModel->event;
+            }else{
+                $html_event_name = $this->eventName($eventModel->event) ?: $eventModel->event;
+            }
+            $html_event_name = strtolower($html_event_name);
 
             if (!$eventCodes[$html_event_name]) {
                 $eventCodes[$html_event_name] = ['code'=>[],'args'=>[],'comment'=>''];
@@ -804,9 +802,32 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             if ($actionCodeLines) {
                 $this->build_prepare_event_code($eventModel, $html_event_name, $eventCodes, $actionCodeLines);
                 $eventCodes[$html_event_name]['code'] = $actionCodeLines;
+            }else{
+                $eventCodes[$html_event_name]['code'] = ["// NOT DEFINE ACTION;"];
             }
         }
         return $eventCodes;
+    }
+
+    /**
+     * 是否包含指定的事件
+     *
+     * @param $eventName
+     * @return Page_Bind_Event_Model|mixed|void
+     */
+    protected function has_event($eventName)
+    {
+        if (!$this->_events){
+            $eventModels = @$this->build->get_events($this->myid());
+            if (!$eventModels) return;
+
+            foreach ($eventModels as $eventModel) {
+                $html_event_name = strtolower($eventModel->uicomponent_event_id ? $eventModel->event : $this->eventName($eventModel->event));
+                $html_event_name = $html_event_name?:strtolower($eventModel->event);
+                $this->_events[$html_event_name] = $eventModel;
+            }
+        }
+        return $this->_events[strtolower($eventName)];
     }
     /**
      * 输出组件自己的事件绑定的代码, 并放入codefragment中
@@ -1233,6 +1254,9 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     protected function is_1d_any_array($dataConfig){
         return $dataConfig['type']=='array' && $dataConfig['item']['type'] == 'any';
     }
+    protected function is_1d_file_array($dataConfig){
+        return $dataConfig['type']=='array' && $dataConfig['item']['type'] == 'file';
+    }
     protected function is_1d_object_array($dataConfig){
         return $dataConfig['type']=='array' && $this->is_object($dataConfig['item']);
     }
@@ -1272,6 +1296,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                 case 'ALT':return null;
                 case 'VALUELIST':
                     if ($this->is_scale($outputData)) return null;
+                    if ($this->is_1d_file_array($outputData)) return "itemOf{$dataName}?.name";
                     if ($this->is_object($outputData) || $this->is_1d_array($outputData)) return "itemOf{$dataName}";
                     if ($this->is_2d_array($outputData)) return "itemOf{$dataName}2";
                     return null;
@@ -1294,10 +1319,12 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                 case 'TEXT':
                     if ($this->is_scale($outputData)) return $outputDataName;
                     if ($outputData['type'] == 'any' || $this->is_object($outputData)) return "JSON.stringify({$outputDataName})";
+                    if ($outputData['type'] == 'file') return "{$outputDataName}?.name";
                     if ($this->is_1d_scale_array($outputData)) return "itemOf{$dataName}";
                     if ($this->is_1d_any_array($outputData)) return "JSON.stringify(itemOf{$dataName})";
+                    if ($this->is_1d_file_array($outputData)) return "itemOf{$dataName}?.name";
                     if ($this->is_1d_object_array($outputData) || $this->is_2d_array($outputData)) return "JSON.stringify(itemOf{$dataName})";
-                    return null;
+                    return $outputDataName;
                 case 'VALUELIST': return null;
                 case 'VALUE':
                     if ($this->is_scale($outputData)) return $outputDataName;
@@ -1392,6 +1419,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             return $this->is_2d_array($outputData) && $outputas == 'VALUELIST';
         }else{
             if ($this->is_1d_any_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'NONE'])) return true;
+            if ($this->is_1d_file_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'NONE'])) return true;
             if ($this->is_1d_scale_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'VALUE', 'NONE'])) return true;
             if ($this->is_1d_object_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'KEYVALUE', 'STYLE', 'NONE'])) return true;
             if ($this->is_2d_array($outputData) && in_array($outputas, ['TEXT', 'HTML', 'NONE'])) return true;
@@ -1434,32 +1462,37 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     }
 
     /**
-     * 返回在遍历时用到的name，value
+     * 返回在遍历时用到的name，value, checked, data等对应等获取名
      * - 对象数组，如果对象有name属性用之，没有JSON.stringify(数组项)
      * - 对象数组，如果对象有value属性用之，没有返回数组索引
      * - 对象，name和value都采用key:value都格式
      *
      * @param $bindOutput
      * @param $itemName
-     * @return string[] [name, value, checked]
+     * @return string[] [name, value, checked, data]
      */
     protected function get_bind_name_value($bindOutput, $itemName)
     {
-        if (!$bindOutput || !$itemName) return ['name'=>null, 'value'=>null, 'checked'=>null];
+        if (!$bindOutput || !$itemName) return ['name'=>null, 'value'=>null, 'checked'=>null, 'data'=>null];
 
         $name = "itemOf{$itemName}";
         $value = "itemOf{$itemName}";
         $checked = null;
+        $data = "itemOf{$itemName}";
 
         if ($bindOutput['type']=='array'){
             if ($this->has_props($bindOutput['item'],'name')){//对象数组
                 $name = "itemOf{$itemName}.name";
+            }else if ($bindOutput['item']['type'] == 'file'){
+                $name = "itemOf{$itemName}?.name";
             }else if ($this->is_object($bindOutput['item'])){
                 $name = "JSON.stringify(itemOf{$itemName})";
             }
 
             if ($this->has_props($bindOutput['item'],'value')){
                 $value = "itemOf{$itemName}.value";
+            }else if ($bindOutput['item']['type'] == 'file'){
+                $value = "itemOf{$itemName}?.name";
             }else if ($this->is_object($bindOutput['item'])){
                 $value = "idxOf{$itemName}";
             }
@@ -1467,15 +1500,20 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             if ($this->has_props($bindOutput['item'],'checked')){
                 $checked = "itemOf{$itemName}.checked";
             }
-
         }else if ($this->is_object($bindOutput)){
             $name = "idxOf{$itemName}";
             $value = "itemOf{$itemName}";
+            $data = $itemName;
         }else if ($this->is_scale($bindOutput)){
             $name = $itemName;
             $value = $itemName;
+            $data = $itemName;
+        }else if ($bindOutput['type'] == 'file'){
+            $name = "{$itemName}?.name";
+            $value = "{$itemName}?.name";
+            $data = $itemName;
         }
-        return ['name'=>$name, 'value'=>$value, 'checked'=>$checked];
+        return ['name'=>$name, 'value'=>$value, 'checked'=>$checked, 'data'=>$data];
     }
 
     protected function set_iterator_data_name($dataName){
@@ -1506,4 +1544,135 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         return $this->_iteratorIndexName;
     }
 
+    /**
+     * 在具体的某个事件中使用的变量
+     *
+     * @param $argName
+     * @return void
+     */
+    protected function add_used_variable($argName){
+        $this->usedVariables[] = $argName;
+    }
+    protected function get_event_arg_names($event_name) {
+        $args = [
+            'onchange' => [
+                'args' => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'string', "name" => 'oldValue', "uuid" => 'oldValue'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'oninput' => [
+                'args' => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', 'uuid' => 'boundData']
+                ]
+            ],
+            'onkeyup' => [
+                'args' => [
+                    ["type" => 'string', "name" => 'keyCode', "uuid" => 'keyCode'],
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onkeydown' => [
+                'args' => [
+                    ["type" => 'string', "name" => 'keyCode', "uuid" => 'keyCode'],
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onkeypress' => [
+                'args' => [
+                    ["type" => 'string', "name" => 'keyCode', "uuid" => 'keyCode'],
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onclick' => [
+                "args" => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'ondblclick' => [
+                "args" => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onmousedown' => [
+                "args" => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onmouseup' => [
+                "args" => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onmouseover' => [
+                "args" => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onmouseout' => [
+                "args" => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onmousemove' => [
+                "args" => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onmouseenter' => [
+                "args" => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onmouseleave' => [
+                "args" => [
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onfilechange' => [
+                "args" => [
+                    ["type" => 'array', "name" => 'files', "uuid" => 'files', 'item' => ["type" => 'file']]
+
+                ]],
+            'onuploadprogress' => [
+                "args" => [
+                    ["type" => 'number', "name" => 'index', "uuid" => 'index'],
+                    ["type" => 'file', "name" => 'file', "uuid" => 'file'],
+                    ["type" => 'number', "name" => 'progress', "uuid" => 'progress']
+                ]
+            ],
+            'onbeforeupload' => [
+                "args" => [
+                    ["type" => 'number', "name" => 'index', "uuid" => 'index'],
+                    ["type" => 'file', "name" => 'file', "uuid" => 'file']
+                ]
+            ],
+            'onfileuploaded' => [
+                "args" => [
+                    ["type" => 'number', "name" => 'index', "uuid" => 'index'],
+                    ["type" => 'file', "name" => 'file', "uuid" => 'file'],
+                    ["type" => 'any', "name" => 'rst', "uuid" => 'rst']
+                ]
+            ]
+        ];
+        $_ = ['event'];
+        foreach ($args[strtolower($event_name)]['args'] ?: [] as $item){
+            $_[] = $item['name'];
+        };
+        return $_;
+    }
 }

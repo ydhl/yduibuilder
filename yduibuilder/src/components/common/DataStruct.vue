@@ -13,10 +13,10 @@
       <div v-if="!datas || datas.length===0" class="p-3 text-muted">
         <i class="iconfont icon-wuneirong"></i> {{t('common.empty')}}
       </div>
-      <Data v-for="(data, index) in datas" :open="openState"
+      <DataComp v-for="(data, index) in datas" :open="openState"
                  @remove="removeItem" @update="updateItem" :from-type="fromType" :from-id="data.uuid"
                  :can-input="canInput" :can-output="canOutput" :can-mutation="canMutation"
-                 :index="index" :model="data" :intent="0" :key="index"></Data>
+                 :index="index" :model="data" :intent="0" :key="index"></DataComp>
     </div>
   </div>
   <lay-layer v-model="dialogVisible" :title="t('api.addData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
@@ -43,14 +43,14 @@ export default {
     },
     types: {
       type: Array,
-      default: () => ['string', 'integer', 'number', 'boolean', 'object', 'array', 'map', 'null', 'any']
+      default: () => ['string', 'integer', 'number', 'boolean', 'object', 'array', 'map', 'null', 'any', 'file']
     },
     canMutation: Boolean, // 能否修改数据
     canInput: Boolean, // 能绑定ui提供输入
     canOutput: Boolean, // 能绑定ui作为输出
     dataTitle: String
   },
-  components: { AddData, Data },
+  components: { AddData, DataComp: Data },
   setup (props: any, context: any) {
     const { t } = useI18n()
     const dialogVisible = ref(false)

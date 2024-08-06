@@ -77,6 +77,11 @@ class Mutation_Model extends YZE_Model{
      * @var string
      */
     const F_EXPRESSION = "expression";
+    /**
+     * 赋值操作符
+     * @var string
+     */
+    const F_MUTATION_OPERATOR = "mutation_operator";
     public static $columns = [
     'id'         => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
       'created_on' => ['type' => 'date', 'null' => false,'length' => '','default'	=> 'CURRENT_TIMESTAMP'],
@@ -89,6 +94,7 @@ class Mutation_Model extends YZE_Model{
       'mutation_data_type' => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
       'action_id'  => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
       'expression' => ['type' => 'string', 'null' => false,'length' => '','default'	=> ''],
+      'mutation_operator' => ['type' => 'string', 'null' => false,'length' => '45','default'	=> '='],
     ];
     /**
      * @see YZE_Model::$unique_key

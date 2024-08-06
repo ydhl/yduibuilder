@@ -182,7 +182,7 @@ trait Page_Bind_Api_Model_Method{
     /**
      * 返回调用该api时能使用的局部变量：
      * 1。如果是组件触发的事件调用api，那么该事件的参数
-     * 2。如果是bind action调用的api，那么就是该bind action管理的数据：目前有bind api的响应
+     * 2。如果是bind action调用的api，那么就是该bind action关联的数据：目前有bind api的响应
      * @return []
      */
     public function get_local_Variables(){
@@ -209,6 +209,18 @@ trait Page_Bind_Api_Model_Method{
             $bindAction = Page_Bind_API_Action_Model::find_by_uuid($this->bind_uuid);
             return $bindAction->get_local_variables();
         }
+        // 组件中触发的api调用，
+        if (!$this->bind_class && $this->bind_uuid){
+            $uiItem = $this->get_page()->find_ui_item($this->bind_uuid);
+            if (!$uiItem) return null;
+            if (!strcasecmp($uiItem->type,'file')){// 文件组件立即上传
+                $arg = new \stdClass();
+                $arg->name = 'file';
+                $arg->uuid = 'file';
+                $arg->type = 'file';
+                return [$arg];
+            }
+        }
         return null;
     }
 
@@ -220,7 +232,7 @@ trait Page_Bind_Api_Model_Method{
      * @throws YZE_DBAException
      */
     public static function remove_gone_uiid(Page_Model $page) {
-       $objects = Page_Bind_Api_Model::from('api')
+        $objects = Page_Bind_Api_Model::from('api')
             ->left_join(Page_Bind_Event_Model::CLASS_NAME, 'ent', 'ent.uuid=api.bind_uuid and api.bind_class=:event')
             ->left_join(Page_Bind_Api_Action_Model::CLASS_NAME, 'act', 'act.uuid=api.bind_uuid and api.bind_class=:action')
             ->where('api.page_id=:pid')
@@ -231,10 +243,17 @@ trait Page_Bind_Api_Model_Method{
             $event = $object['ent'];
             $action = $object['act'];
             if (!$event && !$action){
-                $api->remove();
+                if ($api->bind_uuid){
+                    $uiItem = $page->find_ui_item($api->bind_uuid);
+                    // 绑定到ui上到api
+                    if (!$uiItem || $uiItem->meta->custom->apiUuid!= $api->uuid){
+                        $api->remove();
+                    }
+                }else{
+                    $api->remove();
+                }
             }
         }
-
     }
     public function remove(){
         Page_Bind_Variable_Model::from()

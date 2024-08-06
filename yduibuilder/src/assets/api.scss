@@ -34,6 +34,9 @@
 .param-blob{
   color: #9d9d00;
 }
+.param-file{
+  color: #656565;
+}
 .api-method-get{
   color: #22a100;
 }
@@ -81,7 +84,9 @@
   .model-field{
     display: flex;
     align-items: center;
+    width: 0;// 数据源中显示...
     flex-grow: 1;
+    flex-shrink: 0;
   }
   .model-title{
     flex-grow: 1;

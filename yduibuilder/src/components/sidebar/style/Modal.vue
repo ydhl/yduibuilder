@@ -22,12 +22,7 @@
       <label class="col-sm-3 col-form-label text-end">{{ t('style.modal.backdrop') }}</label>
       <div class="col-sm-9">
         <label class="form-control-plaintext">
-          <select class="form-select form-select-sm" v-model="backdrop">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-            <option value="static">Static</option>
-          </select>
-          <span class="text-muted"> {{t('style.modal.backdropTip')}}</span>
+          <AdvanceSelect :options="backdrops" :default-text="backdrop || t('action.notSet')" @change="(option) => backdrop = option.value"></AdvanceSelect>
         </label>
       </div>
     </div>
@@ -44,10 +39,11 @@
 import initUI from '@/components/Common'
 import { useI18n } from 'vue-i18n'
 import Position from '@/components/common/Position.vue'
+import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 
 export default {
   name: 'StyleModal',
-  components: { Position },
+  components: { AdvanceSelect, Position },
   setup (props: any, context: any) {
     const info = initUI()
     const { t } = useI18n()
@@ -56,11 +52,16 @@ export default {
     const esc = info.computedWrap('esc', 'custom', true)
     const backdrop = info.computedWrap('backdrop', 'custom', 'yes')
     const position = info.computedWrap('position', 'custom', [])
-
+    const backdrops = [
+      { name: 'Yes', value: 'yes', desc: t('style.modal.backdropYes') },
+      { name: 'No', value: 'no', desc: t('style.modal.backdropNo') },
+      { name: 'Static', value: 'static', desc: t('style.modal.backdropStatic') }
+    ]
     return {
       ...info,
       footless,
       headless,
+      backdrops,
       esc,
       backdrop,
       position,

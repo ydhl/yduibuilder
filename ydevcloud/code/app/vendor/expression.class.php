@@ -80,6 +80,7 @@ class Expression extends YZE_Object {
     public function get_expression_code($hidePrefix=false){
         switch (strtolower($this->type)){
             case 'literal': return $this->literal;
+            case 'code': return $this->code;
             case 'connect':return $this->remove_prefix($this->data->path, $hidePrefix);
             case 'operator':return $this->operator;
             case 'expression':return $this->get_condition_expression_code($hidePrefix);
@@ -123,17 +124,20 @@ class Expression extends YZE_Object {
     }
     private function get_condition_expression_code($hidePrefix) {
         $code = [];
-        if ($this->data){
-            $code[] = $this->remove_prefix($this->data->path, $hidePrefix, $this->data->modifier) ?: $this->data->literal;
-        }else if ($this->expression) {
+        if ($this->expression) {
             $code[] = $this->expression->get_expression_code();
+        }else if ($this->data){
+            $code[] = $this->remove_prefix($this->data->path, $hidePrefix, $this->data->modifier) ?: $this->data->literal;
         }
-        if ($this->rightData){
-            $code[] = $this->operator;
-            $code[] = $this->remove_prefix($this->rightData->path, $hidePrefix, $this->rightData->modifier) ?: $this->rightData->literal;
-        }else if ($this->rightExpression) {
+
+        if ($this->operator)$code[] = $this->operator;
+
+        if ($this->rightExpression) {
             $code[] = $this->rightExpression->get_expression_code();
+        }else if ($this->rightData){
+            $code[] = $this->remove_prefix($this->rightData->path, $hidePrefix, $this->rightData->modifier) ?: $this->rightData->literal;
         }
+
         return join(' ', $code);
     }
 }?>

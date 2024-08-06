@@ -15,8 +15,8 @@
          :class="{'iconfont icon-data-output bind-icon': true, 'bound-out': myModel.out}"></i>
     </div>
     <div class="model-field text-truncate" @click="isOpen = !isOpen" :style="'padding-left: ' + (intent * 16) + 'px'">
-      <i v-if="myModel.type=='array' || myModel.type=='object'" :class="{'iconfont':true, 'icon-tree-close': !isOpen, 'icon-tree-open': isOpen}"></i>
-      <i v-if="myModel.type!='array' && myModel.type!='object'" class="flex-shrink-0" style="width: 16px;height: 24px;">&nbsp;</i>
+      <i v-if="hasSubItem" :class="{'iconfont':true, 'icon-tree-close': !isOpen, 'icon-tree-open': isOpen}"></i>
+      <i v-if="!hasSubItem" class="flex-shrink-0" style="width: 16px;height: 24px;">&nbsp;</i>
       <div :class="{'pointer hover-text-primary': true, 'fw-bolder':intent==0}" @click.stop="viewDetail">
         <template v-if="isArrayItem">
           <span class="text-success">ITEM</span>
@@ -43,7 +43,7 @@
         {{enumValues}}
       </span>
     </div>
-    <div class="model-action" v-if="canMutation">
+    <div class="model-action" v-if="myCanMutation">
       <i class="iconfont icon-import pointer text-muted hover-primary" @click.stop="openCodeEditor('', 'import')" v-if="myModel.type=='object' || myModel.type=='array'"></i>
       <i v-else style="width: 16px;height: 24px;">&nbsp;</i>
       <i class="iconfont icon-plus pointer text-muted hover-primary" @click.stop="add" v-if="myModel.type=='object'"></i>
@@ -87,11 +87,11 @@
                :index="0" @update="updateItem" :can-mutation="canMutation" :intent="intent+1"
                :can-input="false" :can-output="canOutput" :is-array-item="true"></Data>
   </template>
-  <template v-else-if="myModel.type=='object' && isOpen">
+  <template v-else-if="['object', 'file', 'blob'].indexOf(myModel.type) !== -1 && isOpen">
     <div class="text-muted text-center" v-if="!myModel.props || myModel.props.length==0">{{t('api.model.noSubField')}}</div>
     <template v-else>
       <Data v-for="(item, index) in myModel.props" :from-type="fromType" :from-id="fromId" :open="open" :path="[...path, myModel.name]"
-                 @remove="removeItem" @update="updateItem" :can-input="canInput" :can-output="canOutput"
+                 @remove="removeItem" @update="updateItem" :can-input="['file', 'blob'].indexOf(myModel.type) !== -1 ? false : canInput" :can-output="canOutput"
                  :can-mutation="canMutation" :key="index" :intent="intent+1" :model="item" :index="index"></Data>
     </template>
   </template>
@@ -118,7 +118,7 @@ import CodeEditor from '@/components/common/CodeEditor.vue'
 import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 // 数据模型展示，可绑定ui
 export default {
-  name: 'Data',
+  name: 'DataComp',
   components: { AdvanceSelect, CodeEditor, DataInfo, AddData, ConfirmRemove },
   emits: ['remove', 'update'],
   props: {
@@ -148,6 +148,10 @@ export default {
     const showOutputTypeMenu = ref(false)
     const detailDlgVisible = ref(false)
     const codeEditorVisible = ref(false)
+    const myCanMutation = computed(() => {
+      if (myModel.value.readonly) return false
+      return props.canMutation
+    })
     const boundPop = ref()
     const outputTypeMenu = ref()
     const drawFromEl = ref()
@@ -342,7 +346,11 @@ export default {
         { name: 'Bound', value: 'BOUND', desc: t('variable.boundAsBound') }
       ]
     })
+    const hasSubItem = computed(() => {
+      return myModel.value.type === 'array' || myModel.value.type === 'object' || myModel.value.type === 'file' || myModel.value.type === 'blob'
+    })
     const outputAsItems = (uiItem) => {
+      if (!uiItem) return []
       const uiType = uiItem.type
       const _: any = []
       const map: any = {
@@ -641,14 +649,14 @@ export default {
       let json
       try {
         json = JSON.parse(newCode)
-      } catch (e) {
+      } catch (e: any) {
         ydhl.alert('Parse Error: ' + e.message, t('common.ok'))
         return
       }
 
       const type = Object.prototype.toString.call(json).slice(8, -1).toLowerCase()
       if (type !== myModel.value.type) {
-        ydhl.alert('Data type mismatch, please input type: ' + myModel.value.type + type, t('common.ok'))
+        ydhl.alert(t('variable.typeMismatch', [myModel.value.type, type]), t('common.ok'))
         return
       }
       codeEditorVisible.value = false
@@ -708,10 +716,12 @@ export default {
       outputTypeStyle,
       boundAsItems,
       currBindOutUI,
+      hasSubItem,
       boundPop,
       showBoundPop,
       outputTypeMenu,
       tip,
+      myCanMutation,
       closeDropmenu,
       showBound,
       hasOutputAs,

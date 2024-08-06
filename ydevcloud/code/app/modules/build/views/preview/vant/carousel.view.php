@@ -63,7 +63,7 @@ class Carousel_View extends ValueList_View {
         $bindOutput = $is2D ? $outputData['item'] : $outputData;
 
         // 只处理标量一维数组并把标量看作是要加载的子页id
-        list('name'=>$xText, 'value'=>$value) = $this->get_bind_name_value($bindOutput, $itemName);
+        list('name'=>$xText, 'value'=>$value, 'data'=>$boundData) = $this->get_bind_name_value($bindOutput, $itemName);
         $needLoadSubpage = $this->is_2d_scale_array($outputData) || $this->is_1d_scale_array($outputData);
 
         if ($this->is_1d_scale_array($bindOutput)){
@@ -102,6 +102,7 @@ class Carousel_View extends ValueList_View {
         echo $this->indent(1)."<div";
         echo $this->wrap_output('class', 'van-carousel-item');
         echo $this->wrap_output(':data-value', $value);
+        echo $this->wrap_output('data-bound', $boundData);
         echo $this->wrap_output('data-target', $myid);
         echo $this->wrap_output(':class', "{'active': {$activeExp}}");
         if ($needLoadSubpage){

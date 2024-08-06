@@ -25,10 +25,10 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 |      UI+框架       | UIBuilder | 预览器 | 编译器 |
 |:----------------:|:---------:|:---:|:----:|
 |  Bootstrap + H5  |✅ | ✅ |✅ |
-| Bootstrap + Vue3 | ✅ |   ⌛  |   ⌛   |
-|   Vant + Vue3    |  ✅     |   ⌛  |   ⌛   |
-|   Vant + 微信小程序   |    ✅     |  ⌛   |    ⌛  |
-|   Weui + 微信小程序   |   ✅     |  ⌛   |    ⌛  |
+| Bootstrap + Vue3 | ✅ |   ✅  |   ⌛   |
+|   Vant + Vue3    |  ✅     |   ✅  |   ⌛   |
+|   Vant + 微信小程序   |    ✅     |  ✅   |    ⌛  |
+|   Weui + 微信小程序   |   ✅     |  ✅   |    ⌛  |
 |    Layui + H5    |    ✅     |  ⌛   |   ⌛   |
 |   Layui + Vue3   |   ✅     | ⌛    | ⌛     |
 

@@ -32,6 +32,11 @@ export default function (uiconfig: any = null) {
       store.commit('updatePageState', { hoverUIItemId: v })
     }
   })
+  const hoverUIItem = computed(() => {
+    if (!hoverUIItemId.value) return null
+    const { uiConfig } = store.getters.getUIItemInPage(hoverUIItemId.value, selectedPageId.value)
+    return uiConfig
+  })
   const ui = computed(() => store.state.design.project.ui)
   const uiVersion = computed(() => store.state.design.project.ui_version)
 
@@ -173,6 +178,7 @@ export default function (uiconfig: any = null) {
     selectedUIItemId,
     selectedUIItem,
     hoverUIItemId,
+    hoverUIItem,
     ui,
     uiVersion,
     focusUIItem,

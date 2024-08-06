@@ -4,6 +4,7 @@ use app\build\Build_Model;
 use app\modules\build\views\preview\bootstrap\Page_View;
 use app\modules\build\views\preview\Preview_View;
 use app\project\Action_Model;
+use app\project\Label_Model;
 use app\project\Page_Bind_Api_Model;
 use app\project\Page_Bind_Data_Model;
 use app\project\Page_Bind_Event_Model;
@@ -233,7 +234,7 @@ class Bind_Controller extends YZE_Resource_Controller {
 
         return YZE_JSON_View::success($this, $datas);
     }
-    // 页面绑定api
+    // 页面绑定api升级
     public function post_upgradeapi(){
         $request = $this->request;
         $this->layout = '';
@@ -248,6 +249,66 @@ class Bind_Controller extends YZE_Resource_Controller {
 
         $bind_api = Page_Bind_Api_Model::save_from_web_api($page, $bind_api->get_web_api(), $bind_api->bind_class, $bind_api->bind_uuid);
         return YZE_JSON_View::success($this, ['uuid'=>$bind_api->uuid]);
+    }
+    // 页面绑定api, 该api没有和任何事件及action绑定，用于UI组件引用到api到情况，比如file组件到自动上传文件api
+    public function post_webapi(){
+        $request = $this->request;
+        $this->layout = '';
+        $data = json_decode(file_get_contents('php://input'), true);
+
+        $this->valid($data["page_uuid"]);
+        $api_uuid = trim($data["api_uuid"]);
+        $page = $this->page;
+        $web_api = find_by_uuid(Web_Api_Model::CLASS_NAME, $api_uuid);
+        if (!$web_api) throw new YZE_FatalException(__('Api not found'));
+
+        $bind_api = Page_Bind_Api_Model::from()->where("is_deleted=0 and bind_class='' and bind_uuid=:uiid and page_id=:pid and web_api_id=:id")
+            ->get_Single([':id'=>$web_api->id,':pid'=>$page->id, ':uiid'=>$data["uiid"]]);
+        if (!$bind_api){
+            $bind_api = Page_Bind_Api_Model::save_from_web_api($page, $web_api, '', $data["uiid"]);
+        }
+        return YZE_JSON_View::success($this, ['uuid'=>$bind_api->uuid]);
+    }
+
+    /**
+     * 拉取API基本信息
+     * @return YZE_JSON_View
+     * @throws YZE_FatalException
+     */
+    public function apiinfo(){
+        $request = $this->request;
+        $this->layout = '';
+        $getData = $request->the_get_datas();
+        $loginUser = YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
+
+        $bindApi = find_by_uuid(Page_Bind_Api_Model::CLASS_NAME, $getData['uuid']);
+        if (!$bindApi) throw new YZE_FatalException(__('Web Api not found'));
+        $project = $bindApi->get_page()->get_project();
+
+        $project_member = $project->get_member($loginUser->id);
+        if (!$project_member) throw new YZE_FatalException(__('not a project member'));
+        $webApi = $bindApi->get_web_api();
+
+        $api = $bindApi->get_records();
+        $content = json_decode(html_entity_decode($webApi->content), true)?:[];
+        unset($api['id'], $api['content'], $api['api_folder_id'], $api['project_member_id']);
+        $api += $content;
+        $api_folder = $webApi->get_api_folder();
+        if ($api_folder){
+            $api['folder'] = ['uuid'=>$api_folder->uuid, 'name'=>$api_folder->name];
+        }else{
+            $api['folder'] = new \stdClass();
+        }
+        $project_member = $webApi->get_project_member();
+        if ($project_member){
+            $api['responsible'] = ['uuid'=>$project_member->uuid, 'name'=>$project_member->get_user()->nickname];
+        }else{
+            $api['responsible'] = new \stdClass();
+        }
+        foreach (Label_Model::get_labels($webApi) as $label){
+            $api['label'][$label->uuid] = $label->name;
+        }
+        return YZE_JSON_View::success($this, $api);
     }
 
     /**
@@ -298,7 +359,7 @@ class Bind_Controller extends YZE_Resource_Controller {
         if (!$bindIO) throw new YZE_FatalException(__('Please bind the superior data output first'));
         $parentBoundUI = $this->page->find_ui_item($bindIO->uiid);
         if (!$parentBoundUI) throw new YZE_FatalException(__('Please bind the superior data output first'));
-        if (!$this->page->is_sub_ui($check_uiid, $parentBoundUI)) throw new YZE_FatalException(__('Must be bound to the subordinate UI of the UI bound to the superior array'));
+        if (!$this->page->is_sub_ui($check_uiid, $parentBoundUI) && $check_uiid!=$parentBoundUI->meta->id) throw new YZE_FatalException(__('Must be bound to the subordinate UI of the UI bound to the superior array'));
     }
 
     private function check_bind_in($from_uuid, $data_id, $check_uiid){

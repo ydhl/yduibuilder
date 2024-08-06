@@ -26,7 +26,7 @@ class Table_View extends ValueList_View {
 
         //header
         if (!$this->data['meta']['custom']['headless']){
-            list('name'=>$headText, 'value'=>$xValue) = $this->get_bind_name_value($outputData['item'], 'Header');
+            list('name'=>$headText, 'value'=>$xValue, 'data'=>$boundData) = $this->get_bind_name_value($outputData['item'], 'Header');
 
             echo $this->indent(2);
             echo "<thead";
@@ -38,6 +38,8 @@ class Table_View extends ValueList_View {
             echo $this->indent(4)."<th";
             echo $this->wrap_output('class', $this->td_css());
             echo $this->wrap_output('x-text', $headText);
+            echo $this->wrap_output(':data-value', $xValue);
+            echo $this->wrap_output('data-bound', $boundData);
             echo "></th>".PHP_EOL;
             echo $this->indent(4) . "</template>".PHP_EOL;
 
@@ -46,7 +48,7 @@ class Table_View extends ValueList_View {
         }
 
         // row
-        list('name'=>$tdText, 'value'=>$xValue) = $this->get_bind_name_value($outputData['item'], 'Column');
+        list('name'=>$tdText, 'value'=>$xValue, 'data'=>$boundData) = $this->get_bind_name_value($outputData['item'], 'Column');
         echo $this->indent(2) . "<tbody>".PHP_EOL;
         echo $this->indent(2) . '<template x-for="(row, idxOfRow) in row" :key="idxOfRow">'.PHP_EOL;
         echo $this->indent(3) . "<tr>".PHP_EOL;
@@ -54,6 +56,8 @@ class Table_View extends ValueList_View {
         echo $this->indent(4) . "<th";
         echo $this->wrap_output('class', $this->td_css());
         echo $this->wrap_output('x-text', $tdText);
+        echo $this->wrap_output(':data-value', $xValue);
+        echo $this->wrap_output('data-bound', $boundData);
         echo "></th>".PHP_EOL;
         echo $this->indent(4) . "</template>".PHP_EOL;
         echo $this->indent(3) . "</tr>".PHP_EOL;
@@ -62,7 +66,7 @@ class Table_View extends ValueList_View {
 
         //footer
         if (!$this->data['meta']['custom']['footless']){
-            list('name'=>$footerText, 'value'=>$xValue) = $this->get_bind_name_value($outputData['item'], 'Footer');
+            list('name'=>$footerText, 'value'=>$xValue, 'data'=>$boundData) = $this->get_bind_name_value($outputData['item'], 'Footer');
             echo $this->indent(2);
             echo "<tfoot";
             echo $this->wrap_output('class', $this->footer_css()).">".PHP_EOL;
@@ -72,6 +76,8 @@ class Table_View extends ValueList_View {
             echo $this->indent(4)."<th";
             echo $this->wrap_output('class', $this->td_css());
             echo $this->wrap_output('x-text', $footerText);
+            echo $this->wrap_output(':data-value', $xValue);
+            echo $this->wrap_output('data-bound', $boundData);
             echo "></th>".PHP_EOL;
             echo $this->indent(4) . "</template>".PHP_EOL;
 

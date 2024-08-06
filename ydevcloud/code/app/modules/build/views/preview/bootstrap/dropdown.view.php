@@ -52,10 +52,11 @@ class Dropdown_View extends ValueList_View {
         $staticValue = $staticData['value']?:$staticData['name'];
         // 动态数据
         if($outputData){
-            list('name'=>$name, 'value'=>$value, "checked"=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+            list('name'=>$name, 'value'=>$value, "checked"=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
             echo '<a href="javascript:void(0)"';
             echo $this->wrap_output('data-root', $myid);
             echo $this->wrap_output(':data-value', $value);
+            echo $this->wrap_output('data-bound', $boundData);
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$value} : ''" : null);
             echo $this->wrap_output(':class', $this->itemCss($value));
             echo $this->wrap_output('x-text', $name);

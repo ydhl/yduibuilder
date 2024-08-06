@@ -95,8 +95,8 @@ export default {
     }
     const loadVariables = () => {
       ydhl.get('api/data.json', { page_uuid: props.pageUuid }, (rst) => {
-        pageVariables.value = rst.data.page
-        globalVariables.value = rst.data.global
+        pageVariables.value = rst.data?.page || []
+        globalVariables.value = rst.data?.global || []
       })
     }
     onMounted(() => {

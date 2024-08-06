@@ -17,11 +17,8 @@ class Select_View extends ValueList_View {
 
     protected function build_ui_begin($iteratorName = null)
     {
-        $this->get_input_data($inputDataName);
         $myid = $this->myid();
-        if (!$inputDataName){
-            $inputDataName = $this->myid().'_value';
-        }
+        $inputDataName = $this->get_input_data_name();
 
         $space =  $this->indent();
         echo $space.'<div';
@@ -56,7 +53,7 @@ class Select_View extends ValueList_View {
     protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null, $iteratorName='')
     {
         $myid = $this->myid();
-        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
         $idxData = "idxOf{$itemName}";
         if (!$outputData){
             $staticValue = $staticData['value']?:$staticData['name'];
@@ -73,6 +70,7 @@ class Select_View extends ValueList_View {
         echo $this->wrap_output('class', 'van-action-sheet__item');
         echo $this->wrap_output(':data-value', $xValue);
         if ($outputData){
+            echo $this->wrap_output('data-bound', $boundData);
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
         }else{
             echo $this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null);

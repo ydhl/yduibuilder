@@ -25,7 +25,7 @@ class Nav_View extends ValueList_View {
     }
     protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex = null, $iteratorName='')
     {
-        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
         $myid = $this->myid();
         $staticValue = $staticData ? $staticData['value']?:$staticData['name'] : null;
 
@@ -36,6 +36,7 @@ class Nav_View extends ValueList_View {
             .$this->wrap_output('data-root', $myid);
         if ($outputData){
             echo $this->wrap_output(':data-value', $xValue);
+            echo $this->wrap_output('data-bound', $boundData);
             echo $this->wrap_output('x-text', $xText);
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
         }else{

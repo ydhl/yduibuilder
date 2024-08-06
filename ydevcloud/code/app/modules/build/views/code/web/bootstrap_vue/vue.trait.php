@@ -49,7 +49,7 @@ trait Vue {
         parent::build_main_attrs();
         $events = @$this->data['events'];
         foreach((array)$events as $eventName => $eventBinds){
-            $sortEventName = $this->eventMap($eventName);
+            $sortEventName = $this->eventName($eventName);
             echo ' @'.$sortEventName.'="'.$this->myId().ucfirst($sortEventName).'"';
         }
     }
@@ -58,7 +58,7 @@ trait Vue {
      * @param $eventName
      * @return string
      */
-    protected function eventMap($eventName){
+    protected function eventName($eventName){
         return[
             'onload' => 'load',
             'onready' => '',
@@ -164,7 +164,7 @@ trait Vue {
             return;
         }
         foreach($events as $eventName => $eventBinds){
-            $functionName = $this->myId().ucfirst($this->eventMap($eventName));
+            $functionName = $this->myId().ucfirst($this->eventName($eventName));
             ob_start();
 ?>
 () => {

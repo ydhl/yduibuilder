@@ -37,7 +37,7 @@ abstract class ValueList_View extends Preview_View implements Valuable_View{
 
     protected function default_value() {
         $uiType = strtolower($this->data['type']);
-        $isArr = $uiType == 'checkbox' || ($uiType=='select' && $this->data['meta']['custom']['multiple']);
+        $isArr = $uiType == 'checkbox' || ($uiType=='select' && $this->data['meta']['custom']['multiple']) || $this->need_iterate_data();
         if (@!$this->data['meta']['values']){
             return $isArr ? ['item 1'] : 'item 1';
         }

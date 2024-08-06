@@ -43,16 +43,16 @@ function findDragPosition (target: any) {
 }
 
 function getUIDragged () {
-  return (top.window as any).uidragged
+  return (top!.window as any).uidragged
 }
 function setUIDragged (el: any) {
-  (top.window as any).uidragged = el
+  (top!.window as any).uidragged = el
 }
 function getUIDragFromWhere () {
-  return (top.window as any).uiDragFromWhere
+  return (top!.window as any).uiDragFromWhere
 }
 function setUIDragFromWhere (type: UIDragType) {
-  (top.window as any).uiDragFromWhere = type
+  (top!.window as any).uiDragFromWhere = type
 }
 /**
  * 处理设计器中的ui元素和UITree中的元素拖动

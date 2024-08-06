@@ -141,7 +141,7 @@ TICK;
     private function build_item($bindOutput, $iteratorName, $itemName, $indent){
         $myid = $this->myid();
         // 只处理标量一维数组并把标量看作是要加载的子页url
-        list('name'=>$xTitle, 'value'=>$xValue) = $this->get_bind_name_value($bindOutput, $itemName);
+        list('name'=>$xTitle, 'value'=>$xValue, 'data'=>$boundData) = $this->get_bind_name_value($bindOutput, $itemName);
         $needLoadSubpage =  $this->is_2d_scale_array($bindOutput) || $this->is_1d_scale_array($bindOutput);
         if ($this->is_1d_scale_array($bindOutput)){
             $activeExp = 'idxOf'.$itemName.' == 0';
@@ -160,7 +160,7 @@ TICK;
 <div class="card">
     <div class="card-header" :id="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-header')">
         <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-bound="{$boundData}"
             :data-value="{$xValue}"{$eventListen} :data-target="alpinejs_get_index(\$el, '#{$myid}', idxOf{$itemName} + '-collapse')"
             aria-expanded="true" :aria-controls="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-collapse')"
             x-text="{$headerText}"></button>

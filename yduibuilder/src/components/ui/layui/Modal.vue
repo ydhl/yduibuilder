@@ -5,20 +5,20 @@
        :data-pageid="pageid">
       <div :class="['layui-card-header layui-d-flex layui-align-items-center layui-justify-content-between subui',{'dragenter-subcontainer': isDragIn && dragoverInParent=='head'}]" v-if="!uiconfig.meta.custom?.headless" data-placeInParent="head">
         <template v-if="!myItems.head.length">
-          {{t('style.modal.drapTip')}}
+          {{t('common.dragtohere')}}
         </template>
         <UIBase v-for="(item, index) in myItems.head" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
         <button type='button' class='layui-btn layui-btn-primary layui-btn-xs layui-border-0 layui-reset d-none'><i class='layui-icon layui-icon-close'></i></button>
       </div>
       <div class="layui-card-body">
         <template v-if="!hasMainItems">
-          {{t('style.modal.drapTip')}}
+          {{t('common.dragtohere')}}
         </template>
         <UIBase v-for="(item, index) in mainItems" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
       </div>
       <div :class="['layui-card-footer subui',{'dragenter-subcontainer': isDragIn && dragoverInParent=='foot'}]" v-if="!uiconfig.meta.custom?.footless" data-placeInParent="foot">
         <template v-if="!myItems.foot.length">
-          {{t('style.modal.drapTip')}}
+          {{t('common.dragtohere')}}
         </template>
         <UIBase v-for="(item, index) in myItems.foot" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
       </div>

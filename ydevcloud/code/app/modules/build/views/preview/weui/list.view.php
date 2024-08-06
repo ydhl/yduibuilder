@@ -26,7 +26,7 @@ class List_View extends ValueList_View {
         $space =  $this->indent();
         $myid = $this->myid();
         $inputDataName = $this->get_input_data_name($inputIsArr);
-        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
 
         if (!$outputData){
             $staticValue = $staticData['value']?:$staticData['name'];
@@ -38,6 +38,7 @@ class List_View extends ValueList_View {
         echo $this->wrap_output(':class', $this->item_theme($inputDataName, $xValue));
         echo $this->wrap_output(':style', $this->item_style($inputDataName,$xValue));
         echo $this->wrap_output(':data-value', $xValue)
+            .$this->wrap_output('data-bound', $boundData)
             .$this->wrap_output('data-root', $myid);
         if ($checked){
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);

@@ -12,7 +12,7 @@ class Nav_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper;
 
     protected function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null, $iteratorName=''){
-        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+        list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
         $myid = $this->myid();
         $staticValue = $staticData ? $staticData['value']?:$staticData['name'] : null;
         echo $this->indent(1) . '<div class="nav-item">'.PHP_EOL;
@@ -24,6 +24,7 @@ class Nav_View extends ValueList_View {
         echo $this->wrap_output('data-root', $myid);
         if ($outputData){
             echo $this->wrap_output(':data-value', $xValue);
+            echo $this->wrap_output('data-bound', $boundData);
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
         }else{
             echo $this->wrap_output('data-value', $staticValue);

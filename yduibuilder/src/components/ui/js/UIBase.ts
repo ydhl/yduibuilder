@@ -222,7 +222,7 @@ export default class UIBase {
    * ui继承的数据获取和处理
    * @return { t, dragoverUIItemId, dragoverPlacement, dragoverInParent, inlineEditItemId, parentUi, hasItems }
    */
-  public setup () {
+  public setup (): any {
     const props = this.props
     // const context = this.context
     const { t } = useI18n()

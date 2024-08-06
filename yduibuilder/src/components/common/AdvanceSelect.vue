@@ -23,7 +23,7 @@
   </template>
   <template v-else>
     <div class="dropdown">
-      <button ref="dropdownToggle" :class="['btn btn-light dropdown-toggle', btnSize]" @click.stop.prevent type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <button ref="dropdownToggle" :class="['btn dropdown-toggle', btnSize]" @click.stop.prevent type="button" data-bs-toggle="dropdown" aria-expanded="false">
         {{defaultText}}
       </button>
       <div class="dropdown-menu" ref="dropdownMenu" :style="flexMode ? 'width:250px' : ''">
@@ -41,6 +41,7 @@
               <div v-if="!option.disabled"><a class="dropdown-item" href="javascript:void(0)"
                   @mouseenter="showDesc(option)" @click.stop.prevent="click(option)">{{option.name}}</a></div>
             </template>
+            <div v-else-if="option.header"><h6 class="dropdown-header">{{option.header}}</h6></div>
             <div v-else class="w-100"><hr class="dropdown-divider"></div>
           </template>
         </div>
@@ -58,6 +59,7 @@
                                                             @mouseenter="showDesc(option)" @click.stop.prevent="click(option)">{{option.name}}</a></div>
               <div v-else-if="option.disabled"><span class="dropdown-item-text text-muted">{{option.name}}</span></div>
             </template>
+            <div v-else-if="option.header"><h6 class="dropdown-header">{{option.header}}</h6></div>
             <div v-else><hr class="dropdown-divider"></div>
           </template>
         </template>
@@ -85,7 +87,7 @@ export default {
     flexMode: Boolean,
     hideToggle: Boolean,
     btnSize: {
-      default: 'btn-xs ',
+      default: 'btn-xs btn-light ',
       type: String
     }
   },

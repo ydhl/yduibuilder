@@ -17,7 +17,7 @@
 import { ref } from 'vue'
 
 export default {
-  name: 'Test',
+  name: 'TestPage',
   setup (props: any, context: any) {
     const single = ref('single')
     const arr = ref([])

@@ -17,10 +17,6 @@ $pages = $curr_module ? $curr_module->get_pages() : [];
 $type = $this->get_data('type');
 $curr_api_env = trim($request->get_from_get("api_env"));
 $curr_page = $curr_page ?: reset($pages);
-$has_api = Action_Model::from('a')
-    ->left_join(Page_Model::CLASS_NAME,'p', 'p.id = a.page_id')
-    ->where('p.project_id=:pid and a.bind_api_id!=0 and a.is_deleted=0 and a.page_id=:id')
-    ->count('id', [":pid"=>$project->id,":id"=>$curr_page->id],'a');
 
 $api_envs = Project_Setting_Model::get_setting_value($project->id, 'api_env');
 
@@ -199,7 +195,7 @@ foreach ($subpages as $page){
                         <?php }?>
                         <a href="/code/<?= $project->uuid?>?module=<?= $curr_module->uuid?>&page=<?= $curr_page->uuid?>" class="btn btn-outline-primary <?= $type=='code' ? 'active' : ''?>"><?= __('Code')?></a>
                     </div>
-                    <?php if ($has_api && $api_envs && $type!='code'){?>
+                    <?php if ($api_envs && $type!='code'){?>
                         <div class="btn-group ms-2">
                             <div class="btn-group">
                                 <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

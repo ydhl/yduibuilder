@@ -1,0 +1,7 @@
+.monaco-editor .codelens-decoration {
+    font-size: 12px !important;
+    color: #007acc !important;
+    background-color: rgba(0, 122, 204, 0.1);
+    border-radius: 3px;
+    font-family: Menlo, Monaco, "Courier New", monospace
+}

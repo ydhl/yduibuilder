@@ -1,4 +1,3 @@
-
 import UIBase from '@/components/ui/js/UIBase'
 
 export default class Collapse extends UIBase {

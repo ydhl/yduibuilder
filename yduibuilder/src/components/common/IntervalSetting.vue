@@ -88,14 +88,14 @@
   </lay-layer>
 
   <!-- bind action Dialog -->
-  <lay-layer v-model="addActionDlgVisible" skin="layui-layer-content-overflow"  :title="t('common.action')" :shade="true" :area="['420px', '250px']" :btn="addActionButtons">
+  <lay-layer v-model="addActionDlgVisible" layer-classes="layui-layer-content-overflow"  :title="t('common.action')" :shade="true" :area="['420px', '250px']" :btn="addActionButtons">
     <div class="ps-4 pe-4 pt-2 pb-2">
       <div class="row g-3 mt-1 align-items-center">
         <div class="col-sm-2">
           <label>{{t('common.action')}}</label>
         </div>
         <div class="col-auto">
-          <AdvanceSelect btn-size="btn-sm" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
+          <AdvanceSelect btn-size="btn-sm btn-light" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
         </div>
       </div>
     </div>

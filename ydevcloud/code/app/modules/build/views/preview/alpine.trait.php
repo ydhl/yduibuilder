@@ -24,7 +24,6 @@ trait Alpine {
         $isTopPage = !$this->find_parent($this->myid());
         // 顶级元素构建alpine代码结构主体
         if ($isTopPage){
-            $fragment->add_code(Html_Code_Fragment::SECTION_BEGIN,"Alpine.data('".$this->myid()."', () => ({");
             $this->build_page_data_code(1);
         }
 
@@ -67,7 +66,6 @@ trait Alpine {
             if (in_array($this->build->get_page()->page_type, ['popup', 'subpage'])){
                 $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent(0, true).'this.$data.$loadSubPages[this.$url] = encodeURIComponent("'.$this->data['meta']['title'].'")');
             }
-            $fragment->add_code(Html_Code_Fragment::SECTION_END, "}))");
             // 如果是子页、组件、Modal弹窗，则作为module加载，不调用Alpine.start（由主页面调用）
             if (!$this->build->is_subpage() && !in_array($this->build->get_page()->page_type, ['popup','subpage'])){
                 $fragment->add_code(Html_Code_Fragment::SECTION_END, PHP_EOL."Alpine.start()");
@@ -170,7 +168,8 @@ INPITCONFIG;
         $myid = $this->myid();
         foreach ($events as $event){
             if(!$event->uicomponent_event_id && $this->isLifeCycleEvent($event->event)) continue;
-            $name = strtolower($event->uicomponent_event_id ? $event->event : $this->eventMap($event->event));
+            $name = strtolower($event->uicomponent_event_id ? $event->event : $this->eventName($event->event));
+            if (!$name) continue;
             if (!$this->is_custom_ui() && $name=='change') {
                 $inputDataName = $this->get_input_data_name();
                 $eventHandlers['x-init'] = "\$watch(alpinejs_get_input_data_name(\$el, '{$inputDataName}'), (value, oldValue) => {$myid}_change(value, oldValue))";
@@ -206,7 +205,7 @@ INPITCONFIG;
      * @param $eventName
      * @return string
      */
-    protected function eventMap($eventName){
+    protected function eventName($eventName){
         return [
             'onchange'=>'change',
             'oninput'=>'input',
@@ -330,12 +329,11 @@ INTERVAL;
         $codeLines[] = $interval;
     }
     private function build_api_body_data(Page_Bind_Api_Model $bind_api, $formatVariables, $inputBody, &$codeLines) {
+        if(!$inputBody) return;
 
         switch (strtolower($bind_api->requestBodyType)){
             case 'none': return;
-            case 'form-data':
             case 'x-www-form-urlencoded':
-                if(!$inputBody) return;
                 $args = [];
                 foreach ($inputBody as $dataConfig){
                     $bindVariable = $formatVariables[$dataConfig['uuid']];
@@ -345,6 +343,10 @@ INTERVAL;
                     $args[] = $dataConfig['name'].'=${'.$expression->get_expression_code().'}';
                 }
                 if($args) $codeLines[] = $this->indent(1, true).'data: `'.join('&', $args).'`,';
+                return;
+            case 'form-data':
+                // formData 在外面进行了组装
+                $codeLines[] = $this->indent(1, true).'data: formData,';
                 return;
             case 'json':
                 $this->build_api_input($formatVariables, 'data', $inputBody, $codeLines);
@@ -356,13 +358,8 @@ INTERVAL;
             case 'msgpack': return;
         }
     }
-    protected function build_webapi_code(Action_Model $action, &$codeLines){
-        $bind_api = $action->get_bind_api();
-        if (!$bind_api){
-            $codeLines[] = '// NO WEB API BIND';
-            return;
-        }
-        $actions = Page_Bind_API_Action_Model::get_bind_actions($action->page_id, Page_Bind_Api_Model::CLASS_NAME, $bind_api->uuid);
+    protected function build_axios_code(Page_Bind_Api_Model $bind_api, &$codeLines, $onUploadProgress = [], $onSuccess = []){
+        $actions = Page_Bind_API_Action_Model::get_bind_actions($bind_api->page_id, Page_Bind_Api_Model::CLASS_NAME, $bind_api->uuid);
         $io_data_fetch = new Io_Data_Fetch($this->build);
         $responseType = ['json'=>'json', 'xml'=>'text', 'html'=>'text', 'binary'=>'blob'];
         $inputAuth = $bind_api->get_input_configs('auth');
@@ -383,28 +380,60 @@ INTERVAL;
             if ($args) $codeLines[] = "YDECloud.setCookie(".$args.");";
         }
 
-        $codeLines[] = "axios({";
-        $codeLines[] = $this->indent(1, true)."method: '".strtolower($bind_api->method)."',";
-        $codeLines[] = $this->indent(1, true)."withCredentials: true,";
-        if ($inputPath){
-            $params = $this->get_param_variable($formatVariables, $inputPath);
-            $url = $this->replace_param($this->build->get_api_base().$bind_api->path, $params);
-            $codeLines[] = $params ? $this->indent(1, true).'url: `'.$url.'`,' : $this->indent(1, true).'url: "'.$url.'",';
-        }else{
-            $codeLines[] = $this->indent(1, true).'url: "'.$this->build->get_api_base().$bind_api->path.'",';
+        if(strtolower($bind_api->requestBodyType) == 'form-data'){
+            $codeLines[] = "const formData = new FormData();";
+            foreach ($inputBody as $dataConfig){
+                $bindVariable = $formatVariables[$dataConfig['uuid']];
+                if (!$bindVariable) continue;
+                $expression = $bindVariable->get_expression();
+                if (!$expression) continue;
+                $codeLines[] = 'formData.append("'.$dataConfig['name'].'", '.$expression->get_expression_code().');';
+            }
         }
+
+        $codeLines[] = "axios({";
         $this->build_api_body_data($bind_api, $formatVariables, $inputBody, $codeLines);
         $this->build_api_input($formatVariables, 'params', $inputParam, $codeLines);
         $this->build_api_input($formatVariables, 'headers', $inputHeader, $codeLines);
         $this->build_api_input($formatVariables, 'auth', $inputAuth, $codeLines);
 
-        $codeLines[] = $this->indent(1, true)."responseType: '".($responseType[$bind_api->get_response_type()]?:'json')."'";
+        $codeLines[] = $this->indent(1, true)."responseType: '".($responseType[$bind_api->get_response_type()]?:'json')."',";
+
+        if ($onUploadProgress){
+            $codeLines[] = $this->indent(1, true)."onUploadProgress: (progressEvent) => {";
+            $codeLines[] = $this->indent(2, true)."const progress = progressEvent.total > 0 ? ~~(progressEvent.loaded / progressEvent.total * 100) : 0;";
+            $codeLines = array_merge($codeLines, $this->build->indent_code(2, $onUploadProgress));
+            $codeLines[] = $this->indent(1, true)."},";
+        }
+
+        $codeLines[] = $this->indent(1, true)."method: '".strtolower($bind_api->method)."',";
+        $codeLines[] = $this->indent(1, true)."withCredentials: true,";
+        if ($inputPath){
+            $params = $this->get_param_variable($formatVariables, $inputPath);
+            $url = $this->replace_param($this->build->get_api_base().$bind_api->path, $params);
+            $codeLines[] = $params ? $this->indent(1, true).'url: `'.$url.'`,' : $this->indent(1, true).'url: "'.$url.'"';
+        }else{
+            $codeLines[] = $this->indent(1, true).'url: "'.$this->build->get_api_base().$bind_api->path.'"';
+        }
+
         $codeLines[] = " }).then((response) => {";
         $codeLines = array_merge($codeLines, $this->build->indent_code(1, $this->get_post_processor($actions, $io_data_fetch, $bind_api)));
+        if ($onSuccess) {
+            $codeLines = array_merge($codeLines, $this->build->indent_code(1, $onSuccess));
+        }
         $codeLines[] = " }).catch((err) =>{";
         $codeLines[] = $this->indent(1, true)."alert(err)";
         $codeLines[] = " })";
     }
+    protected function build_webapi_code(Action_Model $action, &$codeLines){
+        $bind_api = $action->get_bind_api();
+        if (!$bind_api){
+            $codeLines[] = '// NO WEB API BIND';
+            return;
+        }
+        $this->build_axios_code($bind_api, $codeLines);
+    }
+
     protected function build_popup_event_code(Action_Model $action, &$codeLines){
         switch ($action->popup_type){
             case 'page':
@@ -505,8 +534,12 @@ INTERVAL;
             $dataConfig = $bindData->find_data($mutation->mutation_data_id, $dataModel, $allParents, $path);
             $path[] = $dataConfig['name'];
             $path[] = 'page';
-            $codes = [join('.', array_reverse($path)), '=', $expression->get_expression_code()];
-            $codeLines[] = join(' ', $codes);
+            $rightValue = $expression->get_expression_code();
+            $operatior = $mutation->mutation_operator ?: '=';
+            $operatior = preg_replace("/@/", $rightValue, $operatior);
+            $codes = [join('.', array_reverse($path)), $operatior];
+            $this->add_used_variable($rightValue);
+            $codeLines[] = join('', $codes);
         }
     }
     protected function build_closepopup_code(Action_Model $action, &$codeLines){
@@ -572,7 +605,9 @@ INTERVAL;
         $inputIsArr = false;
         $inputDataConfig = $inputData;
         $uiType = strtolower($this->data['type']);
-        $isArray = $this->has_iterate() || $uiType == 'checkbox' || ($uiType=='select' && $this->data['meta']['custom']['multiple']);
+        $isArray = $this->has_iterate() || $uiType == 'checkbox'
+            || ($uiType=='select' && $this->data['meta']['custom']['multiple'])
+            || ($uiType=='file' && $this->data['meta']['custom']['multiple']);
 
         if ($inputDataName){
             // 绑定数据输入的情况下，绑定的数据明确是数组时才输出为数组

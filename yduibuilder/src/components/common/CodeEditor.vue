@@ -1,24 +1,66 @@
 <template>
-  <lay-layer resize :resizeEnd="recomputed" v-model="myDlgVisible" :title="title || t('common.customCode')" :shade="true" :area="['680px', '400px']" :btn="buttons">
+  <lay-layer resize layer-classes="layui-layer-content-overflow" :resizeEnd="recomputed" v-model="myDlgVisible" :title="`${title || t('common.customCode')} - ${language}`"
+             :shade="true" :area="['800px', '400px']" :btn="buttons">
     <div class="p-3" ref="editorContainer">
-      <div class="text-danger p-1 m-1 fs-7">{{tip}}</div>
-      <div ref="codeEditor" :style="editStyle"></div>
+      <div class="text-danger p-1 m-1 fs-7" v-if="tip">{{tip}}</div>
+      <div class="d-flex align-items-stretch">
+        <div ref="codeEditor" class="flex-grow-1" :style="editStyle"></div>
+        <div style="width: 300px;border-left:1px solid #dcdcdb" class="flex-shrink-0 d-flex">
+          <div class="vertical-tab">
+            <a :class="{'vertical-tab-item': true, 'active': scope=='local'}" @click="scope='local'" href="javascript:void(0)">{{t('variable.localScope')}}</a>
+            <a :class="{'vertical-tab-item': true, 'active': scope=='page'}" @click="scope='page'" href="javascript:void(0)">{{t('variable.pageScope')}}</a>
+            <a :class="{'vertical-tab-item': true, 'active': scope=='global'}" @click="scope='global'" href="javascript:void(0)">{{t('variable.globalScope')}}</a>
+          </div>
+          <div v-if="scope=='local'" class="flex-grow-1">
+            <template v-for="(variable, index) in variables" :key="index">
+              <DataSimple :model="variable" path="" :index="index" :intent="0" :root-uuid="variable.id"></DataSimple>
+            </template>
+            <div v-if="!variables || variables.length ==0" class="d-flex align-items-center text-muted h-100 justify-content-center">{{t('common.empty')}}</div>
+          </div>
+          <div v-if="scope=='page'" class="flex-grow-1">
+            <template v-for="(variable, index) in pageVariables" :key="index">
+              <DataSimple :model="variable" path="" :index="index" :intent="0" :root-uuid="variable.id"></DataSimple>
+            </template>
+            <div v-if="!pageVariables || pageVariables.length ==0" class="d-flex align-items-center text-muted h-100 justify-content-center">{{t('common.empty')}}</div>
+          </div>
+          <div v-if="scope=='global'" class="flex-grow-1">
+            <template v-for="(variable, index) in globalVariables" :key="index">
+              <DataSimple :model="variable" path="" :index="index" :intent="0" :root-uuid="variable.id"></DataSimple>
+            </template>
+            <div v-if="!globalVariables || globalVariables.length ==0" class="d-flex align-items-center text-muted h-100 justify-content-center">{{t('common.empty')}}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </lay-layer>
+  <DataInfo v-model="detailDlgVisible" :data="leftData"></DataInfo>
 </template>
 
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import * as monaco from 'monaco-editor'
+import ydhl from '@/lib/ydhl'
+import DataSimple from '@/components/common/DataSimple.vue'
+import { useStore } from 'vuex'
+import DataInfo from '@/components/common/DataInfo.vue'
 
 // 代码编辑对话框
 export default {
   name: 'CodeEditor',
+  components: { DataInfo, DataSimple },
   props: {
     code: String,
+    schema: Object, // variables json数据的schema
+    leftData: Object, // 左值
+    leftValuePath: String, // 左值
+    leftOperator: String, // 左值操作符
     title: String,
     tip: String,
+    variables: {
+      default: () => [],
+      type: Array
+    },
     readOnly: {
       default: false,
       type: Boolean
@@ -33,10 +75,31 @@ export default {
   setup (props: any, context: any) {
     const { t } = useI18n()
     const codeEditor = ref()
+    let editTimer
     const editorContainer = ref()
-    const editStyle = ref('height: 500px; width:100%')
+    const detailDlgVisible = ref(false)
+    const editStyle = ref('height: 250px;')
     const myCode = computed(() => props.code)
+    const store = useStore()
+    const currPage = computed(() => store.state.design.page)
+    const scope = ref('local')
+    const pageVariables = ref([])
+    const globalVariables = ref([])
+    const suggestions: any = []
     let editorInstance
+    let completionItemProvider
+    let codeLensProvider
+    let hoverProvider
+    let myUri
+    const leftDataInfo = computed(() => {
+      if (!props.leftData) return ''
+      const info = [props.leftValuePath ? props.leftValuePath + '.' + props.leftData?.name : props.leftData?.name]
+      const operators = props.leftOperator?.split('@')
+      if (operators?.length > 0) {
+        info.push(operators[0])
+      }
+      return info.join('')
+    })
     const myDlgVisible = computed({
       set (n) {
         context.emit('update:modelValue', n)
@@ -45,28 +108,210 @@ export default {
         return props.modelValue
       }
     })
+    onMounted(() => {
+      suggestions.push(...ydhl.getVariableSuggestions(props.variables))
+      loadVariables()
+    })
+    const loadVariables = () => {
+      ydhl.get('api/data.json', { page_uuid: currPage.value.meta.id }, (rst) => {
+        pageVariables.value = rst.data?.page || []
+        globalVariables.value = rst.data?.global || []
+
+        suggestions.push(...ydhl.getVariableSuggestions(pageVariables.value, 'page.'))
+        suggestions.push(...ydhl.getVariableSuggestions(globalVariables.value, 'global.'))
+      })
+    }
+    const escapeRegExp = (string) => {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    }
     watch(myDlgVisible, (n) => {
       if (!n) {
         editorInstance.dispose()
+        codeLensProvider.dispose()
+        completionItemProvider.dispose()
+        hoverProvider.dispose()
         editorInstance = null
         return
       }
       nextTick(() => {
+        if (props.language === 'json' && props.schema) {
+          console.log(props.schema)
+          // json格式配置
+          monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
+            validate: true,
+            allowComments: false,
+            enableSchemaRequest: false,
+            schemas: [
+              {
+                uri: ydhl.api,
+                fileMatch: ['*'],
+                schema: props.schema
+              }
+            ]
+          })
+        }
         if (!editorInstance) {
-          // console.log(codeEditor.value)
           editorInstance = monaco.editor.create(codeEditor.value as HTMLElement, {
             roundedSelection: true,
             scrollBeyondLastLine: false,
+            minimap: {
+              enabled: false
+            },
             readOnly: props.readOnly,
-            language: props.language || 'html'
+            language: props.language
           })
+          myUri = editorInstance.getModel().uri.toString()
         }
-        editorInstance.setValue(myCode.value || '// write you code here')
-        monaco.editor.setModelLanguage(editorInstance.getModel(), props.language || 'html')
+        codeLensProvider = monaco.languages.registerCodeLensProvider(props.language, {
+          provideCodeLenses (model, token) {
+            if (!model.uri.toString().includes(myUri)) {
+              return {
+                lenses: [],
+                dispose: () => {}
+              }
+            }
+            const id = props.leftData
+              ? editorInstance.addCommand(0, function () {
+                detailDlgVisible.value = true
+              }, '')
+              : ''
+            const lenses = [
+              {
+                range: {
+                  startLineNumber: 1,
+                  startColumn: 1,
+                  endLineNumber: 2,
+                  endColumn: 1
+                },
+                command: {
+                  id,
+                  title: leftDataInfo.value
+                }
+              }
+            ]
+            const operators = props.leftOperator?.split('@')
+            if (operators?.length > 1 && operators[1].trim()) {
+              const lineCount = model.getLineCount()
+              lenses.push({
+                range: {
+                  startLineNumber: lineCount,
+                  startColumn: 1,
+                  endLineNumber: lineCount,
+                  endColumn: 1
+                },
+                command: {
+                  id: '',
+                  title: operators[1]
+                }
+              })
+            }
+            return {
+              lenses,
+              dispose: () => {}
+            }
+          }
+        })
+        // 加载自动补全配置, 把当前变量的名称加入到自动补全中
+        completionItemProvider = monaco.languages.registerCompletionItemProvider(props.language, {
+          triggerCharacters: [' ', '.', '"'],
+          provideCompletionItems: (model, position, context, token) => {
+            if (!model.uri.toString().includes(myUri)) {
+              return { suggestions: [] }
+            }
+            return { suggestions: suggestions }
+          }
+        })
+        // 悬浮提示
+        hoverProvider = monaco.languages.registerHoverProvider(props.language, {
+          provideHover (model, position, token) {
+            if (!model.uri.toString().includes(myUri)) {
+              return null
+            }
+            const word = model.getWordAtPosition(position)
+            if (!word) return null
+            let str = word.word.replace(/\[.*\]/, '[.*]')
+            str = escapeRegExp(str)
+            const findSuggestions = suggestions.filter((suggestion: any) => {
+              return suggestion.label.match(new RegExp(`^${str}$`))
+            })
+            if (findSuggestions.length === 0) return null
+            const contents: any = []
+            for (const findSuggestion of findSuggestions) {
+              contents.push({ value: findSuggestion.detail + (findSuggestion.documentation ? ' ' + findSuggestion.documentation : '') })
+            }
+            return {
+              range: new monaco.Range(position.lineNumber, word.startColumn, position.lineNumber, word.endColumn),
+              contents
+            }
+          }
+        })
+        editorInstance.onDidChangeModelContent(() => {
+          // 非=号时认为是代码调用
+          const operators = props.leftOperator?.split('@')
+          if (operators?.length > 1 && operators[1].trim()) {
+            const model = editorInstance.getModel()
+            const lineCount = model.getLineCount()
+            const lastLineContent = model.getLineContent(lineCount)
+
+            // 有括号时，如果最后一行不是空的，则添加一个新行
+            if (lastLineContent.trim() !== '' || lineCount === 1) {
+              model.pushEditOperations([], [
+                {
+                  range: new monaco.Range(lineCount, lastLineContent.length + 1, lineCount, lastLineContent.length + 1),
+                  text: '\n'
+                }
+              ], () => null)
+            }
+            // editorInstance.setValue(editorInstance.getValue())
+          }
+          clearTimeout(editTimer)
+          // 延迟执行，避免被编辑器默认的markerts标记覆盖掉
+          editTimer = setTimeout(filterMarkers, 800)
+        })
+        editorInstance.setValue(myCode.value || '// write you code here \n')
         editorInstance.getAction('editor.action.formatDocument').run()
         editorInstance.setValue(editorInstance.getValue())
       })
     })
+    const filterMarkers = () => {
+      if (props.language === 'json') {
+        const model = editorInstance.getModel()
+        const markers = monaco.editor.getModelMarkers({ owner: props.language })
+        // json或者其他语言中提示关键字不存在时，做检查，在variable中的关键字编辑器不能识别，但他们时存在但过滤掉这些错误
+        const filteredMarkers = markers.filter(marker => {
+          if (!marker.message.includes('Value expected')) return true // json中非Value expected的提示错误都展示
+          let word = model.getValueInRange(marker)
+          if (!word) return true
+
+          // 关键字没有找到都则提示出来
+          word = word.replace(/\[.*\]/, '[.*]')
+          word = escapeRegExp(word)
+          return suggestions.filter((suggestion: any) => {
+            return suggestion.label.match(new RegExp(`^${word}$`))
+          }).length === 0
+        })
+        monaco.editor.setModelMarkers(model, props.language, filteredMarkers)
+      } else {
+        const code = editorInstance.getValue()
+        const lines = code.split('\n')
+        const markers: any = []
+        lines.forEach((line: string, index: number) => {
+          const lineNumber = index + 1
+          const semicolonIndex = line.indexOf(';')
+          if (semicolonIndex !== -1) {
+            markers.push({
+              startLineNumber: lineNumber,
+              startColumn: semicolonIndex + 1,
+              endLineNumber: lineNumber,
+              endColumn: semicolonIndex + 2,
+              severity: monaco.MarkerSeverity.Error,
+              message: 'Cannot use semicolons'
+            })
+          }
+        })
+        monaco.editor.setModelMarkers(editorInstance.getModel(), 'custom-linter', markers)
+      }
+    }
     const buttons = computed(() => {
       if (props.readOnly) {
         return [
@@ -77,26 +322,33 @@ export default {
             }
           }
         ]
-      } else {
-        return [
-          {
-            text: t('common.ok'),
-            callback: () => {
-              context.emit('update', editorInstance.getValue())
-            }
-          },
-          {
-            text: t('common.cancel'),
-            callback: () => {
-              myDlgVisible.value = false
-            }
-          }
-        ]
       }
+      return [
+        {
+          text: t('common.ok'),
+          callback: () => {
+            const model = editorInstance.getModel()
+            const markers = monaco.editor.getModelMarkers({ resource: model.uri })
+            if (markers.length > 0) {
+              ydhl.alert(t('variable.codeError'))
+              return
+            }
+            context.emit('update', editorInstance.getValue().trim())
+          }
+        },
+        {
+          text: t('common.cancel'),
+          callback: () => {
+            myDlgVisible.value = false
+          }
+        }
+      ]
     })
-    const recomputed = () => {
-      const { width, height } = editorContainer.value.getBoundingClientRect()
-      editStyle.value = `height:${height - 40}px;width:${width - 40}px`
+    const recomputed = (id) => {
+      const container = document.getElementById(id)
+      if (!container) return
+      const { width, height } = container.getBoundingClientRect()
+      editStyle.value = `height:${height - 150}px;width:${width - 340}px`
       nextTick(() => {
         if (editorInstance) editorInstance.layout()
       })
@@ -107,7 +359,12 @@ export default {
       myCode,
       codeEditor,
       editorContainer,
+      pageVariables,
+      globalVariables,
+      detailDlgVisible,
       editStyle,
+      suggestions,
+      scope,
       recomputed,
       myDlgVisible
     }

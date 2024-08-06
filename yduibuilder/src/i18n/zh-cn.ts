@@ -30,7 +30,7 @@ export default {
     pathParams: '路径参数',
     popup: '弹窗',
     popupDesc: '弹窗展示其他页面',
-    queryParams: '请求参数',
+    queryParams: '传入参数',
     redirect: '重定向',
     redirectDesc: '重定向到其他页面或外部地址',
     redirectPage: '页面',
@@ -65,7 +65,7 @@ export default {
       importTip: '导入后会改变所有数据节点的id，数据绑定等会失效',
       initLength: '初始长度',
       mock: 'Mock',
-      name: '名称',
+      name: '数据名称',
       noSubField: '没有字段',
       title: '名称',
       type: '类型'
@@ -191,13 +191,18 @@ export default {
     view: '查看'
   },
   event: {
-    args: '事件参数',
     add: '添加事件',
+    args: '事件参数',
     bind: '绑定事件',
     bindAPI: '绑定API',
     bindAPIEmptyTip: '没有API, 请通过APIBOX添加',
     bindTip: '绑定事件到UI',
+    componentEvent: '监听「{0}」的自定义事件',
     customEvent: '自定义事件',
+    data: '数据事件',
+    declareEvent: '自定义事件',
+    declareEventDesc: '组件可以显式声明它将触发的事件',
+    declareEventNoListen: '未注册',
     defineEvent: '定义事件',
     deleteConfirm: '确定删除吗?',
     error: {
@@ -209,18 +214,17 @@ export default {
     },
     form: '表单',
     interactive: '人机交互',
-    keyboard: '键盘',
+    keyboard: '键盘事件',
     lifeCycle: '生命周期',
-    mouse: '鼠标',
+    mouse: '鼠标事件',
     name: '事件名',
     noArgs: '没有参数',
     notBindEvent: '未绑定事件',
+    other: '其他事件',
     popupDesign: '设计',
-    pageEvent: '页面事件',
-    componentEvent: '监听「{0}」的自定义事件',
-    declareEvent: '自定义事件',
-    declareEventDesc: '组件可以显式声明它将触发的事件',
-    declareEventNoListen: '未注册'
+    page: '页面事件',
+    uiNotSupportEvent: '{0} 不支持 {1} 事件',
+    upload: '上传事件'
   },
   expression: {
     '~@': "将 {'@'} 中为 0 的位设为 1，反之亦然。{'@'}指数据",
@@ -259,12 +263,14 @@ export default {
     changeToTernary: '转成 ?: 表达式',
     changeToLiteral: '转成字面量',
     clear: '清空',
-    connect: '关联',
+    code: '表达式',
+    connect: '关联数据',
     condition: '条件表达式',
     connectTip: '关联其他数据',
     comparison: '比较操作',
     customError: "自定义操作符必须包含{'@'}占位符",
     customModifier: "自定义单目操作符或函数调用, 例如 !!{'@'}, func({'@'}), {'@'}.toLowerCase(), {'@'} 是数据占位符",
+    customOperator: "自定义操作符或函数调用, 例如 push({'@'}), [item] = {'@'}, {'@'} 是有值占位符",
     data: '数据',
     editor: '表达式编辑器',
     expression: '表达式',
@@ -434,7 +440,6 @@ export default {
     byCustomClass: '按自定义样式',
     byValue: '按值',
     card: {
-      drapTip: '请拖动组件到这里',
       footless: '无脚',
       headless: '无头'
     },
@@ -482,8 +487,13 @@ export default {
     existingClasses: '存在的样式',
     file: {
       accept: '文件名后缀',
-      acceptTip: '例如 jpg,png',
-      multiple: '多文件上传'
+      acceptTip: '例如 jpg,png 或者mime type 如 image/png, text/html',
+      isAutoUpload: ' 自动上传',
+      isAutoUploadTip: '选择文件后自动上传',
+      maxFileSize: '最大文件大小',
+      multiple: '多文件上传',
+      url: 'URL',
+      urlTip: '服务端处理上传文件的接口地址'
     },
     form: {
       addValue: '添加值',
@@ -596,8 +606,9 @@ export default {
     'margin-top': '上外边距',
     modal: {
       backdrop: '遮罩',
-      backdropTip: 'Yes 有遮罩（点击可关闭）；No 无遮罩；Static有遮罩，并点击不能关闭',
-      drapTip: '请拖动组件到这里',
+      backdropNo: 'No 无遮罩；',
+      backdropStatic: 'Static有遮罩，并点击不能关闭',
+      backdropYes: 'Yes 有遮罩（点击可关闭）',
       esc: 'Esc 关闭',
       escTip: '按下Esc键关闭对话框',
       footless: '无脚',
@@ -797,21 +808,25 @@ export default {
     success: '导出成功，你可以在左边的项目面板中编辑组件'
   },
   variable: {
+    assignOperator: 'assign operator',
     bindInputInvalid: '只有有值类UI才能绑定数据的输入',
     bound: '绑定数据',
     boundAsValue: '绑定为事件的「value」参数',
     boundAsBound: '绑定为事件的「boundData」参数',
     boundTypeMismatch: '类型不匹配, 绑定的数据类型应该是 {0}',
     cannotBindOutput: '不能绑定数据输出',
+    codeError: '代码中存在错误，请检查',
     globalScope: '全局数据',
     hasBeenBound: '已绑定',
     hasBoundInput: 'UI已经绑定了其他数据输入',
     hasBoundOutput: 'UI 已经绑定了 {0} 输出',
     inputData: '输入数据',
     inputDataDesc: '为组件【{0}】的数据提供值',
+    leftValue: '左值',
     literal: '字面量',
     literalTip: '手动输入的值',
     localScope: '局部数据',
+    localScopeInEvent: '{0}中的局部数据',
     mutation: '数据赋值',
     needBoundVariable: '{0} 需要绑定一个变量',
     objectHasBoundTip: '对象已被绑定, 所以下级字段不能被绑定',
@@ -828,6 +843,11 @@ export default {
       NONE: '不做任何输出'
     },
     pageScope: '页面数据',
-    remaintime: '剩余时间'
+    pleaseChooseMutationData: '请选择要赋值的数据',
+    pushDesc: '将数据压入数组的末尾（入栈）',
+    remaintime: '剩余时间',
+    rightValue: '右值',
+    typeMismatch: '类型不匹配, 该数据的类型是{0}, 实际输入的数据是 {1}',
+    unshiftDesc: '在数组开头插入数据'
   }
 }

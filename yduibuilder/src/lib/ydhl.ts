@@ -3,7 +3,15 @@ import { createPopper, Placement, VirtualElement } from '@popperjs/core'
 import { nextTick } from 'vue'
 import { YDJSStatic } from './ydjs'
 import { layer } from '@layui/layer-vue'
-import { Expression } from '@/store/model'
+import {
+  Expression,
+  DataStructObject,
+  DataStructArray,
+  DataStructNumber,
+  DataStructString,
+  DataStruct
+} from '@/store/model'
+import * as monaco from 'monaco-editor'
 declare const YDJS: YDJSStatic
 export default {
   version: '1.0.16-220207',
@@ -295,7 +303,7 @@ export default {
     return new Promise((resolve, reject) => {
       layer.confirm(msg, {
         title: '',
-        closeBtn: 0,
+        closeBtn: false,
         btn: [
           {
             text: okLabel,
@@ -518,10 +526,10 @@ export default {
   },
   getConditionExpression (expression: any) {
     const rst: any = []
-    if (expression.data) {
-      rst.push(this.getModifier(expression.data.modifier, expression.data.path || expression.data.literal))
-    } else if (expression.expression) {
+    if (expression.expression) {
       rst.push(this.getExpressionDesc(expression.expression))
+    } else if (expression.data) {
+      rst.push(this.getModifier(expression.data.modifier, expression.data.path || expression.data.literal))
     }
     if (expression.operator) rst.push(expression.operator)
     if (expression.rightData) {
@@ -547,6 +555,8 @@ export default {
       return this.getConditionExpression(expression)
     } else if (expression.type === 'literal') {
       return expression.literal
+    } else if (expression.type === 'code') {
+      return expression.code
     } else if (expression.type === 'ternary') {
       const rst: any = []
       if (expression.expression) {
@@ -565,5 +575,114 @@ export default {
       return expression.operator
     }
     return ''
+  },
+  getModelJSONSchema (data: any) {
+    if (!data) return null
+    if (data.type === 'object') {
+      return this.getModelObjectJSONSchema(data)
+    } else if (data.type === 'array') {
+      return this.getModelArrayJSONSchema(data)
+    } else if (data.type === 'string') {
+      return this.getModelStringJSONSchema(data)
+    } else if (data.type === 'number' || data.type === 'integer') {
+      return this.getModelNumberJSONSchema(data)
+    } else {
+      return {
+        type: data.type
+      }
+    }
+  },
+  getModelObjectJSONSchema (data: DataStructObject) {
+    if (!data || !data.props) return null
+    const schema: any = {
+      type: data.type,
+      additionalProperties: false, // 不允许未定义的其他属性。
+      properties: {}
+    }
+
+    const required: any = []
+    for (const prop of data.props) {
+      if (!prop.name) continue
+      schema.properties[prop.name] = this.getModelJSONSchema(prop)
+      if (prop.required) required.push(prop.name)
+    }
+
+    if (data.min) schema.minProperties = data.min
+    if (data.max) schema.maxProperties = data.max
+    if (data.comment) schema.description = data.comment
+    if (data.title) schema.title = data.title
+    if (required.length > 0) schema.required = required
+
+    return schema
+  },
+  getModelArrayJSONSchema (data: DataStructArray) {
+    if (!data) return null
+
+    const schema: any = {
+      type: data.type,
+      items: {}
+    }
+    schema.items = this.getModelJSONSchema(data.item)
+    if (data.min) schema.minItems = data.min
+    if (data.max) schema.maxItems = data.max
+    if (data.unique) schema.uniqueItems = data.unique
+    if (data.comment) schema.description = data.comment
+    if (data.title) schema.title = data.title
+    return schema
+  },
+  getModelNumberJSONSchema (data: DataStructNumber) {
+    if (!data) return null
+    const schema: any = {
+      type: data.type
+    }
+    if (data.min) schema.minimum = data.min
+    if (data.max) schema.maximum = data.max
+    if (data.enumValue) schema.enum = Object.keys(data.enumValue)
+    if (data.comment) schema.description = data.comment
+    if (data.title) schema.title = data.title
+    if (data.defaultValue) schema.default = data.defaultValue
+    return schema
+  },
+  getModelStringJSONSchema (data: DataStructString) {
+    if (!data) return null
+    const schema: any = {
+      type: data.type
+    }
+    if (data.min) schema.minLength = data.min
+    if (data.max) schema.maxLength = data.max
+    if (data.pattern) schema.pattern = data.pattern
+    if (data.enumValue) schema.enum = Object.keys(data.enumValue)
+    if (data.comment) schema.description = data.comment
+    if (data.title) schema.title = data.title
+    if (data.defaultValue) schema.default = data.defaultValue
+    return schema
+  },
+  getVariableSuggestions (variables: DataStruct[], prefix = '') {
+    const suggestions: any = []
+    if (!variables) return []
+    for (const variable of variables) {
+      const name = prefix + (variable.name || '')
+      if (variable.name) {
+        suggestions.push(
+          {
+            label: name,
+            kind: monaco.languages.CompletionItemKind.Variable,
+            insertText: name,
+            documentation: variable.comment || '',
+            detail: variable.type + (variable.title || '')
+          }
+        )
+      }
+      if (variable.type === 'object' || variable.type === 'file' || variable.type === 'map') {
+        const props = (variable as DataStructObject).props || []
+        suggestions.push(...this.getVariableSuggestions(props, name + '.'))
+      } else if (variable.type === 'array') {
+        const item = (variable as DataStructArray).item
+        if (item && item.type === 'object') {
+          suggestions.push(...this.getVariableSuggestions([item], name + '[]'))
+        }
+      }
+    }
+    return suggestions
   }
 }

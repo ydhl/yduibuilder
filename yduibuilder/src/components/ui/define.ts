@@ -174,7 +174,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     type: 'Progress',
     kind: ['mobile', 'pc'],
     name: 'ui.progress',
-    outputAs: ['VALUE', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
+    outputAs: ['VALUE', 'TEXT', 'STYLE', 'CSS', 'TITLE', 'KEYVALUE', 'NONE']
   },
   Radio: {
     type: 'Radio',

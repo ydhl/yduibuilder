@@ -109,7 +109,7 @@
     </div>
   </div>
 
-  <lay-layer v-model="addStyleStateVisible" skin="layui-layer-content-overflow" :title="t('style.state.addState')" :shade="true" :area="['520px', '500px']" :btn="buttons">
+  <lay-layer v-model="addStyleStateVisible" layer-classes="layui-layer-content-overflow" :title="t('style.state.addState')" :shade="true" :area="['520px', '500px']" :btn="buttons">
     <div class="p-2" style="width: 500px">
       <div class="row">
         <label class="col-sm-3 col-form-label text-truncate">{{t("style.state.stateName")}}</label>

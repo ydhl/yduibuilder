@@ -786,6 +786,7 @@ export default {
           type: 'Container',
           meta: {
             id: ydhl.uuid(5, 0, pageId),
+            isContainer: true,
             style:{
               width: '300px',
               height: '300px'

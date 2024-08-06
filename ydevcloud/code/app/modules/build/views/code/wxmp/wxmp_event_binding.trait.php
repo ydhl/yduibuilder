@@ -16,7 +16,7 @@ trait Wxmp_Event_Binding {
      * @param $eventName
      * @return string
      */
-    protected function eventMap($eventName){
+    protected function eventName($eventName){
         return[
             'onload' => '',
             'onready' => '',
@@ -67,7 +67,7 @@ wx.navigateTo({
             return ;
         }
         foreach($events as $eventName => $eventBinds){
-            $sortEventName = $this->eventMap($eventName);
+            $sortEventName = $this->eventName($eventName);
             ob_start();
             foreach ($eventBinds as $bindId => $eventBind) {
                 $action = $eventBind['action'];

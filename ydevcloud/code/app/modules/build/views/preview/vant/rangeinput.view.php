@@ -39,7 +39,7 @@ class Rangeinput_View extends Preview_View implements Valuable_View {
         echo $this->indent(5).'<div';
         echo $this->wrap_output('style', $this->handle_style());
         echo $this->wrap_output('class', $this->handle_class());
-        echo $this->wrap_output('x-text', $this->myid().'_value');
+        echo $this->wrap_output('x-text', $this->get_input_data_name());
         echo "></div>".PHP_EOL;
 
 

@@ -5,7 +5,7 @@
                     :page-data-inline="popupPageDataInline" v-model="myAction"></PopupSetting>
     </template>
     <template v-else-if="myAction.type==='mutation'">
-      <MutationSetting :readonly="readonly" :autosave="autosave" v-model="myAction" :variables="variables"></MutationSetting>
+      <MutationSetting :readonly="readonly" :autosave="autosave" v-model="myAction" :event-name="eventName" :variables="variables"></MutationSetting>
     </template>
     <template v-else-if="myAction.type==='emit'">
       <EmitSetting :readonly="readonly" :autosave="autosave" :page-data-inline="popupPageDataInline" v-model="myAction" :variables="variables"></EmitSetting>
@@ -47,6 +47,7 @@ export default {
     // 绑定action的来源类型
     bindType: String,
     bindUuid: String,
+    eventName: String,
     readonly: Boolean,
     autosave: {
       default: true,

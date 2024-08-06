@@ -483,7 +483,6 @@ class Build_Model{
 		}else{
 			$indent =  str_repeat(' ', $indent * $this->indentSpaceSize);
 		}
-
 		$lines = array_map(function ($code) use($indent){
 			$lines = explode(PHP_EOL, $code);
 			return join(PHP_EOL,array_map(function ($line) use($indent){

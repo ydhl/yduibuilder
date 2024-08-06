@@ -5,20 +5,20 @@
        :data-pageid="pageid">
     <div :class="['card-header subui',{'dragenter-subcontainer': isDragIn && dragoverInParent=='head'}]" v-if="!uiconfig.meta.custom?.headless" data-placeInParent="head">
       <template v-if="!myItems.head.length">
-        {{t('style.card.drapTip')}}
+        {{t('common.dragtohere')}}
       </template>
       <UIBase v-for="(item, index) in myItems.head" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
     </div>
     <div class="card-body">
       <template v-if="!hasMainItems">
-        {{t('style.card.drapTip')}}
+        {{t('common.dragtohere')}}
       </template>
       <UIBase v-for="(item, index) in mainItems" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
     </div>
     <UIBase v-for="(item, index) in otherMainItems" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
     <div :class="['card-footer subui',{'dragenter-subcontainer': isDragIn && dragoverInParent=='foot'}]" v-if="!uiconfig.meta.custom?.footless" data-placeInParent="foot">
       <template v-if="!myItems.foot.length">
-        {{t('style.card.drapTip')}}
+        {{t('common.dragtohere')}}
       </template>
       <UIBase v-for="(item, index) in myItems.foot" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
     </div>

@@ -14,7 +14,7 @@ class Radio_View extends ValueList_View {
 
     protected $type = 'radio';
     protected function build_valuelist($outputData, $itemName, $staticData=null, $staticDataIndex=null, $iteratorName=''){
-        list('name'=>$name, 'value'=>$value, 'checked'=>$checked) = $this->get_bind_name_value($outputData, $itemName);
+        list('name'=>$name, 'value'=>$value, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
         $staticValue = $staticData['value']?:$staticData['name'];
         $myid = $this->myid();
         $inputDataName = $this->get_input_data_name($inputIsArr);
@@ -25,6 +25,7 @@ class Radio_View extends ValueList_View {
 
         if ($value){
             echo $this->wrap_output(':data-value', $value);
+            echo $this->wrap_output('data-bound', $boundData);
         }else{
             echo $this->wrap_output('data-value',$staticValue );
         }

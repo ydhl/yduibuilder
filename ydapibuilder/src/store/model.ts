@@ -89,14 +89,6 @@ export interface DataStructString extends DataStruct{
     enumValue?: Record<string, string>;
     mock?: string;
 }
-export interface DataStructInteger extends DataStruct{
-    min?: number;
-    max?: number;
-    format?:IntegerFormat;
-    defaultValue?: number;
-    enumValue?: Record<string, string>;
-    mock?: string;
-}
 export interface DataStructNumber extends DataStruct{
     min?: number;
     max?: number;
@@ -105,6 +97,7 @@ export interface DataStructNumber extends DataStruct{
     enumValue?: Record<string, string>;
     mock?: string;
 }
+export type DataStructInteger = DataStructNumber
 export interface DataStructBoolean extends DataStruct{
     defaultValue?: boolean;
     mock?: string;

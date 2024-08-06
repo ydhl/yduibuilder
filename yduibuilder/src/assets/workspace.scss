@@ -17,7 +17,7 @@ html{
   right: 0;
 }
 .bgtransparent{
-  background-image: url(/transparent.svg);
+  background-image: url(image/transparent.svg);
   background-size: 30px;
   background-color: #ccc!important;
 }
@@ -176,6 +176,10 @@ html{
     }
     .label {
       padding: 0px 15px 0px 5px;
+      overflow: hidden;
+      white-space: nowrap;
+      max-width: 200px;
+      text-overflow: ellipsis;
     }
   }
   .workspace-scrollbar{

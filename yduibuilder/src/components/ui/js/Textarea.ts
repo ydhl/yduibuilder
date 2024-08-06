@@ -1,4 +1,3 @@
-
 import { computed } from 'vue'
 import UIBase from '@/components/ui/js/UIBase'
 export default class Textarea extends UIBase {

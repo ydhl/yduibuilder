@@ -223,8 +223,7 @@ function alpinejs_init_directive(Alpine){
     Alpine.directive('input', (el, { expression, modifiers }, { effect, evaluate, Alpine, evaluateLater }) => {
         const uiType = el.dataset.type;
         if (!uiType) return;
-        let isArrayInput = !!expression.match(/\[-1\]/)//输入数据是数组
-        let lastIsArray = isArrayInput
+        let lastIsArray = false
         // 绑定了数据类型输入数据，同时ui也被迭代的时候，则判断UI本身是否是多值的情况
         // 只有checkbox和multiple的select时是多值
         // 比如UI绑定input数组被迭代了一次，那么对于每个UI的值存储在input[index]里，这时如果lastIsArray为真，则input[index] = []否则input[index]=''
@@ -303,8 +302,8 @@ function alpinejs_init_directive(Alpine){
             }})
         }else if ('file' === uiType){
             Alpine.bind(el, { '@change'(event) {
-                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray)
-                execExp(exp, event.target.files)
+                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray);
+                execExp(exp, Array.from(event.target.files));
             }})
         }else{
             // 其他迭代类元素

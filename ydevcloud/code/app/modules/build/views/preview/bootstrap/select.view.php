@@ -13,13 +13,14 @@ class Select_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper;
 
     protected function build_valuelist($bindOutput=null, $itemName=null, $staticData=null, $staticDataIndex=null, $iteratorName=''){
-        list('name'=>$name, 'value'=>$value, 'checked'=>$checked) = $this->get_bind_name_value($bindOutput, $itemName);
+        list('name'=>$name, 'value'=>$value, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($bindOutput, $itemName);
         $inputDataName = $this->get_input_data_name($inputIsArr);
         $staticValue = $staticData['value'] ?: $staticData['name'];
 
         echo $this->indent(2).'<option';
         if ($value){
             echo $this->wrap_output(":value", $value);
+            echo $this->wrap_output('data-bound', $boundData);
             echo $this->wrap_output("x-text", $name);
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$value} : ''" : null);
             echo $this->wrap_output(':selected', "alpinejs_in_array(\$el, '{$inputDataName}', {$value})");

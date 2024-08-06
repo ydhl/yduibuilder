@@ -15,7 +15,7 @@
         <template #leaf="{data}">
           <label class="d-flex justify-content-center align-items-center pe-3">
             <input v-if="!isSingle" @click="checkedOneAPI=data" type="checkbox" v-model="checked[data.id]" >
-            <input v-if="isSingle" @click="checkedOneAPI=data" type="radio" :value="data.id" v-model="checkAPI" >
+            <input v-if="isSingle" @click="checkedOneAPI=data" type="radio" :value="data.id" v-model="checkAPIUuid" >
           </label>
         </template>
       </APITree>
@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, toRef, ref, watch } from 'vue'
 import APITree from '@/components/common/APITree.vue'
 import { APIFolder } from '@/store/model'
 import ydhl from '@/lib/ydhl'
@@ -38,21 +38,21 @@ export default {
   name: 'ImportAPI',
   components: { APITree },
   props: {
-    modelValue: Object,
+    defaultApi: Object,
     isSingle: Boolean
   },
   emits: ['checkAPI'],
   setup (props: any, context: any) {
     const { t } = useI18n()
-    const checked = computed(() => props.modelValue) // 这部分是由于modelValue就是一个对象引用，所以直接更改了，没有update事件update:modelValue
-    const checkAPI = ref('')
+    const checked = toRef(props, 'defaultApi')
+    const checkAPIUuid = ref('')
     const store = useStore()
     const project = computed(() => store.state.design.project)
     const checkedOneAPI = ref({})
     const loading = ref(true)
     const openState = ref(true)
     const apis = ref<Array<APIFolder>>([])
-    watch(checkAPI, () => {
+    watch(checkAPIUuid, () => {
       context.emit('checkAPI', checkedOneAPI.value)
     })
 
@@ -69,7 +69,7 @@ export default {
       }, 'json')
     }
     onMounted(() => {
-      if (props.isSingle) checkAPI.value = props.modelValue
+      if (props.isSingle) checkAPIUuid.value = props.defaultApi
       loadApi()
     })
     return {
@@ -78,7 +78,7 @@ export default {
       loading,
       t,
       checked,
-      checkAPI,
+      checkAPIUuid,
       checkedOneAPI,
       collapseAll,
       expandAll

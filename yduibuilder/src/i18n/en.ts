@@ -197,7 +197,12 @@ export default {
     bindAPI: 'Bind API',
     bindAPIEmptyTip: 'No API, please add WEB API information to the project through APIBOX',
     bindTip: 'Bind event to UI',
+    componentEvent: 'Listen custom events in 「{0}」',
     customEvent: 'Custom Event',
+    data: 'Data Event',
+    declareEvent: 'Custom Events',
+    declareEventDesc: 'A component can explicitly declare the events it will emit',
+    declareEventNoListen: 'No registered',
     defineEvent: 'Define Event',
     deleteConfirm: 'Are you sure?',
     error: {
@@ -209,18 +214,17 @@ export default {
     },
     form: 'Form',
     interactive: 'Interactive',
-    keyboard: 'Keyboard',
+    keyboard: 'Keyboard Event',
     lifeCycle: 'Life Cycle',
-    mouse: 'Mouse',
+    mouse: 'Mouse Event',
     name: 'Event Name',
     noArgs: 'No Args',
     notBindEvent: 'Not bind event',
+    other: 'Other Event',
     popupDesign: 'Design',
-    pageEvent: 'Page Event',
-    componentEvent: 'Listen custom events in 「{0}」',
-    declareEvent: 'Custom Events',
-    declareEventDesc: 'A component can explicitly declare the events it will emit',
-    declareEventNoListen: 'No registered'
+    page: 'Page Event',
+    uiNotSupportEvent: '{0} not support {1} event',
+    upload: 'Upload Event'
   },
   expression: {
     '~@': "Bits that are set in {'@'} are not set, and vice versa.{'@'} is data",
@@ -259,12 +263,14 @@ export default {
     changeToTernary: 'Change to ?: expression',
     changeToLiteral: 'Change to literal',
     clear: 'Clear',
-    connect: 'Connect',
+    code: 'Expression',
+    connect: 'Connect Data',
     connectTip: 'Link to another variable',
     condition: 'Conditional expression',
     comparison: 'Comparison Operation',
     customError: "Custom operator must contain {'@'}",
     customModifier: "Custom unary operator or function, such as !!{'@'}, func({'@'}), {'@'}.toLowerCase(), {'@'} is data placeholder",
+    customOperator: "Custom operator or function, such as push({'@'}), [item] = {'@'}, {'@'} is right value placeholder",
     data: 'Data',
     editor: 'Expression Editor',
     expression: 'Exp.',
@@ -434,7 +440,6 @@ export default {
     byCustomClass: 'By Custom Class',
     byValue: 'By value',
     card: {
-      drapTip: 'Please Drag component in here',
       footless: 'Footless',
       headless: 'Headless'
     },
@@ -482,8 +487,13 @@ export default {
     existingClasses: 'Existing Classes',
     file: {
       accept: 'File extension',
-      acceptTip: 'Such as jpg,png',
-      multiple: 'Multiple'
+      acceptTip: 'Such as jpg,png or mime type image/png, text/html',
+      isAutoUpload: 'Auto upload',
+      isAutoUploadTip: 'Automatically upload files after selecting them',
+      maxFileSize: 'Max file size',
+      multiple: 'Multiple',
+      url: 'URL',
+      urlTip: 'Url of the server-side upload handler that will accept the files'
     },
     form: {
       addValue: 'Add Value',
@@ -596,8 +606,9 @@ export default {
     'margin-top': 'Margin Top',
     modal: {
       backdrop: 'Backdrop',
-      backdropTip: 'Includes a modal-backdrop element. Alternatively, specify static for a backdrop which doesn\'t close the modal on click.',
-      drapTip: 'Please Drag component in here',
+      backdropNo: 'no a modal-backdrop element',
+      backdropStatic: 'specify static for a backdrop which doesn\'t close the modal on click.',
+      backdropYes: 'Includes a modal-backdrop element',
       esc: 'Esc',
       escTip: 'Closes the modal when escape key is pressed',
       footless: 'Footless',
@@ -797,21 +808,25 @@ export default {
     success: 'Export Success, you can edit component from the left project panel'
   },
   variable: {
+    assignOperator: 'Assign operator',
     bindInputInvalid: 'Only valuable UI can bind data input',
     bound: 'Bind Data',
     boundAsValue: 'Bind as input 「value」 parameters for events',
     boundAsBound: 'Bind as input 「boundData」 parameters for events',
     boundTypeMismatch: 'Type mismatch, bound type should be {0}',
     cannotBindOutput: 'Cannot bind output',
+    codeError: 'There are errors in the code, please check',
     globalScope: 'Global Scope',
     hasBeenBound: 'Bound',
     hasBoundInput: 'Target UI has Bind another data input',
     hasBoundOutput: 'Target UI has Bind another {0} output',
     inputData: 'Input Data',
     inputDataDesc: 'Provide values for the data of the component 【{0}】',
+    leftValue: 'Left Value',
     literal: 'Literal',
     literalTip: 'Manually entered values',
     localScope: 'Local Scope',
+    localScopeInEvent: 'Local scope in {0}',
     mutation: 'Mutation',
     needBoundVariable: '{0} need bound one variable',
     objectHasBoundTip: 'The object has already been bound, so the properties inside cannot be bound',
@@ -828,6 +843,11 @@ export default {
       NONE: 'Do not make any output'
     },
     pageScope: 'Page Scope',
-    remaintime: 'Remaining time'
+    pleaseChooseMutationData: 'Please select the data to be assigned',
+    pushDesc: 'Push data onto the end of array',
+    remaintime: 'Remaining time',
+    rightValue: 'Right Value',
+    typeMismatch: 'Type mismatch, data type need {0}, but you input is {1}',
+    unshiftDesc: 'Prepend one data to the beginning of an array'
   }
 }

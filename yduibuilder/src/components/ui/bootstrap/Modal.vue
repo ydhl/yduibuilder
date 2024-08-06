@@ -7,20 +7,20 @@
       <div :class="bodyClass" :style="bodyStyle">
         <div :class="['modal-header subui',{'dragenter-subcontainer': isDragIn && dragoverInParent=='head'}]" v-if="!uiconfig.meta.custom?.headless" data-placeInParent="head">
           <template v-if="!myItems.head.length">
-            {{t('style.modal.drapTip')}}
+            {{t('common.dragtohere')}}
           </template>
           <UIBase v-for="(item, index) in myItems.head" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
           <button type="button" class="close" ><span>×</span></button>
         </div>
         <div class="modal-body">
           <template v-if="!hasMainItems">
-            {{t('style.modal.drapTip')}}
+            {{t('common.dragtohere')}}
           </template>
           <UIBase v-for="(item, index) in mainItems" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
         </div>
         <div :class="['modal-footer subui',{'dragenter-subcontainer': isDragIn && dragoverInParent=='foot'}]" v-if="!uiconfig.meta.custom?.footless" data-placeInParent="foot">
           <template v-if="!myItems.foot.length">
-            {{t('style.modal.drapTip')}}
+            {{t('common.dragtohere')}}
           </template>
           <UIBase v-for="(item, index) in myItems.foot" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
         </div>

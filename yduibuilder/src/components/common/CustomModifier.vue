@@ -1,6 +1,9 @@
 <template>
   <div class="d-flex">
-    <input style="width: 150px" type="text" @click.stop.prevent class="form-control form-control-sm" v-model.trim="customModifier"/>
+    <div class="input-group input-group-sm" style="min-width: 150px" >
+      <div class="input-group-text" v-if="prefix">{{ prefix }}</div>
+      <input type="text" @click.stop.prevent class="form-control form-control-sm" v-model.trim="customModifier"/>
+    </div>
     <button type="button" :disabled="error?true:false" class="btn btn-sm btn-light ms-1" @click="updateModifier">{{t('common.ok')}}</button>
   </div>
   <div class="fs-7 text-danger" v-if="error">{{error}}</div>
@@ -15,10 +18,12 @@ export default {
   name: 'CustomModifier',
   emits: ['update'],
   props: {
-    dataName: String
+    dataName: String,
+    defaultModifier: String,
+    prefix: String
   },
   setup (props: any, context: any) {
-    const customModifier = ref('')
+    const customModifier = ref(props.defaultModifier || '')
     const { t } = useI18n()
     const error = computed(() => {
       if (!customModifier.value) return ''
@@ -26,7 +31,8 @@ export default {
       return ''
     })
     const customModifierPreview = computed(() => {
-      return customModifier.value.replace(/@/, props.dataName)
+      if (!customModifier.value) return ''
+      return (props.prefix || '') + customModifier.value.replace(/@/, props.dataName)
     })
     const updateModifier = () => {
       if (!customModifier.value) return

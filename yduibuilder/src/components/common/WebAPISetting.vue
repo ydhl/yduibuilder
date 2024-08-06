@@ -10,7 +10,7 @@
   <!-- API Dialog -->
   <lay-layer v-model="addApiDialogVisible" :title="t('event.bindAPI')" :shade="true" :area="['80vw', '60vh']" :btn="bindAPIButtons">
     <div  class="p-2">
-      <ImportAPI :modelValue="myAction.bindApi?.apiUuid" :is-single="true" @checkAPI="checkedAPI"/>
+      <ImportAPI :default-api="myAction.bindApi?.apiUuid" :is-single="true" @checkAPI="checkedAPI"/>
     </div>
   </lay-layer>
 </template>

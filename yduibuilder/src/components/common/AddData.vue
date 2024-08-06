@@ -64,7 +64,7 @@
         <input type="text" class="form-control form-control-sm" placeholder="mock template string" v-model="myModel.mock">
       </div>
     </div>
-    <div class="row" v-else>
+    <div class="row" v-else-if="['blob', 'file'].indexOf(myModel.type) === -1">
       <label class="col-sm-3 col-form-label text-end">{{ t('api.model.mock') }}</label>
       <div class="col-sm-9">
         <select class="form-select-sm form-select" v-model="myModel.mock">
@@ -73,11 +73,11 @@
         </select>
       </div>
     </div>
-    <div class="row" v-if="hasDefaultValue">
+    <div class="row" v-if="hasDefaultValue && ['blob', 'file'].indexOf(myModel.type) === -1">
       <label class="col-sm-3 col-form-label text-end">{{ t('api.model.defaultValue') }}</label>
       <div class="col-sm-9">
         <input type="text" v-if="['object','array','map','any'].indexOf(myModel.type) == -1" class="form-control form-control-sm" v-model="myModel.defaultValue">
-        <button type="button" v-if="['object','array','map','any'].indexOf(myModel.type) !== -1" @click="openCodeDialog('default')" class="btn btn-xs btn-light">{{myModel.defaultValue?t('common.view'):t('action.notSet')}}</button>
+        <button type="button" v-else @click="openCodeDialog" class="btn btn-xs btn-light">{{myModel.defaultValue?t('common.view'):t('action.notSet')}}</button>
       </div>
     </div>
     <div class="row">
@@ -93,7 +93,7 @@
       </div>
     </div>
   </div>
-  <CodeEditor v-model="codeDialogVisible" :code="code" @update="updateCode"></CodeEditor>
+  <CodeEditor v-model="codeDialogVisible" :schema="modelSchema" :code="code" @update="updateCode"></CodeEditor>
 </template>
 
 <script lang="ts">
@@ -109,7 +109,7 @@ export default {
     modelValue: Object,
     types: {
       type: Array,
-      default: () => ['string', 'integer', 'number', 'boolean', 'object', 'array', 'map', 'null', 'any', 'blob']
+      default: () => ['string', 'integer', 'number', 'boolean', 'object', 'array', 'map', 'null', 'any', 'blob', 'file']
     },
     isArrayItem: Boolean, // 数组结点标识, 数组结点则只能修改type和comment
     hasDefaultValue: {
@@ -152,6 +152,9 @@ export default {
       }
       return values
     })
+    const modelSchema = computed(() => {
+      return ydhl.getModelJSONSchema(props.modelValue)
+    })
     onMounted(() => {
       if (!ydhl.isEmptyObject(props.modelValue.enumValue)) {
         valueType.value = 'enum'
@@ -168,6 +171,50 @@ export default {
         delete myModel.value.props
       } else if (type === 'object' && !myModel.value.props) {
         myModel.value.props = []
+        delete myModel.value.item
+      } else if (type === 'blob') {
+        myModel.value.props = [
+          {
+            uuid: 'blobSize',
+            type: 'number',
+            name: 'size',
+            readonly: true
+          },
+          {
+            uuid: 'blobType',
+            type: 'string',
+            name: 'type',
+            readonly: true
+          }
+        ]
+        delete myModel.value.item
+      } else if (type === 'file') {
+        myModel.value.props = [
+          {
+            uuid: 'fileSize',
+            type: 'number',
+            name: 'size',
+            readonly: true
+          },
+          {
+            uuid: 'fileType',
+            type: 'string',
+            name: 'type',
+            readonly: true
+          },
+          {
+            uuid: 'fileName',
+            type: 'string',
+            name: 'name',
+            readonly: true
+          },
+          {
+            uuid: 'fileLastModified',
+            type: 'string',
+            name: 'lastModified',
+            readonly: true
+          }
+        ]
         delete myModel.value.item
       } else if (type !== 'array' && type !== 'object') {
         delete myModel.value.item
@@ -189,7 +236,7 @@ export default {
       context.emit('update:modelValue', JSON.parse(JSON.stringify(myModel.value)))
     }
     const updateCode = (newCode) => {
-      codeDialogVisible.value = true
+      codeDialogVisible.value = false
       myModel.value.defaultValue = newCode
     }
     const openCodeDialog = () => {
@@ -216,6 +263,7 @@ export default {
       enumValues,
       mocks,
       changeType,
+      modelSchema,
       openCodeDialog
     }
   }

@@ -218,7 +218,7 @@ class Env {
                 'ui'=>['bootstrap','vant'],
                 'language'=>['typescript'],
                 'version'=>['3.x'=>[
-                    'require'=>['axios@1.1.2', 'ydecloud@0.0.1']
+                    'require'=>['axios@1.1.2', 'ydecloud@1']
                 ] ]
             ],
             'html' => [
@@ -231,7 +231,7 @@ class Env {
                 'language'=>['javascript'],
                 'version'=>[ '5.0'=>[
                     // 固定使用 jquery操作dom，alpinejs做界面操作逻辑，axios做http请求，ydecloud是前端数据处理封装
-                    'require'=>['jquery@3.5.1', 'alpinejs@3.x.x','axios@1.1.2','ydecloud@0.0.1']
+                    'require'=>['jquery@3.5.1', 'alpinejs@3.x.x','axios@1.1.2','ydecloud@1']
                 ] ]
             ],
             'wxmp' => [

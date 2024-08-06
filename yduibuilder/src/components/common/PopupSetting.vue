@@ -18,7 +18,7 @@
   <template v-else-if="myAction.popup_type=='alert'">
     <div class="d-inline-flex align-items-center justify-content-start">
       Alert(&nbsp;
-      <ExpressionDropdown :readonly="readonly" :variables="variables" @updateExpression="updateBoundAlert" :expression="alertExpression.expression"></ExpressionDropdown>
+      <ExpressionDropdown :readonly="readonly" :has-mutation-operator="false" :variables="variables" @updateExpression="updateBoundAlert" :expression="alertExpression.expression"></ExpressionDropdown>
       <ConfirmRemove icon="icon-remove" v-if="!readonly" @remove="removePopup"></ConfirmRemove>
       &nbsp;)
     </div>
@@ -256,6 +256,7 @@ export default {
         }
         if (myAction.value.uuid) {
           ydhl.postJson('api/action/popup.json',
+            // eslint-disable-next-line camelcase
             { action_uuid: myAction.value.uuid, input, popupPageId, function_uuid: currFunctionId.value, popup_type }).then((res: any) => {
             if (!res.success) {
               ydhl.alert(res.msg || t('common.operationFail'), t('common.ok'))
