@@ -304,7 +304,7 @@ class Event_Controller extends YZE_Resource_Controller {
         $index = array_search($ui_id, $uiids);
         unset($uiids[$index]);
         $bind_event->set('uiid', join(',', array_filter($uiids)))->save();
-        return YZE_JSON_View::success($this,$this->get_event_record($bind_event));
+        return YZE_JSON_View::success($this,$bind_event->get_event_data());
     }
 
     public function exception(\Exception $e){

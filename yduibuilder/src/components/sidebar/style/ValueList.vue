@@ -155,6 +155,7 @@ export default {
         initInfo.setMeta('values', values)
       } else {
         initInfo.setMeta('values', [rawItem], '', true)
+        valueItems.value = initInfo.getMeta('values')
       }
 
       closeSetting()

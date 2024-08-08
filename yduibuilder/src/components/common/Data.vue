@@ -98,7 +98,7 @@
   <lay-layer v-model="editDlgVisible" :title="isAddProps ? t('api.addData') : t('api.editData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
     <AddData v-model="editModel" :has-default-value="path.length==0" :is-array-item="!isAddProps && isArrayItem"/>
   </lay-layer>
-  <CodeEditor :read-only="codeType=='view'" :title="codeType=='view'?t('api.model.defaultValue'):t('api.model.import')" :tip="tip" v-model="codeEditorVisible" :code="code" @update="importData"></CodeEditor>
+  <CodeEditorDialog :read-only="codeType=='view'" :title="codeType=='view'?t('api.model.defaultValue'):t('api.model.import')" :tip="tip" v-model="codeEditorVisible" :code="code" @update="importData"></CodeEditorDialog>
   <DataInfo :data="myModel" v-model="detailDlgVisible"></DataInfo>
 </template>
 
@@ -114,12 +114,12 @@ import ydhl from '@/lib/ydhl'
 import $ from 'jquery'
 import baseUIDefines from '@/components/ui/define'
 import DataInfo from '@/components/common/DataInfo.vue'
-import CodeEditor from '@/components/common/CodeEditor.vue'
+import CodeEditorDialog from '@/components/common/CodeEditorDialog.vue'
 import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 // 数据模型展示，可绑定ui
 export default {
   name: 'DataComp',
-  components: { AdvanceSelect, CodeEditor, DataInfo, AddData, ConfirmRemove },
+  components: { AdvanceSelect, CodeEditorDialog, DataInfo, AddData, ConfirmRemove },
   emits: ['remove', 'update'],
   props: {
     model: Object,

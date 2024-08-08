@@ -292,7 +292,7 @@ export default {
 
     const allEvents = computed(() => {
       if (!info.selectedUIItem.value) return eventMap
-      return getEvents(baseUIDefines[info.selectedUIItem.value?.type])
+      return getEvents(baseUIDefines[info.selectedUIItem.value?.type], info.selectedUIItem.value)
     })
     const imgSite = ydhl.api
     const boundEvents = ref({})
@@ -445,7 +445,7 @@ export default {
     })
     watch(mouseupInFrame, (v) => {
       if (!canvas.isDrawline() || canvas.getDrawFromId() !== currBoundEvent.value?.uuid) return
-      if (!hasEvent(baseUIDefines[info.hoverUIItem.value.type], currBoundEvent.value?.event)) {
+      if (!hasEvent(baseUIDefines[info.hoverUIItem.value.type], currBoundEvent.value?.event, info.hoverUIItem.value)) {
         ydhl.alert(t('event.uiNotSupportEvent', [info.hoverUIItem.value.type, currBoundEvent.value?.event]))
         return
       }

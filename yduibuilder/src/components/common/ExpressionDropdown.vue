@@ -52,9 +52,9 @@
                  :checked-uuid="myExpression.data?.id" :page-uuid="selectedPageId"/>
     </div>
   </lay-layer>
-  <CodeEditor v-model="codeDlgVisible" :left-operator="defaultMutationOperator" :language="codeType === 'literal' ? 'json' : 'javascript'"
+  <CodeEditorDialog v-model="codeDlgVisible" :surround-code="defaultMutationOperator" :language="codeType === 'literal' ? 'json' : 'javascript'"
               :left-value-path="leftValuePath" :left-data="leftValue" :variables="variables"
-              :schema="leftValueSchema" :code="code" @update="updateCode"></CodeEditor>
+              :schema="leftValueSchema" :code="code" @update="updateCode"></CodeEditorDialog>
 </template>
 
 <script lang="ts">
@@ -63,7 +63,7 @@ import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
 import ydhl from '@/lib/ydhl'
 import { useStore } from 'vuex'
-import CodeEditor from '@/components/common/CodeEditor.vue'
+import CodeEditorDialog from '@/components/common/CodeEditorDialog.vue'
 import { Expression } from '@/store/model'
 import CustomModifier from '@/components/common/CustomModifier.vue'
 
@@ -84,7 +84,7 @@ export default {
     defaultMutationOperator: String
   },
   emits: ['updateExpression', 'updateMutationOperator'],
-  components: { CustomModifier, CodeEditor, AdvanceSelect },
+  components: { CustomModifier, CodeEditorDialog, AdvanceSelect },
   setup (props: any, context: any) {
     const { t } = useI18n()
     const myExpression = ref<Expression>(props.expression) // 通过引用的方式通知上层

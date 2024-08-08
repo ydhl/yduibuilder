@@ -9,3 +9,5 @@ ADD COLUMN `mutation_operator` VARCHAR(45) NOT NULL DEFAULT '=' COMMENT '赋值�
 
 ALTER TABLE `page` CHANGE `config` `config` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '页面的组成配置文件';
 ALTER TABLE `page_version` CHANGE `config` `config` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '页面的组成配置文件';
+ALTER TABLE `ydecloud`.`action` 
+ADD COLUMN `bind_condition` ENUM('true', 'false') NOT NULL DEFAULT 'true' COMMENT '绑定的条件' AFTER `bind_uuid`;

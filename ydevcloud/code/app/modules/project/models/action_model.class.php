@@ -31,6 +31,8 @@ class Action_Model extends YZE_Model{
     const POPUP_PAGE_TYPE_PAGE = 'page';
     const POPUP_PAGE_TYPE_POPUP = 'popup';
     const POPUP_PAGE_TYPE_UNSET = 'unset';
+    const BIND_CONDITION_TRUE = 'true';
+    const BIND_CONDITION_FALSE = 'false';
     const TABLE= "action";
     const MODULE_NAME = "project";
     const KEY_NAME = "id";
@@ -127,6 +129,11 @@ class Action_Model extends YZE_Model{
      */
     const F_BIND_UUID = "bind_uuid";
     /**
+     * 绑定的条件
+     * @var enum
+     */
+    const F_BIND_CONDITION = "bind_condition";
+    /**
      * 
      * @var integer
      */
@@ -179,11 +186,12 @@ class Action_Model extends YZE_Model{
       'popup_page_type' => ['type' => 'enum', 'null' => false,'length' => '','default'	=> 'unset'],
       'bind_class' => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
       'bind_uuid'  => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
+      'bind_condition' => ['type' => 'enum', 'null' => false,'length' => '','default'	=> 'true'],
       'page_id'    => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
       'emit_event_id' => ['type' => 'integer', 'null' => true,'length' => '','default'	=> ''],
       'index'      => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '0'],
-      'interval_duration' => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '1'],
-      'interval_delay' => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '1000'],
+      'interval_duration' => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '0'],
+      'interval_delay' => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '0'],
       'interval_action' => ['type' => 'string', 'null' => true,'length' => '145','default'	=> ''],
       'interval_complete' => ['type' => 'string', 'null' => true,'length' => '145','default'	=> ''],
     ];
@@ -262,6 +270,9 @@ class Action_Model extends YZE_Model{
 	}
 	public static function get_popup_page_type(){
 		return ['page','popup','unset'];
+	}
+	public static function get_bind_condition(){
+		return ['true','false'];
 	}
 
 }?>

@@ -111,12 +111,13 @@ trait Page_Bind_Api_Action_Model_Method{
                      ->left_join(Action_Model::CLASS_NAME,'a', "ba.page_id = a.page_id and a.is_deleted=0 and a.bind_class=:bclass and a.bind_uuid=ba.uuid")
                      ->where('ba.page_id=:pid and ba.from_class=:cls and ba.from_uuid=:uuid and ba.is_deleted=0')
                      ->select([':pid'=>$page_id,':cls'=>$from_class, ':uuid'=>$from_uuid,':bclass'=>Page_Bind_API_Action_Model::CLASS_NAME]) as $item){
+            $ba = $actions[$item['ba']->id]?:$item['ba'];
 
             if ($item['a']) {
-                $item['ba']->add_action($item['a']);
+                $ba->add_action($item['a']);
             }
 
-            $actions[] = $item['ba'];
+            $actions[$ba->id] = $ba;
         }
         return $actions;
     }
@@ -215,9 +216,14 @@ trait Page_Bind_Api_Action_Model_Method{
     }
     public function get_action_data(){
         $actions = $this->get_actions();
-        $actionData = [];
+        $trueActionData = [];
+        $falseActionData = [];
         foreach ($actions as $action){
-            $actionData[] = $action->get_action_data();
+            if ($action->bind_condition == 'true'){
+                $trueActionData[] = $action->get_action_data();
+            }else{
+                $falseActionData[] = $action->get_action_data();
+            }
         }
         $expression = $this->get_expression();
         return  [
@@ -227,7 +233,8 @@ trait Page_Bind_Api_Action_Model_Method{
             'expression'=>json_decode(html_entity_decode($this->expression), true),
             'expression_desc'=>$expression ? $expression->get_expression_code() : '',
             'output_data_id'=>$this->output_data_id,
-            'actions'=>$actionData
+            'trueActions'=>$trueActionData,
+            'falseActions'=>$falseActionData,
         ];
     }
     public function get_condition_info(){

@@ -21,6 +21,7 @@
             </div>
           </div>
           <div class="fs-7 text-muted ms-3">{{api.trigger}}</div>
+          <div class="fs-7 text-muted ms-3">Request: {{api.requestBodyType}}, Response: {{api.responseType}}</div>
         </div>
         <div class="style-body d-none" style="padding: 0">
           <div v-if="api.hasNewVersion" class="p-2 bg-light text-danger mb-2">

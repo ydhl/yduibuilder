@@ -1,4 +1,5 @@
 import { UIDefine } from '@/components/ui/define'
+import { UIBase } from '@/store/model'
 
 const eventMap = {
   page: {
@@ -261,15 +262,16 @@ const eventMap = {
     onFocus: {}
   }
 }
-export function hasEvent (ui: UIDefine, event: string) {
-  const events = getEvents(ui)
+export function hasEvent (ui: UIDefine, event: string, uiConfig: UIBase | null = null) {
+  const events = getEvents(ui, uiConfig)
   for (const key in events) {
-    if (events[key]?.[event] !== -1) return true
+    if (events[key]?.[event]) return true
   }
   return false
 }
-export function getEvents (ui: UIDefine): Object {
+export function getEvents (ui: UIDefine, uiConfig: UIBase | null = null): Object {
   const map: any = JSON.parse(JSON.stringify(eventMap))
+  const onFileChange = map.upload.onFileChange
 
   if (['Input', 'Textarea'].indexOf(ui.type) !== -1) {
     map.upload = {}
@@ -280,6 +282,12 @@ export function getEvents (ui: UIDefine): Object {
     map.keyboard = {}
     map.upload = {}
     if (!ui.isValuable) map.data = {}
+  }
+
+  if (uiConfig && uiConfig.type === 'File' && !uiConfig.meta?.custom?.isAutoUpload) {
+    map.upload = {
+      onFileChange
+    }
   }
   return map
 }

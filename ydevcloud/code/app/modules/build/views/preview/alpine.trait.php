@@ -7,7 +7,10 @@ use app\project\Action_Model;
 use app\project\Page_Bind_API_Action_Model;
 use app\project\Page_Bind_Api_Model;
 use app\project\Page_Bind_Data_Model;
+use app\project\Page_Bind_Event_Model;
+use app\project\Page_Bind_Io_Model;
 use app\project\Page_Model;
+use app\project\Web_Api_Model;
 use function yangzie\__;
 
 /**
@@ -117,7 +120,7 @@ INPITCONFIG;
                 $lines[] = " * ".join(PHP_EOL." * ", $comments);
                 $lines[] = " */";
             }
-            $lines[] = "{$myid}_{$html_event_name}(".join(', ', $args).") {";
+            $lines[] = $this->get_event_function_name($html_event_name)."(".join(', ', $args).") {";
             $lines[] = $this->indent(1, true)."const page = this";
             foreach ($codeBlocks as $codes){
                 $lines = array_merge($lines, $this->build->indent_code(1, $codes));
@@ -328,38 +331,8 @@ INTERVAL;
 
         $codeLines[] = $interval;
     }
-    private function build_api_body_data(Page_Bind_Api_Model $bind_api, $formatVariables, $inputBody, &$codeLines) {
-        if(!$inputBody) return;
-
-        switch (strtolower($bind_api->requestBodyType)){
-            case 'none': return;
-            case 'x-www-form-urlencoded':
-                $args = [];
-                foreach ($inputBody as $dataConfig){
-                    $bindVariable = $formatVariables[$dataConfig['uuid']];
-                    if (!$bindVariable) continue;
-                    $expression = $bindVariable->get_expression();
-                    if (!$expression) continue;
-                    $args[] = $dataConfig['name'].'=${'.$expression->get_expression_code().'}';
-                }
-                if($args) $codeLines[] = $this->indent(1, true).'data: `'.join('&', $args).'`,';
-                return;
-            case 'form-data':
-                // formData 在外面进行了组装
-                $codeLines[] = $this->indent(1, true).'data: formData,';
-                return;
-            case 'json':
-                $this->build_api_input($formatVariables, 'data', $inputBody, $codeLines);
-                return;
-            case 'xml': return;
-            case 'raw': return;
-            case 'binary': return;
-            case 'graphql': return;
-            case 'msgpack': return;
-        }
-    }
     protected function build_axios_code(Page_Bind_Api_Model $bind_api, &$codeLines, $onUploadProgress = [], $onSuccess = []){
-        $actions = Page_Bind_API_Action_Model::get_bind_actions($bind_api->page_id, Page_Bind_Api_Model::CLASS_NAME, $bind_api->uuid);
+        $bindApiActions = Page_Bind_API_Action_Model::get_bind_actions($bind_api->page_id, Page_Bind_Api_Model::CLASS_NAME, $bind_api->uuid);
         $io_data_fetch = new Io_Data_Fetch($this->build);
         $responseType = ['json'=>'json', 'xml'=>'text', 'html'=>'text', 'binary'=>'blob'];
         $inputAuth = $bind_api->get_input_configs('auth');
@@ -376,26 +349,21 @@ INTERVAL;
         }
 
         if ($inputCookie) {
-            $args = $this->build_api_input($formatVariables, '', $inputCookie);
+            $args = $this->build_api_form_data($formatVariables, $inputCookie, $codeLines, 'cookie');
             if ($args) $codeLines[] = "YDECloud.setCookie(".$args.");";
         }
+        $method = strtolower($bind_api->method);
 
-        if(strtolower($bind_api->requestBodyType) == 'form-data'){
-            $codeLines[] = "const formData = new FormData();";
-            foreach ($inputBody as $dataConfig){
-                $bindVariable = $formatVariables[$dataConfig['uuid']];
-                if (!$bindVariable) continue;
-                $expression = $bindVariable->get_expression();
-                if (!$expression) continue;
-                $codeLines[] = 'formData.append("'.$dataConfig['name'].'", '.$expression->get_expression_code().');';
-            }
-        }
+        $bodyCodes = $this->build_api_body_data($bind_api, $formatVariables, $inputBody, $codeLines);
+        $paramCode = $this->build_api_form_data($formatVariables,  $inputParam, $codeLines, 'params');
+        $headerCode = $this->build_api_form_data($formatVariables, $inputHeader, $codeLines, 'headers');
+        $authCode = $this->build_api_form_data($formatVariables,  $inputAuth, $codeLines, 'auth');
 
         $codeLines[] = "axios({";
-        $this->build_api_body_data($bind_api, $formatVariables, $inputBody, $codeLines);
-        $this->build_api_input($formatVariables, 'params', $inputParam, $codeLines);
-        $this->build_api_input($formatVariables, 'headers', $inputHeader, $codeLines);
-        $this->build_api_input($formatVariables, 'auth', $inputAuth, $codeLines);
+        $codeLines = array_merge($codeLines, $bodyCodes);
+        if ($paramCode) $codeLines[] = $this->indent(1, true)."params: {$paramCode},";
+        if ($headerCode) $codeLines[] = $this->indent(1, true)."headers: {$headerCode},";
+        if ($authCode) $codeLines[] = $this->indent(1, true)."auth: {$authCode},";
 
         $codeLines[] = $this->indent(1, true)."responseType: '".($responseType[$bind_api->get_response_type()]?:'json')."',";
 
@@ -406,18 +374,20 @@ INTERVAL;
             $codeLines[] = $this->indent(1, true)."},";
         }
 
-        $codeLines[] = $this->indent(1, true)."method: '".strtolower($bind_api->method)."',";
+        $codeLines[] = $this->indent(1, true).'method: "'.$method.'",';
         $codeLines[] = $this->indent(1, true)."withCredentials: true,";
         if ($inputPath){
             $params = $this->get_param_variable($formatVariables, $inputPath);
             $url = $this->replace_param($this->build->get_api_base().$bind_api->path, $params);
-            $codeLines[] = $params ? $this->indent(1, true).'url: `'.$url.'`,' : $this->indent(1, true).'url: "'.$url.'"';
+            $codeLines[] = $params ?
+                $this->indent(1, true).'url: `'.$url.'`,' :
+                $this->indent(1, true).'url: "'.$url.'"';
         }else{
             $codeLines[] = $this->indent(1, true).'url: "'.$this->build->get_api_base().$bind_api->path.'"';
         }
 
         $codeLines[] = " }).then((response) => {";
-        $codeLines = array_merge($codeLines, $this->build->indent_code(1, $this->get_post_processor($actions, $io_data_fetch, $bind_api)));
+        $codeLines = array_merge($codeLines, $this->build->indent_code(1, $this->get_post_processor($bindApiActions, $io_data_fetch, $bind_api)));
         if ($onSuccess) {
             $codeLines = array_merge($codeLines, $this->build->indent_code(1, $onSuccess));
         }
@@ -431,8 +401,10 @@ INTERVAL;
             $codeLines[] = '// NO WEB API BIND';
             return;
         }
+
         $this->build_axios_code($bind_api, $codeLines);
     }
+
 
     protected function build_popup_event_code(Action_Model $action, &$codeLines){
         switch ($action->popup_type){
@@ -625,20 +597,99 @@ INTERVAL;
         return "{$myid}_value";
     }
 
-    private function build_api_input($formatVariables, $argName, $dataConfigs, &$codeLines=null){
-        if(!$dataConfigs) return;
-        $args = [];
+    private function build_api_body_data(Page_Bind_Api_Model $bind_api, $formatVariables, $inputBody, &$codeLines) {
+        if(!$inputBody) return [];
+
+        switch (strtolower($bind_api->requestBodyType)){
+            case 'none': return [];
+            case 'x-www-form-urlencoded':
+                $codeLines[] = "const formData = [];";
+                foreach ($inputBody as $dataConfig){
+                    $bindVariable = $formatVariables[$dataConfig['uuid']];
+                    if (!$bindVariable) continue;
+                    $expression = $bindVariable->get_expression();
+                    if (!$expression) continue;
+                    $exp = $expression->get_expression_code();
+                    if ($dataConfig['type'] == 'array'){
+                        $codeLines[] = "if({$exp} !== undefined){";
+                        $codeLines[] = $this->indent(1, true)."for(const item of {$exp}) {";
+                        $codeLines[] = $this->indent(2, true).'formData.push(`'.$dataConfig['name'].'[]=${item}`);';
+                        $codeLines[] = $this->indent(1, true)."}";
+                        $codeLines[] = '}';
+                    }else{
+                        $codeLines[] = 'formData.push(`'.$dataConfig['name'].'=${'.$exp.'}`);';
+                    }
+                }
+                return [$this->indent(1, true)."data: formData.join('&'),"];
+            case 'form-data':
+                $codeLines[] = "const formData = new FormData();";
+                foreach ($inputBody as $dataConfig){
+                    $bindVariable = $formatVariables[$dataConfig['uuid']];
+                    if (!$bindVariable) continue;
+                    $expression = $bindVariable->get_expression();
+                    if (!$expression) continue;
+
+                    $codeLines[] = 'if('.$expression->get_expression_code().' !== undefined){';
+                    if ($dataConfig['type'] == 'array'){
+                        $codeLines[] = $this->indent(1, true)."for(const item of ".$expression->get_expression_code().") {";
+                        $codeLines[] = $this->indent(2, true).'formData.append("'.$dataConfig['name'].'[]", item);';
+                        $codeLines[] = $this->indent(1, true)."}";
+                    }else{
+                        $codeLines[] = $this->indent(1, true).'formData.append("'.$dataConfig['name'].'", '.$expression->get_expression_code().');';
+                    }
+                    $codeLines[] = '}';
+                }
+                return [$this->indent(1, true).'data: formData,'];
+            case 'json':
+                return ['data:' . $this->build_api_json_data($formatVariables, $inputBody, $codeLines, 'jsonData').','];
+            case 'xml': return [];
+            case 'raw': return [];
+            case 'binary': return [];
+            case 'graphql': return [];
+            case 'msgpack': return [];
+            default: return [];
+        }
+    }
+    private function build_api_form_data($formatVariables, $dataConfigs, &$codeLines=[], $dataName=''){
+        if(!$dataConfigs) return null;
+        $codeLines[] = "const _{$dataName} = {};";
         foreach ($dataConfigs as $dataConfig){
             $bindVariable = $formatVariables[$dataConfig['uuid']];
             if (!$bindVariable) continue;
             $expression = $bindVariable->get_expression();
             if (!$expression) continue;
-            $args[] = '"'.$dataConfig['name'].'": '. $expression->get_expression_code();
+            $expression_code = $expression->get_expression_code();
+
+            if ($dataConfig['type'] == 'array'){
+                $codeLines[] = "if({$expression_code} !== undefined){";
+                $codeLines[] = $this->indent(1, true)."for(const index in {$expression_code}) {";
+                $codeLines[] = $this->indent(2, true)."const item = {$expression_code}[index];";
+                $codeLines[] = $this->indent(2, true)."_{$dataName}[`{$dataConfig['name']}[\${index}]`] = item;";
+                $codeLines[] = $this->indent(1, true)."}";
+                $codeLines[] = '}';
+            }else{
+                $codeLines[] = "_{$dataName}[\"{$dataConfig['name']}\"] = $expression_code";
+            }
         }
-        if (isset($codeLines) && $args){
-            $codeLines[] = $this->indent(1, true).$argName.': '.join(" ", ['{',join(',', $args),'}']).',';
+
+        return "_{$dataName}";
+    }
+    private function build_api_json_data($formatVariables, $dataConfigs, &$codeLines=[], $dataName=''){
+        if(!$dataConfigs) return null;
+        $codeLines[] = "const _{$dataName} = {};";
+        foreach ($dataConfigs as $dataConfig){
+            $bindVariable = $formatVariables[$dataConfig['uuid']];
+            if (!$bindVariable) continue;
+            $expression = $bindVariable->get_expression();
+            if (!$expression) continue;
+            $expression_code = $expression->get_expression_code();
+
+            $codeLines[] = "if({$expression_code} !== undefined){";
+            $codeLines[] = $this->indent(1, true)."_{$dataName}[{$dataConfig['name']}] = {$expression_code}";
+            $codeLines[] = '}';
         }
-        return $args ? join(" ", ['{',join(',', $args),'}']) : null;
+
+        return "_{$dataName}";
     }
     private function get_param_variable($formatVariables, $dataConfigs){
         if(!$dataConfigs) return;
@@ -714,22 +765,27 @@ INTERVAL;
             $bodyLines[] = $this->indent($indent, true).'// NOT DEFINED ACTION TYPE '.$action->type;
         }
     }
-    private function get_post_processor_body($indent, Page_Bind_API_Action_Model $bindAction, Io_Data_Fetch $io_data_fetch, Page_Bind_Api_Model $bind_api, &$bodyLines){
+    private function get_post_processor_body($indent, Page_Bind_API_Action_Model $bindAction, Io_Data_Fetch $io_data_fetch, Page_Bind_Api_Model $bind_api, &$bodyLines, $trueFalse='true'){
         $actions = $bindAction->get_actions();
         foreach ($actions as $action){
-            $this->get_action_code($indent, $action, $bodyLines, $bind_api);
+            if ($action->bind_condition == $trueFalse){
+                $this->get_action_code($indent, $action, $bodyLines, $bind_api);
+            }
         }
     }
     private function get_post_processor($bindActions, Io_Data_Fetch $io_data_fetch, Page_Bind_Api_Model $bind_api){
         $codeLines = [];
         $codeLines[] = "const rst = response.data;";
-        foreach ($bindActions as $index => $bindAction){
+        $index = 0;
+        foreach ($bindActions as $bindAction){
             if ($bindAction->mode == 'code') {
                 $codeLines[] = "const promise{$index} = new Promise((resolve) => {";
                 $codeLines = array_merge($codeLines, $this->build->indent_code(1, $bindAction->code));
                 $codeLines[] = "})";
                 $codeLines[] = "promise{$index}.then(() => {";
-                $this->get_post_processor_body(1, $bindAction, $io_data_fetch, $bind_api, $codeLines);
+                $this->get_post_processor_body(1, $bindAction, $io_data_fetch, $bind_api, $codeLines, 'true');
+                $codeLines[] = "}).catch((e) => {";
+                $this->get_post_processor_body(1, $bindAction, $io_data_fetch, $bind_api, $codeLines, 'false');
                 $codeLines[] = "})";
             }else{
                 $expression = $bindAction->get_expression();
@@ -737,6 +793,7 @@ INTERVAL;
                 $this->get_post_processor_body($expression ? 1 : 0, $bindAction, $io_data_fetch, $bind_api, $codeLines);
                 if ($expression) $codeLines[] = "}";
             }
+            $index ++;
         }
         return $codeLines;
     }

@@ -21,6 +21,11 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 
 ![](doc/uibuilder.png)![](doc/code.png)
 
+## 要求
+1. nodejs 18.20+
+2. npm 10.7
+3. php 7.3+
+
 ## 主体框架开发计划
 |      UI+框架       | UIBuilder | 预览器 | 编译器 |
 |:----------------:|:---------:|:---:|:----:|

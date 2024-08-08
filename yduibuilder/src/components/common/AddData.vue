@@ -93,18 +93,18 @@
       </div>
     </div>
   </div>
-  <CodeEditor v-model="codeDialogVisible" :schema="modelSchema" :code="code" @update="updateCode"></CodeEditor>
+  <CodeEditorDialog v-model="codeDialogVisible" :schema="modelSchema" :code="code" @update="updateCode"></CodeEditorDialog>
 </template>
 
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref, watch } from 'vue'
 import ydhl from '@/lib/ydhl'
-import CodeEditor from '@/components/common/CodeEditor.vue'
+import CodeEditorDialog from '@/components/common/CodeEditorDialog.vue'
 
 export default {
   name: 'AddData',
-  components: { CodeEditor },
+  components: { CodeEditorDialog },
   props: {
     modelValue: Object,
     types: {

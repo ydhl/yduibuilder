@@ -14,6 +14,7 @@ use yangzie\GraphqlSearchNode;
  */
 trait Page_Bind_Variable_Model_Method{
 	private $expressionModel;
+	private $fromPageData;
 	/**
 	 * 返回每个字段的描述文本
 	 * @param $column
@@ -96,6 +97,13 @@ trait Page_Bind_Variable_Model_Method{
 		}
 		return null;
     }
+	public function get_from_page_data(){
+		if ($this->fromPageData) return $this->fromPageData;
+		if ($this->from_class == Page_Bind_Data_Model::CLASS_NAME){
+			$this->fromPageData = $this->from_uuid ? Page_Bind_Data_Model::find_by_uuid($this->from_uuid) : null;
+		}
+		return $this->fromPageData;
+	}
     public function get_to_data() {
 		return [
 			'expression'=>[

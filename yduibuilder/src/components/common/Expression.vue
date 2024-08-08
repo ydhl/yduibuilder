@@ -101,7 +101,7 @@
       <DataCheckPanel :local-variables="variables" @updateChecked="chooseData" :checked-uuid="checkUuid" :page-uuid="selectedPageId"></DataCheckPanel>
     </div>
   </lay-layer>
-  <CodeEditor v-model="codeDlgVisible" :title="t('expression.literal')" :variables="variables" language="javascript" :code="code" @update="updateCode"></CodeEditor>
+  <CodeEditorDialog v-model="codeDlgVisible" :title="t('expression.literal')" :variables="variables" language="javascript" :code="code" @update="updateCode"></CodeEditorDialog>
 </template>
 
 <script lang="ts">
@@ -111,7 +111,7 @@ import DataCheckPanel from '@/components/common/DataCheckPanel.vue'
 import { useStore } from 'vuex'
 import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 import { Expression as ExpressionModel } from '@/store/model'
-import CodeEditor from '@/components/common/CodeEditor.vue'
+import CodeEditorDialog from '@/components/common/CodeEditorDialog.vue'
 import DataModifier from '@/components/common/DataModifier.vue'
 import CustomModifier from '@/components/common/CustomModifier.vue'
 import ydhl from '@/lib/ydhl'
@@ -119,7 +119,7 @@ import ydhl from '@/lib/ydhl'
 // 表达式展示
 export default {
   name: 'Expression',
-  components: { CustomModifier, DataModifier, CodeEditor, AdvanceSelect, DataCheckPanel },
+  components: { CustomModifier, DataModifier, CodeEditorDialog, AdvanceSelect, DataCheckPanel },
   props: {
     deep: {
       type: Number,

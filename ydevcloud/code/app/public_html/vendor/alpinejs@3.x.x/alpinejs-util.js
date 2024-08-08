@@ -81,7 +81,7 @@ function alpinejs_get_input_data_name(el, valueName){
     }
     return valueName
 }
-function alpinejs_init_iterator_value(el, expression, evaluate, lastIsArray=false){
+function alpinejs_init_iterator_value(el, expression, evaluate, isArrayData=false){
     if (!expression.match(/\[-1\]/)) return expression;
     // 处理动态数组
     let index = alpinejs_find_index(el);
@@ -98,7 +98,7 @@ function alpinejs_init_iterator_value(el, expression, evaluate, lastIsArray=fals
         tmp += `[${idx}]`
         if (last == i){
             // 最后一个数据项是数组的（checkbox, select的multiple才是数组）其他定义为undefined
-            evaluate(`if(!${tmp}) ${tmp} = ${!lastIsArray ? 'undefined' : '[]'}`);
+            evaluate(`if(!${tmp}) ${tmp} = ${!isArrayData ? 'undefined' : '[]'}`);
         }else{
             evaluate(`if(!${tmp}) ${tmp} = []`);
         }
@@ -114,10 +114,10 @@ function alpinejs_init_iterator_value(el, expression, evaluate, lastIsArray=fals
  * @param effect
  * @param evaluateLater
  */
-function alpinejs_init_bind_value(uitype, el, expression, evaluate, effect, evaluateLater, lastIsArray){
+function alpinejs_init_bind_value(uitype, el, expression, evaluate, effect, evaluateLater, isArrayData){
     const isInput = uitype == 'textarea' || uitype === 'input' || uitype === 'rangeinput';
 
-    const xInputExp = alpinejs_init_iterator_value(el, expression, evaluate, lastIsArray)
+    const xInputExp = alpinejs_init_iterator_value(el, expression, evaluate, isArrayData)
     if (!xInputExp) return
 
     if (isInput) { // 直接体现值类
@@ -223,21 +223,19 @@ function alpinejs_init_directive(Alpine){
     Alpine.directive('input', (el, { expression, modifiers }, { effect, evaluate, Alpine, evaluateLater }) => {
         const uiType = el.dataset.type;
         if (!uiType) return;
-        let lastIsArray = false
-        // 绑定了数据类型输入数据，同时ui也被迭代的时候，则判断UI本身是否是多值的情况
-        // 只有checkbox和multiple的select时是多值
-        // 比如UI绑定input数组被迭代了一次，那么对于每个UI的值存储在input[index]里，这时如果lastIsArray为真，则input[index] = []否则input[index]=''
-        // 如果UI没有迭代输出，则绑定的数据是什么就是什么
-        if (el.hasAttribute('data-index')){
-            lastIsArray = !!((uiType === 'select' && el.querySelector("[multiple]")) || uiType === 'checkbox')
+        let isArrayData = false
+        if (el.hasAttribute('data-index')){// ui被循环输出时
+            isArrayData = !!((uiType === 'select' && el.querySelector("[multiple]")) || uiType === 'checkbox')
+        }else{// 绑定了数组数据
+            isArrayData = !!expression.match(/[-1]/)
         }
 
         Alpine.nextTick(() => {
-            alpinejs_init_bind_value(uiType, el, expression, evaluate, effect, evaluateLater, lastIsArray)
+            alpinejs_init_bind_value(uiType, el, expression, evaluate, effect, evaluateLater, isArrayData)
         })
         const execExp = (exp, value) => {
             if (!exp) return
-            if (lastIsArray){
+            if (isArrayData){
                 evaluate(`${exp} = [value]`, { scope: { value } });
             }else{
                 evaluate(`${exp} = value`, { scope: { value } });
@@ -246,7 +244,7 @@ function alpinejs_init_directive(Alpine){
 
         if (['checkbox', 'radio'].indexOf(uiType) !== -1){
             Alpine.bind(el, { '@click'(event) {
-                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray);
+                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, isArrayData);
                 if (!exp) return;
                 const hasInput = el.querySelector('input[type]');
                 let eventTarget = event.target;
@@ -256,8 +254,8 @@ function alpinejs_init_directive(Alpine){
                 const uiid = eventTarget?.dataset?.uiid
 
                 if (!uiid) return;
-                let values = lastIsArray ? [] : '';
-                if (lastIsArray){// 多值
+                let values = isArrayData ? [] : '';
+                if (isArrayData){// 多值
                     el.querySelectorAll(`[data-uiid='${uiid}']`).forEach((el) => {
                         if(hasInput){
                             if (el.checked) values.push(el.value);
@@ -279,12 +277,12 @@ function alpinejs_init_directive(Alpine){
             const subtype = inputEl.getAttribute('type')?.toLowerCase()
             if (['color', 'date', 'range'].indexOf(subtype) !== -1){
                 Alpine.bind(inputEl, { '@input'(event) {
-                    const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray)
+                    const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, isArrayData)
                     execExp(exp, event.target.value)
                 }})
             }else{
                 Alpine.bind(inputEl, { '@keyup'(event) {
-                    const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray)
+                    const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, isArrayData)
                     execExp(exp, event.target.value)
                 }})
             }
@@ -294,7 +292,7 @@ function alpinejs_init_directive(Alpine){
                 if (!exp) return
                 const selectedValues = Array.from(event.target.options).filter(option => option.selected).map(option=>option.value);
 
-                if (lastIsArray){
+                if (isArrayData){
                     evaluate(`${exp} = selectedValues`, { scope: { selectedValues }});
                 }else{
                     evaluate(`${exp} = "${selectedValues?.[0]}" ? "${selectedValues?.[0]}" : undefined`);
@@ -302,8 +300,9 @@ function alpinejs_init_directive(Alpine){
             }})
         }else if ('file' === uiType){
             Alpine.bind(el, { '@change'(event) {
-                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray);
-                execExp(exp, Array.from(event.target.files));
+                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, isArrayData);
+                const isArray = expression.match(/\[-1\]/)
+                execExp(exp, isArray ? Array.from(event.target.files) : event.target.files?.[0]);
             }})
         }else{
             // 其他迭代类元素
@@ -311,7 +310,7 @@ function alpinejs_init_directive(Alpine){
                 const eventTarget = event.target.closest('[data-value]');
                 if (!eventTarget) return;
 
-                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, lastIsArray)
+                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, isArrayData)
                 execExp(exp, eventTarget.dataset?.value)
             }})
         }

@@ -11,7 +11,8 @@ export default {
     codeModeDesc: '编写你的代码，代码将会运行在Promise中, 通过 resolve 来标识执行成功',
     completedAction: '结束时执行的动作',
     condition: '条件',
-    conditionDesc: '当指定的条件为真时执行指定的行为',
+    conditionFalseDesc: '当指定的条件为【假】时执行指定的行为',
+    conditionTrueDesc: '当指定的条件为【真】时执行指定的行为',
     emit: '触发',
     emitDesc: '触发自定义事件',
     interval: '定时器',
@@ -56,6 +57,7 @@ export default {
     inputNameInvalid: '不正确的名称, 不能以数字开头',
     pleaseInputName: '请输入名称',
     manage: 'API 管理',
+    meetConditions: '满足如下条件时',
     model: {
       comment: '备注',
       defaultValue: '默认值',
@@ -75,9 +77,11 @@ export default {
     output: '输出',
     outputAS: '输出为',
     postProcessors: '后置操作',
+    response: 'API 响应',
     responseData: 'API 响应数据',
     update: '更新',
-    when: '当'
+    when: '当',
+    whenResponseIs: '当API的响应是'
   },
   common: {
     action: '行为',

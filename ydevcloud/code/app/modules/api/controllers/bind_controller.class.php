@@ -216,6 +216,8 @@ class Bind_Controller extends YZE_Resource_Controller {
                 'major' => $bind->major,
                 'minor' => $bind->minor,
                 'revision' => $bind->revision,
+                'requestBodyType' => $bind->requestBodyType,
+                'responseType' => $bind->get_response_type(),
                 'version' => $bind->version,
                 'inBoundData' => $inBoundData,
                 'outBoundData' => $outBoundData,

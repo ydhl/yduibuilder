@@ -750,6 +750,10 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         $codes[] = "";
         array_unshift($actionCodeLines, ...$codes);
     }
+    protected function get_event_function_name($html_event_name, $uiconfig=null){
+        $myid = $uiconfig ? $uiconfig->meta->id : $this->myid();
+        return "{$myid}_{$html_event_name}";
+    }
     /**
      * 获取事件的action代码
      * @return array|void [事件名=>['args'=>[], 'code'=>action codes]

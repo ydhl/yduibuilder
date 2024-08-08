@@ -12,6 +12,8 @@ export default {
     completedAction: 'Action when completed',
     condition: 'Condition',
     conditionDesc: 'Execute the specified action when the specified conditions are met',
+    conditionFalseDesc: 'Execute when the condition is false',
+    conditionTrueDesc: 'Execute when the condition is true',
     emit: 'Emit',
     emitDesc: 'Emit custom event',
     interval: 'Interval',
@@ -56,6 +58,7 @@ export default {
     inputNameInvalid: 'Incorrect name, cannot start with a number',
     pleaseInputName: 'Please input name',
     manage: 'API Manage',
+    meetConditions: 'Meet the following conditions:',
     model: {
       comment: 'Comment',
       defaultValue: 'Default Value',
@@ -75,9 +78,11 @@ export default {
     output: 'Output',
     outputAS: 'Output as',
     postProcessors: 'Post Processors',
+    response: 'API Response',
     responseData: 'API response data',
     update: 'Update',
-    when: 'When'
+    when: 'When',
+    whenResponseIs: 'When API response is'
   },
   common: {
     action: 'Action',

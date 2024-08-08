@@ -4,7 +4,6 @@ namespace app\modules\build\views\preview\bootstrap;
 use app\modules\build\views\code\Base_Code_Fragment;
 use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Alpinejs_Code_Fragment;
-use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 use app\modules\build\views\preview\Valuable_View;
@@ -112,15 +111,17 @@ class File_View extends Preview_View implements Valuable_View {
         if ($autoupload) $codes = array_merge($codes, $this->build->indent_code(2, $autoupload));
         $codes[] = $this->indent(1, true)."}";
 
-        $codes[] = "";
-        $codes[] = $this->indent(1, true)."Promise.all(promises).then((value)=>{";
+        if ($this->data['meta']['custom']['isAutoUpload']){
+            $codes[] = "";
+            $codes[] = $this->indent(1, true)."Promise.all(promises).then((value)=>{";
 
-        if ($onUploadComplete){
-            $codes[] = $this->indent(2, true)."if (files?.length > 0){";
-            $codes[] = $this->indent(3, true).$onUploadComplete;
-            $codes[] = $this->indent(2, true).'}';
+            if ($onUploadComplete){
+                $codes[] = $this->indent(2, true)."if (files?.length > 0){";
+                $codes[] = $this->indent(3, true).$onUploadComplete;
+                $codes[] = $this->indent(2, true).'}';
+            }
+            $codes[] = $this->indent(1, true)."});";
         }
-        $codes[] = $this->indent(1, true)."});";
         $codes[] = "},";
 
         $fragment->add_code(Alpinejs_Code_Fragment::SECTION_EVENT, $codes);

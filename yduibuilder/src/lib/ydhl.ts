@@ -15,7 +15,7 @@ import * as monaco from 'monaco-editor'
 declare const YDJS: YDJSStatic
 export default {
   version: '1.0.16-220207',
-  api: 'http://ydecloud-os.local.com/',
+  api: 'http://ydecloud.local.com/',
   apiBuilder: 'http://localhost:9998',
   modelDesign: 'http://localhost:9997',
   socket: 'ws://localhost:8888',
