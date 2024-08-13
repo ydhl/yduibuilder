@@ -24,8 +24,8 @@
   </div>
 
   <!-- API Dialog -->
-  <lay-layer v-model="dialogVisible" :title="t('action.interval')" resize :shade="true" :area="['800px', '90vh']" :btn="buttons">
-    <div class="p-2" style="overflow-x: hidden">
+  <lay-layer v-model="dialogVisible" :title="t('action.interval')" resize layer-classes="layui-layer-content-overflow" :shade="true" :area="['800px', '400px']" :btn="buttons">
+    <div class="p-2">
       <div class="d-flex mb-3">
         <div class="row">
           <label class="col-sm-6 col-form-label text-end">{{t("action.intervalDuration")}}</label>

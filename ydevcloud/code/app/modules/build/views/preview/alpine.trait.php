@@ -255,7 +255,7 @@ INPITCONFIG;
         foreach ($matches[1] as $name){
             $expression = $inputArgs[$name];
             if (!$expression) continue;
-            $string = preg_replace("/{{$name}}/", '${'.$expression->get_expression_code().'}', $string);
+            $string = preg_replace("/{{$name}}/i", '\\${'.$expression->get_expression_code().'}', $string);
         }
         return $string;
     }
@@ -276,7 +276,6 @@ INPITCONFIG;
             foreach ($bindDatas as $data){
                 $expression = $inputArgs[$data->uuid];
                 if (!$expression) continue;
-//                $codeLines[] = "const {$data->name} = ".$expression->get_expression_code();
                 $args[] = $data->name.'=${'.$expression->get_expression_code().'}';
             }
 
@@ -507,7 +506,7 @@ INTERVAL;
             $path[] = $dataConfig['name'];
             $path[] = 'page';
             $rightValue = $expression->get_expression_code();
-            $operatior = $mutation->mutation_operator ?: '=';
+            $operatior = $mutation->mutation_operator ?: ' = ';
             $operatior = preg_replace("/@/", $rightValue, $operatior);
             $codes = [join('.', array_reverse($path)), $operatior];
             $this->add_used_variable($rightValue);
@@ -652,7 +651,6 @@ INTERVAL;
     }
     private function build_api_form_data($formatVariables, $dataConfigs, &$codeLines=[], $dataName=''){
         if(!$dataConfigs) return null;
-        $codeLines[] = "const _{$dataName} = {};";
         foreach ($dataConfigs as $dataConfig){
             $bindVariable = $formatVariables[$dataConfig['uuid']];
             if (!$bindVariable) continue;
@@ -661,18 +659,23 @@ INTERVAL;
             $expression_code = $expression->get_expression_code();
 
             if ($dataConfig['type'] == 'array'){
-                $codeLines[] = "if({$expression_code} !== undefined){";
-                $codeLines[] = $this->indent(1, true)."for(const index in {$expression_code}) {";
-                $codeLines[] = $this->indent(2, true)."const item = {$expression_code}[index];";
-                $codeLines[] = $this->indent(2, true)."_{$dataName}[`{$dataConfig['name']}[\${index}]`] = item;";
-                $codeLines[] = $this->indent(1, true)."}";
-                $codeLines[] = '}';
+                $myCodes[] = "if({$expression_code} !== undefined){";
+                $myCodes[] = $this->indent(1, true)."for(const index in {$expression_code}) {";
+                $myCodes[] = $this->indent(2, true)."const item = {$expression_code}[index];";
+                $myCodes[] = $this->indent(2, true)."_{$dataName}[`{$dataConfig['name']}[\${index}]`] = item;";
+                $myCodes[] = $this->indent(1, true)."}";
+                $myCodes[] = '}';
             }else{
-                $codeLines[] = "_{$dataName}[\"{$dataConfig['name']}\"] = $expression_code";
+                $myCodes[] = "_{$dataName}[\"{$dataConfig['name']}\"] = $expression_code";
             }
         }
-
-        return "_{$dataName}";
+        if ($myCodes){
+            array_unshift($myCodes, "const _{$dataName} = {};");
+            $codeLines = array_merge($codeLines, $myCodes);
+            return "_{$dataName}";
+        }else{
+            return null;
+        }
     }
     private function build_api_json_data($formatVariables, $dataConfigs, &$codeLines=[], $dataName=''){
         if(!$dataConfigs) return null;

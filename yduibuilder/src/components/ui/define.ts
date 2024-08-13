@@ -82,7 +82,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     isContainer: true,
     kind: ['mobile', 'pc'],
     name: 'ui.container',
-    outputAs: ['TEXT', 'HTML', 'STYLE', 'CSS', 'KEYVALUE', 'NONE']
+    outputAs: ['VALUE', 'TEXT', 'HTML', 'STYLE', 'CSS', 'KEYVALUE', 'NONE']
   },
   Dropdown: {
     type: 'Dropdown',

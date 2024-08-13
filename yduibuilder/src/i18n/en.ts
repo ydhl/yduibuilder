@@ -470,6 +470,9 @@ export default {
       align: 'Align',
       gutter: 'Gutter',
       justify: 'Justify',
+      subset: 'Subset',
+      subsetName: 'Subset name',
+      subsetNameExist: 'The name cannot be repeated',
       type: 'Type',
       wrap: 'Wrap'
     },

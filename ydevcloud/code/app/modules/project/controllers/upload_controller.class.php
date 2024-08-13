@@ -17,7 +17,6 @@ use yangzie\yze_remove_path;
  *
  */
 class Upload_Controller extends YZE_Resource_Controller {
-
     public function index() {
         $request = $this->request;
         $this->layout = '';
@@ -40,12 +39,16 @@ class Upload_Controller extends YZE_Resource_Controller {
         if (!$project->get_member($loginUser->id)) return YZE_JSON_View::error($this, __('Project not found'));
 
         $upload_file_name = "file";
-        if (!file_exists(YZE_UPLOAD_PATH.'project')) mkdir(YZE_UPLOAD_PATH.'project');
-        if (!file_exists(YZE_UPLOAD_PATH.'project/'.$project->uuid)) mkdir(YZE_UPLOAD_PATH.'project/'.$project->uuid);
+        if (!file_exists(YZE_UPLOAD_PATH.'project')) @mkdir(YZE_UPLOAD_PATH.'project');
+        if (!file_exists(YZE_UPLOAD_PATH.'project/'.$project->uuid)) @mkdir(YZE_UPLOAD_PATH.'project/'.$project->uuid);
 
         $path = '';
         $action = $request->get_from_get("action");
-        if($action=='icon') $path = YZE_UPLOAD_PATH.'project/'.$project->uuid.'/iconfont';
+        if($action=='icon') {
+            $path = YZE_UPLOAD_PATH.'project/'.$project->uuid.'/iconfont';
+        }else{
+            $path = YZE_UPLOAD_PATH.'project/'.$project->uuid;
+        }
         if (!$path) return YZE_JSON_View::error($this, __('unknown action'));
 
         $upload = new Uploader($path);

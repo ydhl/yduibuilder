@@ -549,7 +549,23 @@ export default {
       }
       state.pageSaved[state.page.meta.id] = 0
     },
-
+    /**
+     * 删除传入的ui id
+     * @param state
+     * @param ids
+     * @param pageId
+     */
+    deleteItem (state: any, { ids, pageId }) {
+      for (const id of ids) {
+        const { index, uiConfig, parentConfig } = findUIItemInfo(state, id)
+        if (uiConfig.meta.isLock || index === -1) continue
+        if (parentConfig != null) {
+          parentConfig.items.splice(index, 1)
+        }
+      }
+      state.selectedUIItemId = ''
+      state.pageSaved[state.page.meta.id] = 0
+    },
     /**
      * 更新item的meta普通的内容，对于meta中的array，object等复合型属性通过type指定（比如style，custom，css），直接
      * 在meta下的名值对不用传type
@@ -588,23 +604,7 @@ export default {
       }
       updateMeta(state, type, props, state.previewStyleItem, isMerge)
     },
-    /**
-     * 删除传入的ui id
-     * @param state
-     * @param ids
-     * @param pageId
-     */
-    deleteItem (state: any, { ids, pageId }) {
-      for (const id of ids) {
-        const { index, uiConfig, parentConfig } = findUIItemInfo(state, id)
-        if (uiConfig.meta.isLock || index === -1) continue
-        if (parentConfig != null) {
-          parentConfig.items.splice(index, 1)
-        }
-      }
-      state.selectedUIItemId = ''
-      state.pageSaved[state.page.meta.id] = 0
-    },
+
     /**
      * 更新组件的属性, 非meta总的，如果meta中的信息请使用updateItemMeta
      * @param state

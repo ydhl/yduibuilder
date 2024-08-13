@@ -3,8 +3,8 @@
     <button class="btn btn-primary d-flex align-items-center text-truncate justify-content-center"
          data-bs-toggle="dropdown" ref="dropdownToggle" :style="style">{{!modelValue.id ? t('common.upload') : modelValue.name}}</button>
     <ul class="dropdown-menu dropdown-menu-end">
-      <li><a class="dropdown-item" id="upload" href="javascript:;" ref="uploadBtn">{{t('common.upload')}}</a></li>
-      <li><a class="dropdown-item" id="select" href="javascript:;" @click="openSelectFileDialog">{{t('common.selectFile')}}</a></li>
+      <li><div class="dropdown-item" id="upload" ref="uploadBtn">{{t('common.upload')}}</div></li>
+      <li><div class="dropdown-item" id="select" @click="openSelectFileDialog">{{t('common.selectFile')}}</div></li>
     </ul>
   </div>
   <lay-layer v-model="isFileSelectorOpen" teleport="body" :shade="true" :area="['520px', '500px']" :btn="buttons">
@@ -40,14 +40,13 @@
 }
 </style>
 <script lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import ydhl from '@/lib/ydhl'
 import { useI18n } from 'vue-i18n'
+import Uploader, { MimeType } from '@/lib/ydhl_uploader'
 import { YDJSStatic } from '@/lib/ydjs'
 import $ from 'jquery'
 declare const YDJS: YDJSStatic
-// eslint-disable-next-line camelcase
-declare const yd_upload_render: Function
 
 export default {
   name: 'Upload',
@@ -69,17 +68,11 @@ export default {
     // const store = useStore()
     const uploadBtn = ref()
     const { t } = useI18n()
-    const mimeType = {
-      image: 'image/*',
-      excel: 'xls,xlsx'
-    }
     const dropdownToggle = ref()
     const fileSearchWord = ref('')
     const page = ref(1)
     const isFileSelectorOpen = ref(false)
-    // watch(isFileSelectorOpen, function (v) {
-    //   store.commit('updateState', { backdropVisible: v })
-    // })
+
     const files = ref<Array<Record<string, string>>>()
     const selectFile = ref()
 
@@ -92,19 +85,29 @@ export default {
     })
 
     let loadingId = ''
-    const imageAdded = (up, files) => {
-      up.setOption('url', ydhl.api + 'api/' + props.projectId + '/upload.json')
+    const imageAdded = (file) => {
       loadingId = YDJS.loading(t('common.pleaseWait'))
     }
-    const imageUploaded = (up: any, files: Array<any>, response) => {
+    const imageUploaded = (file: File, rst: any) => {
       YDJS.hide_dialog(loadingId)
-      if (!response || !response.success) return
+      if (!rst || !rst.success) return
       // console.log(response)
-      context.emit('update:modelValue', response.data)
+      context.emit('update:modelValue', rst.data)
+    }
+    const imageProgress = (file: File, progress: number) => {
+      YDJS.update_loading(loadingId, t('common.pleaseWait') + ' ' + progress + '%')
     }
     onMounted(() => {
-      // const uploadApi = ydhl.api + 'api/' + props.projectId + '/upload.json'
-      if (uploadBtn.value) yd_upload_render(uploadBtn.value, '#', mimeType[props.type], imageAdded, imageUploaded)
+      const uploadApi = ydhl.api + 'api/' + props.projectId + '/upload.json'
+      const mime: MimeType | undefined = props.type as MimeType
+      nextTick(() => {
+        if (uploadBtn.value) {
+          Uploader(uploadBtn.value, mime, uploadApi, imageAdded, imageUploaded, imageProgress, (file, error) => {
+            YDJS.hide_dialog(loadingId)
+            ydhl.alert(error)
+          })
+        }
+      })
     })
     const select = (event, file: any) => {
       selectFile.value = file

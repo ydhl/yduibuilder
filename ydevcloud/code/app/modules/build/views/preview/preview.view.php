@@ -39,7 +39,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     /**
      * @var 组件的样式数组，格式[selector=>[styleName=>styleValue]]
      */
-    private $styles = [];
+    protected $styles = [];
     /**
      * @var array Preview_View
      */
@@ -72,27 +72,30 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         $this->build = $build;
         $this->cssTranslate = $build->get_Css_Translate();
         foreach ((array)@$this->data['items'] as $index => $item){
-            $build = $this->build->clone();
-            $build->set_ui_config($item);
-            $build->set_is_subpage(false);
-            $subPageId = @$item['subPageId'];
-            // 如果该组件的内容是引用一个组件页面; 因为顶层的build已经把该页面所有的uibase拉取出来了
-            // 这里只需要init_data重新拉取子页关联的数据即可
-            // 组件页面的关联内容在宿主页面是不提现出来的
-            if ($subPageId){
-                $subPage = $this->get_page($subPageId);
-                if ($subPage){
-                    $build->set_page($subPage);
-                    $build->set_is_subpage(true);
-                    $build->set_id_suffix("_".$this->myid()."_{$index}");
-                    $build->init_data();
-                }
-            }
-
-            $build->increase_indent(1);
-            $childView = self::create_View($build);
-            $this->childViews[] = $childView;
+            $this->childViews[] = $this->create_item_view($index, $item);
         }
+    }
+
+    protected function create_item_view($index, $item){
+        $build = $this->build->clone();
+        $build->set_ui_config($item);
+        $build->set_is_subpage(false);
+        $subPageId = @$item['subPageId'];
+        // 如果该组件的内容是引用一个组件页面; 因为顶层的build已经把该页面所有的uibase拉取出来了
+        // 这里只需要init_data重新拉取子页关联的数据即可
+        // 组件页面的关联内容在宿主页面是不提现出来的
+        if ($subPageId){
+            $subPage = $this->get_page($subPageId);
+            if ($subPage){
+                $build->set_page($subPage);
+                $build->set_is_subpage(true);
+                $build->set_id_suffix("_".$this->myid()."_{$index}");
+                $build->init_data();
+            }
+        }
+
+        $build->increase_indent(1);
+        return self::create_View($build);
     }
 
     /**

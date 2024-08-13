@@ -10,14 +10,14 @@
     </a>
   </template>
   <template  v-else>
-    <button :draggable='draggable' :class="[btnCss, dragableCss]" :style="btnStyle"
+    <div :draggable='draggable' :class="[btnCss, dragableCss]" :style="btnStyle"
             :id="myId" :data-type="uiconfig.type"
             :data-pageid="pageid" :data-isContainer="false"
             @dblclick="inlineEditItemId=uiconfig.meta.id"  @keyup.enter="inlineEditItemId=''"
             :contenteditable="inlineEditItemId==uiconfig.meta.id"
             :type="buttonType">
       <IconWrapper :uiconfig="uiconfig">{{uiconfig.meta.title}}</IconWrapper>
-    </button>
+    </div>
   </template>
 </template>
 

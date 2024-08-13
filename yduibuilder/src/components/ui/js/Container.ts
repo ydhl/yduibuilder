@@ -35,8 +35,14 @@ export default class Container extends UIBase {
       if (parentOfParent.parentConfig.type === 'Container') return true
       return false
     })
+
+    const subsetActive = computed<string>(() => this.getMeta('subsetActive', 'custom') || 'normal')
+    const subset = computed<string>(() => this.getMeta('subset', 'custom') || { normal: [] })
+
     return {
       ...superSetup,
+      subset,
+      subsetActive,
       isRow,
       isCol
     }

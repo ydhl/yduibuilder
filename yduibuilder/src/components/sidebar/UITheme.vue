@@ -76,9 +76,9 @@
           <div class="dropdown">
             <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">{{t('common.upload')}}</button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-              <li><a href="javascript:void(0)" class="dropdown-item" id="upload-woff2" ref="uploadWoff2">{{ fontFace.file?.woff2 ? t('common.uploaded') : t('common.upload') }} woff2</a></li>
-              <li><a href="javascript:void(0)" class="dropdown-item" id="upload-woff" ref="uploadWoff">{{ fontFace.file?.woff ? t('common.uploaded') : t('common.upload') }} woff</a></li>
-              <li><a href="javascript:void(0)" class="dropdown-item" id="upload-ttf" ref="uploadTtf">{{ fontFace.file?.ttf ? t('common.uploaded') : t('common.upload') }} ttf</a></li>
+              <li><a href="javascript:void(0)" class="dropdown-item" id="uploadwoff2">{{ fontFace.file?.woff2 ? t('common.uploaded') : t('common.upload') }} woff2</a></li>
+              <li><a href="javascript:void(0)" class="dropdown-item" id="uploadwoff">{{ fontFace.file?.woff ? t('common.uploaded') : t('common.upload') }} woff</a></li>
+              <li><a href="javascript:void(0)" class="dropdown-item" id="uploadttf">{{ fontFace.file?.ttf ? t('common.uploaded') : t('common.upload') }} ttf</a></li>
             </ul>
           </div>
         </td>
@@ -114,13 +114,12 @@
 <script lang="ts">
 import initUI from '@/components/Common'
 import { useI18n } from 'vue-i18n'
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
 import ydhl from '@/lib/ydhl'
 import { YDJSStatic } from '@/lib/ydjs'
+import Uploader from '@/lib/ydhl_uploader'
 declare const YDJS: YDJSStatic
-// eslint-disable-next-line camelcase
-declare const yd_upload_render: Function
 export default {
   name: 'UITheme',
   emits: ['save'],
@@ -157,33 +156,37 @@ export default {
     const defaultSpacer = ref(project.value.defaultSpacer || store.getters.translate('spacer', 'default'))
     const fontFaces = ref(project.value.fontFace || [{ name: '' }])
 
-    const uploadWoff2 = ref()
-    const uploadWoff = ref()
-    const uploadTtf = ref()
-
     let loadingId = ''
-    const imageAdded = (up, files) => {
-      up.setOption('url', ydhl.api + 'api/' + project.value.id + '/upload.json')
+    const fileAdded = (file) => {
       loadingId = YDJS.loading(t('common.pleaseWait'))
     }
-    const imageUploaded = (up: any, files: Array<any>, response) => {
+    const fileUploaded = (file, rst: any) => {
       YDJS.hide_dialog(loadingId)
       // console.log(response)
-      if (!response || !response.success) {
-        YDJS.alert(response?.msg || 'Oops, Upload failed', 'Oops')
+      if (!rst || !rst.success) {
+        YDJS.alert(rst?.msg || 'Oops, Upload failed', 'Oops')
         return
       }
       if (!fontFaces.value[0].file) fontFaces.value[0].file = {} // 目前仅支持一个字体上传
-      fontFaces.value[0].file[response.data.ext] = response.data.id
+      fontFaces.value[0].file[rst.data.ext] = rst.data.id
+    }
+    const fileUploadError = (file, error) => {
+      YDJS.hide_dialog(loadingId)
+      ydhl.alert(error)
+    }
+    const fileProgress = (file: File, progress: number) => {
+      YDJS.update_loading(loadingId, t('common.pleaseWait') + ' ' + progress + '%')
     }
     const removeFontFace = (index: number) => {
       // fontFaces.value.splice(index, 1)
       fontFaces.value = [{ name: '' }]// 目前仅支持一个字体上传
     }
     onMounted(() => {
-      yd_upload_render(uploadWoff2.value, '#', 'woff2', imageAdded, imageUploaded)
-      yd_upload_render(uploadWoff.value, '#', 'woff', imageAdded, imageUploaded)
-      yd_upload_render(uploadTtf.value, '#', 'ttf', imageAdded, imageUploaded)
+      nextTick(() => {
+        Uploader(document.getElementById('uploadwoff2'), 'woff2', ydhl.api + 'api/' + project.value.id + '/upload.json', fileAdded, fileUploaded, fileProgress, fileUploadError)
+        Uploader(document.getElementById('uploadwoff'), 'woff', ydhl.api + 'api/' + project.value.id + '/upload.json', fileAdded, fileUploaded, fileProgress, fileUploadError)
+        Uploader(document.getElementById('uploadttf'), 'ttf', ydhl.api + 'api/' + project.value.id + '/upload.json', fileAdded, fileUploaded, fileProgress, fileUploadError)
+      })
     })
     const save = () => {
       const data = {
@@ -254,9 +257,6 @@ export default {
       bgDarkColor,
       fgDarkColor,
       defaultFontSize,
-      uploadWoff2,
-      uploadWoff,
-      uploadTtf,
       defaultSpacer,
       supportDarkMode,
       removeFontFace,

@@ -469,6 +469,9 @@ export default {
       align: '交叉轴对齐',
       gutter: '元素间距',
       justify: '对齐',
+      subset: '内容子集',
+      subsetName: '子集名称',
+      subsetNameExist: '子集名称已存在',
       type: '类型',
       wrap: '是否换行'
     },

@@ -12,6 +12,7 @@
 import UIBase from '@/components/ui/UIBase.vue'
 import Container from '@/components/ui/js/Container'
 import { useStore } from 'vuex'
+import { onMounted } from 'vue'
 
 export default {
   name: 'Bootstrap_Container',
@@ -26,6 +27,7 @@ export default {
   },
   setup (props: any, context: any) {
     const container = new Container(props, context, useStore())
+    onMounted(() => console.log('container'))
     return {
       ...container.setup()
     }

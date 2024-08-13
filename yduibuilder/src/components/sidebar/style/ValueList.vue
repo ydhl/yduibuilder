@@ -8,7 +8,7 @@
             <transition-group>
             <div class="list-group-item p-1 d-flex justify-content-between align-items-center" v-for="(item, index) in valueItems" :key="index">
               <div><i class="iconfont icon-drag" style="cursor: move"></i></div>
-              <label class="flex-grow-1 m-0 text-truncate">
+              <label class="flex-grow-1 m-0 text-truncate d-flex align-items-center">
                 <input type="radio" v-if="!isMultiple" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
                 <input type="checkbox" v-if="isMultiple" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
                 {{item.name}} ({{item.value}})</label>
