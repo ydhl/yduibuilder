@@ -98,7 +98,9 @@
   <lay-layer v-model="editDlgVisible" :title="isAddProps ? t('api.addData') : t('api.editData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
     <AddData v-model="editModel" :has-default-value="path.length==0" :is-array-item="!isAddProps && isArrayItem"/>
   </lay-layer>
-  <CodeEditorDialog :read-only="codeType=='view'" :title="codeType=='view'?t('api.model.defaultValue'):t('api.model.import')" :tip="tip" v-model="codeEditorVisible" :code="code" @update="importData"></CodeEditorDialog>
+  <CodeEditorDialog :read-only="codeType=='view'" :title="codeType=='view'?t('api.model.defaultValue'):t('api.model.import')"
+                    :hide-variable="true" :ignore-code-error="true"
+                    :tip="tip" v-model="codeEditorVisible" :code="code" @update="importData"></CodeEditorDialog>
   <DataInfo :data="myModel" v-model="detailDlgVisible"></DataInfo>
 </template>
 
@@ -385,7 +387,8 @@ export default {
       const isObject = ['object', 'map'].indexOf(dataType) !== -1
       const isArray = myModel.value.type === 'array'
       const is1DArray = myModel.value.type === 'array' && myModel.value.item.type !== 'array'
-      const is1DObjectArray = myModel.value.type === 'array' && ['object', 'map'].indexOf(myModel.value.item.type) !== -1
+      const is1DObjectMapArray = myModel.value.type === 'array' && ['object', 'map'].indexOf(myModel.value.item.type) !== -1
+      const is1DObjectArray = myModel.value.type === 'array' && myModel.value.item.type === 'object'
       const is1DScaleArray = myModel.value.type === 'array' && scaleTypes.indexOf(myModel.value.item.type) !== -1
       const is2DScaleArray = is2DArray && scaleTypes.indexOf(myModel.value.item.item.type) !== -1
       const iterate = baseUIDefines[uiType].isIterable ? 'Iterable' : 'unIterable'
@@ -396,14 +399,20 @@ export default {
         if (iterate === 'Iterable') {
           if (output === 'STYLE' && !isObject && !is1DScaleArray && !isScale) continue
           if (output === 'CSS' && !is1DScaleArray && !isScale) continue
-          if (output === 'NONE' && !is2DArray) continue
-          if (output === 'VALUELIST' && ['Collapse', 'Carousel'].indexOf(uiType) !== -1 && (isObject || is1DObjectArray || (is2DArray && !is2DScaleArray))) continue
+          if (output === 'NONE') {
+            if (uiType === 'Table') {
+              if (!is1DObjectArray) continue
+            } else {
+              if (!is2DArray) continue
+            }
+          }
+          if (output === 'VALUELIST' && ['Collapse', 'Carousel'].indexOf(uiType) !== -1 && (isObject || is1DObjectMapArray || (is2DArray && !is2DScaleArray))) continue
           if (output === 'VALUELIST' && uiType === 'Table' && !is2DArray) continue
         } else {
           if (output === 'VALUE' && !isScale && !is1DScaleArray) continue
           if (output === 'STYLE' && !isScale && !isObject && !is1DArray && (is2DArray && !is2DScaleArray)) continue
           if (output === 'CSS' && !isScale && !is1DScaleArray && (is2DArray && !is2DScaleArray)) continue
-          if (output === 'KEYVALUE' && !isObject && !is1DObjectArray) continue
+          if (output === 'KEYVALUE' && !isObject && !is1DObjectMapArray) continue
           if (output === 'NONE' && !isArray) continue
         }
         _.push({ name: output + (uiItem.dataOut?.[output] ? ` (${t('variable.hasBeenBound')})` : ''), value: output, desc: t('variable.output.' + output), disabled: !!uiItem.dataOut?.[output] })
@@ -427,7 +436,7 @@ export default {
     }
     const hasBoundAs = (uiType) => {
       if (!hasOutputAs(uiType)) return false
-      if (baseUIDefines[uiType].IsForm) return false
+      if (baseUIDefines[uiType].isForm) return false
       if (baseUIDefines[uiType].isIterable) return false
       return true
     }

@@ -1,24 +1,83 @@
 <template>
-  <div :draggable='draggable'
-       :class="[dragableCss, uiCss]" :style="uiStyle" :id="myId" :data-type="uiconfig.type"
-       :data-pageid="pageid">
-    <table  :class="['table', dragableCss, tableCss]" :style="tableStyle">
-      <thead v-if="!uiconfig.meta.custom?.headless" :class="headerCss" :style="headerStyle">
-        <tr>
-          <th v-for="(item, index) in header" :class="[alignCss]" :key="index" v-html="item.name"></th>
-        </tr>
-      </thead>
-      <tbody>
-      <tr v-for="(r, rindex) in row" :key="rindex">
-        <td v-for="(item, cindex) in r" :class="[alignCss]" :key="cindex" v-html="item.name"></td>
+  <table :draggable='!inlineEditItemId' @dblclick="inlineEditItemId = uiconfig.meta.id"
+         :class="['table', dragableCss, tableCss, uiCss]" :style="uiStyle" :id="myId" :data-type="uiconfig.type"
+         :data-pageid="pageid" :data-isContainer="true">
+    <thead v-if="inlineEditItemId==uiconfig.meta.id">
+    <tr>
+      <th class="bg-light" style="width: 20px"></th>
+      <template v-for="column in columnCount" :key="column">
+        <th class="bg-light" :style="size?.width?.[column-1] ? `width:${size.width[column-1]}px` : ''"
+            @mouseenter="showToolbar($event, 'column', 0, column)">{{column}}</th>
+      </template>
+    </tr>
+    </thead>
+    <thead v-if="!uiconfig.meta.custom?.headless" :class="headerCss" :style="headerStyle">
+      <tr v-for="row in headerRow" :key="row" :style="size?.height?.[row-1] ? `height:${size.height[row-1]}px` : ''">
+        <th class="bg-light" v-if="inlineEditItemId==uiconfig.meta.id"  @mouseenter="showToolbar($event, 'row', row, 0)">{{row}}</th>
+        <template v-for="column in columnCount" :key="column">
+          <th v-if="!columnConfig?.[row-1]?.[column-1]?.isMerged"
+              :style="size?.width?.[column-1] ? `width:${size.width[column-1]}px` : ''"
+              :colspan="columnConfig?.[row-1]?.[column-1]?.colspan"
+              :rowspan="columnConfig?.[row-1]?.[column-1]?.rowspan" :class="{[alignCss]: true, 'dragenter-subcontainer': isDragIn && dragoverInParent==`${row-1}-${column-1}`, 'subui': true}"
+              :data-placeInParent="`${row-1}-${column-1}`"
+              @mouseenter="inlineEditItemId==uiconfig.meta.id ? showToolbar($event, 'td', row, column) : null">
+            <template v-if="!columnItems?.[row-1]?.[column-1]">{{rowData?.[row-1]?.[column-1]?.name || ''}}</template>
+            <UIBase v-for="(item, index) in columnItems?.[row-1]?.[column-1]" :key="index"
+                    :is-readonly="myIsReadonly || inlineEditItemId===uiconfig.meta.id" :is-lock="myIsLock || inlineEditItemId===uiconfig.meta.id"
+                    :uiconfig="item" :pageid="pageid"></UIBase>
+          </th>
+        </template>
       </tr>
-      </tbody>
-      <tfoot v-if="!uiconfig.meta.custom?.footless" :class="footerCss" :style="footerStyle">
-      <tr>
-        <th v-for="(item, index) in footer" :class="[alignCss]" :key="index" v-html="item.name"></th>
-      </tr>
-      </tfoot>
-    </table>
+    </thead>
+    <tbody>
+    <tr v-for="row in bodyRow" :key="row" :style="size?.height?.[row-1+headerRow] ? `height:${size.height[row-1+headerRow]}px` : ''">
+      <td class="bg-light" v-if="inlineEditItemId==uiconfig.meta.id"  @mouseenter="showToolbar($event, 'row', row+headerRow, 0)">{{row+headerRow}}</td>
+      <template v-for="column in columnCount" :key="column">
+        <td v-if="!columnConfig?.[row-1+headerRow]?.[column-1]?.isMerged"
+            :style="size?.width?.[column-1] ? `width:${size.width[column-1]}px` : ''"
+            :colspan="columnConfig?.[row-1+headerRow]?.[column-1]?.colspan"
+            :rowspan="columnConfig?.[row-1+headerRow]?.[column-1]?.rowspan"
+            :class="{[alignCss]: true, 'dragenter-subcontainer': isDragIn && dragoverInParent==`${row-1+headerRow}-${column-1}`, 'subui': true}"
+            :data-placeInParent="`${row-1+headerRow}-${column-1}`"
+            @mouseenter="inlineEditItemId==uiconfig.meta.id ? showToolbar($event, 'td', row+headerRow, column) : null">
+          <template v-if="!columnItems?.[row-1+headerRow]?.[column-1]">{{rowData?.[row-1+headerRow]?.[column-1]?.name || ''}}</template>
+          <UIBase v-for="(item, index) in columnItems?.[row-1+headerRow]?.[column-1]" :key="index"
+                  :is-readonly="myIsReadonly || inlineEditItemId===uiconfig.meta.id" :is-lock="myIsLock || inlineEditItemId===uiconfig.meta.id"
+                  :uiconfig="item" :pageid="pageid"></UIBase>
+        </td>
+      </template>
+    </tr>
+    </tbody>
+    <tfoot v-if="!uiconfig.meta.custom?.footless" :class="footerCss" :style="footerStyle">
+    <tr v-for="row in footerRow" :key="row" :style="size?.height?.[row-1+headerRow+bodyRow] ? `height:${size.height[row-1+headerRow+bodyRow]}px` : ''">
+      <th class="bg-light" v-if="inlineEditItemId==uiconfig.meta.id"  @mouseenter="showToolbar($event, 'row', row+headerRow+bodyRow, 0)">{{row+headerRow+bodyRow}}</th>
+      <template v-for="column in columnCount" :key="column">
+        <th v-if="!columnConfig?.[row-1+headerRow+bodyRow]?.[column-1]?.isMerged"
+            :colspan="columnConfig?.[row-1+headerRow+bodyRow]?.[column-1]?.colspan"
+            :rowspan="columnConfig?.[row-1+headerRow+bodyRow]?.[column-1]?.rowspan"
+            :class="{[alignCss]: true, 'dragenter-subcontainer': isDragIn && dragoverInParent==`${row-1+headerRow+bodyRow}-${column-1}`, 'subui': true}"
+            :data-placeInParent="`${row-1+headerRow+bodyRow}-${column-1}`" @mouseenter="inlineEditItemId==uiconfig.meta.id ? showToolbar($event, 'td', row+headerRow+bodyRow, column) : null">
+          <template v-if="!columnItems?.[row-1+headerRow+bodyRow]?.[column-1]">{{rowData?.[row-1+headerRow+bodyRow]?.[column-1]?.name || ''}}</template>
+          <UIBase v-for="(item, index) in columnItems?.[row-1+headerRow+bodyRow]?.[column-1]" :key="index"
+                  :is-readonly="myIsReadonly || inlineEditItemId===uiconfig.meta.id" :is-lock="myIsLock || inlineEditItemId===uiconfig.meta.id" :uiconfig="item" :pageid="pageid"></UIBase>
+        </th>
+      </template>
+    </tr>
+    </tfoot>
+  </table>
+  <div v-if="tableToolbarVisible" @mouseleave="closeToolbar" class="table-toolbar" :style="`${tableToolbarStyle}`">
+    <div v-if="tableToolbarType=='column'" class="table-toolbar-column">
+      <div class="split-tool-x" :data-target="tableToolbarKey"><i class="iconfont icon-resize-column"></i></div>
+    </div>
+    <div v-else-if="tableToolbarType=='row'" class="table-toolbar-row">
+      <div class="split-tool-y" :data-target="tableToolbarKey"><i class="iconfont icon-resize-row"></i></div>
+    </div>
+    <div v-else-if="tableToolbarType=='td'" class="table-toolbar-td">
+      <div class="tool" v-if="canSplitColumn" @click.stop.prevent="splitColumn"><i class="iconfont icon-split-column"></i></div>
+      <div class="tool" v-if="canSplitRow" @click.stop.prevent="splitRow"><i class="iconfont icon-split-row"></i></div>
+      <div class="tool" v-if="canSpanColumn" @click.stop.prevent="spanColumn"><i class="iconfont icon-span-column"></i></div>
+      <div class="tool" v-if="canSpanRow" @click.stop.prevent="spanRow"><i class="iconfont icon-span-row"></i></div>
+    </div>
   </div>
 </template>
 
@@ -26,9 +85,11 @@
 import Table from '@/components/ui/js/Table'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import UIBase from '@/components/ui/UIBase.vue'
 
 export default {
   name: 'Bootstrap_Table',
+  components: { UIBase },
   props: {
     uiVersion: String,
     uiconfig: Object,
@@ -41,65 +102,12 @@ export default {
     const store = useStore()
     const table = new Table(props, context, store)
     const tableSetup = table.setup()
-    const header = computed(() => {
-      const header = props.uiconfig.meta?.custom?.data?.header
-      if (header && header.length > 0) return header
-      // 非无头模式下，没有头部数据就用第一行作为头部
-      const row = table.getMeta('row', 'custom')
-      if (row && row.length > 0 && !props.uiconfig.meta?.custom?.headless) return row[0]
-      return [
-        { name: 'Header 1' },
-        { name: 'Header 2' },
-        { name: 'Header 3' }
-      ]
-    })
-    const footer = computed(() => {
-      const footer = props.uiconfig.meta?.custom?.data?.footer
-      if (footer && footer.length > 0) return footer
-      // 非无脚模式下，没有脚数据就用最后一行作为脚
-      const row = table.getMeta('row', 'custom')
-      if (row && row.length > 0 && !props.uiconfig.meta?.custom?.footless) return row[row.length - 1]
-      return [
-        { name: 'Footer 1' },
-        { name: 'Footer 2' },
-        { name: 'Footer 3' }
-      ]
-    })
-    const row = computed(() => {
-      const row = props.uiconfig.meta?.custom?.data?.row
-      // console.log(row)
-      if (row && row.length > 0) {
-        return row
-      }
-      return [[
-        { name: 'row 1 column 1' },
-        { name: 'row 1 column 2' },
-        { name: 'row 1 column 3' }
-      ],
-      [
-        { name: 'row 2 column 1' },
-        { name: 'row 2 column 2' },
-        { name: 'row 2 column 3' }
-      ],
-      [
-        { name: 'row 3 column 1' },
-        { name: 'row 3 column 2' },
-        { name: 'row 3 column 3' }
-      ],
-      [
-        { name: 'row 4 column 1<br/> new line' },
-        { name: 'row 4 column 2' },
-        { name: 'row 4 column 3' }
-      ]
-      ]
-    })
     const backgroundTheme = computed(() => props.uiconfig.meta?.css?.backgroundTheme === 'default' ? '' : props.uiconfig.meta?.css?.backgroundTheme)
     const alignCss = computed(() => {
       const css = table.getUICss()
       const newCss = [css?.verticalAlignment, css?.textAlignment]
       return newCss.join(' ')
     })
-
     const uiCss = computed(() => {
       const css = table.getUICss()
       delete css?.textAlignment
@@ -112,7 +120,6 @@ export default {
       // console.log(newCss)
       return Object.values(css).join(' ')
     })
-
     const tableCss = computed(() => {
       const css = table.getUICss()
       const newCss: any = {}
@@ -147,24 +154,9 @@ export default {
     })
     const uiStyle = computed(() => {
       const style = table.getUIStyle()
-      for (const styleKey in style) {
-        if (styleKey.match(/^background/)) delete style[styleKey]
-        if (styleKey.match(/^color/)) delete style[styleKey]
-      }
       style.overflow = 'hidden'
+      style.margin = '0px'
       return table.appendImportant(style)
-    })
-
-    const tableStyle = computed(() => {
-      const style = table.getUIStyle()
-      const newStyle:any = {}
-      for (const styleKey in style) {
-        if (styleKey.match(/^background/)) newStyle[styleKey] = style[styleKey]
-        if (styleKey.match(/^color/)) newStyle[styleKey] = style[styleKey]
-        if (styleKey.match(/^border/)) newStyle[styleKey] = style[styleKey]
-      }
-      newStyle.margin = '0px'
-      return table.appendImportant(newStyle)
     })
     /**
      * Header的css和style
@@ -207,18 +199,14 @@ export default {
 
     return {
       ...tableSetup,
-      header,
-      footer,
       uiCss,
       tableCss,
       uiStyle,
-      tableStyle,
       headerCss,
       headerStyle,
       footerCss,
       footerStyle,
-      alignCss,
-      row
+      alignCss
     }
   }
 }

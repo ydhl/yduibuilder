@@ -33,7 +33,7 @@ class List_View extends ValueList_View {
             return;
         }
         // 静态数据
-        $staticValue = $staticData['value']?:$staticData['name'];
+        $staticValue = strlen($staticData['value'])?$staticData['value']:$staticData['name'];
         echo $this->indent(1) . "<a href='javascript:;'"
             .$this->wrap_output(':class', $this->item_theme(null, $staticValue))
             .$this->wrap_output(':style', $this->item_style(null, $staticValue))

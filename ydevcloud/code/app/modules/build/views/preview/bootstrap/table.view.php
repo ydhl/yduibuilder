@@ -13,6 +13,7 @@ use function yangzie\__;
 
 class Table_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper;
+    private $columnItems = [];
     public function build_valuelist_static()
     {
         $this->build_ui_begin();
@@ -21,7 +22,7 @@ class Table_View extends ValueList_View {
     }
     public function build_valuelist_iterator($outputData, $outDataName, $iteratorName, $itemName, $is2D = false, $firstIndex = '')
     {
-        // table的第一维时行，第二维时列
+        // table的第一维是行，第二维是列
         $this->build_ui_begin($outputData);
 
         //header
@@ -30,12 +31,13 @@ class Table_View extends ValueList_View {
 
             echo $this->indent(2);
             echo "<thead";
-            echo $this->wrap_output('class', $this->header_css())
-                .">".PHP_EOL;
-            echo $this->indent(3)."<tr>".PHP_EOL;
+            echo $this->wrap_output('class', $this->header_css()).">".PHP_EOL;
 
-            echo $this->indent(4) . '<template x-for="(itemOfHeader, idxOfHeader) in header" :key="idxOfHeader">'.PHP_EOL;
-            echo $this->indent(4)."<th";
+            echo $this->indent(3) . '<template x-for="(headerRow, idxOfHeaderRow) in header" :key="idxOfHeaderRow">'.PHP_EOL;
+            echo $this->indent(3) . "<tr>".PHP_EOL;
+
+            echo $this->indent(4) . '<template x-for="(itemOfHeader, idxOfHeader) in headerRow" :key="idxOfHeader">'.PHP_EOL;
+            echo $this->indent(4) . "<th";
             echo $this->wrap_output('class', $this->td_css());
             echo $this->wrap_output('x-text', $headText);
             echo $this->wrap_output(':data-value', $xValue);
@@ -44,13 +46,15 @@ class Table_View extends ValueList_View {
             echo $this->indent(4) . "</template>".PHP_EOL;
 
             echo $this->indent(3)."</tr>".PHP_EOL;
+            echo $this->indent(3) . "</template>".PHP_EOL;
+
             echo $this->indent(2)."</thead>".PHP_EOL;
         }
 
         // row
         list('name'=>$tdText, 'value'=>$xValue, 'data'=>$boundData) = $this->get_bind_name_value($outputData['item'], 'Column');
         echo $this->indent(2) . "<tbody>".PHP_EOL;
-        echo $this->indent(2) . '<template x-for="(row, idxOfRow) in row" :key="idxOfRow">'.PHP_EOL;
+        echo $this->indent(2) . '<template x-for="(row, idxOfRow) in body" :key="idxOfRow">'.PHP_EOL;
         echo $this->indent(3) . "<tr>".PHP_EOL;
         echo $this->indent(4) . '<template x-for="(itemOfColumn, idxOfColumn) in row" :key="idxOfColumn">'.PHP_EOL;
         echo $this->indent(4) . "<th";
@@ -70,9 +74,10 @@ class Table_View extends ValueList_View {
             echo $this->indent(2);
             echo "<tfoot";
             echo $this->wrap_output('class', $this->footer_css()).">".PHP_EOL;
+            echo $this->indent(3) . "<template x-for=\"(footerRow, idxFooterRow) in footer\" :key=\"idxFooterRow\">".PHP_EOL;
             echo $this->indent(3)."<tr>".PHP_EOL;
 
-            echo $this->indent(4) . "<template x-for=\"(itemOfFooter, idxOfFooter) in footer\" :key=\"idxOfFooter\">".PHP_EOL;
+            echo $this->indent(4) . "<template x-for=\"(itemOfFooter, idxOfFooter) in footerRow\" :key=\"idxOfFooter\">".PHP_EOL;
             echo $this->indent(4)."<th";
             echo $this->wrap_output('class', $this->td_css());
             echo $this->wrap_output('x-text', $footerText);
@@ -82,6 +87,7 @@ class Table_View extends ValueList_View {
             echo $this->indent(4) . "</template>".PHP_EOL;
 
             echo $this->indent(3)."</tr>".PHP_EOL;
+            echo $this->indent(3) . "</template>".PHP_EOL;
             echo $this->indent(2)."</tfoot>".PHP_EOL;
         }
 
@@ -93,6 +99,9 @@ class Table_View extends ValueList_View {
         $space =  $this->indent();
         $headless = $this->data['meta']['custom']['headless'];
         $footless = $this->data['meta']['custom']['footless'];
+        $headerRow = @!$this->data['meta']['custom']['headless'] ? intval($this->data['meta']['custom']['headerRow'])?:1 : 0;
+        $footerRow = !$this->data['meta']['custom']['footless'] ? intval($this->data['meta']['custom']['footerRow'])?:1 : 1;
+
         echo "{$space}<div";
         echo $this->build_main_attrs();
         echo ">".PHP_EOL;
@@ -101,15 +110,15 @@ class Table_View extends ValueList_View {
             $xdata = [];
             if (!$headless) {
                 $xdata[] = "header: []";
-                $headerCode = "header = {$outputData['name']}?.shift();";
+                $headerCode = "header = {$outputData['name']}?.splice(0, {$headerRow});";
             }
             if (!$footless) {
                 $xdata[] = "footer: []";
-                $footerCode = "footer = {$outputData['name']}?.pop(); ";
+                $footerCode = "footer = {$outputData['name']}?.splice(-{$footerRow}); ";
             }
-            $xdata[] = "row: []";
+            $xdata[] = "body: []";
             echo $this->wrap_output('x-data', "{ ".join(',', $xdata)." }");
-            echo $this->wrap_output('x-init', "{$footerCode}{$headerCode}row={$outputData['name']}");
+            echo $this->wrap_output('x-init', "{$footerCode}{$headerCode}body={$outputData['name']}");
         }
         echo $this->wrap_output('class', $this->table_class());
         echo ">".PHP_EOL;
@@ -149,68 +158,31 @@ class Table_View extends ValueList_View {
         $style['overflow'] = 'overflow:hidden';
         return $style;
     }
+    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null, $iteratorName='')
+    {
+        // build_valuelist_static 和 build_valuelist_iterator中实现
+    }
+
+    private function get_demo($row, $column) {
+        $data = [];
+        for($i = 0; $i < $row; $i++){
+            for ($j =0; $j < $column; $j++){
+                $data[$i][$j] = ['name'=>"row {$i} column {$j}"];
+            }
+        }
+        return $data;
+    }
 
     private function get_table_data() {
         $excelData = $this->data['meta']['custom']['data'];
-        $data = ['header'=>[], 'row'=>[], 'footer'=>[]];
-        $data['header'] = $excelData['header'] ?: [];
-        $data['row'] = $excelData['row'] ?: [];
-        $data['footer'] = $excelData['footer'] ?: [];
+        if ($excelData) return $excelData;
 
-        if (!$data['header']) {
-            if ($data['row'] && @!$this->data['meta']['custom']['headless']){
-                $data['header'] = $data['row'][0];
-            }else{
-                $data['header'] = [
-                    ['name'=>'Header 1'],
-                    ['name'=>'Header 2'],
-                    ['name'=>'Header 3'],
-                ];
-            }
-        }
-        if (!$data['footer']) {
-            if ($data['row'] && @!$this->data['meta']['custom']['footless']){
-                $data['footer'] =  count($data['row']) > 1 ? end($data['row']) : [];
-            }else {
-                $data['footer'] = [
-                    ['name' => 'Footer 1'],
-                    ['name' => 'Footer 2'],
-                    ['name' => 'Footer 3'],
-                ];
-            }
-        }
-        if ($data['row']) {
-            if (@!$this->data['meta']['custom']['headless']){
-                array_splice($data['row'], 0, 1);
-            }
-            if (@!$this->data['meta']['custom']['footless']){
-                array_splice($data['row'], -1, 1);
-            }
-        }else{
-            $data['row'] = [
-                [
-                    ['name'=>'row 1 column 1'],
-                    ['name'=>'row 1 column 2'],
-                    ['name'=>'row 1 column 3'],
-                ],
-                [
-                    ['name'=>'row 2 column 1'],
-                    ['name'=>'row 2 column 2'],
-                    ['name'=>'row 2 column 3'],
-                ],
-                [
-                    ['name'=>'row 3 column 1'],
-                    ['name'=>'row 3 column 2'],
-                    ['name'=>'row 3 column 3'],
-                ],
-                [
-                    ['name'=>'row 4 column 1<br/> new line'],
-                    ['name'=>'row 4 column 2'],
-                    ['name'=>'row 4 column 3'],
-                ],
-            ];
-        }
-        return $data;
+        $headerRow = @!$this->data['meta']['custom']['headless'] ? intval($this->data['meta']['custom']['headerRow'])?:1 : 0;
+        $footerRow = !$this->data['meta']['custom']['footless'] ? intval($this->data['meta']['custom']['footerRow'])?:1 : 1;
+        $bodyRow = intval($this->data['meta']['custom']['bodyRow'])?:1;
+        $columnCount = intval($this->data['meta']['custom']['columnCount'])?:2;
+
+        return $this->get_demo($bodyRow + $headerRow + $footerRow, $columnCount);
     }
     private function header_style() {
         $styleMap = $this->data['meta']['style'];
@@ -301,64 +273,158 @@ class Table_View extends ValueList_View {
         }
         return $newCss ? join(' ', $newCss) : null;
     }
+    private function get_column_items() {
+        if ($this->columnItems) return $this->columnItems;
+        if (!$this->childViews) return [];
+        $items = [];
+        foreach ($this->childViews as $view){
+            $placeInParent = $view->data['placeInParent'];
+            if (!$placeInParent) continue;
+            list($row, $column) = explode('-', $placeInParent);
+            if (!$items[$row]) $items[$row] = [];
+            if (!$items[$row][$column]) $items[$row][$column] = [];
+            $items[$row][$column][] = $view;
+        }
+        $this->columnItems = $items;
+        return $this->columnItems;
+    }
+    private function output_td_content($row, $column, $indent, $staticData=[]) {
+        $columnItems = $this->get_column_items();
+        if (!$columnItems[$row][$column]){
+            echo $this->indent(4) . @$staticData[$row][$column]['name'] . PHP_EOL;
+            return;
+        }
+
+        foreach ($columnItems[$row][$column] as $view){
+            $view->increase_indent($indent);
+            $view->output();
+        }
+
+    }
+    private function get_td_width($column){
+        $size = @$this->data['meta']['custom']['size']['width'][$column];
+        return $size ? "width:${size}px": "";
+    }
+    private function get_tr_height($row){
+        $size = @$this->data['meta']['custom']['size']['height'][$row];
+        return $size ? "height:${size}px": "";
+    }
 
     private function build_static_table($staticData=null){
+        $headerRow = $this->data['meta']['custom']['headless'] ? 0 : (intval($this->data['meta']['custom']['headerRow'])?:1);
+        $footerRow = $this->data['meta']['custom']['footless'] ? 0 : intval($this->data['meta']['custom']['footerRow'])?:1;
+        $bodyRow = intval($this->data['meta']['custom']['bodyRow'])?:1;
+        $columnCount = intval($this->data['meta']['custom']['columnCount'])?:2;
+        $columnConfig = $this->data['meta']['custom']['columnConfig'];
+
         //header
         if (!$this->data['meta']['custom']['headless']){
             echo $this->indent(2);
             echo "<thead";
             echo $this->wrap_output('class', $this->header_css())
                 .">".PHP_EOL;
-            echo $this->indent(3)."<tr>".PHP_EOL;
-            foreach($staticData['header'] as $index => $item){
-                echo $this->indent(4)."<th";
-                echo $this->wrap_output('class', $this->td_css());
-                echo ">";
-                echo $item['name'];
-                echo "</th>".PHP_EOL;
+            for($row=0; $row < $headerRow; $row++){
+                echo $this->indent(3)."<tr";
+                echo $this->wrap_output('style', $this->get_tr_height($row));
+                echo ">".PHP_EOL;
+                for($column=0; $column < $columnCount; $column++){
+                    if ($columnConfig[$row][$column]['isMerged']) continue;
+                    echo $this->indent(4)."<th";
+                    echo $this->wrap_output('class', $this->td_css());
+                    echo $this->wrap_output('style', $this->get_td_width($column));
+                    echo $this->wrap_output('colspan', $columnConfig[$row][$column]['colspan']);
+                    echo $this->wrap_output('rowspan', $columnConfig[$row][$column]['rowspan']);
+                    echo ">".PHP_EOL;
+                    $this->output_td_content($row, $column, 4, $staticData);
+                    echo $this->indent(4) . "</th>".PHP_EOL;
+                }
+                echo $this->indent(3)."</tr>".PHP_EOL;
             }
-            echo $this->indent(3)."</tr>".PHP_EOL;
+
             echo $this->indent(2)."</thead>".PHP_EOL;
         }
 
         // row
-        echo $this->indent(2);
-        echo "<tbody>".PHP_EOL;
-        foreach($staticData['row'] as $rindex => $row){
-            echo $this->indent(3)."<tr>".PHP_EOL;
-            foreach($row as $cindex => $item) {
-                echo $this->indent(4)
-                    . "<td";
-                echo $this->wrap_output('class', $this->td_css());
-                echo ">";
-                echo $item['name'];
-                echo "</td>".PHP_EOL;
-            }
-            echo $this->indent(3)."</tr>".PHP_EOL;
+        $outputDatas = $this->get_output_datas($dataNames);
+        if ($dataNames['NONE']){
+            $this->build_data_bind_body($headerRow,$columnCount,$columnConfig,$outputDatas, $dataNames);
+        }else{
+            $this->build_static_body($headerRow,$bodyRow,$columnCount,$columnConfig,$staticData);
         }
-        echo $this->indent(2)."</tbody>".PHP_EOL;
-
 
         //footer
         if (!$this->data['meta']['custom']['footless']){
             echo $this->indent(2);
             echo "<tfoot";
             echo $this->wrap_output('class', $this->footer_css()).">".PHP_EOL;
-            echo $this->indent(3)."<tr>".PHP_EOL;
-            foreach($staticData['footer'] as $index => $item){
-                echo $this->indent(4)."<th";
-                echo $this->wrap_output('class', $this->td_css());
-                echo ">";
-                echo $item['name'];
-                echo "</th>".PHP_EOL;
+            for($row=0; $row < $footerRow; $row++) {
+                echo $this->indent(3) . "<tr";
+                echo $this->wrap_output('style', $this->get_tr_height($row + $bodyRow + $headerRow));
+                echo ">".PHP_EOL;
+                for($column=0; $column < $columnCount; $column++){
+                    if ($columnConfig[$row + $bodyRow + $headerRow][$column]['isMerged']) continue;
+                    echo $this->indent(4) . "<th";
+                    echo $this->wrap_output('class', $this->td_css());
+                    echo $this->wrap_output('colspan', $columnConfig[$row + $bodyRow + $headerRow][$column]['colspan']);
+                    echo $this->wrap_output('rowspan', $columnConfig[$row + $bodyRow + $headerRow][$column]['rowspan']);
+                    echo ">".PHP_EOL;
+                    $this->output_td_content($row + $headerRow + $bodyRow, $column, 4, $staticData);
+                    echo $this->indent(4) . "</th>" . PHP_EOL;
+                }
+                echo $this->indent(3) . "</tr>" . PHP_EOL;
             }
-            echo $this->indent(3)."</tr>".PHP_EOL;
             echo $this->indent(2)."</tfoot>".PHP_EOL;
         }
     }
+    private function build_static_body($headerRow,$bodyRow,$columnCount,$columnConfig,$staticData) {
+        echo $this->indent(2);
+        echo "<tbody>".PHP_EOL;
+        for($row=0; $row < $bodyRow; $row++) {
+            echo $this->indent(3) . "<tr";
+            echo $this->wrap_output('style', $this->get_tr_height($row + $headerRow));
+            echo ">".PHP_EOL;
+            for ($column=0; $column < $columnCount; $column++) {
+                if ($columnConfig[$row + $headerRow][$column]['isMerged']) continue;
+                echo $this->indent(4). "<td";
+                echo $this->wrap_output('style', $this->get_td_width($column));
+                echo $this->wrap_output('class', $this->td_css());
+                echo $this->wrap_output('colspan', $columnConfig[$row + $headerRow][$column]['colspan']);
+                echo $this->wrap_output('rowspan', $columnConfig[$row + $headerRow][$column]['rowspan']);
+                echo ">".PHP_EOL;
+                $this->output_td_content($row + $headerRow, $column, 4, $staticData);
+                echo $this->indent(4) . "</td>" . PHP_EOL;
+            }
+            echo $this->indent(3) . "</tr>" . PHP_EOL;
+        }
+        echo $this->indent(2)."</tbody>".PHP_EOL;
+    }
+    private function build_data_bind_body($headerRow,$columnCount,$columnConfig,$outputDatas, $dataNames) {
+        echo $this->indent(2);
+        echo "<tbody>".PHP_EOL;
+        $dataName = $dataNames['NONE'];
+        $iterateDataName = $outputDatas['NONE']['name'] ?: $dataName;
 
-    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null, $iteratorName='')
-    {
-        // build_valuelist_static 和 build_valuelist_iterator中实现
+        echo $this->indent(3) . '<template x-for="(itemOf'.$iterateDataName.', idxOf'.$iterateDataName.') in '.$dataName.'" :key="idxOf'.$iterateDataName.'">'.PHP_EOL;
+        $this->set_iterator_index_name("idxOf{$iterateDataName}");
+        $this->set_iterator_data_name("itemOf{$iterateDataName}");
+
+        echo $this->indent(3) . "<tr";
+        echo $this->wrap_output('style', $this->get_tr_height($headerRow));
+        echo ">".PHP_EOL;
+        for ($column=0; $column < $columnCount; $column++) {
+            if ($columnConfig[$headerRow][$column]['isMerged']) continue;
+            echo $this->indent(4). "<td";
+            echo $this->wrap_output('style', $this->get_td_width($column));
+            echo $this->wrap_output('class', $this->td_css());
+            echo $this->wrap_output('colspan', $columnConfig[$headerRow][$column]['colspan']);
+            echo $this->wrap_output('rowspan', $columnConfig[$headerRow][$column]['rowspan']);
+            echo ">".PHP_EOL;
+            $this->output_td_content($headerRow, $column, 4, []);
+            echo $this->indent(4) . "</td>" . PHP_EOL;
+        }
+        echo $this->indent(3) . "</tr>" . PHP_EOL;
+        echo $this->indent(3) . "</template>" . PHP_EOL;
+
+        echo $this->indent(2)."</tbody>".PHP_EOL;
     }
 }

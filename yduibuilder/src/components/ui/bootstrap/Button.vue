@@ -3,7 +3,7 @@
     <a :draggable='draggable' :class="[btnCss, dragableCss]" :style="btnStyle"
        :id="myId" :data-type="uiconfig.type"
        :data-isContainer="false" href="#"
-       @dblclick="inlineEditItemId=uiconfig.meta.id"  @keyup.enter="inlineEditItemId=''"
+       @dblclick.stop.prevent="inlineEditItemId=uiconfig.meta.id"  @keyup.enter="inlineEditItemId=''"
        :contenteditable="inlineEditItemId==uiconfig.meta.id"
        :data-pageid="pageid">
       <IconWrapper :uiconfig="uiconfig">{{uiconfig.meta.title}}</IconWrapper>
@@ -13,7 +13,7 @@
     <div :draggable='draggable' :class="[btnCss, dragableCss]" :style="btnStyle"
             :id="myId" :data-type="uiconfig.type"
             :data-pageid="pageid" :data-isContainer="false"
-            @dblclick="inlineEditItemId=uiconfig.meta.id"  @keyup.enter="inlineEditItemId=''"
+            @dblclick.stop.prevent="inlineEditItemId=uiconfig.meta.id"  @keyup.enter="inlineEditItemId=''"
             :contenteditable="inlineEditItemId==uiconfig.meta.id"
             :type="buttonType">
       <IconWrapper :uiconfig="uiconfig">{{uiconfig.meta.title}}</IconWrapper>

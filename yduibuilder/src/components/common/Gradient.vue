@@ -422,7 +422,7 @@ export default {
       if (deg > 90) { // 右下 case 7
         const y = centerY + Math.sin(2 * Math.PI / 360 * (deg - 90)) * 50
         const x = centerX + Math.sin(2 * Math.PI / 360 * (90 - (deg - 90))) * 50
-        console.log(`${x},${y}:${origX},${origY}`)
+        // console.log(`${x},${y}:${origX},${origY}`)
         return `transform: translate(${x - origX}px, ${y - origY}px)`
       }
       // 小于90度 右上 case 8

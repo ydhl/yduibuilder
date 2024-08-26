@@ -35,7 +35,7 @@ class Nav_View extends ValueList_View {
     protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex=null, $iteratorName='')
     {
         list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
-        $staticValue = $staticData ? $staticData['value']?:$staticData['name'] : null;
+        $staticValue = $staticData ? (strlen($staticData['value'])?$staticData['value']:$staticData['name']) : null;
         $myid = $this->myid();
 
         echo $this->indent(3) . "<div";

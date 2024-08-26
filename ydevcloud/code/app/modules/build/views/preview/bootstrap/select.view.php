@@ -15,7 +15,7 @@ class Select_View extends ValueList_View {
     protected function build_valuelist($bindOutput=null, $itemName=null, $staticData=null, $staticDataIndex=null, $iteratorName=''){
         list('name'=>$name, 'value'=>$value, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($bindOutput, $itemName);
         $inputDataName = $this->get_input_data_name($inputIsArr);
-        $staticValue = $staticData['value'] ?: $staticData['name'];
+        $staticValue = strlen($staticData['value'])?$staticData['value']:$staticData['name'];
 
         echo $this->indent(2).'<option';
         if ($value){
@@ -25,7 +25,7 @@ class Select_View extends ValueList_View {
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$value} : ''" : null);
             echo $this->wrap_output(':selected', "alpinejs_in_array(\$el, '{$inputDataName}', {$value})");
         }else{
-            echo $this->wrap_output("value", $staticData['value']?:$staticData['name']);
+            echo $this->wrap_output("value", strlen($staticData['value'])?$staticData['value']:$staticData['name']);
             echo $this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null);
             echo $this->wrap_output(':selected', "alpinejs_in_array(\$el, '{$inputDataName}', '{$staticValue}')");
         }

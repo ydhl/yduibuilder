@@ -634,7 +634,7 @@ function yze_ajax () {
         if (errorCallback) {
           errorCallback(errorThrown)
         } else {
-          console.log(errorThrown)
+          console.log('yze_ajax', errorThrown)
         }
       },
       success: function (data, textStatus, jqXHR) {
@@ -714,7 +714,7 @@ function yze_ajax () {
           if (errorCallback) {
             errorCallback(errorThrown)
           } else {
-            console.log(errorThrown)
+            console.log('yze_ajax', errorThrown)
           }
         },
         success: function (data, textStatus, jqXHR) {

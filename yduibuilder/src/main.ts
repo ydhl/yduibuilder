@@ -10,6 +10,7 @@ import '@layui/layer-vue/lib/index.css'
 import DataConnect from '@/components/common/DataConnect.vue'
 import DataCheckPanel from '@/components/common/DataCheckPanel.vue'
 import EventAction from '@/components/common/EventAction.vue'
+import UITreeWrap from '@/components/sidebar/uitree/UITreeWrap.vue'
 
 if (window.top === window) {
   if (navigator.userAgent.indexOf('Firefox') > -1) {
@@ -35,4 +36,5 @@ app.use(store).use(router).use(layer).use(i18n)
   .component('DataConnect', DataConnect)
   .component('DataCheckPanel', DataCheckPanel)
   .component('EventAction', EventAction)
+  .component('UITreeWrap', UITreeWrap)
   .mount('#app')

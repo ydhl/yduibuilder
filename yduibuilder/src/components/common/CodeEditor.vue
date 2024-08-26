@@ -3,7 +3,7 @@
       <div class="text-danger p-1 m-1 fs-7" v-if="tip">{{tip}}</div>
       <div class="d-flex align-items-stretch">
         <div ref="editor" class="flex-grow-1" :style="editStyle"></div>
-        <div style="width: 300px;border-left:1px solid #dcdcdb" class="flex-shrink-0 d-flex">
+        <div v-if="!hideVariable" style="width: 300px;border-left:1px solid #dcdcdb" class="flex-shrink-0 d-flex">
           <div class="vertical-tab">
             <a :class="{'vertical-tab-item': true, 'active': scope=='local'}" @click="scope='local'" href="javascript:void(0)">{{t('variable.localScope')}}</a>
             <a :class="{'vertical-tab-item': true, 'active': scope=='page'}" @click="scope='page'" href="javascript:void(0)">{{t('variable.pageScope')}}</a>
@@ -54,6 +54,10 @@ export default {
     surroundCode: String, // 操作符或前后代码，@表示编辑器中的代码嵌入的位置
     editStyle: String,
     title: String,
+    hideVariable: {
+      default: false,
+      type: Boolean
+    },
     tip: String,
     variables: {
       default: () => [],
@@ -108,7 +112,6 @@ export default {
     })
     onMounted(() => {
       if (props.language === 'json' && props.schema) {
-        console.log(props.schema)
         // json格式配置
         monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
           validate: true,

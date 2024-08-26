@@ -790,12 +790,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                     case 'popup': $this->build_popup_event_code($action, $actionCodeLines);break;
                     case 'call': $this->build_call_event_code($action, $actionCodeLines);break;
                     case 'webapi': {
-                        // api 主体单独生成一个方法
-                        $innerMethod = "call_api_in_{$html_event_name}";
-                        $actionCodeLines[] = 'page.'.$this->myId(true)."_{$innerMethod}(event)";
-                        $apicCodes = [];
-                        $this->build_webapi_code($action, $apicCodes);
-                        $eventCodes[$innerMethod] = ['code'=>$apicCodes,'args'=>['event'],'comment'=>''];
+                        $this->build_webapi_code($action, $actionCodeLines);
                         break;
                     }
                     case 'redirect': $this->build_redirect_code($action, $actionCodeLines);break;
@@ -1371,11 +1366,12 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * - pagination
      * - radio
      * - select
+     * - table
      *
      * @return bool
      */
     protected function is_iteration_ui(){
-        return in_array(strtolower($this->data['type']),['breadcrumb','carousel','checkbox','collapse','dropdown','list','nav','radio','select']);
+        return in_array(strtolower($this->data['type']),['breadcrumb','carousel','checkbox','collapse','dropdown','list','nav','radio','select', 'table', 'pagination']);
     }
 
     /**

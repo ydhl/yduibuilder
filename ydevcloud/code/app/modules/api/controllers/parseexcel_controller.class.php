@@ -42,35 +42,67 @@ class Parseexcel_Controller extends YZE_Resource_Controller {
         if (!$project->get_member($loginUser->id)) return YZE_JSON_View::error($this, __('project not found'));
         $file = find_by_uuid(File_Model::CLASS_NAME, $fid);
         if (!$file) return YZE_JSON_View::error($this, __('file not found'));
-        $data = [
-            'header'=>[],
-            'footer'=>[],
-            'row'=>[]
-        ];
+        $data = [];
+        $config = [];
+        $mergedColumn = [];
         try{
             $tmp = tempnam('/tmp', 'excel');
             @file_put_contents($tmp, file_get_contents(UPLOAD_SITE_URI.$file->url));
             $spreadsheet = IOFactory::load($tmp); //载入excel表格
 
             $worksheet = $spreadsheet->getActiveSheet();
-    //        $rowData = array_map(function ($row) {
-    //            return array_filter($row);
-    //        },$worksheet->toArray());
             $rowData = $worksheet->toArray();
+            $mergeCells = $worksheet->getMergeCells();
+            foreach ($mergeCells as $mergeCell){
+                list ($mergeFrom, $mergeTo) = explode(":", $mergeCell);
+                $mergeFromRow = preg_replace("/\D+/", "", $mergeFrom);
+                $mergeToRow = preg_replace("/\D+/", "", $mergeTo);
+                $mergeFromColumn = $this->get_column_index(preg_replace("/\d+/", "", $mergeFrom));
+                $mergeToColumn = $this->get_column_index(preg_replace("/\d+/", "", $mergeTo));
+                $tmp = [];
+                if ($mergeFromRow !== $mergeToRow) {
+                    $tmp['rowspan'] = $mergeToRow - $mergeFromRow + 1;
+                }
+                if ($mergeFromColumn !== $mergeToColumn) {
+                    $tmp['colspan'] = $mergeToColumn - $mergeFromColumn + 1;
+                }
+                $config[$mergeFromRow-1][$mergeFromColumn] = $tmp;
+
+                if ($mergeFromRow === $mergeToRow){// 跨列
+                    for($col = $mergeFromColumn + 1; $col <= $mergeToColumn; $col++) {
+                        $mergedColumn[$mergeFromRow-1][$col] = true;
+                    }
+                }else if ($mergeFromColumn === $mergeToColumn){// 跨行
+                    for($row = $mergeFromRow; $row <= $mergeToRow-1; $row++) { //行的所以是从1开始
+                        $mergedColumn[$row][$mergeFromColumn] = true;
+                    }
+                }else{//跨行跨列
+//                    echo ($mergeFromRow-1).' / '.$mergeFromColumn." : ".($mergeToRow-1). '/' .$mergeToColumn;
+                    for($row = $mergeFromRow-1; $row <= $mergeToRow-1; $row++) {
+                        for($col = $mergeFromColumn; $col <= $mergeToColumn; $col++) {
+                            if ($row == $mergeFromRow - 1 && $col == $mergeFromColumn) continue;// 第一个单元格忽略
+                            $mergedColumn[$row][$col] = true;
+                        }
+                    }
+                }
+            }
 
     //        print_r($rowData);
-            $data['row'] = array_map(function ($row) {
-                return array_map(function ($column) {
-                    return ['name'=>$column];
-                }, $row);
-            }, $rowData);
-            // 第一行默认为header，最后一行默认为footer
-            $data['header'] = array_shift($data['row']);
-            $data['footer'] = array_pop($data['row']);
+//            print_r($mergedColumn);
+            array_walk($rowData, function (&$row, $rowIndex) use($mergedColumn, &$config) {
+                array_walk($row, function (&$column, $colIndex) use($mergedColumn, $rowIndex, &$config) {
+                    $config[$rowIndex][$colIndex]['isMerged'] = (bool)@$mergedColumn[$rowIndex][$colIndex];
+                    $column = ['name'=>$column];
+                });
+            });
         }catch (\Exception $e){
-            $data['row'][] = [['name'=>$e->getMessage()]];
+            $rowData[] = [['name'=>$e->getMessage()]];
         }
-        return YZE_JSON_View::success($this, $data);
+        return YZE_JSON_View::success($this, ['data'=>$rowData,'config'=>$config ?: new \stdClass()]);
+    }
+    private function get_column_index($str){
+        $str = trim(strtoupper($str));
+        return (strlen($str)-1) * 26 + ord(substr($str, -1)) - 65;
     }
 
     public function exception(\Exception $e){

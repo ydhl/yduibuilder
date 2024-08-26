@@ -40,7 +40,16 @@ function findUIItemInfo (state: Record<any, any>, uiid: string) {
   }
   return _find(uiid, state.uiconfig)
 }
-
+function isSubItem (targetId, uiconfig:UIBase|null) {
+  if (!uiconfig) return false
+  if (uiconfig.meta.id === targetId) return true
+  if (!uiconfig.items) return false
+  for (const item of uiconfig.items) {
+    const rst = isSubItem(targetId, item)
+    if (rst) return true
+  }
+  return false
+}
 const store = {
   state: {
     project: {},
@@ -135,6 +144,30 @@ const store = {
      */
     getUIItemInPage: (state) => (uiid: string) => {
       return findUIItemInfo(state, uiid)
+    },
+    /**
+     * 检查parentUuid是不是childuuid的上级ui
+     * @param state
+     */
+    isParent: (state) => (childUuid: string, parentUuid: string) => {
+      if (!parentUuid) {
+        return false
+      }
+      const obj = findUIItemInfo(state, parentUuid)
+      if (obj.index === -1) return false
+      return isSubItem(childUuid, obj.uiConfig)
+    },
+    /**
+     * 检查childUuid是不是parentUuid的上级下级
+     * @param state
+     */
+    isSub: (state) => (childUuid: string, parentUuid: string) => {
+      if (!parentUuid) {
+        return false
+      }
+      const obj = findUIItemInfo(state, parentUuid)
+      if (obj.index === -1) return false
+      return isSubItem(childUuid, obj.uiConfig)
     }
   }
 }

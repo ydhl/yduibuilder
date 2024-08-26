@@ -29,7 +29,7 @@ class List_View extends ValueList_View {
         list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
 
         if (!$outputData){
-            $staticValue = $staticData['value']?:$staticData['name'];
+            $staticValue = strlen($staticData['value'])?$staticData['value']:$staticData['name'];
             $xValue = "'{$staticValue}'";
             $xText = "'{$staticData['name']}'";
         }

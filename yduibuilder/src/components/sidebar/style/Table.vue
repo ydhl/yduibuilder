@@ -8,15 +8,46 @@
           <input type="checkbox" v-model="headless" value="1"> {{ t('style.table.headless') }}
         </label>
       </div>
-      <div class="col-sm-9 offset-sm-3" v-if="!headless">
-        <div class="input-group input-group-sm">
-          <label class="input-group-text">{{t("style.predefinedClass")}}</label>
-          <select class="form-select" v-model="headerCss">
-            <option :key="value" :value="value" v-for="value in cssMap['backgroundTheme']">{{value}}</option>
-          </select>
+      <template v-if="!headless">
+        <div class="col-sm-9 offset-sm-3">
+          <div class="input-group input-group-sm">
+            <label class="input-group-text">{{t("style.predefinedClass")}}</label>
+            <select class="form-select form-select-sm" v-model="headerCss">
+              <option :key="value" :value="value" v-for="value in cssMap['backgroundTheme']">{{value}}</option>
+            </select>
+          </div>
+          <ColorPicker css="form-control" v-model="headerColor"></ColorPicker>
         </div>
-        <ColorPicker css="form-control" v-model="headerColor"></ColorPicker>
-      </div>
+        <div class="col-sm-9 offset-sm-3 mt-1">
+          <div class="input-group input-group-sm">
+            <label class="input-group-text">{{t("style.table.headerRow")}}</label>
+            <input type="number" min="1" max="10" class="form-control-sm form-control" v-model="headerRow">
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-sm-3 text-end"> {{ t('style.table.body') }}</div>
+      <template v-if="hasBondValueList">
+        <div class="col-sm-9">
+          {{t('style.table.noBodyWhenBoundValueList')}}
+        </div>
+      </template>
+      <template v-else>
+        <div class="col-sm-9">
+          <div class="input-group input-group-sm">
+            <label class="input-group-text">{{t("style.table.columnCount")}}</label>
+            <input type="number" min="1" class="form-control form-control-sm" v-model="columnCount">
+          </div>
+        </div>
+        <div class="col-sm-9 offset-sm-3 mt-1">
+          <div class="input-group input-group-sm">
+            <label class="input-group-text">{{t("style.table.bodyRow")}}</label>
+            <input type="number" min="1" class="form-control-sm form-control" v-model="bodyRow">
+          </div>
+        </div>
+      </template>
     </div>
     <div class="row mt-2">
       <div class="col-sm-3 text-end"> {{ t('style.table.footer') }}</div>
@@ -24,15 +55,23 @@
         <label class=" form-check-label text-truncate d-block">
           <input type="checkbox" v-model="footless" value="1"> {{ t('style.table.footless') }}</label>
       </div>
-      <div class="col-sm-9 offset-sm-3" v-if="!footless">
-        <div class="input-group input-group-sm">
-          <label class="input-group-text">{{t("style.predefinedClass")}}</label>
-          <select class="form-select" v-model="footerCss">
-            <option :key="value" :value="value" v-for="value in cssMap['backgroundTheme']">{{value}}</option>
-          </select>
+      <template v-if="!footless">
+        <div class="col-sm-9 offset-sm-3">
+          <div class="input-group input-group-sm">
+            <label class="input-group-text">{{t("style.predefinedClass")}}</label>
+            <select class="form-select form-select-sm" v-model="footerCss">
+              <option :key="value" :value="value" v-for="value in cssMap['backgroundTheme']">{{value}}</option>
+            </select>
+          </div>
+          <ColorPicker css="form-control" v-model="footerColor"></ColorPicker>
         </div>
-        <ColorPicker css="form-control" v-model="footerColor"></ColorPicker>
-      </div>
+        <div class="col-sm-9 offset-sm-3 mt-1">
+          <div class="input-group input-group-sm">
+            <label class="input-group-text">{{t("style.table.footerRow")}}</label>
+            <input type="number" min="1" max="10" class="form-control-sm form-control" v-model="footerRow">
+          </div>
+        </div>
+      </template>
     </div>
     <div class="row mt-2">
       <div class="col-sm-3 text-end"> {{ t('style.table.accented') }}</div>
@@ -102,6 +141,7 @@ export default {
     const info = initUI()
     const { t } = useI18n()
     const store = useStore()
+
     const headless = info.computedWrap('headless', 'custom', false)
     const stripedRow = info.computedWrap('stripedRow', 'custom', false)
     const hoverableRow = info.computedWrap('hoverableRow', 'custom', false)
@@ -114,7 +154,14 @@ export default {
     const headerColor = info.computedWrap('header', 'custom')
     const footerCss = info.computedWrap('footer', 'css')
     const footerColor = info.computedWrap('footer', 'custom')
+    const columnCount = info.computedWrap('columnCount', 'custom', 2)
+    const footerRow = info.computedWrap('footerRow', 'custom', 1)
+    const headerRow = info.computedWrap('headerRow', 'custom', 1)
+    const bodyRow = info.computedWrap('bodyRow', 'custom', 1)
     const project = computed(() => store.state.design.project)
+    const hasBondValueList = computed(() => {
+      return !!info.selectedUIItem.value?.dataOut?.VALUELIST
+    })
     const currExcelFile = computed({
       get () {
         const files = info.getMeta('datasource', 'files') || []
@@ -141,13 +188,15 @@ export default {
           YDJS.alert(rst?.msg || t('table.canNotParseExcel'), 'Oops')
           return
         }
-        const data = {
-          header: rst.data.header || [],
-          footer: rst.data.footer || [],
-          row: rst.data.row || []
-        }
-
+        const data = rst.data.data || []
+        const config = rst.data.config || {}
+        // 导入excel后默认是无头无脚的
+        headless.value = true
+        footless.value = true
+        bodyRow.value = data.length
+        columnCount.value = data?.[0].length
         info.setMeta('data', data, 'custom')
+        info.setMeta('columnConfig', config, 'custom')
       }, 'json')
     }
     const projectId = computed(() => store.state.design.project.id)
@@ -160,8 +209,13 @@ export default {
       headerColor,
       footerColor,
       stripedRow,
+      bodyRow,
+      footerRow,
+      headerRow,
+      columnCount,
       hoverableRow,
       currExcelFile,
+      hasBondValueList,
       grid,
       t,
       small,

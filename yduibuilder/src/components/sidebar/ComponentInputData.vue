@@ -74,11 +74,12 @@ export default {
     watch(selectedUIItemId, (n, v) => {
       if (n !== v) loadData(false)
     })
-    const removeBound = (uuid) => {
+    const removeBound = (fromUuid, toUuid) => {
       ydhl.postJson('api/bind/deleteconnect.json', {
         to_page_uuid: subpageId.value,
         from_page_uuid: selectedPageId.value,
-        to_uuid: uuid
+        to_uuid: toUuid,
+        from_uuid: fromUuid
       }).then((rst: any) => {
         if (!rst?.success) {
           ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
@@ -91,7 +92,7 @@ export default {
     // 选择的数据toData绑定给 界面上的数据From
     const updateConnectData = (fromRootUuid, fromPath, fromUuid, toData, remove, desc) => {
       if (remove) {
-        removeBound(fromRootUuid)
+        removeBound(toData.data?.fromUuid, fromRootUuid)
         return
       }
       if (!toData || ydhl.isEmptyObject(toData)) return

@@ -33,7 +33,7 @@ import { computed, nextTick, Ref, ref, watch } from 'vue'
 import { useStore } from 'vuex'
 
 export default {
-  name: 'UITreeLoader',
+  name: 'UITreeItem',
   props: {
     uiconfig: Object,
     index: Number,

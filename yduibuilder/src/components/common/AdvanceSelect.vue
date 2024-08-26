@@ -15,10 +15,8 @@
         <div v-else-if="option.header"><h6 class="dropdown-header">{{option.header}}</h6></div>
         <div v-else><hr class="dropdown-divider"></div>
       </template>
-      <template v-if="desc">
-        <div><hr class="dropdown-divider"></div>
-        <div><div class="ps-3 pe-3 text-muted fs-7">{{ desc }}</div></div>
-      </template>
+      <div><hr class="dropdown-divider"></div>
+      <div><div class="ps-3 pe-3 text-muted fs-7">{{ desc}}&nbsp;</div></div>
     </div>
   </template>
   <template v-else>
@@ -63,10 +61,8 @@
             <div v-else><hr class="dropdown-divider"></div>
           </template>
         </template>
-        <template v-if="desc">
-          <div><hr class="dropdown-divider"></div>
-          <div><div class="ps-3 pe-3 text-muted fs-7">{{ desc }}</div></div>
-        </template>
+        <div><hr class="dropdown-divider"></div>
+        <div><div class="ps-3 pe-3 text-muted fs-7">{{ desc }}&nbsp;</div></div>
       </div>
     </div>
   </template>

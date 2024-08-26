@@ -11,7 +11,7 @@ use \yangzie\YZE_DBAImpl;
  * @package common
  */
 trait File_Model_Method{
-    public static function get_files($file_name, $project_id, $type='', $page=1) {
+    public static function get_files($file_name, $project_id, $type='', $page=1, &$total=0) {
         $page = intval($page);
         if ($page<1)$page=1;
 
@@ -25,10 +25,13 @@ trait File_Model_Method{
             $where .= ' and file_name like :like';
             $params[":like"] = '%'.$file_name.'%';
         }
+        $total = File_Model::from()->where($where)
+            ->order_By('upload_date', 'DESC')
+            ->count('id', $params);
 
         return File_Model::from()->where($where)
             ->order_By('upload_date', 'DESC')
-            ->limit(($page - 1) * 100, 100)
+            ->limit(($page - 1) * 50, 50)
             ->select($params);
     }
 }?>

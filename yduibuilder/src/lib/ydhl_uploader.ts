@@ -58,8 +58,10 @@ export default function (el: HTMLElement | null,
     }).then((response) => {
       const rst = response.data
       if (imageUploaded) imageUploaded(file, rst)
+      input.value = null
     }).catch((err) => {
       if (uploadedError) uploadedError(file, err?.message)
+      input.value = null
     })
   }
   el.after(input)

@@ -98,7 +98,7 @@
         }, 200)
       },
       update_loading: function (dialog_id, content) {
-
+        $(`#${dialog_id} .message-content`).html(content)
       },
 
       /**
@@ -120,7 +120,7 @@
                                     <div class="spinner-border me-3 text-primary" role="status">
                                         <span class="visually-hidden"></span>
                                     </div>
-                                    ${msg}
+                                    <span class="message-content">${msg}</span>
                                 </div>
                             </div>
                         </div>
@@ -298,16 +298,6 @@
           invoke_cb(submittedCallback, [rst])
         })
         return dialog_id
-      },
-
-      /**
-       * 更新对话框的内容
-       *
-       * @param dialog_id
-       * @param content
-       */
-      update_loading: function (dialog_id, content) {
-
       },
 
       /**

@@ -59,7 +59,7 @@ class Dropdown_View extends ValueList_View {
         $myid = $this->myid();
         list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
         if (!$outputData){
-            $staticValue = $staticData['value']?:$staticData['name'];
+            $staticValue = strlen($staticData['value'])?$staticData['value']:$staticData['name'];
             $xText = "'{$staticData['name']}'";
             $xValue = "'{$staticValue}'";
         }

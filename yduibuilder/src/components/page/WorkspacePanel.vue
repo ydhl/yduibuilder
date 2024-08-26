@@ -415,7 +415,7 @@ export default {
               items: pasteItem.items,
               placeInParent: '',
               pageId: data.pageId,
-              placement: uiConfig.meta.isContainer ? 'in' : 'bottom',
+              placement: uiConfig.meta.isContainer && uiConfig.type !== 'Table' ? 'in' : 'bottom',
               targetId: data.data.ids[0]
             })
           })

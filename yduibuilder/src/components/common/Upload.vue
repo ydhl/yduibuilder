@@ -16,27 +16,29 @@
         </div>
       </div>
       <div v-if="files.length===0" class="text-muted text-center p-5"><i class="iconfont icon-empty fs-1"></i></div>
-      <div class="d-flex mt-2 flex-wrap align-items-start" v-if="type==='image'" style="height:400px;overflow: auto">
+      <div class="d-flex mt-2 flex-wrap align-items-start" v-if="type==='image'">
         <div @click="select($event, file)" :key="index" v-for="(file, index) in files"
              :class="{'d-flex flex-column btn btn-light cursor align-items-center align-content-center m-1 file': true, 'text-primary border-primary': file.id == modelValue.id}">
           <div class="file-preview" :style="`${file.url ? 'background-image: url(' + file.url + ')' : ''}`"></div>
           <small class="text-truncate" style="width: 4rem;">{{file.name}}</small>
         </div>
       </div>
-      <div class="mt-2" v-if="type!=='image'" style="height:400px;overflow: auto">
-        <table class="table table-striped table-hover">
+      <div class="mt-2" v-if="type!=='image'">
+        <table class="table table-sm">
           <tr :key="index" v-for="(file, index) in files">
-            <td @click="select($event, file)" :class="['file cursor', {'bg-light': file.id == modelValue.id}]">{{file.name}}</td>
+            <td @click="select($event, file)" :class="['file cursor', {'bg-light text-primary': file.id == selectFile.id}]">{{file.name}}</td>
+            <td @click="select($event, file)" style="text-align: right" :class="['file cursor text-muted', {'bg-light text-primary': file.id == selectFile.id}]">{{file.upload_date}} {{file.file_size}} Byte</td>
           </tr>
         </table>
       </div>
+      <div v-if="hasMore" class="d-flex align-items-center justify-content-center p-1 pointer text-" @click="searchFile(page + 1)">{{t('common.loadMore')}}</div>
     </div>
   </lay-layer>
 </template>
 <style scoped>
 .file-preview{
   width: 4rem;height: 4rem;
-  background-size:contain;background-repeat: no-repeat;background-position: top;font-size:11px;
+  background-size:contain;background-repeat: no-repeat;background-position: center;font-size:11px;
 }
 </style>
 <script lang="ts">
@@ -45,7 +47,6 @@ import ydhl from '@/lib/ydhl'
 import { useI18n } from 'vue-i18n'
 import Uploader, { MimeType } from '@/lib/ydhl_uploader'
 import { YDJSStatic } from '@/lib/ydjs'
-import $ from 'jquery'
 declare const YDJS: YDJSStatic
 
 export default {
@@ -72,9 +73,10 @@ export default {
     const fileSearchWord = ref('')
     const page = ref(1)
     const isFileSelectorOpen = ref(false)
+    const hasMore = ref(false)
 
-    const files = ref<Array<Record<string, string>>>()
-    const selectFile = ref()
+    const files = ref<Array<Record<string, string>>>([])
+    const selectFile = ref(props.modelValue)
 
     const style = computed(() => {
       let str = `width:${props.width};height:${props.height}`
@@ -90,7 +92,10 @@ export default {
     }
     const imageUploaded = (file: File, rst: any) => {
       YDJS.hide_dialog(loadingId)
-      if (!rst || !rst.success) return
+      if (!rst || !rst.success) {
+        ydhl.alert(rst?.msg || 'upload error')
+        return
+      }
       // console.log(response)
       context.emit('update:modelValue', rst.data)
     }
@@ -111,34 +116,26 @@ export default {
     })
     const select = (event, file: any) => {
       selectFile.value = file
-      const parentEl = event.target.closest('.file')
-      $('.file').removeClass('text-primary border-primary')
-      $(parentEl).addClass('text-primary border-primary')
+      // const parentEl = event.target.closest('.file')
+      // $('.file').removeClass('text-primary border-primary')
+      // $(parentEl).addClass('text-primary border-primary')
     }
-    const searchFile = (currPage: number = 0) => {
-      if (currPage > 0) {
-        page.value = currPage
-      } else {
-        page.value = 1
-      }
-      files.value = []
-      ydhl.get(`api/${props.projectId}/file`, { type: props.type, q: fileSearchWord.value, page: page.value }, (rst) => {
-        if (!rst || rst.success) {
+    const searchFile = (p = 1) => {
+      if (p === 1) files.value = []
+      const loadingId = YDJS.loading(t('page.loading'))
+      page.value = p
+      ydhl.get(`api/${props.projectId}/file`, { type: props.type, q: fileSearchWord.value, page: p }, (rst) => {
+        YDJS.hide_dialog(loadingId)
+        if (!rst || !rst.success) {
           return
         }
-        files.value = rst.data
+        files.value?.push(...rst.data.list)
+        hasMore.value = files.value?.length < rst.data.total
       }, 'json')
     }
     const openSelectFileDialog = () => {
       isFileSelectorOpen.value = true
-      files.value = []
-
-      const loadingId = YDJS.loading(t('page.loading'))
-      ydhl.get(`api/${props.projectId}/file`, { type: props.type, q: fileSearchWord.value }, (rst) => {
-        YDJS.hide_dialog(loadingId)
-        // console.log(rst)
-        files.value = rst?.data || []
-      }, 'json')
+      searchFile()
     }
     const hideFileDialog = () => {
       isFileSelectorOpen.value = false
@@ -170,7 +167,9 @@ export default {
       openSelectFileDialog,
       imageUploaded,
       imageAdded,
+      hasMore,
       searchFile,
+      page,
       selectFile,
       files,
       buttons,

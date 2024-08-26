@@ -113,6 +113,14 @@ class Bind_Controller extends YZE_Resource_Controller {
             $to_class = Page_Bind_Api_Model::CLASS_NAME;
         }
 
+        // 从api的响应数据赋值给别的数据时，只能赋值给一个（界面只能展示一个）
+        if ($from_type=='bind_api'){
+            $bound_variable = Page_Bind_Variable_Model::from()
+                ->where('from_page_id=:fid and from_uuid=:fromuuid and from_expression=:exp')
+                ->get_Single([':fid'=>$from_page->id, ':fromuuid'=>$input['data']['fromUuid']?:'', ':exp'=>json_encode($input)]);
+            if ($bound_variable) $bound_variable->remove();
+        }
+
         $bound_variable = Page_Bind_Variable_Model::from()
             ->where('from_page_id=:fid and to_page_id=:tid and to_uuid=:touuid and to_data_id=:to_data_id and from_uuid=:fromuuid')
             ->get_Single([':fid'=>$from_page->id, ':tid'=>$this->page->id, ':touuid'=>$to_uuid, ':to_data_id'=>$to_data_id?:$to_uuid, ':fromuuid'=>$input['data']['fromUuid']?:'']);
@@ -140,13 +148,14 @@ class Bind_Controller extends YZE_Resource_Controller {
         $this->valid($data["to_page_uuid"]);
         $from_page_uuid = trim($data["from_page_uuid"]);
         $to_uuid = trim($data["to_uuid"]);
+        $from_uuid = trim($data["from_uuid"]);
 
         $from_page = Page_Model::find_by_uuid($from_page_uuid);
         if (!$from_page) throw new YZE_FatalException(__('page not found'));
 
         $bound_variable = Page_Bind_Variable_Model::from()
-            ->where('from_page_id=:fid and to_page_id=:tid and to_uuid=:touuid')
-            ->get_Single([':fid'=>$from_page->id, ':tid'=>$this->page->id, ':touuid'=>$to_uuid]);
+            ->where('from_page_id=:fid and to_page_id=:tid and to_uuid=:touuid and is_deleted=0 and from_uuid=:fromuuid')
+            ->get_Single([':fid'=>$from_page->id, ':tid'=>$this->page->id, ':touuid'=>$to_uuid, ':fromuuid'=>$from_uuid]);
         if ($bound_variable) {
             $bound_variable->remove();
         }

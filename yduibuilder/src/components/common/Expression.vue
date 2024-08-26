@@ -378,7 +378,7 @@ export default {
         //     myExpression.value.subexpression.push(rightExp)
         //   }
         // }
-        console.log(JSON.stringify(myExpression.value))
+        // console.log(JSON.stringify(myExpression.value))
       } else {
         myExpression.value[key]!.modifier = modifier
       }

@@ -1,5 +1,5 @@
 <template>
-  <component :dragableCss="{'ui': !myIsLock && !myIsReadonly, 'uicontainer':isContainer, 'dragenter-container': isDragIn}"
+  <component :dragableCss="{'ui': !myIsLock && !myIsReadonly, 'uicontainer':isContainer, 'dragenter-container': isDragIn, 'opacity-50': needOpacity}"
      ref="ui" :isLock="myIsLock" :isReadonly="myIsReadonly" :uiVersion="uiVersion"
      :is="uiComponentWrap" :key="uiconfig.meta.id" :uiconfig="uiconfig" :pageid="pageid">
   </component>
@@ -135,6 +135,12 @@ export default {
       }, 100)
     }, { immediate: true })
 
+    const needOpacity = computed(() => {
+      if (!inlineEditItemId.value) return false
+      return !store.getters.isParent(inlineEditItemId.value, props.uiconfig.meta.id) &&
+        !store.getters.isParent(props.uiconfig.meta.id, inlineEditItemId.value)
+    })
+
     return {
       ...setup,
       ui,
@@ -144,7 +150,8 @@ export default {
       showAction,
       showRect,
       width,
-      height
+      height,
+      needOpacity
     }
   }
 }

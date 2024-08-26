@@ -93,7 +93,7 @@
       </div>
     </div>
   </div>
-  <CodeEditorDialog v-model="codeDialogVisible" :schema="modelSchema" :code="code" @update="updateCode"></CodeEditorDialog>
+  <CodeEditorDialog v-model="codeDialogVisible" :hide-variable="true" :schema="modelSchema" :code="code" @update="updateCode"></CodeEditorDialog>
 </template>
 
 <script lang="ts">

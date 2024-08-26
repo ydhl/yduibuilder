@@ -276,7 +276,9 @@ INPITCONFIG;
             foreach ($bindDatas as $data){
                 $expression = $inputArgs[$data->uuid];
                 if (!$expression) continue;
-                $args[] = $data->name.'=${'.$expression->get_expression_code().'}';
+                $expression_code = $expression->get_expression_code();
+                $args[] = $data->name.'=${'.$expression_code.'}';
+                $this->add_used_variable($expression_code);
             }
 
             $codeLines[] = 'document.location.href=`'.$this->get_popup_page_url($popupPage).'?'.join('&', $args).'`';
@@ -424,6 +426,7 @@ INTERVAL;
             $dataName = $this->is_scale_type($expression->data->type) ? "{$expression->data->path}" : "JSON.stringify({$expression->data->path})";
         }else{
             $dataName = $expression->get_expression_code();
+            $this->add_used_variable($dataName);
         }
         $codeLines[] = "alert({$dataName})";
     }
@@ -451,7 +454,9 @@ INTERVAL;
                 }elseif ($inputExpression->type=='connect'){ //数据赋值
                     $queryArgs[] = $bindData->name.': '. $inputExpression->data->path;
                 }else { //表达式赋值
-                    $queryArgs[] = $bindData->name . ': ' . $inputExpression->get_expression_code();
+                    $expression_code = $inputExpression->get_expression_code();
+                    $this->add_used_variable($expression_code);
+                    $queryArgs[] = $bindData->name . ': ' . $expression_code;
                 }
             }else{
                 $queryArgs[] = $bindData->name.': '. $this->data_default($bindData->get_data_model());
@@ -485,7 +490,9 @@ INTERVAL;
         $args = [];
         foreach ($argConfigs as $argConfig){
             $inputExpression = $inputExpressions[$argConfig['uuid']];
-            $args[] = $argConfig['name'].": ".$inputExpression->get_expression_code();
+            $expression_code = $inputExpression->get_expression_code();
+            $this->add_used_variable($expression_code);
+            $args[] = $argConfig['name'].": ".$expression_code;
         }
 
         $codeLines[] = 'page.$dispatch("'.strtolower($emit_event->name).'", '.join(' ', ['{',join(', ',$args), '}']).')';
@@ -618,6 +625,7 @@ INTERVAL;
                     }else{
                         $codeLines[] = 'formData.push(`'.$dataConfig['name'].'=${'.$exp.'}`);';
                     }
+                    $this->add_used_variable($exp);
                 }
                 return [$this->indent(1, true)."data: formData.join('&'),"];
             case 'form-data':
@@ -627,14 +635,16 @@ INTERVAL;
                     if (!$bindVariable) continue;
                     $expression = $bindVariable->get_expression();
                     if (!$expression) continue;
+                    $expression_code = $expression->get_expression_code();
+                    $this->add_used_variable($expression_code);
 
-                    $codeLines[] = 'if('.$expression->get_expression_code().' !== undefined){';
+                    $codeLines[] = 'if('.$expression_code.' !== undefined){';
                     if ($dataConfig['type'] == 'array'){
-                        $codeLines[] = $this->indent(1, true)."for(const item of ".$expression->get_expression_code().") {";
+                        $codeLines[] = $this->indent(1, true)."for(const item of ".$expression_code.") {";
                         $codeLines[] = $this->indent(2, true).'formData.append("'.$dataConfig['name'].'[]", item);';
                         $codeLines[] = $this->indent(1, true)."}";
                     }else{
-                        $codeLines[] = $this->indent(1, true).'formData.append("'.$dataConfig['name'].'", '.$expression->get_expression_code().');';
+                        $codeLines[] = $this->indent(1, true).'formData.append("'.$dataConfig['name'].'", '.$expression_code.');';
                     }
                     $codeLines[] = '}';
                 }
@@ -657,6 +667,7 @@ INTERVAL;
             $expression = $bindVariable->get_expression();
             if (!$expression) continue;
             $expression_code = $expression->get_expression_code();
+            $this->add_used_variable($expression_code);
 
             if ($dataConfig['type'] == 'array'){
                 $myCodes[] = "if({$expression_code} !== undefined){";
@@ -690,6 +701,7 @@ INTERVAL;
             $codeLines[] = "if({$expression_code} !== undefined){";
             $codeLines[] = $this->indent(1, true)."_{$dataName}[{$dataConfig['name']}] = {$expression_code}";
             $codeLines[] = '}';
+            $this->add_used_variable($expression_code);
         }
 
         return "_{$dataName}";
@@ -720,7 +732,9 @@ INTERVAL;
         foreach ($bindVariables as $bindVariable){
             $expression = $bindVariable->get_expression();
             if (!$expression) continue;
-            $codeLines[] = $bindVariable->to_data_path.' = '.$expression->get_expression_code();
+            $expression_code = $expression->get_expression_code();
+            $codeLines[] = $bindVariable->to_data_path . ' = ' . $expression_code;
+            $this->add_used_variable($expression_code);
         }
     }
 
@@ -753,17 +767,9 @@ INTERVAL;
             $this->build_interval_code($action, $codes);
             $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $codes));
         }else if ($action->type=='webapi'){
-            // api 主体单独生成一个方法
-            $innerMethod = "call_api_inner";
-            $bodyLines[] = $this->indent($indent, true).'page.'.$this->myId(true)."_{$innerMethod}(rst)";
-
-            $apicCodes = ['const page = this;'];
+            $apicCodes = [];
             $this->build_webapi_code($action, $apicCodes);
-            $apicCodes = $this->build->indent_code(1, $apicCodes);
-            array_unshift($apicCodes,$this->myId(true)."_{$innerMethod}(rst) {");
-            array_unshift($apicCodes,'');
-            $apicCodes[] = '},';
-            $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_EVENT, $apicCodes);
+            $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $apicCodes));
         }else{
             $bodyLines[] = $this->indent($indent, true).'// NOT DEFINED ACTION TYPE '.$action->type;
         }
@@ -792,7 +798,11 @@ INTERVAL;
                 $codeLines[] = "})";
             }else{
                 $expression = $bindAction->get_expression();
-                if ($expression) $codeLines[] = "if (".$expression->get_expression_code()."){";
+                if ($expression) {
+                    $expression_code = $expression->get_expression_code();
+                    $codeLines[] = "if ({$expression_code}){";
+                    $this->add_used_variable($expression_code);
+                }
                 $this->get_post_processor_body($expression ? 1 : 0, $bindAction, $io_data_fetch, $bind_api, $codeLines);
                 if ($expression) $codeLines[] = "}";
             }

@@ -193,7 +193,7 @@ export default {
             fromPageId: currPage.value.meta.id
           }
         }).catch((e) => {
-          console.log(e)
+          console.log('PopupSetting', e)
         })
       }).catch((e) => {
         myAction.value.popup_type = 'page'
@@ -229,7 +229,7 @@ export default {
         myAction.value.popupPageId = ''
         context.emit('update:modelValue', myAction.value)
       }).catch((e) => {
-        console.log(e)
+        console.log('PopupSetting', e)
       })
     }
     const openBindPageDataDlg = () => {
@@ -243,7 +243,7 @@ export default {
         pageDatas.value = []
         context.emit('update:modelValue', myAction.value)
       }).catch((e) => {
-        console.log(e)
+        console.log('PopupSetting', e)
       })
     }
     // eslint-disable-next-line camelcase

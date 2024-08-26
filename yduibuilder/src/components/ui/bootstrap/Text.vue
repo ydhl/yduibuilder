@@ -1,5 +1,5 @@
 <template>
-  <div :draggable='draggable' @dblclick="inlineEditItemId=uiconfig.meta.id"
+  <div :draggable='draggable' @dblclick.stop.prevent="inlineEditItemId=uiconfig.meta.id"
        :contenteditable="inlineEditItemId==uiconfig.meta.id" @keyup.enter="inlineEditItemId=''"
        :class="[dragableCss, myCss]" :style="myStyleText" :id="myId" :data-type="uiconfig.type"
        :data-pageid="pageid">

@@ -14,7 +14,7 @@ class Breadcrumb_View extends ValueList_View {
         if ($outputData){
             list('name'=>$xText, 'value'=>$xValue, 'checked'=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);
         }else{
-            $staticValue = $staticData['value']?:$staticData['name'];
+            $staticValue = strlen($staticData['value'])?$staticData['value']:$staticData['name'];
             $staticName = $staticData['name'];
             $xValue = "'{$staticValue}'";
         }

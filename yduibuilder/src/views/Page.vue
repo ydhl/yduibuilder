@@ -303,7 +303,6 @@ export default {
       if (!el.hasClass('ui')) el = el.parents('.ui')
       if (el.length === 0) {
         // 如果没有选择ui元素 重置选择的元素，如果当前有内部编辑元素，则也退出（UIBase.ts中watch selectedUIItemId），另外一个重置的地方是page.vue
-
         // 如果处于富文本编辑，那么只有点击富文本上的退出才退出
         if (selectedUIItem.value?.type === 'RichText' && selectedUIItem.value?.meta.id === inlineEditItemId.value) return
         postMessage({ type: 'update', data: { selectedUIItemId: '' } })

@@ -16,7 +16,6 @@
  * UI结构树
  */
 import { computed, onMounted, ref } from 'vue'
-import UITreeWrap from '@/components/sidebar/uitree/Wrap.vue'
 import InitUI from '@/components/Common'
 import $ from 'jquery'
 import uidrag from '@/lib/uidrag'
@@ -27,7 +26,6 @@ import { useI18n } from 'vue-i18n'
 
 export default {
   name: 'UITree',
-  components: { UITreeWrap },
   emits: ['contextMenu'],
   setup (props: any, context: any) {
     const store = useStore()

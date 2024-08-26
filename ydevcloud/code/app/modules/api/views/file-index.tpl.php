@@ -6,7 +6,8 @@ use function yangzie\__;
 use function yangzie\yze_isimage;
 
 $project = $this->get_data('project');
-$files = File_Model::get_files($_GET['q'], $project->id, $_GET['type'],$_GET['page']);
+$total = 0;
+$files = File_Model::get_files($_GET['q'], $project->id, $_GET['type'],$_GET['page'], $total);
 $this->layout = '';
 $datas = [];
 
@@ -21,4 +22,4 @@ foreach ($files as $file){
     $datas[] = $data;
 }
 
-YZE_JSON_View::success($this->controller, $datas)->output();
+YZE_JSON_View::success($this->controller, ['total'=>$total,'list'=>$datas])->output();

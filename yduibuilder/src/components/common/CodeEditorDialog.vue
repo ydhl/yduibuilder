@@ -2,7 +2,7 @@
   <lay-layer resize layer-classes="layui-layer-content-overflow" :resizeEnd="recomputed" v-model="myDlgVisible"
              :title="`${title || t('common.customCode')} - ${language}`"
              :shade="true" :area="['800px', '400px']" :btn="buttons">
-    <CodeEditor v-if="myDlgVisible" ref="codeEditor" :editStyle="editStyle" :code="code" :schema="schema" :leff-data="leftData" :left-value-path="leftValuePath"
+    <CodeEditor v-if="myDlgVisible" :hide-variable="hideVariable" ref="codeEditor" :editStyle="editStyle" :code="code" :schema="schema" :leff-data="leftData" :left-value-path="leftValuePath"
     :surround-code="leftOperator" :tip="tip" :variables="variables" :read-only="readOnly" :language="language"
     ></CodeEditor>
   </lay-layer>
@@ -27,6 +27,14 @@ export default {
     leftOperator: String, // 左值操作符
     title: String,
     tip: String,
+    ignoreCodeError: {
+      default: false,
+      type: Boolean
+    },
+    hideVariable: {
+      default: false,
+      type: Boolean
+    },
     variables: {
       default: () => [],
       type: Array
@@ -44,7 +52,7 @@ export default {
   emits: ['update:modelValue', 'update'],
   setup (props: any, context: any) {
     const { t } = useI18n()
-    const editStyle = ref('height: 250px')
+    const editStyle = ref('height: 200px')
     const codeEditor = ref()
 
     const myDlgVisible = computed({
@@ -73,11 +81,13 @@ export default {
           text: t('common.ok'),
           callback: () => {
             if (!editorInstance) return
-            const model = editorInstance.getModel()
-            const markers = monaco.editor.getModelMarkers({ resource: model.uri })
-            if (markers.length > 0) {
-              ydhl.alert(t('variable.codeError'))
-              return
+            if (!props.ignoreCodeError) {
+              const model = editorInstance.getModel()
+              const markers = monaco.editor.getModelMarkers({ resource: model.uri })
+              if (markers.length > 0) {
+                ydhl.alert(t('variable.codeError'))
+                return
+              }
             }
             context.emit('update', editorInstance.getValue().trim())
           }
@@ -94,7 +104,7 @@ export default {
       const container = document.getElementById(id)
       if (!container) return
       const { width, height } = container.getBoundingClientRect()
-      editStyle.value = `height:${height - 150}px;width:${width - 340}px`
+      editStyle.value = `height:${height - 200}px;width:${width - 340}px`
     }
     return {
       buttons,

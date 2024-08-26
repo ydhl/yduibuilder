@@ -49,7 +49,7 @@ class Dropdown_View extends ValueList_View {
     {
         echo $this->indent(2);
         $myid = $this->myid();
-        $staticValue = $staticData['value']?:$staticData['name'];
+        $staticValue = strlen($staticData['value'])?$staticData['value']:$staticData['name'];
         // 动态数据
         if($outputData){
             list('name'=>$name, 'value'=>$value, "checked"=>$checked, 'data'=>$boundData) = $this->get_bind_name_value($outputData, $itemName);

@@ -146,11 +146,12 @@ export default {
       })
     }
 
-    const removeBound = (uuid, apiIndex = -1, apiInputName = null, apiOutputName = null) => {
+    const removeBound = (fromUuid, toUuid, apiIndex = -1, apiInputName = null, apiOutputName = null) => {
       ydhl.postJson('api/bind/deleteconnect.json', {
         to_page_uuid: currPageId.value,
         from_page_uuid: currPageId.value,
-        to_uuid: uuid
+        to_uuid: toUuid,
+        from_uuid: fromUuid
       }).then((rst: any) => {
         if (!rst?.success) {
           ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
@@ -163,7 +164,7 @@ export default {
     // 输入数据绑定，是从选择的rightData(右值)表达式，绑定给left数据（左值）, From是界面上显示要绑定的数据
     const updateInputBoundData = (apiIndex, leftRootUuid, leftDataPath, leftDataUuid, rightData: Expression, remove, expDesc: string) => {
       if (remove) {
-        removeBound(leftRootUuid, apiIndex, currInputName.value[apiIndex])
+        removeBound(rightData?.data?.fromUuid, leftRootUuid, apiIndex, currInputName.value[apiIndex])
         return
       }
       if (!rightData || ydhl.isEmptyObject(rightData)) return
@@ -187,7 +188,7 @@ export default {
     // 输出数据绑定，是从api的输出数据（右值）绑定给选择的left（左值）, right是界面上显示要绑定的数据
     const updateOutputBoundData = (apiIndex, rightRootUuid, rightDataPath, rightDataUuid, leftData: Expression, remove, expDesc) => {
       if (remove) {
-        removeBound(leftData.data?.fromUuid, apiIndex, null, currOutputIndex.value[apiIndex])
+        removeBound(rightRootUuid, leftData.data?.fromUuid, apiIndex, null, currOutputIndex.value[apiIndex])
         return
       }
       if (!leftData || ydhl.isEmptyObject(leftData)) return
