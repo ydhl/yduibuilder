@@ -652,6 +652,14 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     protected abstract function build_emit_code(Action_Model $action, &$actionCodeLines);
 
     /**
+     * 构建数据验证代码
+     * @param Action_Model $action
+     * @param $actionCodeLines
+     * @return mixed
+     */
+    protected abstract function build_validate_code(Action_Model $action, &$actionCodeLines);
+
+    /**
      * 构建内部数据赋值代码
      * @param Action_Model $action
      * @param $actionCodeLines
@@ -659,6 +667,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      */
     protected abstract function build_mutation_code(Action_Model $action, &$actionCodeLines);
     protected abstract function build_closepopup_code(Action_Model $action, &$actionCodeLines);
+    protected abstract function build_break_code(Action_Model $action, &$actionCodeLines);
     /**
      * 弹窗模版输出，各终端根据自己的框架进行输出
      */
@@ -763,6 +772,18 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      */
     protected function get_event_action_codes(){
         $eventModels = @$this->build->get_events($this->myid());
+        return $this->_get_event_action_codes($eventModels);
+    }
+
+    /**
+     * 获取弹窗的事件
+     * @return array|null
+     */
+    protected function get_popup_event_action_codes(){
+        $eventModels = @$this->build->get_popup_events();
+        return $this->_get_event_action_codes($eventModels);
+    }
+    private function _get_event_action_codes($eventModels){
         $eventCodes = [];
 
         if (!$eventModels) return;
@@ -782,6 +803,8 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             }
             if ($eventModel->desc){
                 $eventCodes[$html_event_name]['comment'] .= PHP_EOL.$eventModel->desc;
+            }else if ($eventModel->get_uicomponent_event()) {
+                $eventCodes[$html_event_name]['comment'] .= PHP_EOL.$eventModel->get_uicomponent_event()->desc;
             }
 
             // 先编译事件体代码，并记录使用了哪些基础变量
@@ -798,6 +821,8 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                     case 'mutation': $this->build_mutation_code($action, $actionCodeLines);break;
                     case 'closepopup': $this->build_closepopup_code($action, $actionCodeLines);break;
                     case 'interval': $this->build_interval_code($action, $actionCodeLines);break;
+                    case 'validate': $this->build_validate_code($action, $actionCodeLines);break;
+                    case 'break': $this->build_break_code($action, $actionCodeLines);break;
                     default: $actionCodeLines = [];
                 }
             }
@@ -884,6 +909,11 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      */
     public function myid($full=false){
         return $this->data['meta']['id'].($full ? $this->get_build()->get_id_suffix() : '');
+    }
+
+    public function get_page_uuid(){
+        $data = $this->build->get_page()->get_ui_config();
+        return $data->meta->id;
     }
 
     public function get_sub_page(){
@@ -1089,6 +1119,23 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      */
     protected abstract function build_event_listen();
 
+    protected function get_event_listen_props(){
+        $events = $this->build->get_events($this->myid());
+        $eventHandlers = [];
+        $myid = $this->myid();
+        foreach ($events as $event){
+            if(!$event->uicomponent_event_id && $this->isLifeCycleEvent($event->event)) continue;
+            $name = strtolower($event->uicomponent_event_id ? $event->event : $this->eventName($event->event));
+            if (!$name) continue;
+            if (!$this->is_custom_ui() && $name=='change') {
+                $inputDataName = $this->get_input_data_name();
+                $eventHandlers['x-init'] = "\$watch(alpinejs_get_input_data_name(\$el, '{$inputDataName}'), (value, oldValue) => {$myid}_change(value, oldValue))";
+            }else{
+                $eventHandlers['@'.$name] = $this->myid().'_'.$name;
+            }
+        }
+        return $eventHandlers;
+    }
     /**
      * 对于表单元素，输出表单特有的属性，比如name，disabled，readonly required placeholder等
      *

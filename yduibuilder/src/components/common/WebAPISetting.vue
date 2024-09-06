@@ -29,7 +29,7 @@ export default {
   props: {
     modelValue: Object,
     readonly: Boolean,
-    // 绑定api的类型（谁绑定的api） bind_action bind_event
+    // 绑定api的类型（谁绑定的api） bind_api_action bind_event
     bindType: String,
     // 绑定的api的绑定对象uuid（谁绑定的api）
     bindUuid: String,

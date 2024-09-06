@@ -22,7 +22,8 @@
           <span class="text-success">ITEM</span>
         </template>
         <template v-else>
-          {{myModel.name}}
+          <span class="text-decoration-line-through text-muted" v-if="myModel.deprecated">{{myModel.name}}</span>
+          <template v-else>{{myModel.name}}</template>
         </template>
       </div>
       <span class="ps-1 text-truncate fs-7">
@@ -96,7 +97,7 @@
     </template>
   </template>
   <lay-layer v-model="editDlgVisible" :title="isAddProps ? t('api.addData') : t('api.editData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
-    <AddData v-model="editModel" :has-default-value="path.length==0" :is-array-item="!isAddProps && isArrayItem"/>
+    <AddData v-model="editModel" :is-array-item="!isAddProps && isArrayItem"/>
   </lay-layer>
   <CodeEditorDialog :read-only="codeType=='view'" :title="codeType=='view'?t('api.model.defaultValue'):t('api.model.import')"
                     :hide-variable="true" :ignore-code-error="true"

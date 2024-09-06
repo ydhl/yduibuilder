@@ -28,6 +28,7 @@ class Textarea_View extends Input_View {
         }
         $iteratorDataName = $this->get_iterator_data_name();
         $myid = $this->myid();
+        $eventHandlers = $this->get_event_listen_props();
 
         echo "{$space}<div";
         echo $this->build_main_attrs();
@@ -39,6 +40,9 @@ class Textarea_View extends Input_View {
         $this->build_form_attrs();
         echo $this->wrap_output('@keyup', ($wordCountVisible || $clearButtonVisible) ? $this->myid().'_keyup' : null);
         echo $this->wrap_output('rows', @$this->data['meta']['custom']['row']);
+
+        echo $this->wrap_output('@blur', $eventHandlers['@blur']);
+        echo $this->wrap_output('@focus', $eventHandlers['@focus']);
 
         if ($inputDataName && !$outputDataName['VALUE']){
             echo $this->wrap_output(':value', $inputDataName);

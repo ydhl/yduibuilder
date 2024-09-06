@@ -4,6 +4,8 @@ export default {
     api: {
       notBindAnyApi: 'Not Bind Any Api'
     },
+    break: 'Break',
+    breakDesc: 'The subsequent actions will no longer be executed',
     call: 'Call',
     closepopup: 'Close Popup',
     closepopupDesc: 'Close the current pop-up window',
@@ -40,7 +42,9 @@ export default {
     redirectUrl: 'RD URL',
     settingMode: 'Setting Mode',
     webapi: 'Web API',
-    webapiDesc: 'Invoke Web API'
+    webapiDesc: 'Invoke Web API',
+    whenTrue: 'When True',
+    validateDesc: 'Verify whether the data meets the specified rules'
   },
   api: {
     action: 'Action',
@@ -62,6 +66,7 @@ export default {
     model: {
       comment: 'Comment',
       defaultValue: 'Default Value',
+      deprecated: 'Deprecated',
       enumValue: 'Enum Value',
       isEnumValue: 'Is enum value',
       import: 'Import Data Struct',
@@ -70,8 +75,19 @@ export default {
       mock: 'Mock',
       name: 'Name',
       noSubField: 'Has No Field',
+      nullable: 'Nullable',
+      readonly: 'Readonly',
+      required: 'Required',
       title: 'Title',
-      type: 'Type'
+      type: 'Type',
+      valid: {
+        regular: 'regular expressions',
+        notEmpty: 'Not empty',
+        notEmptyDesc: 'Cannot be a false value，such as "",false, null,undefined and so on',
+        whenPass: 'When data is valid',
+        whenFail: 'When data is invalid'
+      },
+      validate: 'Validate'
     },
     noInputs: 'No Input',
     noOutputs: 'No Output',
@@ -134,6 +150,7 @@ export default {
     function: 'Function',
     fontName: 'Font Name',
     fontNameEmpty: 'Please Input Font Name',
+    general: 'General',
     goBack: 'Go Back',
     icon: 'Icon',
     idIsInvalidate: 'ID is invalidate',
@@ -206,9 +223,10 @@ export default {
     componentEvent: 'Listen custom events in 「{0}」',
     customEvent: 'Custom Event',
     data: 'Data Event',
-    declareEvent: 'Custom Events',
+    declareEvent: 'Custom events',
     declareEventDesc: 'A component can explicitly declare the events it will emit',
     declareEventNoListen: 'No registered',
+    declarePopupEventDesc: 'Pop up pages can define custom events to interact with the source page',
     defineEvent: 'Define Event',
     deleteConfirm: 'Are you sure?',
     error: {
@@ -672,7 +690,7 @@ export default {
       stateConditionTip: 'Display the style of the state when the specified conditions are met:',
       stateName: 'State Name',
       variable: 'Variable',
-      variableTip: 'Trigger the current state when the following variables meet the specified conditions'
+      variableTip: 'Trigger the current state when the following expression is true'
     },
     table: {
       accented: 'Accented',
@@ -859,6 +877,7 @@ export default {
     },
     pageScope: 'Page Scope',
     pleaseChooseMutationData: 'Please select the data to be assigned',
+    pleaseChooseValidateData: 'Please select the data to be verified',
     pushDesc: 'Push data onto the end of array',
     remaintime: 'Remaining time',
     rightValue: 'Right Value',

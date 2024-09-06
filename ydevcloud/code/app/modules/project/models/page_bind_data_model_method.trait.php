@@ -33,8 +33,8 @@ trait Page_Bind_Data_Model_Method{
      *
      * @param $data_id string 要查找的数据id
      * @param $dataSource array 查找数据员源
-     * @param $allParents array 找到data_id的所有上级路径，从下往上
-     * @param $path array 从找到的parent到自己的访问路径，从下往上
+     * @param $allParents array 找到data_id的所有上级路径，注意因为是递归，结果是从下往上
+     * @param $path array 从找到的parent到自己的访问路径，注意因为是递归，结果是从下往上
      * @return mixed|null
      */
     public function find_data($data_id, $dataSource, &$allParents=[], &$path=[]) {
@@ -116,8 +116,8 @@ trait Page_Bind_Data_Model_Method{
         $allParents =[];
         $data = $from_data->find_data($data_id, $dataConfig, $allParents, $path);
         if (!$data) return null;
-        $path[] = $data['name'];
         $path = array_reverse($path);
+        $path[] = $data['name'];
         return $data;
     }
 }?>

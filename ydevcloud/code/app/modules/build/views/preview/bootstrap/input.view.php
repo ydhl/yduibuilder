@@ -33,17 +33,21 @@ class Input_View extends Preview_View implements Valuable_View {
         }
         $iteratorDataName = $this->get_iterator_data_name();
         $myid = $this->myid();
+        $eventHandlers = $this->get_event_listen_props();
 
         echo "{$space}<div";
         $this->build_main_attrs();
         echo ">";
         echo $this->indent(1);
-        $this->wrap_icon(function() use($iteratorDataName, $isArr, $outputDataName, $inputDataName){
+        $this->wrap_icon(function() use($iteratorDataName, $isArr, $outputDataName, $inputDataName, $eventHandlers){
             echo '<input'.$this->wrap_output('type', @$this->data['meta']['custom']['inputType'] ?: 'text');
             echo ' class="w-100 border-0 bg-transparent input" ';// input 用于前端jas处理时找input元素
             echo $this->wrap_output("autocomplete", $this->data['meta']['custom']['autocomplete']?:NULL);
             echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength']?:NULL);
             echo $this->build_form_attrs();
+
+            echo $this->wrap_output('@blur', $eventHandlers['@blur']);
+            echo $this->wrap_output('@focus', $eventHandlers['@focus']);
 
             if ($this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
                 echo $this->wrap_output('@keyup', $this->myid().'_keyup');

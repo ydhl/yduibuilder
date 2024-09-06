@@ -87,7 +87,6 @@ class State_Controller extends YZE_Resource_Controller {
         $uiid = $data['uiid'];
         $state = $data['state'];
 
-        $bindData = Page_Bind_Data_Model::find_by_uuid($state['leftRootDataId']);
         $bindState = $state['uuid'] ? Page_Bind_State_Model::find_by_uuid($state['uuid']) : null;
         if (!$bindState && $state['type']!='custom'){
             $bindState = Page_Bind_State_Model::from()->where('state_type=:type and state_name=:name and page_id=:pid and uiid=:uiid')

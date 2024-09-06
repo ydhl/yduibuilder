@@ -15,7 +15,9 @@ trait Action_Model_Method{
     private $web_bind;
     private $popup_page;
     private $mutations;
+    private $validates;
     private $expression;
+    private $subConditionAction = [];
     public function set_bind_api($api){
         $this->web_bind = $api;
         return $this;
@@ -65,6 +67,7 @@ trait Action_Model_Method{
         $bind_api = $this->get_bind_api();
         if ($bind_api) $bind_api->remove();
         Mutation_Model::from()->where('action_id=:aid')->delete([':aid'=>$this->id]);
+        Validate_Data_Model::from()->where('action_id=:aid')->delete([':aid'=>$this->id]);
         parent::remove();
     }
     public function get_action_data(){
@@ -88,6 +91,26 @@ trait Action_Model_Method{
                 $mutationData[$mutation->mutation_data_id] = $mutation->get_muation_data();
             }
             $action_records['mutations'] = $mutationData?:new \stdClass();
+        }else if ($this->type == 'validate'){
+            $validates = Validate_Data_Model::from()->where('is_deleted=0 and action_id=:id')->select([':id'=>$this->id]);
+            $validateData = [];
+            foreach ($validates as $validate){
+                $validateData[] = $validate->get_validate_data();
+            }
+            $action_records['validate']['datas'] = $validateData?:[];
+
+
+            $subActions = Action_Model::from()->where('is_deleted = 0 and bind_class=:bind_class and bind_uuid=:bind_uuid')
+                ->select([':bind_class'=>Action_Model::CLASS_NAME, ':bind_uuid'=>$this->uuid]);
+            $action_records['validate']['trueActions'] = [];
+            $action_records['validate']['falseActions'] = [];
+            foreach ($subActions as $subAction){
+                if ($subAction->bind_condition=='true'){
+                    $action_records['validate']['trueActions'][] = $subAction->get_action_data();
+                } else if ($subAction->bind_condition=='false'){
+                    $action_records['validate']['falseActions'][] = $subAction->get_action_data();
+                }
+            }
         }else if($this->type == 'emit'){
             $emit = $this->get_emit_event();
             if ($emit){
@@ -146,6 +169,33 @@ trait Action_Model_Method{
             }
         }
         return $this->mutations;
+    }
+    public function get_validate_datas(){
+        if (!$this->validates){
+            $this->validates = [];
+            foreach (Validate_Data_Model::from('m')
+                ->left_join(Page_Bind_Data_Model::CLASS_NAME, 'd', 'd.uuid = m.from_uuid and m.from_class=:cls')
+                ->where('m.action_id=:aid and m.is_deleted=0 and d.is_deleted=0')
+                 ->select([':aid'=>$this->id,':cls'=>Page_Bind_Data_Model::CLASS_NAME]) as $item){
+                if($item['d']) $item['m']->set_from_object($item['d']);
+                $this->validates[$item['m']->id] = $item['m'];
+            }
+        }
+        return $this->validates;
+    }
+    public function get_sub_condition_action(){
+        if (!$this->subConditionAction){
+            $this->subConditionAction = [];
+            foreach (Action_Model::from('m')
+                ->where('m.bind_class=:cls and m.is_deleted=0 and m.bind_uuid=:uid')
+                         ->order_By('index', 'asc', 'm')
+                         ->select([':uid'=>$this->uuid,':cls'=>Action_Model::CLASS_NAME]) as $item){
+                $condition = $item->bind_condition;
+                if (!$this->subConditionAction[$condition]) $this->subConditionAction[$condition] = [];
+                $this->subConditionAction[$condition][] = $item;
+            }
+        }
+        return $this->subConditionAction;
     }
 
     /**

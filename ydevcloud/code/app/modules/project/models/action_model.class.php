@@ -22,6 +22,8 @@ class Action_Model extends YZE_Model{
     const TYPE_MUTATION = 'mutation';
     const TYPE_CLOSEPOPUP = 'closepopup';
     const TYPE_INTERVAL = 'interval';
+    const TYPE_VALIDATE = 'validate';
+    const TYPE_BREAK = 'break';
     const REDIRECT_TYPE_INSIDE = 'inside';
     const REDIRECT_TYPE_OUTSIDE = 'outside';
     const REDIRECT_TYPE_UNSET = 'unset';
@@ -204,6 +206,7 @@ class Action_Model extends YZE_Model{
   'emit_event_id' => 'fk_action_uicomponent_event1_idx',
   'bind_class' => 'bind_class',
   'bind_uuid' => 'bind_class',
+  'popupPageId' => 'popupPageId',
 );
 
     /**
@@ -260,7 +263,7 @@ class Action_Model extends YZE_Model{
 
 	
 	public static function get_type(){
-		return ['output','redirect','popup','call','webapi','emit','mutation','closepopup','interval'];
+		return ['output','redirect','popup','call','webapi','emit','mutation','closepopup','interval','validate','break'];
 	}
 	public static function get_redirect_type(){
 		return ['inside','outside','unset'];

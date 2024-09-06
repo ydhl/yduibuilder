@@ -662,6 +662,8 @@ export default {
     if (!variables) return []
     for (const variable of variables) {
       const name = prefix + (variable.name || '')
+      const errorKey = name.replace(/page\./, '')
+      const errorName = 'error.' + (errorKey.match(/\./) ? `['${errorKey}']` : errorKey)
       if (variable.name) {
         suggestions.push(
           {
@@ -670,6 +672,15 @@ export default {
             insertText: name,
             documentation: variable.comment || '',
             detail: variable.type + (variable.title || '')
+          }
+        )
+        suggestions.push(
+          {
+            label: errorName,
+            kind: monaco.languages.CompletionItemKind.Variable,
+            insertText: errorName,
+            documentation: 'Data validation has errors',
+            detail: 'boolean'
           }
         )
       }

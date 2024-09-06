@@ -148,6 +148,21 @@ class Page_Bind_Data_Model extends YZE_Model{
      * @var integer
      */
     const F_INITLENGTH = "initLength";
+    /**
+     * 数据验证正则表达式字符串
+     * @var string
+     */
+    const F_VALIDREGULAR = "validRegular";
+    /**
+     * 默认的验证规则
+     * @var string
+     */
+    const F_VALIDRULE = "validRule";
+    /**
+     * 
+     * @var string
+     */
+    const F_INVALIDMSG = "invalidMsg";
     public static $columns = [
     'id'         => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
       'created_on' => ['type' => 'date', 'null' => false,'length' => '','default'	=> 'CURRENT_TIMESTAMP'],
@@ -173,6 +188,9 @@ class Page_Bind_Data_Model extends YZE_Model{
       'action'     => ['type' => 'enum', 'null' => false,'length' => '','default'	=> 'ReadWrite'],
       'mock'       => ['type' => 'string', 'null' => false,'length' => '45','default'	=> ''],
       'initLength' => ['type' => 'integer', 'null' => true,'length' => '','default'	=> ''],
+      'validRegular' => ['type' => 'string', 'null' => true,'length' => '145','default'	=> ''],
+      'validRule'  => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
+      'invalidMsg' => ['type' => 'string', 'null' => true,'length' => '145','default'	=> ''],
     ];
     /**
      * @see YZE_Model::$unique_key

@@ -18,15 +18,35 @@
           <input type="text" class="form-control form-control-sm" v-model="myModel.name">
         </div>
       </div>
+      <div class="row mb-1">
+        <div class="col-sm-9 offset-sm-3 d-flex gap-2 align-items-center">
+          <label>
+            <input type="checkbox" true-value="1" false-value="0" v-model="myModel.deprecated"> {{ t('api.model.deprecated') }}
+          </label>
+        </div>
+      </div>
+      <div class="row mb-2">
+        <label class="col-sm-3 col-form-label text-end">
+          {{t("api.model.validate")}}
+        </label>
+        <div class="col-sm-9">
+          <AdvanceSelect :options="validateRules"
+                         @change="(option) => { myModel.validRule = option.value; myModel.validRegular='' }"
+                         :default-text="validateRuleDesc">
+            <template #input>
+              <input type="text" placeholder="such as /\d+/" class="form-control form-control-sm" v-model="myModel.validRegular"/>
+            </template>
+          </AdvanceSelect>
+          <input type="text" class="form-control mt-1 form-control-sm" placeholder="error message" maxlength="145" v-model="myModel.invalidMsg">
+        </div>
+      </div>
       <template v-if="isScale">
         <div class="row">
-          <div class="col-sm-9 offset-sm-3">
-            <div class="d-flex align-items-center">
-              <div class="form-check form-switch me-5" @click="changeValueType()">
-                <input class="form-check-input" type="checkbox" role="switch" id="enum" :checked="valueType == 'enum'">
-                <label class="form-check-label" for="enum">{{t("api.model.isEnumValue")}}</label>
-              </div>
-            </div>
+          <label class="col-sm-3 col-form-label text-end" @click="changeValueType()">
+            <input class="form-check-input" type="checkbox" role="switch" id="enum" :checked="valueType == 'enum'">
+            {{t("api.model.isEnumValue")}}
+          </label>
+          <div class="col-sm-9">
             <table class="table table-sm table-borderless table-hover table-striped" v-if="valueType == 'enum'">
               <thead><tr><th>{{t("api.model.enumValue")}}</th><th>{{t("api.model.comment")}}</th></tr></thead>
               <tbody>
@@ -101,10 +121,11 @@ import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref, watch } from 'vue'
 import ydhl from '@/lib/ydhl'
 import CodeEditorDialog from '@/components/common/CodeEditorDialog.vue'
+import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 
 export default {
   name: 'AddData',
-  components: { CodeEditorDialog },
+  components: { AdvanceSelect, CodeEditorDialog },
   props: {
     modelValue: Object,
     types: {
@@ -141,6 +162,32 @@ export default {
       '@url(http)': t('mock.URL')
     }
     const isScale = computed(() => ['string', 'integer', 'number', 'any'].indexOf(myModel.value.type) !== -1)
+    const validateRules = computed(() => {
+      const rules: any = [
+        {
+          header: t('common.general')
+        },
+        {
+          name: t('api.model.valid.notEmpty'),
+          value: 'notEmpty',
+          desc: t('api.model.valid.notEmptyDesc')
+        }
+      ]
+      if (isScale.value) {
+        rules.push(
+          {
+            header: t('common.custom')
+          },
+          {
+            name: t('common.custom'),
+            value: '',
+            input: true,
+            desc: t('api.model.valid.regular')
+          }
+        )
+      }
+      return rules
+    })
 
     const enumValues = computed(() => {
       const values: any = []
@@ -155,6 +202,11 @@ export default {
     const modelSchema = computed(() => {
       return ydhl.getModelJSONSchema(props.modelValue)
     })
+    const validateRuleDesc = computed(() => {
+      if (myModel.value.validRegular) return myModel.value.validRegular
+      if (myModel.value.validRule) return t('api.model.valid.' + myModel.value.validRule)
+      return t('api.model.validate')
+    })
     onMounted(() => {
       if (!ydhl.isEmptyObject(props.modelValue.enumValue)) {
         valueType.value = 'enum'
@@ -166,6 +218,8 @@ export default {
     const changeType = (type) => {
       show.value = false
       myModel.value.type = type
+      delete myModel.value.validRegular
+      delete myModel.value.validRule
       if (type === 'array' && !myModel.value.item) {
         myModel.value.item = { type: 'string', uuid: ydhl.uuid() }
         delete myModel.value.props
@@ -264,6 +318,8 @@ export default {
       mocks,
       changeType,
       modelSchema,
+      validateRules,
+      validateRuleDesc,
       openCodeDialog
     }
   }

@@ -49,7 +49,7 @@ trait Page_Bind_Event_Model_Method{
      * @return void
      */
     public static function remove_gone_uiid(Page_Model $page) {
-        $events = Page_Bind_Event_Model::from()->where('page_id=:pid')->select([':pid'=>$page->id]);
+        $events = Page_Bind_Event_Model::from()->where('page_id=:pid and uicomponent_event_id is null')->select([':pid'=>$page->id]);
         foreach ($events as $event){
             $uiids = array_filter(explode(",", $event->uiid));
             $filter_uiids = [];

@@ -1,5 +1,6 @@
 <?php
 namespace app\api;
+use app\project\Action_Model;
 use app\project\Function_Model;
 use app\project\Page_Model;
 use app\project\Project_Model;
@@ -67,7 +68,17 @@ class Load_Controller extends YZE_Resource_Controller {
                 $state['function'] = ['id'=>$function->uuid, 'name'=>$function->name];
             }
 
-            $state['page'] = $page ? $page->get_config() : null;
+            $config = null;
+            if ($page) {
+                $config = $page->get_config();
+                $config->bePopup = (bool)Action_Model::from()
+                    ->where('is_deleted=0 and popupPageId=:pageid')
+                    ->count('id', [':pageid'=>$page->uuid]);
+                $config->includePopup = (bool)Action_Model::from()
+                    ->where("is_deleted=0 and popupPageId!='' and page_id=:pid")
+                    ->count('id', [':pid'=>$page->id]);
+            }
+            $state['page'] = $config;
             return YZE_JSON_View::success($this, [ 'design'=>$state ]);
         }
 
@@ -106,7 +117,18 @@ class Load_Controller extends YZE_Resource_Controller {
             ];
         }
 
-        $state['page'] = $page ? $page->get_config() : null;
+
+        $config = null;
+        if ($page) {
+            $config = $page->get_config();
+            $config->bePopup = (bool)Action_Model::from()
+                ->where('is_deleted=0 and popupPageId=:pageid')
+                ->count('id', [':pageid'=>$page->uuid]);
+            $config->includePopup = (bool)Action_Model::from()
+                ->where("is_deleted=0 and popupPageId !='' and page_id=:pid")
+                ->count('id', [':pid'=>$page->id]);
+        }
+        $state['page'] = $config;
 
         $factory = Css_Factory::getFactory($project_setting['ui']);
 

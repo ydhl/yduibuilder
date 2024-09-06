@@ -9,7 +9,7 @@ class web_html5 extends Base_Factory{
         if (!file_exists($path)){
             return;
         }
-        $this->server->push($this->frame->fd, __('exporting iconfont'));
+        $this->server->push(__('exporting iconfont'));
         $this->addScaffoldFiles($path, "vendor/iconfont/");
     }
 
@@ -53,7 +53,7 @@ class web_html5 extends Base_Factory{
             if (! file_exists(YZE_PUBLIC_HTML."vendor/{$package}/install.php")) continue;
             include_once YZE_PUBLIC_HTML."vendor/{$package}/install.php";
 
-            $this->server->push($this->frame->fd, sprintf(__('add %s'), "{$package}"));
+            $this->server->push(sprintf(__('add %s'), "{$package}"));
             $vendor_path = rtrim(YZE_PUBLIC_HTML . "vendor/{$package}", DS);
             $this->addScaffoldFiles($vendor_path, "vendor/{$package}/");
         }
@@ -68,7 +68,7 @@ class web_html5 extends Base_Factory{
         foreach ($this->project->get_modules() as $module) {
             foreach ($module->get_pages('popup') as $popup) {
                 $page_file = $popup->get_save_path('html');
-                $this->server->push($this->frame->fd, sprintf(__('%scompile popup page %s => %s%s'), "<strong>", $popup->name, $page_file, "</strong>"));
+                $this->server->push(sprintf(__('%scompile popup page %s => %s%s'), "<strong>", $popup->name, $page_file, "</strong>"));
 
                 $this->extractImage(json_decode(html_entity_decode($popup->config), true));
 
@@ -80,7 +80,7 @@ class web_html5 extends Base_Factory{
 
                 $assetFileName = $popup->get_export_file_name('html');
                 foreach (['css'=>"assets/css/{$assetFileName}.css", 'js'=>"assets/js/{$assetFileName}.js"] as $code_type=>$assetFileName) {
-                    $this->server->push($this->frame->fd, sprintf(__('%scompile %s %s => %s%s'), "<strong>", $code_type, $popup->name, $assetFileName, "</strong>"));
+                    $this->server->push(sprintf(__('%scompile %s %s => %s%s'), "<strong>", $code_type, $popup->name, $assetFileName, "</strong>"));
 
                     $ydhttp = new YDHttp();
                     $ydhttp->request_header = ['token:' . $this->token];
@@ -93,11 +93,11 @@ class web_html5 extends Base_Factory{
         // 编译ui文件
         $files = [];
         foreach ($this->project->get_modules() as $module) {
-            $this->server->push($this->frame->fd, sprintf(__('generate folder for modlue %s'), $module->name));
+            $this->server->push(sprintf(__('generate folder for modlue %s'), $module->name));
             foreach ($module->get_pages() as $page) {
                 $page_file = $page->get_save_path('html');
                 $pageName = basename($page_file);
-                $this->server->push($this->frame->fd, sprintf(__('%scompile page %s => %s%s'), "<strong>", $page->name, $page_file, "</strong>"));
+                $this->server->push(sprintf(__('%scompile page %s => %s%s'), "<strong>", $page->name, $page_file, "</strong>"));
                 $files[$pageName] = ['url'=>$page_file,'name'=>$page->name];
 
                 $this->extractImage(json_decode(html_entity_decode($page->config), true));
@@ -110,7 +110,7 @@ class web_html5 extends Base_Factory{
 
                 $assetFileName = $page->get_export_file_name('html');
                 foreach (['css'=>"assets/css/{$assetFileName}.css", 'js'=>"assets/js/{$assetFileName}.js"] as $code_type=>$assetFileName) {
-                    $this->server->push($this->frame->fd, sprintf(__('%scompile %s %s => %s%s'), "<strong>", $code_type, $page->name, $assetFileName, "</strong>"));
+                    $this->server->push(sprintf(__('%scompile %s %s => %s%s'), "<strong>", $code_type, $page->name, $assetFileName, "</strong>"));
 
                     $ydhttp = new YDHttp();
                     $ydhttp->request_header = ['token:' . $this->token];
@@ -122,7 +122,7 @@ class web_html5 extends Base_Factory{
         }
 
         // 编译公共selector style
-        $this->server->push($this->frame->fd, __('compile common style file： common.css'));
+        $this->server->push(__('compile common style file： common.css'));
 
         $ydhttp = new YDHttp();
         $ydhttp->request_header = ['token:' . $this->token];
@@ -131,7 +131,7 @@ class web_html5 extends Base_Factory{
 
         $this->exportIcon();
 
-        $this->server->push($this->frame->fd, __('generating index page'));
+        $this->server->push(__('generating index page'));
         $this->zip->addFromString('index.html', $this->generateIndex($files));
     }
 }

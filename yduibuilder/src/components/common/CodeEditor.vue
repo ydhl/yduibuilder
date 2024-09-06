@@ -94,7 +94,11 @@ export default {
     const leftSurroundCode = computed(() => {
       if (!props.surroundCode) return ''
       const info: any = []
-      if (props.leftValuePath) info.push(props.leftValuePath ? props.leftValuePath + '.' + props.leftData?.name : props.leftData?.name)
+      if (props.leftValuePath) {
+        info.push(props.leftValuePath ? props.leftValuePath + '.' + props.leftData?.name : props.leftData?.name)
+      } else {
+        info.push(props.leftData?.name)
+      }
       const operators = props.surroundCode?.split('@')
       if (operators?.length > 0) {
         info.push(operators[0])

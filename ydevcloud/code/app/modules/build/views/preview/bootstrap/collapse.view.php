@@ -151,7 +151,7 @@ TICK;
         ob_start();
         $this->build_event_listen();
         $eventListen = ob_get_clean();
-        $headerText = $needLoadSubpage ? "decodeURIComponent(\$loadSubPages[{$xValue}])" : $xTitle;
+        $headerText = $needLoadSubpage ? "decodeURIComponent(this.\$store.loadSubPages[{$xValue}])" : $xTitle;
         if (!$needLoadSubpage){
             $bodyAttr = ' x-text="'.$xTitle.'"';
         }

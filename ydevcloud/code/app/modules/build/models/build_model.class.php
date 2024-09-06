@@ -13,6 +13,7 @@ use app\project\Page_Model;
 use app\project\Project_Model;
 use app\project\Project_Setting_Model;
 use app\project\Style_Model;
+use app\project\Uicomponent_Event_Model;
 use app\project\Web_Api_Model;
 use app\vendor\css\Css_Factory;
 use yangzie\YZE_Resource_Controller;
@@ -71,6 +72,7 @@ class Build_Model{
 	 */
 	private $cssFactory;
 	private $events=[];
+	private $popupEvents=[];
 	private $ioBinds=[];
 	private $dataBinds=[];
 	private $uiid2BindData=[];
@@ -215,6 +217,7 @@ class Build_Model{
 		$this->stateBindStyles = [];
 		$events = [];
 		foreach (Page_Bind_Event_Model::from('e')
+					->left_join(Uicomponent_Event_Model::CLASS_NAME, 'uie', 'uie.id = e.uicomponent_event_id')
 					->left_join(Action_Model::CLASS_NAME, 'a', "a.bind_uuid = e.uuid and a.bind_class=:cls")
 					 ->where('e.page_id=:pid and e.is_deleted=0')
 					 ->left_join(Page_Bind_Api_Model::CLASS_NAME, 'b_api', 'b_api.id=a.bind_api_id and b_api.is_deleted=0')
@@ -228,10 +231,15 @@ class Build_Model{
 				$item['a']->set_bind_api($item['b_api']);
 			}
 			if ($item['a']) $event->add_action($item['a']);
+			if ($item['uie']) $event->set_uicomponent_event($item['uie']);
 			$events[$event->id] = $event;
 		}
 
 		foreach ($events as $event){
+			if($event->get_uicomponent_event() && !$event->uiid) {
+				$this->popupEvents[$event->id] = $event;
+				continue;
+			}
 			foreach (explode(',', $event->uiid) as $uiid){
 				if (!$this->events[$uiid]) $this->events[$uiid] = [];
 				$this->events[$uiid][] = $event;
@@ -384,6 +392,9 @@ class Build_Model{
 	 */
 	public function get_events($uiid){
 		return $this->events[$uiid]?:[];
+	}
+	public function get_popup_events(){
+		return $this->popupEvents;
 	}
 	public function get_ui(){
 		return $this->project->get_setting_value('ui');

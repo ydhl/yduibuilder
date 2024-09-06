@@ -56,8 +56,8 @@
                    class="list-group-item border-0 list-group-item-action p-1 pe-0 ps-3 d-flex align-items-center">
                 <i class="iconfont icon-drag text-muted" style="cursor: move"></i>
                 <i :class="'iconfont text-danger me-1 icon-' + action.type"></i>
-                <EventAction :action="action" bind-type="bind_event"
-                             :bind-uuid="editInterval.uuid" :key="actionIndex"
+                <EventAction :action="action" :bind-type="bindType"
+                             :bind-uuid="bindUuid" :key="actionIndex"
                              :variables="myVariables"></EventAction>
                 <ConfirmRemove @remove="deleteAction(actionIndex, action, 'action')"></ConfirmRemove>
               </div>
@@ -75,8 +75,8 @@
                    class="list-group-item border-0 list-group-item-action p-1 pe-0 ps-3 d-flex align-items-center">
                 <i class="iconfont icon-drag text-muted" style="cursor: move"></i>
                 <i :class="'iconfont text-danger me-1 icon-' + action.type"></i>
-                <EventAction :action="action" bind-type="bind_event"
-                             :bind-uuid="editInterval.uuid" :key="actionIndex"
+                <EventAction :action="action" :bind-type="bindType"
+                             :bind-uuid="bindUuid" :key="actionIndex"
                              :variables="myVariables"></EventAction>
                 <ConfirmRemove @remove="deleteAction(actionIndex, action, 'complete')"></ConfirmRemove>
               </div>
@@ -110,6 +110,7 @@ import { useStore } from 'vuex'
 import { VueDraggableNext } from 'vue-draggable-next'
 import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 import ConfirmRemove from '@/components/common/ConfirmRemove.vue'
+import Util from '@/components/Util'
 
 export default {
   name: 'IntervalSetting',
@@ -117,6 +118,8 @@ export default {
     modelValue: Object,
     readonly: Boolean,
     variables: Object,
+    bindType: String,
+    bindUuid: String,
     autosave: {
       default: true,
       type: Boolean
@@ -142,20 +145,15 @@ export default {
     const editInterval = ref<any>({})
     const { t } = useI18n()
     const store = useStore()
+    const util = Util()
     const selectedPageId = computed(() => store.state.design.page?.meta?.id)
     const bindAction = ref({ value: 'mutation', name: t('action.mutation') })
     const actionTypes = computed(() => {
-      const types = [
-        { name: t('action.mutation'), value: 'mutation', desc: t('action.mutationDesc') },
-        { name: t('action.webapi'), value: 'webapi', desc: t('action.webapiDesc') }
-      ]
       if (addActionType !== 'action') {
-        types.push(...[
-          { name: t('action.redirect'), value: 'redirect', desc: t('action.redirectDesc') },
-          { name: t('action.popup'), value: 'popup', desc: t('action.popupDesc') }
-        ])
+        return util.getActions('mutation', 'webapi', 'validate', 'redirect', 'popup')
+      } else {
+        return util.getActions('mutation', 'webapi', 'validate')
       }
-      return types
     })
     const openDialog = () => {
       editInterval.value = JSON.parse(JSON.stringify(myInterval.value))

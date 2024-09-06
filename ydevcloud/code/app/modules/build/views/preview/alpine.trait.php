@@ -28,6 +28,7 @@ trait Alpine {
         // 顶级元素构建alpine代码结构主体
         if ($isTopPage){
             $this->build_page_data_code(1);
+            $this->build_custom_event_code();
         }
 
         $this->build_event_code();
@@ -57,20 +58,21 @@ trait Alpine {
         }
 
         if ($isTopPage){
-            // 在主页面记录加载的子页url及其title
-            if ($this->build->get_page()->page_type == 'page'){
-                $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, '$loadSubPages: {},');
-            }
             // 当前页面的url
             $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, '$url: "'.$this->get_popup_page_url($this->build->get_page()).'",');
 
             $this->build_component_input(2);
 
             if (in_array($this->build->get_page()->page_type, ['popup', 'subpage'])){
-                $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent(0, true).'this.$data.$loadSubPages[this.$url] = encodeURIComponent("'.$this->data['meta']['title'].'")');
+                $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $this->indent(0, true).'this.$store.loadSubPages[this.$url] = encodeURIComponent("'.$this->data['meta']['title'].'")');
             }
             // 如果是子页、组件、Modal弹窗，则作为module加载，不调用Alpine.start（由主页面调用）
             if (!$this->build->is_subpage() && !in_array($this->build->get_page()->page_type, ['popup','subpage'])){
+                $store = <<< STORE
+Alpine.store('loadSubPages', [])
+STORE;
+
+                $fragment->add_code(Html_Code_Fragment::SECTION_END, $this->build->indent_code(0, $store));
                 $fragment->add_code(Html_Code_Fragment::SECTION_END, PHP_EOL."Alpine.start()");
             }
         }else{
@@ -104,6 +106,31 @@ INPITCONFIG;
         return $style;
     }
 
+    protected function build_custom_event_code() {
+        $eventCodes = $this->get_popup_event_action_codes();
+        if (!$eventCodes) return;
+
+        $codeLines = [];
+        foreach ($eventCodes as $html_event_name => $eventInfo){
+            list('args'=>$args, 'code'=>$codeBlocks, 'comment'=>$comment) = $eventInfo;
+            if (!$codeBlocks) continue;
+            $lines = [''];
+            if ($comment){
+                $comments = explode(PHP_EOL, $comment);
+                $lines[] = "/**";
+                $lines[] = " * ".join(PHP_EOL." * ", $comments);
+                $lines[] = " */";
+            }
+            $lines[] = $this->get_event_function_name($html_event_name)."(".join(', ', $args).") {";
+            $lines[] = $this->indent(1, true)."const page = this";
+            foreach ($codeBlocks as $codes){
+                $lines = array_merge($lines, $this->build->indent_code(1, $codes));
+            }
+            $lines[] = "}";
+            $codeLines[] = join(PHP_EOL, $lines);
+        }
+        if($codeLines) $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_EVENT, join(','.PHP_EOL,$codeLines).','.PHP_EOL);
+    }
     protected function build_event_code() {
         $eventCodes = $this->get_event_action_codes();
         if (!$eventCodes) return;
@@ -134,7 +161,17 @@ INPITCONFIG;
         foreach($this->lifeCycleEvent() as $eventName){
             if (!$eventCodes[$eventName]) continue;
             $_event = preg_replace("/^on/",'',$eventName);
-            $line = "window.addEventListener('{$_event}', (event)=>this.{$myid}_{$eventName}(".join(', ', (array)$eventCodes[$eventName]['args'])."))";
+
+            if (!strcasecmp($_event, 'load')){
+                if (!in_array($this->build->get_page()->page_type, ['popup', 'subpage'])) {
+                    $line = "window.addEventListener('{$_event}', (event)=>this.{$myid}_{$eventName}(".join(', ', (array)$eventCodes[$eventName]['args'])."))";
+                } else {
+                    $line = "this.{$myid}_{$eventName}()";
+                }
+            }else{
+                $line = "window.addEventListener('{$_event}', (event)=>this.{$myid}_{$eventName}(".join(', ', (array)$eventCodes[$eventName]['args'])."))";
+            }
+
             $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_INIT, $line);
         }
     }
@@ -166,20 +203,7 @@ INPITCONFIG;
     }
 
     protected function build_event_listen(){
-        $events = $this->build->get_events($this->myid());
-        $eventHandlers = [];
-        $myid = $this->myid();
-        foreach ($events as $event){
-            if(!$event->uicomponent_event_id && $this->isLifeCycleEvent($event->event)) continue;
-            $name = strtolower($event->uicomponent_event_id ? $event->event : $this->eventName($event->event));
-            if (!$name) continue;
-            if (!$this->is_custom_ui() && $name=='change') {
-                $inputDataName = $this->get_input_data_name();
-                $eventHandlers['x-init'] = "\$watch(alpinejs_get_input_data_name(\$el, '{$inputDataName}'), (value, oldValue) => {$myid}_change(value, oldValue))";
-            }else{
-                $eventHandlers['@'.$name] = $this->myid().'_'.$name;
-            }
-        }
+        $eventHandlers = $this->get_event_listen_props();
         foreach ($eventHandlers as $name => $func){
             echo $this->wrap_output($name, $func);
         }
@@ -462,19 +486,34 @@ INTERVAL;
                 $queryArgs[] = $bindData->name.': '. $this->data_default($bindData->get_data_model());
             }
         }
+        $popup_events = [];
+        $page_uuid = $this->get_page_uuid();
+        $events = $this->build->get_popup_events();
+        foreach ($events as $event){
+            if(!$event->uicomponent_event_id || $event->get_uicomponent_event()->page_id !== $page->id) continue;
+            $name = strtolower($event->event);
+            if (!$name) continue;
+            $popup_events['@'.$name] = $page_uuid.'_'.$name;
+        }
 
         if ($page_type == 'POPUP'){// 加载modal
             $esc = boolval(@$page_config['meta']['custom']['esc']);
             $codeLines[] = "YDECloud.openModal({";
+            $codeLines[] = $this->indent(1, true)."currPageId:'".$this->build->get_page()->uuid."',";
             $codeLines[] = $this->indent(1, true)."pageId:'{$pageId}',";
-            $codeLines[] = $this->indent(1, true)."url:'".$this->get_popup_page_url($page)."?'+YDECloud.buildQuery({".join(", ", $queryArgs)."}),";
+            $codeLines[] = $this->indent(1, true)."url:'".$this->get_popup_page_url($page)."?'+YDECloud.buildQuery({subpage:1, ".join(", ", $queryArgs)."}),";
             $codeLines[] = $this->indent(1, true)."esc: ".($esc?'true':'false').",";
-            $codeLines[] = $this->indent(1, true)."backdrop:'".(@$page_config['meta']['custom']['backdrop'] ??'yes')."'";
+            $codeLines[] = $this->indent(1, true)."backdrop:'".(@$page_config['meta']['custom']['backdrop'] ??'yes')."',";
+            $codeLines[] = $this->indent(1, true)."events:".json_encode($popup_events);
             $codeLines[] = "});";
         }else{
             $codeLines[] = "YDECloud.openPage({";
+            $codeLines[] = $this->indent(1, true)."currPageId:'".$this->build->get_page()->uuid."',";
             $codeLines[] = $this->indent(1, true)."pageId:'{$pageId}',";
-            $codeLines[] = $this->indent(1, true)."url:'".$this->get_popup_page_url($page)."?'+YDECloud.buildQuery({".join(", ", $queryArgs)."})";
+            $codeLines[] = $this->indent(1, true)."url:'".$this->get_popup_page_url($page)."?'+YDECloud.buildQuery({subpage:1, ".join(", ", $queryArgs)."}),";
+            $codeLines[] = $this->indent(1, true)."esc: true,";
+            $codeLines[] = $this->indent(1, true)."backdrop:'yes',";
+            $codeLines[] = $this->indent(1, true)."events:".json_encode($popup_events);
             $codeLines[] = "});";
         }
     }
@@ -510,12 +549,13 @@ INTERVAL;
             $allParents = [];
             $path = [];
             $dataConfig = $bindData->find_data($mutation->mutation_data_id, $dataModel, $allParents, $path);
-            $path[] = $dataConfig['name'];
             $path[] = 'page';
+            $path = array_reverse($path);
+            $path[] = $dataConfig['name'];
             $rightValue = $expression->get_expression_code();
             $operatior = $mutation->mutation_operator ?: ' = ';
             $operatior = preg_replace("/@/", $rightValue, $operatior);
-            $codes = [join('.', array_reverse($path)), $operatior];
+            $codes = [join('.', $path), $operatior];
             $this->add_used_variable($rightValue);
             $codeLines[] = join('', $codes);
         }
@@ -525,6 +565,49 @@ INTERVAL;
             return;
         }
         $codeLines[] = 'YDECloud.closeSelf(event.target)';
+    }
+    protected function build_break_code(Action_Model $action, &$codeLines)
+    {
+        $codeLines[] = 'return;';
+    }
+    protected function build_validate_code(Action_Model $action, &$codeLines){
+        $validates = $action->get_validate_datas();
+        $subActions = $action->get_sub_condition_action();
+        if ($subActions)  $codeLines[] = 'let hasError = false;';
+        foreach ($validates as $validate) {
+            $data = $validate->get_validate_data();
+            $fullName = $data['fullName'];
+            $noPrefix = preg_replace("/^page./", "", $fullName);
+            if ($data['validRegular']){
+                $regular = trim($data['validRegular'], '/');
+                $this->_build_validate_code($codeLines, "{$fullName}.match(/{$regular}/)", $noPrefix, $data['invalidMsg'], $subActions);
+            }else if (strtolower($data['validRule'])=='notempty'){
+                $this->_build_validate_code($codeLines, "{$fullName}", $noPrefix, $data['invalidMsg'], $subActions);
+            }
+        }
+        if ($subActions['true']){
+            $codeLines[] = "if(!hasError){";
+            foreach ($subActions['true'] as $subAction){
+                $this->get_action_code(1, $subAction, $codeLines);
+            }
+            $codeLines[] = "}";
+        }
+
+        if ($subActions['false']){
+            $codeLines[] = "if(hasError){";
+            foreach ($subActions['false'] as $subAction){
+                $this->get_action_code(1, $subAction, $codeLines);
+            }
+            $codeLines[] = "}";
+        }
+    }
+    private function _build_validate_code(&$codeLines, $check, $errorKey, $msg, $subActions){
+        $codeLines[] = "if({$check}){";
+        $codeLines[] = $this->indent(1, true)."delete page.error['{$errorKey}']";
+        $codeLines[] = "} else{";
+        if ($subActions) $codeLines[] = $this->indent(1, true)."hasError = true";
+        $codeLines[] = $this->indent(1, true)."page.error['{$errorKey}'] =  '{$msg}'";
+        $codeLines[] = "}";
     }
 
     /**
@@ -770,6 +853,14 @@ INTERVAL;
             $apicCodes = [];
             $this->build_webapi_code($action, $apicCodes);
             $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $apicCodes));
+        }else if ($action->type=='validate'){
+            $apicCodes = [];
+            $this->build_validate_code($action, $apicCodes);
+            $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $apicCodes));
+        }else if ($action->type=='break'){
+            $apicCodes = [];
+            $this->build_break_code($action, $apicCodes);
+            $bodyLines = array_merge($bodyLines, $this->build->indent_code($indent, $apicCodes));
         }else{
             $bodyLines[] = $this->indent($indent, true).'// NOT DEFINED ACTION TYPE '.$action->type;
         }
@@ -815,7 +906,7 @@ INTERVAL;
         $build = $this->build;
         $index = 0;
         // 对于弹窗访问，参数在加载js的地址中
-        $queryString = $this->build->get_page()->page_type == Page_Model::PAGE_TYPE_POPUP ? ',import.meta.url' : '';
+        $queryString = $this->build->is_subpage() ? ',import.meta.url' : '';
         foreach ($build->get_bound_datas() as $bound_data){
             $dataConfig = $bound_data->get_data_model();
             if ($dataConfig['comment'] || $dataConfig['title'] || $dataConfig['deprecated']){
@@ -839,6 +930,7 @@ INTERVAL;
 
             $index++;
         }
+        $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, 'error: {},');
         $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, "");
         $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, "\$title: \"{$this->data['meta']['title']}\",");
         $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, "\$pageId: \"{$this->myid()}\",");

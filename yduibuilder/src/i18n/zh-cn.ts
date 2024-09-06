@@ -4,6 +4,8 @@ export default {
     api: {
       notBindAnyApi: '未绑定API'
     },
+    break: '中断',
+    breakDesc: '后面的动作将不再执行',
     call: '调用',
     closepopup: '关闭弹窗',
     closepopupDesc: '关闭当前打开的弹窗',
@@ -11,6 +13,7 @@ export default {
     codeModeDesc: '编写你的代码，代码将会运行在Promise中, 通过 resolve 来标识执行成功',
     completedAction: '结束时执行的动作',
     condition: '条件',
+    conditionDesc: '指定的条件满足时执行指定的行为',
     conditionFalseDesc: '当指定的条件为【假】时执行指定的行为',
     conditionTrueDesc: '当指定的条件为【真】时执行指定的行为',
     emit: '触发',
@@ -39,7 +42,9 @@ export default {
     redirectUrl: '地址',
     settingMode: '配置模式',
     webapi: 'Web API',
-    webapiDesc: '调用 Web API'
+    webapiDesc: '调用 Web API',
+    validate: '数据验证',
+    validateDesc: '验证数据是否满足指定的规则'
   },
   api: {
     action: '行为',
@@ -61,6 +66,7 @@ export default {
     model: {
       comment: '备注',
       defaultValue: '默认值',
+      deprecated: '已作废',
       enumValue: '枚举值',
       isEnumValue: '是枚举值',
       import: '导入数据结构',
@@ -69,8 +75,19 @@ export default {
       mock: 'Mock',
       name: '数据名称',
       noSubField: '没有字段',
+      nullable: '允许为null',
+      readonly: '只读',
+      required: '必填项',
       title: '名称',
-      type: '类型'
+      type: '类型',
+      valid: {
+        regular: '正则表达式',
+        notEmpty: '不为空',
+        notEmptyDesc: '不能是假值，比如"",false, null,undefined等',
+        whenPass: '当通过验证时',
+        whenFail: '当未通过验证时'
+      },
+      validate: '验证规则'
     },
     noInputs: '没有输入',
     noOutputs: '没有输出',
@@ -133,6 +150,7 @@ export default {
     function: '功能',
     fontName: '字体名称',
     fontNameEmpty: '请输入字体名称',
+    general: '常规',
     goBack: '回退',
     icon: '图标',
     idIsInvalidate: 'ID无效',
@@ -207,6 +225,7 @@ export default {
     data: '数据事件',
     declareEvent: '自定义事件',
     declareEventDesc: '组件可以显式声明它将触发的事件',
+    declarePopupEventDesc: '弹窗页面可以定义自定义事件来和源页面交互',
     declareEventNoListen: '未注册',
     defineEvent: '定义事件',
     deleteConfirm: '确定删除吗?',
@@ -671,7 +690,7 @@ export default {
       stateConditionTip: '当指定的条件满足时显示该状态的样式:',
       stateName: '状态名',
       variable: '变量',
-      variableTip: '当下面的变量满足指定的条件时显示当前样式'
+      variableTip: '当下面的表达式为真时显示当前样式'
     },
     table: {
       accented: '特色',
@@ -858,6 +877,7 @@ export default {
     },
     pageScope: '页面数据',
     pleaseChooseMutationData: '请选择要赋值的数据',
+    pleaseChooseValidateData: '请选择要验证的数据',
     pushDesc: '将数据压入数组的末尾（入栈）',
     remaintime: '剩余时间',
     rightValue: '右值',

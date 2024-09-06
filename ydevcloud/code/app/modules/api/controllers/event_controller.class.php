@@ -85,16 +85,24 @@ class Event_Controller extends YZE_Resource_Controller {
 
         return YZE_JSON_View::success($this, $rst);
     }
-    // 拉取监听的事件(指定页面的自定义事件)
+    // 拉取可以监听的事件(指定页面的自定义事件或者弹窗页面的自定义事件)
     public function listen() {
         $request = $this->request;
         $page_uuid = trim($request->get_from_get("page_uuid"));
         $subPageId = trim($request->get_from_get("sub_page_uuid"));
         $this->valid($page_uuid);
 
-        $uipage = find_by_uuid(Page_Model::CLASS_NAME, $subPageId);
-        $events = Uicomponent_Event_Model::from()->where('page_id=:pid and is_deleted=0')
-            ->select([':pid'=>$uipage->id]);
+        if ($subPageId){
+            $uipage = find_by_uuid(Page_Model::CLASS_NAME, $subPageId);
+            $events = $uipage ? Uicomponent_Event_Model::from()->where('page_id=:pid and is_deleted=0')
+                ->select([':pid'=>$uipage->id]) : [];
+        }else{ // 不传入当做查询页面中所有弹窗的自定义事件
+            $events = Uicomponent_Event_Model::from('e')
+                ->left_join(Page_Model::CLASS_NAME, 'p', 'p.id = e.page_id')
+                ->left_join(Action_Model::CLASS_NAME, 'a', "a.popupPageId = p.uuid")
+                ->where('e.is_deleted = 0 and a.page_id=:pid')
+                ->select([':pid'=>$this->page->id], 'e');
+        }
 
         $datas = [];
         foreach ($events as $event){
@@ -240,7 +248,7 @@ class Event_Controller extends YZE_Resource_Controller {
             ->save();
         return YZE_JSON_View::success($this);
     }
-    // 拉取自定义事件
+    // 拉取自定义事件，主要是组件的自定义事件和弹窗页面（包含被弹出页面）的自定义事件
     public function declare() {
         $request = $this->request;
         $page_uuid = trim($request->get_from_get("page_uuid"));

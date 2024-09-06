@@ -9,6 +9,7 @@ use app\project\Page_Bind_Api_Model;
 use app\project\Page_Bind_Event_Model;
 use app\project\Page_Model;
 use app\project\Uicomponent_Event_Model;
+use app\project\Validate_Data_Model;
 use app\project\Web_Api_Model;
 use yangzie\YZE_DBAImpl;
 use yangzie\YZE_FatalException;
@@ -138,6 +139,8 @@ class Action_Controller extends YZE_Resource_Controller {
                 $old_value[] = $subAction->id;
                 $action->set($field, join(",", $old_value))->save();
             }
+        }else if ($action->type == Action_Model::TYPE_VALIDATE){
+            $subAction->set('bind_condition', strcasecmp($type, 'falseActions')===0 ? 'false': 'true')->save();
         }
 
         return YZE_JSON_View::success($this, $subAction->get_records());
@@ -368,7 +371,7 @@ class Action_Controller extends YZE_Resource_Controller {
 
         switch ($bind_type){
             case 'bind_event': $bind_class = Page_Bind_Event_Model::CLASS_NAME;break;
-            case 'bind_action': $bind_class = Page_Bind_API_Action_Model::CLASS_NAME;break;
+            case 'bind_api_action': $bind_class = Page_Bind_API_Action_Model::CLASS_NAME;break;
             default: throw new YZE_FatalException(__('unknown bind type'));
         }
 
@@ -401,6 +404,25 @@ class Action_Controller extends YZE_Resource_Controller {
         }
 
         Mutation_Model::save_mutation($action->id, $mutations);
+
+        return YZE_JSON_View::success($this,['uuid'=>$action->uuid]);
+    }
+
+    // 更新数据验证内容
+    public function post_validate() {
+        $request = $this->request;
+        $postData = json_decode(file_get_contents("php://input"), true);
+        $page_uuid = trim($postData["page_uuid"]);
+        $action_uuid = trim($postData["action_uuid"]);
+        $validate = $postData["validate"];
+        $this->valid($page_uuid);
+
+        $action = find_by_uuid(Action_Model::CLASS_NAME, $action_uuid);
+        if(!$action) {
+            throw new YZE_FatalException(__('action not found'));
+        }
+
+        Validate_Data_Model::save_validate($action, $validate);
 
         return YZE_JSON_View::success($this,['uuid'=>$action->uuid]);
     }

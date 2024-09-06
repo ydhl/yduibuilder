@@ -184,7 +184,11 @@ function alpinejs_init_directive(Alpine){
             const keyValue = evaluate(expression)
             if (!keyValue || (typeof keyValue) !== 'object') return
             for(const key in keyValue){
-                el.setAttribute(key, keyValue[key])
+                if (keyValue[key] === undefined || keyValue[key] === null){
+                    el.removeAttribute(key)
+                }else{
+                    el.setAttribute(key, keyValue[key])
+                }
             }
         });
     });

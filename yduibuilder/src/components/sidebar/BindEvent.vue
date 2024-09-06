@@ -1,7 +1,10 @@
 <template>
   <div class="d-flex align-items-center justify-content-between mb-2 pt-2">
     <div class="fs-6 text-muted user-select-none"><i class="iconfont icon-event"></i>&nbsp;{{t('common.event')}}</div>
-    <button type="button" class="btn btn-primary btn-xs" @click.stop="openEventBindDlg">{{t('event.bind')}}</button>
+    <div class="d-flex align-items-center">
+      <button type="button" class="btn btn-primary btn-xs" @click.stop="openEventBindDlg">{{t('event.bind')}}</button>
+      <button type="button" class="btn btn-light btn-xs" @click.stop="refresh">{{t('common.refresh')}}</button>
+    </div>
   </div>
   <div v-if="loading" class="vh-100 d-flex align-items-center justify-content-center">
     {{t('page.loading')}}
@@ -10,7 +13,7 @@
     <div class="style-panel pt-1">
       <template v-for="(events, key) in boundEvents" :key="key">
         <div class="style-header d-flex align-items-center justify-content-between">
-          <span><i class="iconfont icon-tree-close"></i> {{t('event.'+key)}}{{events && events.length>0 ? '('+events.length+')' : ''}}</span>
+          <span class="d-flex align-items-center"><i class="iconfont icon-tree-close"></i> {{t('event.'+key)}}&nbsp;<span class="badge bg-primary" v-if="events && events.length>0">{{events.length}}</span></span>
           <template v-if="events && events.length>0">
             <div v-if="!openState[key]" @click.stop="openState[key]=true"><i class="iconfont hover-primary icon-expandall"></i></div>
             <div v-if="openState[key]" @click.stop="openState[key]=false"><i class="iconfont hover-primary icon-collapseall"></i></div>
@@ -49,8 +52,8 @@
         </div>
       </template>
     </div>
-    <!--组件自定义事件-->
-    <template  v-if="selectedPage?.pageType == 'component'">
+    <!--组件自定义事件和弹窗页面的自定义事件-->
+    <template v-if="selectedPage?.pageType == 'component' || pageIsPopup">
       <div class="d-flex align-items-center justify-content-between mb-2 pt-2">
         <div class="fs-6 text-muted"><i class="iconfont icon-event"></i>&nbsp;{{t('event.declareEvent')}}</div>
         <button type="button" class="btn btn-primary btn-xs" @click.stop="openDeclareDialog">{{t('event.defineEvent')}}</button>
@@ -68,21 +71,21 @@
             <div class="fs-7 text-muted p-1" v-if="event.desc">{{event.desc}}</div>
             <template v-if="!event.args || event.args.length == 0">{{t('event.noArgs')}}</template>
             <template v-for="(arg, index) in event.args" :key="index">
-              <Data :model="arg" :index="index" :can-input="false" :can-output="false" :can-mutation="false" :intent="0"></Data>
+              <DataComp :model="arg" :index="index" :can-input="false" :can-output="false" :can-mutation="false" :intent="0"></DataComp>
             </template>
           </div>
         </template>
       </div>
     </template>
-    <!--注册组件的自定义事件-->
-    <template  v-if="selectedUIItem?.type == 'UIComponent'">
+    <!--注册组件或弹窗的自定义事件-->
+    <template v-if="selectedUIItem?.type == 'UIComponent' || selectedPage.includePopup">
     <div class="d-flex align-items-center justify-content-between mb-2 pt-2 mt-3">
-      <div class="fs-6 text-muted"><i class="iconfont icon-event"></i>&nbsp;{{t('event.componentEvent', [componentName])}}</div>
+      <div class="fs-6 text-muted"><i class="iconfont icon-event"></i>&nbsp;{{t('event.componentEvent', [selectedUIItem?.type == 'UIComponent' ? componentName : t('common.popup')])}}</div>
     </div>
     <template  v-for="(customEvent, index) in customEvents" :key="index">
       <div class="d-flex align-items-center">
         <div class="flex-shrink-0 flex-grow-1 me-1 fw-bold text-truncate hover-text-primary pointer"
-             @click="viewCustomEvent(customEvent)">&nbsp;{{customEvent.name}}</div>
+             @click="viewCustomEvent(customEvent)">&nbsp;{{customEvent.name}} <span class="text-muted fs-7 fw-normal">{{customEvent.desc}}</span></div>
         <div class="text-end" v-if="!customEvent?.bind">
           <i class="iconfont icon-event pointer text-primary" @click="openCustomBindDlg(customEvent)"></i>
         </div>
@@ -105,11 +108,12 @@
           </transition-group>
         </draggable>
       </div>
-      <div v-else class="text-muted text-center fs-7">
+      <div v-else class="text-muted fs-7">
         {{t('event.declareEventNoListen')}}
       </div>
     </template>
   </template>
+
   </template>
   <!--绑定的元素菜单-->
   <div class="list-group shadow-sm" ref="boundPop" v-if="boundUIDialogVisible">
@@ -212,10 +216,10 @@
       </div>
     </div>
   </lay-layer>
-  <!-- declare -->
+  <!-- 自定义事件 -->
   <lay-layer v-model="declareEventDialogVisible" :title="t('event.declareEvent')" :shade="true" :area="['520px', '500px']" :btn="declareEventButtons">
     <div class="p-2">
-      <p class="text-muted">{{t('event.declareEventDesc')}}</p>
+      <p class="text-muted">{{t(pageIsPopup ? 'event.declarePopupEventDesc' : 'event.declareEventDesc')}}</p>
       <label>{{t('event.name')}}:</label>
       <input type="text" class="form-control form-control-sm" v-model.trim="declareEvent.name">
       <label class=" mt-2">{{t('common.desc')}}:</label>
@@ -238,10 +242,11 @@ import canvas from '@/lib/canvas'
 import $ from 'jquery'
 import ConfirmRemove from '@/components/common/ConfirmRemove.vue'
 import DataStruct from '@/components/common/DataStruct.vue'
-import Data from '@/components/common/Data.vue'
+import DataComp from '@/components/common/Data.vue'
 import EventAction from '@/components/common/EventAction.vue'
 import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 import { VueDraggableNext } from 'vue-draggable-next'
+import Util from '@/components/Util'
 
 /**
  * 行为绑定
@@ -251,7 +256,7 @@ export default {
   components: {
     AdvanceSelect,
     EventAction,
-    DataComp: Data,
+    DataComp,
     DataStruct,
     ConfirmRemove,
     draggable: VueDraggableNext
@@ -263,26 +268,21 @@ export default {
     const loading = ref(true)
     const openState = ref({})
     const boundPop = ref()
+    const util = Util()
     const selectedPage = computed(() => store.state.design.page)
     const selectedPageId = computed(() => selectedPage.value?.meta?.id)
     const XYInIframe = computed(() => store.state.design.mouseXYInIframe)
     const mouseupInFrame = computed(() => store.state.design.mouseupInFrame)
     const pageScale = computed(() => store.state.design.scale)
     const actionTypes = computed(() => {
-      const types = [
-        { name: t('action.redirect'), value: 'redirect', desc: t('action.redirectDesc') },
-        { name: t('action.mutation'), value: 'mutation', desc: t('action.mutationDesc') },
-        { name: t('action.popup'), value: 'popup', desc: t('action.popupDesc') },
-        { name: t('action.webapi'), value: 'webapi', desc: t('action.webapiDesc') },
-        { name: t('action.interval'), value: 'interval', desc: t('action.intervalDesc') }
-      ]
-      if (selectedPage.value.pageType === 'component') {
-        types.push({ name: t('action.emit'), value: 'emit', desc: t('action.emitDesc') })
+      const types: any = ['redirect', 'mutation', 'popup', 'webapi', 'interval', 'validate']
+      if (selectedPage.value.pageType === 'component' || pageIsPopup.value) {
+        types.push('emit')
       }
-      if (selectedPage.value.pageType === 'popup') {
-        types.push({ name: t('action.closepopup'), value: 'closepopup', desc: t('action.closepopupDesc') })
+      if (selectedPage.value.pageType === 'popup' || pageIsPopup.value) {
+        types.push('closepopup')
       }
-      return types
+      return util.getActions(...types)
     })
     const types = {}
     const componentName = computed(() => {
@@ -379,18 +379,17 @@ export default {
 
     const loadDeclaredEvent = () => {
       declaredEvents.value = []
-      if (selectedPage.value.pageType !== 'component') return
+      if (selectedPage.value.pageType !== 'component' && !pageIsPopup.value) return
       ydhl.get('api/event/declare.json?page_uuid=' + selectedPageId.value, [], (rst) => {
         if (!rst.success) return
         declaredEvents.value = rst.data
         store.commit('updateState', { declaredEvents: rst.data })
       }, 'json')
     }
-    const loadCustomEvent = () => {
+    const loadListenEvent = () => {
       customEvents.value = []
-      if (info.selectedUIItem?.value?.type !== 'UIComponent') return
-      const subPageUuid = info.selectedUIItem.value?.items?.[0].subPageId
-      if (!subPageUuid) return
+      if (info.selectedUIItem?.value?.type !== 'UIComponent' && !selectedPage.value.includePopup) return
+      const subPageUuid = info.selectedUIItem.value?.items?.[0]?.subPageId || ''
       ydhl.get('api/event/listen.json?page_uuid=' + selectedPageId.value + '&sub_page_uuid=' + subPageUuid, [], (rst) => {
         if (!rst.success) return
         customEvents.value = rst.data
@@ -414,11 +413,16 @@ export default {
     }
     watch(selectedPageId, (v) => {
       if (!v) return
-      loadEventData()
+      refresh()
     })
     watch(info.selectedUIItemId, (v) => {
-      loadCustomEvent()
+      loadListenEvent()
     })
+    const refresh = () => {
+      loadEventData(true)
+      loadDeclaredEvent()
+      loadListenEvent()
+    }
     onMounted(() => {
       boundEvents.value = {}
       for (const key in eventMap) {
@@ -428,9 +432,7 @@ export default {
           types[type] = key
         }
       }
-      loadEventData(true)
-      loadDeclaredEvent()
-      loadCustomEvent()
+      refresh()
       $('body').on('click', (event: any) => {
         boundUIDialogVisible.value = false
       })
@@ -538,13 +540,13 @@ export default {
 
     // 添加自定义事件绑定
     const addCustomBind = () => {
-      ydhl.post('api/event/add.json', { page_uuid: selectedPageId.value, custom_event_uuid: currCustomEvent.value.uuid, type: bindAction.value.value, uiid: info.selectedUIItemId.value }, [], (rst) => {
+      ydhl.post('api/event/add.json', { page_uuid: selectedPageId.value, custom_event_uuid: currCustomEvent.value.uuid, type: bindAction.value.value, uiid: info.selectedUIItemId.value || '' }, [], (rst) => {
         if (!rst.success) {
           ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
           return
         }
         closeDialog()
-        loadCustomEvent()
+        loadListenEvent()
       })
     }
     // 添加事件绑定
@@ -595,7 +597,7 @@ export default {
             return
           }
           loadEventData()
-          loadCustomEvent()
+          loadListenEvent()
           closeDialog()
         })
       })
@@ -660,7 +662,7 @@ export default {
           removeUIEventBind(boundUI.meta.id, event.uuid)
         }
         loadEventData()
-        loadCustomEvent()
+        loadListenEvent()
       })
     }
     const deleteAction = (event, index, action) => {
@@ -690,6 +692,9 @@ export default {
       }
       return names.length > 0 ? '(' + names.join(', ') + ')' : ''
     }
+    const pageIsPopup = computed(() => {
+      return selectedPage.value.bePopup || selectedPage.value.pageType === 'popup'
+    })
     return {
       t,
       ...info,
@@ -720,10 +725,12 @@ export default {
       customEvents,
       declaredEvents,
       openState,
+      pageIsPopup,
+      refresh,
       loadDeclaredEvent,
       addEventBind,
       loadEventData,
-      loadCustomEvent,
+      loadListenEvent,
       addCustomBind,
       openEventBindDlg,
       deleteAction,

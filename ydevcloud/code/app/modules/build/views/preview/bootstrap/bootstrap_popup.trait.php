@@ -21,12 +21,7 @@ trait Bootstrap_Popup {
      * @return string
      */
     protected function get_popup_page_url($page) {
-        if ($page->page_type=='popup' || $page->page_type=='subpage'){
-            // 弹窗加载时显示上完整的html结构
-            return '/preview/popup/'.$page->uuid;
-        }else{
-            return '/preview/page/'.$page->uuid;
-        }
+        return '/preview/popup/'.$page->uuid;
     }
 
 }

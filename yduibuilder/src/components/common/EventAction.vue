@@ -23,7 +23,14 @@
       {{t('action.closepopupDesc')}}
     </template>
     <template v-else-if="myAction.type=='interval'">
-      <IntervalSetting :readonly="readonly" :variables="variables" :autosave="autosave" @beforeSave="beforeSave" v-model="myAction"></IntervalSetting>
+      <IntervalSetting :readonly="readonly" :bind-type="bindType" :bind-uuid="bindUuid" :variables="variables" :autosave="autosave" @beforeSave="beforeSave" v-model="myAction"></IntervalSetting>
+    </template>
+    <template v-else-if="myAction.type=='validate'">
+      <ValidateSetting :readonly="readonly" :variables="variables" :autosave="autosave" @beforeSave="beforeSave" v-model="myAction"></ValidateSetting>
+    </template>
+    <template v-else-if="myAction.type=='break'">
+      {{t('action.break')}}
+      <div class="text-muted fs-7">{{t('action.breakDesc')}}</div>
     </template>
   </div>
 </template>
@@ -37,10 +44,11 @@ import RedirectSetting from '@/components/common/RedirectSetting.vue'
 import MutationSetting from '@/components/common/MutationSetting.vue'
 import EmitSetting from '@/components/common/EmitSetting.vue'
 import IntervalSetting from '@/components/common/IntervalSetting.vue'
+import ValidateSetting from '@/components/common/ValidateSetting.vue'
 
 export default {
   name: 'EventAction',
-  components: { IntervalSetting, EmitSetting, MutationSetting, RedirectSetting, WebAPISetting, PopupSetting },
+  components: { ValidateSetting, IntervalSetting, EmitSetting, MutationSetting, RedirectSetting, WebAPISetting, PopupSetting },
   props: {
     action: Object, // Action
     variables: Object, // 参数

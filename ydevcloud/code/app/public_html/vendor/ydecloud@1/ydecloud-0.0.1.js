@@ -99,7 +99,7 @@ if (!this.YDECloud) {
                         }
                     }
                     $('body').append(scripts)
-                    // 把script单独提出来，先执行，延迟100后在显示dom，避免其中绑定的x-text等数据提示不存在
+                    // 把script单独提出来，先执行，延迟后在显示dom，避免其中绑定的x-text等数据提示不存在
                     setTimeout(() => {
                         $(appendToId).append(other)
                         resolve()

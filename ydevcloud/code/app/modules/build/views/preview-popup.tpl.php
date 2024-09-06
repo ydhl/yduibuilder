@@ -11,6 +11,7 @@ $page = $this->get_data('page');
 
 $build = new Build_Model($this->controller, $page, 0);
 $build->set_api_env($_GET['api_env']);
+$build->set_is_subpage(true);// popup 作为subpage处理
 $view = Preview_View::create_View($build);
 ?>
 <link rel="stylesheet" data-page-uuid="<?= $page->uuid?>" type="text/css" href="/preview/page/<?= $page->uuid?>.css" />

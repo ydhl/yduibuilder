@@ -2,7 +2,7 @@
   <lay-layer resize layer-classes="layui-layer-content-overflow" :resizeEnd="recomputed" v-model="myDlgVisible"
              :title="`${title || t('common.customCode')} - ${language}`"
              :shade="true" :area="['800px', '400px']" :btn="buttons">
-    <CodeEditor v-if="myDlgVisible" :hide-variable="hideVariable" ref="codeEditor" :editStyle="editStyle" :code="code" :schema="schema" :leff-data="leftData" :left-value-path="leftValuePath"
+    <CodeEditor v-if="myDlgVisible" :hide-variable="hideVariable" ref="codeEditor" :editStyle="editStyle" :code="code" :schema="schema" :left-data="leftData" :left-value-path="leftValuePath"
     :surround-code="leftOperator" :tip="tip" :variables="variables" :read-only="readOnly" :language="language"
     ></CodeEditor>
   </lay-layer>

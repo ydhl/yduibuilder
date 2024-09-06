@@ -3,10 +3,10 @@
     <template v-if="hasMutation" >
         <div v-for="(mutation, index) in myAction.mutations" :key="index" class="d-flex align-items-center w-100">
           <span>{{mutation.data_name}}</span>
-          <template v-if="mutation.expression_code"><span class="text-muted">{{mutation.mutation_operator ? mutation.mutation_operator.replace(/@/, '').replace(/\([^)]*\)/,'(') : '='}}</span>
+          <template v-if="mutation.expression_code"><span class="text-muted">{{startBracket(mutation)}}</span>
             <span class="text-success text-truncate">{{mutation.expression_code}}</span>
           </template>
-          <span class="text-muted" v-if="mutation.mutation_operator?.endsWith(')')">)</span>
+          <span class="text-muted" v-if="endBracket(mutation)">{{endBracket(mutation)}}</span>
         </div>
     </template>
     <div v-else>{{ t('action.notSet') }}</div>
@@ -27,11 +27,8 @@
           <td>{{variable.title}} {{variable.comment}}</td>
         </tr>
       </table>
-      <div class="mb-2">
-        <AdvanceSelect btn-size="btn-sm btn-light" :options="leftValues" :default-text="t('variable.pleaseChooseMutationData')" @change="(option)=>updateLeftValue(option.data)"></AdvanceSelect>
-      </div>
       <DataMutation :model="data" :default-value="mutationDefault" :variables="variables" :from-uuid="data.uuid"
-                    :intent="0" v-for="(data, index) in mutatedDatas" :key="index"></DataMutation>
+                    :intent="0" v-for="(data, index) in pageDatas" :key="index"></DataMutation>
     </div>
   </lay-layer>
 </template>
@@ -42,11 +39,10 @@ import ydhl from '@/lib/ydhl'
 import { useI18n } from 'vue-i18n'
 import DataMutation from '@/components/common/DataMutation.vue'
 import { useStore } from 'vuex'
-import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 
 export default {
   name: 'MutationSetting',
-  components: { AdvanceSelect, DataMutation },
+  components: { DataMutation },
   props: {
     readonly: Boolean,
     modelValue: Object,
@@ -62,8 +58,6 @@ export default {
     const dialogVisible = ref(false)
     const dataType = ref('page')
     const pageDatas = ref<any>([])
-    const queryDatas = ref<any>([])
-    const mutatedDatas = ref<any>([])
     const myAction = toRef(props, 'modelValue')
     const mutationDefault = ref(JSON.parse(JSON.stringify(myAction.value.mutations || {})))
     const hasMutation = computed(() => myAction.value.mutations && Object.keys(myAction.value.mutations).length > 0)
@@ -80,19 +74,11 @@ export default {
             return
           }
           pageDatas.value = rst.data.page
-          queryDatas.value = rst.data.query
-          for (const mutationDataId in mutationDefault.value) {
-            mutatedDatas.value.push(...pageDatas.value.filter(item => item.uuid === mutationDataId))
-          }
-          for (const mutationDataId in mutationDefault.value) {
-            mutatedDatas.value.push(...queryDatas.value.filter(item => item.uuid === mutationDataId))
-          }
           dialogVisible.value = true
         }, 'json')
       })
     }
     const openDialog = () => {
-      mutatedDatas.value = []
       loadData()
     }
     const update = () => {
@@ -141,39 +127,30 @@ export default {
       ]
       return btns
     })
-    const leftValues = computed(() => {
-      const values: any = []
-      if (pageDatas.value.length > 0) {
-        values.push({ name: t('variable.pageScope'), disabled: true })
-      }
-      for (const data of pageDatas.value) {
-        values.push({ name: data.name, data, value: data.name, desc: data.type + ' ' + (data.title || '') + (data.comment || '') })
-      }
-      if (queryDatas.value.length > 0) {
-        values.push({ name: t('action.queryParams'), disabled: true })
-      }
-      for (const data of queryDatas.value) {
-        values.push({ name: data.name, data, value: data.name, desc: data.type + ' ' + (data.title || '') + (data.comment || '') })
-      }
-      return values
-    })
-    const updateLeftValue = (data) => {
-      mutatedDatas.value.push(data)
-      mutationDefault.value[data.uuid] = { from_uuid: data.uuid, data_name: data.name, data_type: data.type }
+
+    const startBracket = (mutation) => {
+      const operator = mutation.mutation_operator?.trim() || '='
+      if (!operator) return '='
+      const [start] = operator.split('@')
+      return start || '='
+    }
+    const endBracket = (mutation) => {
+      const operator = mutation.mutation_operator?.trim() || ''
+      if (!operator) return ''
+      const [, end] = operator.split('@')
+      return end || ''
     }
     return {
       dialogVisible,
       myAction,
       t,
       pageDatas,
-      queryDatas,
       hasMutation,
       dataType,
       openDialog,
       mutationDefault,
-      updateLeftValue,
-      mutatedDatas,
-      leftValues,
+      endBracket,
+      startBracket,
       buttons
     }
   }

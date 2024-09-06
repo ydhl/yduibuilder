@@ -29,7 +29,7 @@
         <transition-group>
           <div class="list-group-item border-0 list-group-item-action p-1 d-flex align-items-center" v-for="(action, idx) in bindApiAction.trueActions" :key="idx">
             <div class="me-1"><i class="iconfont icon-drag text-muted" style="cursor: move"></i></div>
-            <EventAction bind-type="bind_action" :bind-uuid="bindApiAction.uuid" :action="action"
+            <EventAction bind-type="bind_api_action" :bind-uuid="bindApiAction.uuid" :action="action"
                          :variables="getActionLocalArgs(bindApiAction)" @beforeSave="(callback) => beforeSave(idx, callback, 'true')"></EventAction>
             <ConfirmRemove @remove="postRemoveAction(bindApiAction, idx, 'true')"></ConfirmRemove>
           </div>
@@ -42,7 +42,7 @@
         <transition-group>
           <div class="list-group-item border-0 list-group-item-action p-1 d-flex align-items-center" v-for="(action, idx) in bindApiAction.falseActions" :key="idx">
             <div class="me-1"><i class="iconfont icon-drag text-muted" style="cursor: move"></i></div>
-            <EventAction bind-type="bind_action" :bind-uuid="bindApiAction.uuid" :action="action"
+            <EventAction bind-type="bind_api_action" :bind-uuid="bindApiAction.uuid" :action="action"
                          :variables="getActionLocalArgs(bindApiAction)" @beforeSave="(callback) => beforeSave(idx, callback, 'false')"></EventAction>
             <ConfirmRemove @remove="postRemoveAction(bindApiAction, idx, 'false')"></ConfirmRemove>
           </div>
@@ -82,7 +82,7 @@
                   <ConfirmRemove @remove="removeAction(index, 'true')"></ConfirmRemove>
                 </div>
                 <div class="card-body">
-                  <EventAction :autosave="false" bind-type="bind_action" :bind-uuid="editBindApiActionModel.uuid" :popup-page-data-inline="true" :action="action"
+                  <EventAction :autosave="false" bind-type="bind_api_action" :bind-uuid="editBindApiActionModel.uuid" :popup-page-data-inline="true" :action="action"
                                :variables="editBindApiActionVariable" @beforeSave="(callback) => beforeSave(index, callback, 'true')">
                   </EventAction>
                 </div>
@@ -104,7 +104,7 @@
                   <ConfirmRemove @remove="removeAction(index, 'false')"></ConfirmRemove>
                 </div>
                 <div class="card-body">
-                  <EventAction :autosave="false" bind-type="bind_action" :bind-uuid="editBindApiActionModel.uuid" :popup-page-data-inline="true" :action="action"
+                  <EventAction :autosave="false" bind-type="bind_api_action" :bind-uuid="editBindApiActionModel.uuid" :popup-page-data-inline="true" :action="action"
                                :variables="editBindApiActionVariable" @beforeSave="(callback) => beforeSave(index, callback, 'false')">
                   </EventAction>
                 </div>
@@ -145,6 +145,7 @@ import EventAction from '@/components/common/EventAction.vue'
 import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 import { VueDraggableNext } from 'vue-draggable-next'
 import CodeEditor from '@/components/common/CodeEditor.vue'
+import Util from '@/components/Util'
 
 export default {
   name: 'BindAPIPostProcessors',
@@ -166,19 +167,13 @@ export default {
     const selectedPage = computed(() => store.state.design.page)
     const editBindApiActionModel = ref<any>({ mode: 'setting', code: '', actions: [] })
     const currAction = ref<any>({})
+    const util = Util()
     const actionTypes = computed(() => {
-      const types = [
-        { name: t('action.output'), value: 'output', desc: t('action.outputDataDesc') },
-        { name: t('action.redirect'), value: 'redirect', desc: t('action.redirectDesc') },
-        { name: t('action.mutation'), value: 'mutation', desc: t('action.mutationDesc') },
-        { name: t('action.popup'), value: 'popup', desc: t('action.popupDesc') },
-        { name: t('action.webapi'), value: 'webapi', desc: t('action.webapiDesc') },
-        { name: t('action.interval'), value: 'interval', desc: t('action.intervalDesc') }
-      ]
+      const actions: any = ['output', 'redirect', 'mutation', 'popup', 'webapi', 'interval', 'validate']
       if (selectedPage.value.pageType === 'component') {
-        types.push({ name: t('action.emit'), value: 'emit', desc: t('action.emitDesc') })
+        actions.push('emit')
       }
-      return types
+      return util.getActions(...actions)
     })
     const bindApiActions = ref([])
     const currOutputIndex = ref(0)

@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex align-items-center justify-content-end w-100">
+  <div class="d-flex align-items-center justify-content-center w-100">
     <template v-if="hasMutationOperator">
       <AdvanceSelect :options="mutationOperators" btn-size="btn-xs" :default-text="myDefaultMutationOperator || t('expression.operator')" @change="(option) => updateMutationOperator(option.value)">
         <template #input>
@@ -36,13 +36,15 @@
     </div>
     <template v-else-if="myExpression?.type">
       <template v-if="!hideArrow">←</template>
-      <span @click="!readonly ? openCodeEditor('code') : ''" class="text-primary fs-7 me-1" :title="myExpressionDesc">{{myExpressionDesc || t('action.notSet')}}</span>
+      <span @click="!readonly ? openCodeEditor('code') : ''" class="text-primary pointer fs-7 me-1" :title="myExpressionDesc">{{myExpressionDesc || t('action.notSet')}}</span>
     </template>
-    <span class="fs-7" v-if="myDefaultMutationOperatorEndWithBracket">)</span>
+    <span class="fs-7" v-if="endBracket">{{endBracket}}</span>
+    <template v-if="!hideMutationType">
     <div v-if="!readonly && (!hasMutationOperator || (hasMutationOperator && defaultMutationOperator))" class="flex-shrink-0 d-flex align-items-center text-muted">&nbsp;{
       <AdvanceSelect :options="mutationTypes"  btn-size="btn-xs" :default-text="myExpression?.type ? t('expression.'+myExpression?.type)  : t('variable.rightValue')" @change="(option) => changeMutationType(option.value)"></AdvanceSelect>
       }&nbsp;
     </div>
+    </template>
   </div>
   <lay-layer v-model="connectDataDialogVisible" :title="t('variable.bound')" resize :shade="true" :area="['500px', '500px']"
              :btn="connectDataDialogButtons">
@@ -52,7 +54,7 @@
                  :checked-uuid="myExpression.data?.id" :page-uuid="selectedPageId"/>
     </div>
   </lay-layer>
-  <CodeEditorDialog v-model="codeDlgVisible" :surround-code="defaultMutationOperator" :language="codeType === 'literal' ? 'json' : 'javascript'"
+  <CodeEditorDialog v-model="codeDlgVisible" :left-operator="defaultMutationOperator" :language="codeType === 'literal' ? 'json' : 'javascript'"
               :left-value-path="leftValuePath" :left-data="leftValue" :variables="variables"
               :schema="leftValueSchema" :code="code" @update="updateCode"></CodeEditorDialog>
 </template>
@@ -77,6 +79,7 @@ export default {
     leftValue: Object, // 左值
     leftValuePath: String, // 左值访问路径
     hideArrow: Boolean,
+    hideMutationType: Boolean,
     hasMutationOperator: {
       default: true,
       type: Boolean
@@ -133,10 +136,16 @@ export default {
       return ydhl.getExpressionDesc(myExpression.value)
     })
     const myDefaultMutationOperator = computed(() => {
-      return props.defaultMutationOperator?.replace(/@/, '').replace(/\([^)]*\)/, '(')
+      const operator = props.defaultMutationOperator?.trim()
+      if (!operator) return ''
+      const [start] = operator.split('@')
+      return start || ''
     })
-    const myDefaultMutationOperatorEndWithBracket = computed(() => {
-      return props.defaultMutationOperator?.trim().endsWith(')')
+    const endBracket = computed(() => {
+      const operator = props.defaultMutationOperator?.trim() || ''
+      if (!operator) return ''
+      const [, end] = operator.split('@')
+      return end || ''
     })
     const leftValueSchema = computed(() => {
       // 如果操作是数组，并且操作的是数组项目，那么只用数组项的定义
@@ -211,7 +220,8 @@ export default {
     const changeMutationType = (type) => {
       if (type === 'remove') {
         delete myExpression.value.type
-        context.emit('updateExpression', myExpression.value, myExpressionDesc.value)
+        context.emit('updateExpression', null, null)
+        context.emit('updateMutationOperator', '')
         return
       }
       clearExpression(myExpression.value)
@@ -252,7 +262,7 @@ export default {
       changeMutationType,
       updateMutationOperator,
       myDefaultMutationOperator,
-      myDefaultMutationOperatorEndWithBracket,
+      endBracket,
       codeType,
       mutationOperators,
       leftValueSchema

@@ -1,5 +1,5 @@
 export declare type UIState = 'normal' | 'readonly' | 'disabled' | 'hidden'
-export declare type UIActionType = 'popup' | 'mutation' | 'webapi' | 'emit' | 'redirect' | 'closepopup'
+export declare type UIActionType = 'output' | 'redirect' | 'popup' | 'webapi' | 'emit' | 'mutation' | 'closepopup' | 'interval' | 'validate' | 'break'
 export declare type PageType = 'popup' | 'subpage' | 'page' | 'master' | 'component'
 export declare type UIKind = 'pc' | 'mobile'
 /**
@@ -177,7 +177,18 @@ export interface DataStruct{
    */
   required?: boolean;
   action?: string;
-  readonly?: boolean;
+  /**
+   * 数据验证正则表达式字符串
+   */
+  validRegular?: string;
+  /**
+   * 默认的验证规则
+   */
+  validRule?: string;
+  /**
+   * 验证错误字符串
+   */
+  invalidMsg?: string;
   /**
    * 提供数据的ui uuid数组
    */
@@ -441,6 +452,14 @@ export interface UIBase{
    * page 就是常规的页面，popup表示该页面是弹窗， master 母版页，subpage 子页，component 自定义的ui组件
    */
   pageType?: PageType;
+  /**
+   * 对应非popup页面，可能会作为弹窗弹窗，该属性记录页面是否被其他弹窗弹出了
+   */
+  bePopup?: boolean;
+  /**
+   * 当前页面是否有弹窗
+   */
+  includePopup?: boolean;
   /**
    * 某些元素的子元素可以包含一个子页，子页单独设计，这里通过subPageId进行引用;
    * 这时mate、items，events，pageType，type从指向的page加载, 并以subpage中的为主;

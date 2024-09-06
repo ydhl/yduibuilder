@@ -210,7 +210,6 @@ trait Page_Model_Method{
         }
 
         $this->merge_selector($config, $styles);
-
         $fetchedConfig[$this->uuid] = $config;
         return $config;
     }

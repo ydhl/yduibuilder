@@ -109,8 +109,8 @@
     </div>
   </div>
 
-  <lay-layer v-model="addStyleStateVisible" layer-classes="layui-layer-content-overflow" :title="t('style.state.addState')" :shade="true" :area="['520px', '500px']" :btn="buttons">
-    <div class="p-2" style="width: 500px">
+  <lay-layer v-model="addStyleStateVisible" layer-classes="layui-layer-content-overflow" :title="t('style.state.addState')" :shade="true" :area="['320px', '300px']" :btn="buttons">
+    <div class="p-2" style="width: 300px">
       <div class="row">
         <label class="col-sm-3 col-form-label text-truncate">{{t("style.state.stateName")}}</label>
         <div class="col-sm-9 d-flex align-items-center">
@@ -121,8 +121,10 @@
         </div>
       </div>
       <div class="row mb-3 p-2 text-muted">{{t('style.state.variableTip')}}</div>
-      <div class="p-3 d-flex align-items-start justify-content-start">
-        <Expression :expression="editState.expression"></Expression>
+      <div class="p-3 d-flex align-items-start justify-content-start fs-1">
+        <ExpressionDropdown :hide-arrow="true" :has-mutation-operator="false"
+                            default-mutation-operator="check data:"
+                            :hideMutationType="true" @updateExpression="updateExpression" :expression="editState.expression"></ExpressionDropdown>
       </div>
     </div>
   </lay-layer>
@@ -143,10 +145,11 @@ import StyleSize from '@/components/sidebar/style/Size.vue'
 import { layer } from '@layui/layer-vue'
 import { useStore } from 'vuex'
 import ydhl from '@/lib/ydhl'
-import Expression from '@/components/common/Expression.vue'
+import ExpressionDropdown from '@/components/common/ExpressionDropdown.vue'
+import { Expression } from '@/store/model'
 export default {
   name: 'UIStyle',
-  components: { Expression, StyleSize, StyleLyout, StyleSelector, StyleUtilities, MarginPadding, StyleBorder, Typography, StyleBackground },
+  components: { ExpressionDropdown, StyleSize, StyleLyout, StyleSelector, StyleUtilities, MarginPadding, StyleBorder, Typography, StyleBackground },
   setup (props: any, context: any) {
     const info = initUI()
     const { t } = useI18n()
@@ -248,14 +251,17 @@ export default {
       const stateType = activeStyleState.value.type
       const stateName = activeStyleState.value.state
       const editState = styleStates.value[stateName]?.state || null
-      const style = JSON.parse(JSON.stringify(previewStyleItem.value.meta))
+      // console.log(styleStates.value[stateName], stateName, 1)
+      const style = JSON.parse(JSON.stringify(previewStyleItem.value))
+      if (!styleStates.value[stateName]) styleStates.value[stateName] = {}
+      styleStates.value[stateName].style = style
       ydhl.postJson('api/state/style.json', {
         state_uuid: editState?.uuid || '',
         page_uuid: pageUuid,
         state_type: stateType,
         state_name: stateName,
         uiid: uiid,
-        style
+        style: style.meta
       }).then((rst: any) => {
         if (!rst.success) {
           ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
@@ -272,7 +278,9 @@ export default {
       editState.value = {
         name: '', // 状态名
         type, // pseudo 伪代码 custom 自定义状态
-        expression: {}
+        expression: {
+          type: 'code'
+        }
       }
     }
     const saveState = (editState) => {
@@ -287,8 +295,10 @@ export default {
             ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
             return
           }
+
           styleStates.value[rst.data.key] = rst.data.state // state 里面包含了state和style
-          switchStyleState(editState.type, editState.name)
+          // console.log(activeStyleState.value, editState.type, editState.name, rst.data.key)
+          switchStyleState(editState.type, rst.data.key)
           initEditState()
           addStyleStateVisible.value = false
         })
@@ -323,6 +333,7 @@ export default {
         editState.value = JSON.parse(JSON.stringify(styleState))
       } else {
         editState.value.type = stateType
+        editState.value.expression = { type: 'code' }
       }
     }
     const loadStateStyle = () => {
@@ -377,6 +388,10 @@ export default {
       editState.value.name = pseudo
       saveState(editState.value)
     }
+    const updateExpression = (expression: Expression, expressionDesc: string) => {
+      editState.value.expression = expression
+      editState.value.expression_code = expressionDesc
+    }
     return {
       ...info,
       currPage,
@@ -391,6 +406,7 @@ export default {
       removeStyleState,
       switchStyleState,
       initEditState,
+      updateExpression,
       buttons,
       editState,
       styleStates,

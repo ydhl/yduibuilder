@@ -25,15 +25,6 @@ if (!this.YDECloud) {
         })
     }
     /**
-     * iframe 加载的页面有变化时调用
-     * @param pageId 要打开的页面id
-     */
-    YDECloud.updateIframe = function (pageId){
-        const title  = $(`#${pageId} iframe`).get(0).contentDocument.title
-        $(`#${pageId} .modal-title`).text(title)
-    }
-
-    /**
      * 加载提示框
      */
     YDECloud.loading = function (){
@@ -57,47 +48,59 @@ style="display: flex!important;justify-content: center;align-items: center; posi
      * bootstrap 用model打开url指定的page
      * page 通过iframe和当前页面做隔离
      *
+     * @param currPageId 当前页面id
      * @param pageId 要打开的页面id
      * @param url 要打开的地址
      */
-    YDECloud.openPage = function ({pageId, url,  esc=true, backdrop= 'yes'}){
+    YDECloud.openPage = function ({currPageId, pageId, url,  esc=true, backdrop= 'yes', events={}}){
         const id = pageId
-        $("body").append(`<div class="modal fade" id="${id}">
+        const listen = []
+        for (const eventName in events) {
+            listen.push(`${eventName}="${events[eventName]}"`)
+        }
+        $(`[data-uiid="${currPageId}"]`).append(`<div class="modal fade" id="${id}">
     <div style="pointer-events: none;display: flex;width: 100vw;height: 100vh;align-items: center;justify-content: center">
-        <div class="modal-dialog" style="max-width: none !important;">
+        <div class="modal-dialog" ${listen.join(' ')} style="max-width: none !important;">
             <div class="modal-content" style="width: 80vw;height: 70vh">
                 <div class="modal-header">
-                    <h5 class="modal-title">Loading</h5>
+                    <h5 class="modal-title" x-text="$store.loadSubPages['${url}']||'Loading'"></h5>
                     <button type="button" onclick="YDECloud.closeSelf(this)" class="close">
                       <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body p-0">
-                    <iframe src="${url}" onload="YDECloud.updateIframe('${id}')" style="width: 100%;height: 100%" frameborder="0"></iframe>
+                <div class="modal-body p-0" id="${id}Body">
                 </div>
             </div>
         </div>
     </div>
     </div>`);
-
-        showModal(id, backdrop, esc)
+        YDECloud.loadUrl(url, `#${id}Body`).then(() => {
+            showModal(id, backdrop, esc)
+        })
     }
 
     /**
      * 打开bootstrap的modal
      *
+     * @param currPageId 当前页面id
      * @param pageId 要打开的对话框页面
      * @param url 弹窗页面的url，页面的输出本身就包含bootstrap的modal结构
      * @param esc 是否按下esc后关闭对话框
      * @param backdrop yes / no / static
      */
-    YDECloud.openModal = function({pageId, url,  esc=true, backdrop= 'yes'}){
+    YDECloud.openModal = function({currPageId, pageId, url,  esc=true, backdrop= 'yes', events={}}){
         let timer;
+        const listen = []
+        for (const eventName in events) {
+            listen.push(`${eventName}="${events[eventName]}"`)
+        }
         const id = pageId
         timer = setTimeout(() => {
             YDECloud.loading()
         }, 1000)
-        YDECloud.loadUrl(url, 'body').then(() => {
+
+        $(`[data-uiid="${currPageId}"]`).append(`<div ${listen.join(' ')} id="${id}Body"></div>`);
+        YDECloud.loadUrl(url, `#${id}Body`).then(() => {
             clearTimeout(timer)
             YDECloud.hideLoading()
             showModal(id, backdrop, esc)

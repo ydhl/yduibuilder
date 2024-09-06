@@ -83,6 +83,7 @@ export default {
       defaultMutation.value[myModel.value.uuid].expression_code = expDesc
     }
     const updateMutationOperator = (operator) => {
+      if (!defaultMutation.value[myModel.value.uuid]) defaultMutation.value[myModel.value.uuid] = { from_uuid: props.fromUuid, data_name: (props.path ? props.path + '.' : '') + (myModel.value.name || ''), data_type: myModel.value.type }
       defaultMutation.value[myModel.value.uuid].mutation_operator = operator
     }
 
