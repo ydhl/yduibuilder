@@ -51,7 +51,9 @@ function buildProject($server, $loginUser, $data) {
         $server->push($e->getMessage());
         return;
     }
-    $server->push(sprintf(__('compile finished please: <a href="%s">download</a>'), getOssLink($url)));
+    $url = \yangzie\yze_move_file($url, YZE_UPLOAD_PATH.basename($url));
+    $server->push(sprintf(__('compile finished please: <a href="%s">download</a>'), UPLOAD_SITE_URI.\yangzie\yze_remove_path($url, YZE_UPLOAD_PATH)));
+    
     $server->push("done");
 }
 

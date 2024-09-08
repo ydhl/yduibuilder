@@ -102,7 +102,7 @@ abstract class Base_Factory{
 
         $this->compile();
         $this->zip->close();
-        return upload2oss($fullpath, "build/{$this->project->uuid}/{$zipFileName}");
+        return $fullpath;
     }
     public abstract function compile();
 
