@@ -239,9 +239,11 @@ export default {
           editValidate.value.datas.splice(index, 1)
         }
       } else {
-        data.from_uuid = rootDataId
-        data.fullName = path
-        editValidate.value.datas.push(data)
+        if (editValidate.value.datas.findIndex(item => item.uuid === data.uuid) === -1) {
+          data.from_uuid = rootDataId
+          data.fullName = path
+          editValidate.value.datas.push(data)
+        }
       }
     }
 

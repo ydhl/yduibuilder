@@ -46,50 +46,75 @@ function find_by_uuids($class, array $uuid=null, $fetch_all=false){
  * @throws Exception
  */
 function post_snapshot_message($isFullPage, $pageid, $preview_url, $file_path,  $width, $height) {
-//    try{
-//        $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_USER, RABBITMQ_PWD);
-//        $channel = $connection->channel();
-//        $channel->queue_declare('ydevcloud_snapshot', false, true, false, false);
-//    }catch (Exception $exception){
-////        throw new \yangzie\YZE_FatalException($exception->getMessage());
-//        return;
-//    }
-//    //生成jwt_token
-//    $loginUser = \yangzie\YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
-//    $payload=array(
-//        'iss'=>'ydevcloud',
-//        'iat'=>time(),
-//        'nbf'=>time(),
-//        'sub'=>$loginUser->uuid,
-//        'jti'=>md5(uniqid('JWT').time()));
-//    $token = \app\vendor\Jwt::getToken($payload);
-//    $data = [
-//        "mysql_user"=> YZE_DB_USER,
-//        "mysql_host"=> YZE_DB_HOST_M,
-//        "mysql_db"  => YZE_DB_DATABASE,
-//        "mysql_port"=> YZE_DB_PORT,
-//        "mysql_pass"=> YZE_DB_PASS,
-//        "save_path" => $file_path,
-//        "preview_url" => $preview_url,
-//        "pageid"    => $pageid,
-//        "region"    => OSS_ENDPOINT,
-//        "accessKeyId" => OSS_ACCESSKEYID,
-//        "accessKeySecret" => OSS_ACCESSKEYSECRET,
-//        "bucket"          => OSS_BUCKET,
-//        "isFullPage" => $isFullPage ? 1 : 0,
-//        "width"     => floatval($width),
-//        "height"    => floatval($height),
-//        "token"     => $token
-//    ];
-//    try {
-//        $msg = new \PhpAmqpLib\Message\AMQPMessage(json_encode($data));
-//        $channel->basic_publish($msg, '', 'ydevcloud_snapshot');
-//        $channel->close();
-//        $connection->close();
-//    } catch (Exception $exception) {
-////        throw new \yangzie\YZE_FatalException($exception->getMessage());
-//        return;
-//    }
+    try{
+        $connection = new \PhpAmqpLib\Connection\AMQPStreamConnection(RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_USER, RABBITMQ_PWD);
+        $channel = $connection->channel();
+        $channel->queue_declare('ydevcloud_snapshot', false, true, false, false);
+    }catch (Exception $exception){
+//        throw new \yangzie\YZE_FatalException($exception->getMessage());
+        return;
+    }
+    //生成jwt_token
+    $loginUser = \yangzie\YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
+    $payload=array(
+        'iss'=>'ydevcloud',
+        'iat'=>time(),
+        'nbf'=>time(),
+        'sub'=>$loginUser->uuid,
+        'jti'=>md5(uniqid('JWT').time()));
+    $token = \app\vendor\Jwt::getToken($payload);
+    $data = [
+        "mysql_user"=> YZE_DB_USER,
+        "mysql_host"=> YZE_DB_HOST_M,
+        "mysql_db"  => YZE_DB_DATABASE,
+        "mysql_port"=> YZE_DB_PORT,
+        "mysql_pass"=> YZE_DB_PASS,
+        "save_path" => $file_path,
+        "preview_url" => $preview_url,
+        "pageid"    => $pageid,
+        "region"    => OSS_ENDPOINT,
+        "accessKeyId" => OSS_ACCESSKEYID,
+        "accessKeySecret" => OSS_ACCESSKEYSECRET,
+        "bucket"          => OSS_BUCKET,
+        "isFullPage" => $isFullPage ? 1 : 0,
+        "width"     => floatval($width),
+        "height"    => floatval($height),
+        "token"     => $token
+    ];
+    try {
+        $msg = new \PhpAmqpLib\Message\AMQPMessage(json_encode($data));
+        $channel->basic_publish($msg, '', 'ydevcloud_snapshot');
+        $channel->close();
+        $connection->close();
+    } catch (Exception $exception) {
+//        throw new \yangzie\YZE_FatalException($exception->getMessage());
+        return;
+    }
+}
+
+/**
+ * 把fullpath文件保存到oss上
+ *
+ * @param $fullpath 本地的文件绝对路径
+ * @param $oss_file_name 存储在oss上的文件路径
+ * @return mixed 返回oss访问地址
+ * @throws YZE_FatalException
+ */
+function upload2oss($fullpath, $oss_file_name) {
+    $ossClient = new OssClient(OSS_ACCESSKEYID, OSS_ACCESSKEYSECRET, OSS_ENDPOINT);
+    $download = '';
+    try {
+        $file = $ossClient->uploadFile(OSS_BUCKET, $oss_file_name, $fullpath);
+        $download = $file['info']['url'];
+    } catch (\OSS\Core\OssException $e) {
+        throw new YZE_FatalException($e->getMessage());
+    }
+    try {
+        unlink($fullpath);
+    } catch (Exception $e) {
+        // ignore
+    }
+    return $download;
 }
 
 /**
@@ -126,6 +151,39 @@ function get_ram_access_key(){
         \app\common\Option_Model::save_option('OSS_RAM_ACCESSKEY', json_encode($result['Credentials']));
         return $result['Credentials'];
     }catch(\Exception $e){
+        throw new YZE_FatalException($e->getMessage());
+    }
+}
+/**
+ *
+ * 获取oss文件的访问链接，上传到oss的文件默认是不能直接访问的，需要通过oss提供的链接访问
+ *
+ * @param $ossLink string 通过upload2oss得到的下载链接
+ * @return string
+ * @throws YZE_FatalException
+ */
+function getOssLink($ossLink) {
+    set_time_limit(0);
+    $file = preg_replace("{^".OSS_BUCKET_HOST."/}", "", trim($ossLink));
+    $isimage = yze_isimage($file);
+
+
+    # 设置签名URL的有效时长为3600秒。
+    $timeout = 3600;
+    # 生成预览的签名URL，然后使用Bucket绑定的自定义域名进行访问。
+    if ($isimage){
+        $options = ["response-content-disposition"=>"inline"];
+    }else{
+        # 生成下载的签名URL。
+        $options = ["response-content-disposition"=>"attachment"];
+    }
+
+    try {
+        list('SecurityToken'=>$SecurityToken, 'AccessKeySecret'=>$AccessKeySecret, 'AccessKeyId'=>$AccessKeyId) = get_ram_access_key();
+
+        $ossClient = new OssClient($AccessKeyId, $AccessKeySecret, OSS_ENDPOINT, false, $SecurityToken);
+        return $ossClient->signUrl(OSS_BUCKET, $file, $timeout,  'GET', $options);
+    } catch (\OSS\Core\OssException $e) {
         throw new YZE_FatalException($e->getMessage());
     }
 }

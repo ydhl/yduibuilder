@@ -18,7 +18,7 @@
       <div v-if="files.length===0" class="text-muted text-center p-5"><i class="iconfont icon-empty fs-1"></i></div>
       <div class="d-flex mt-2 flex-wrap align-items-start" v-if="type==='image'">
         <div @click="select($event, file)" :key="index" v-for="(file, index) in files"
-             :class="{'d-flex flex-column btn btn-light cursor align-items-center align-content-center m-1 file': true, 'text-primary border-primary': file.id == modelValue.id}">
+             :class="{'d-flex flex-column btn btn-light cursor align-items-center align-content-center m-1 file': true, 'text-primary border-primary': file.id == selectFile.id}">
           <div class="file-preview" :style="`${file.url ? 'background-image: url(' + file.url + ')' : ''}`"></div>
           <small class="text-truncate" style="width: 4rem;">{{file.name}}</small>
         </div>

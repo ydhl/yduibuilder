@@ -113,9 +113,9 @@ class OAuthSignatureMethod_HMAC_SHA1 extends OAuthSignatureMethod {
 		$consumer->secret,
 		($token) ? $token->secret : ""
 		);
-		
-		
-		
+
+
+
 		$key_parts = SHOAuthUtil::urlencode_rfc3986($key_parts);
 		$key = implode('&', $key_parts);
 		return base64_encode(hash_hmac('sha1', $base_string, $key, true));
@@ -927,7 +927,7 @@ class OAuthUtil {
 
 		foreach ($params as $parameter => $value)
 		{
-			if( in_array($parameter,array("pic","image")) && $value{0} == '@' )
+			if( in_array($parameter,array("pic","image")) && substr($value, 0, 1) == '@' )
 			{
 				$url = ltrim( $value , '@' );
 				$content = file_get_contents( $url );
@@ -964,7 +964,7 @@ class OAuthUtil {
 			case 'png';
 			$mime = 'image/png';
 			break;
-			 
+
 			case 'gif';
 			default:
 				$mime = 'image/gif';

@@ -27,7 +27,7 @@ class web_html5 extends Base_Factory{
             <title><?= $this->project->name?></title>
         </head>
         <body>
-        <ol style="position: fixed; left:0; top:0px;width: 300px;bottom:0px;text-overflow: ellipsis">
+        <ol style="position: fixed; left:0; top:0px;width: 300px;bottom:0px;text-overflow: ellipsis;overflow: auto">
         <?php
             foreach ($files as $file=>$info){
                 list('url'=>$url, 'name'=>$name) = $info;
@@ -63,61 +63,40 @@ class web_html5 extends Base_Factory{
         $this->zip->addEmptyDir('assets/css');
         $this->zip->addEmptyDir('popup');
 
-        // 编译popup文件
-        $files = [];
-        foreach ($this->project->get_modules() as $module) {
-            foreach ($module->get_pages('popup') as $popup) {
-                $page_file = $popup->get_save_path('html');
-                $this->server->push(sprintf(__('%scompile popup page %s => %s%s'), "<strong>", $popup->name, $page_file, "</strong>"));
-
-                $this->extractImage(json_decode(html_entity_decode($popup->config), true));
-
-                $ydhttp = new YDHttp();
-                $ydhttp->request_header = ['token:' . $this->token];
-                $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $popup->uuid . '?code_type=html');
-                $this->zip->addFromString($page_file, $htmlContent);
-
-
-                $assetFileName = $popup->get_export_file_name('html');
-                foreach (['css'=>"assets/css/{$assetFileName}.css", 'js'=>"assets/js/{$assetFileName}.js"] as $code_type=>$assetFileName) {
-                    $this->server->push(sprintf(__('%scompile %s %s => %s%s'), "<strong>", $code_type, $popup->name, $assetFileName, "</strong>"));
-
-                    $ydhttp = new YDHttp();
-                    $ydhttp->request_header = ['token:' . $this->token];
-                    $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $popup->uuid . '?mode=compile&code_type='.$code_type);
-                    $this->zip->addFromString($assetFileName, $htmlContent);
-                }
-            }
+        // 编译popup,ui组件文件
+        $pages = [];
+        foreach(\app\project\Page_Model::from('p')
+            ->left_join(\app\project\Module_Model::CLASS_NAME,'m','p.module_id=m.id')
+            ->where("p.is_deleted=0 and p.project_id=:pid")
+            ->select([':pid'=>$this->project->id]) as $item){
+            if ($item['m']) $item['p']->set_module($item['m']);
+            $pages[] = $item['p'];
         }
 
-        // 编译ui文件
-        $files = [];
-        foreach ($this->project->get_modules() as $module) {
-            $this->server->push(sprintf(__('generate folder for modlue %s'), $module->name));
-            foreach ($module->get_pages() as $page) {
-                $page_file = $page->get_save_path('html');
+        $this->server->push(sprintf(__('generate popup/component/subpage...')));
+        foreach ($pages as $page) {
+            $page_file = $page->get_save_path('html');
+            $this->server->push(sprintf(__('%s compile popup page %s => %s%s'), "<strong>", $page->name, $page_file, "</strong>"));
+            if ($page->page_type == 'page') {
                 $pageName = basename($page_file);
-                $this->server->push(sprintf(__('%scompile page %s => %s%s'), "<strong>", $page->name, $page_file, "</strong>"));
-                $files[$pageName] = ['url'=>$page_file,'name'=>$page->name];
+                $files[$pageName] = ['url' => $page_file, 'name' => $page->name];
+            }
+            $this->extractImage(json_decode(html_entity_decode($page->config), true));
 
-                $this->extractImage(json_decode(html_entity_decode($page->config), true));
+            $ydhttp = new YDHttp();
+            $ydhttp->request_header = ['token:' . $this->token];
+            $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid . '?code_type=html');
+            $this->zip->addFromString($page_file, $htmlContent);
+
+
+            $assetFileName = $page->get_export_file_name('html');
+            foreach (['css'=>"assets/css/{$assetFileName}.css", 'js'=>"assets/js/{$assetFileName}.js"] as $code_type=>$assetFileName) {
+                $this->server->push(sprintf(__('%scompile %s %s => %s%s'), "<strong>", $code_type, $page->name, $assetFileName, "</strong>"));
 
                 $ydhttp = new YDHttp();
                 $ydhttp->request_header = ['token:' . $this->token];
-                $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid . '?code_type=html');
-                $this->zip->addFromString($page_file, $htmlContent);
-
-
-                $assetFileName = $page->get_export_file_name('html');
-                foreach (['css'=>"assets/css/{$assetFileName}.css", 'js'=>"assets/js/{$assetFileName}.js"] as $code_type=>$assetFileName) {
-                    $this->server->push(sprintf(__('%scompile %s %s => %s%s'), "<strong>", $code_type, $page->name, $assetFileName, "</strong>"));
-
-                    $ydhttp = new YDHttp();
-                    $ydhttp->request_header = ['token:' . $this->token];
-                    $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid . '?mode=compile&code_type='.$code_type);
-                    $this->zip->addFromString($assetFileName, $htmlContent);
-
-                }
+                $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid . '?mode=compile&code_type='.$code_type);
+                $this->zip->addFromString($assetFileName, $htmlContent);
             }
         }
 

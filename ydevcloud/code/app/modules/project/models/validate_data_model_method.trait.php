@@ -102,8 +102,10 @@ trait Validate_Data_Model_Method{
 
 	public static function save_validate(Action_Model $action, $validate){
 		Validate_Data_Model::from()->where('action_id=:aid')->delete([':aid'=>$action->id]);
+		$saved = [];
 
 		foreach ((array)$validate['datas'] as $validateData){
+			if (in_array($validateData['from_uuid'].$validateData['uuid'], $saved)) continue;
 			$model = new Validate_Data_Model();
 			$model->set('from_class', Page_Bind_Data_Model::CLASS_NAME) // 目前先只考虑page bind data
 				->set('from_uuid', $validateData['from_uuid'])
@@ -111,6 +113,7 @@ trait Validate_Data_Model_Method{
 				->set('uuid', Validate_Data_Model::uuid())
 				->set('action_id', $action->id)
 				->save();
+			$saved[] = $validateData['from_uuid'].$validateData['uuid'];
 		}
 	}
 }?>

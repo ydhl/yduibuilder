@@ -26,7 +26,7 @@ YZE_Hook::add_hook(YZE_HOOK_GET_LOCALE, function () {
         $_SESSION['lang'] = $_GET['lang'];
         setcookie('lang', $_GET['lang'], 0, '/');
     }
-    return $_SESSION['lang'] ?: strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0 , strpos($_SERVER['HTTP_ACCEPT_LANGUAGE'], ',')) ?: '');
+    return @$_SESSION['lang'] ?: strtolower(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0 , strpos($_SERVER['HTTP_ACCEPT_LANGUAGE'], ',')) ?: '');
 });
 
 YZE_Hook::add_hook ( YZE_HOOK_GET_LOGIN_USER, function  ( $datas ) {

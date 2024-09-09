@@ -43,7 +43,7 @@ foreach ((array)$jsModule as $file => $import) {
 foreach ((array)$fragment->get_subPage_modules() as $file => $import) {
     echo "import {$file} from '{$import['path']}';".PHP_EOL;
 }
-echo "import ydecloud from '../../ydecloud@1/ydecloud.es.js';".PHP_EOL;
+echo "import ydecloud from '../../vendor/ydecloud@1/ydecloud.es.js';".PHP_EOL;
 // html js 代码都以module的方式使用
 $build->output_code(PHP_EOL."export default function (inputConfig = null){", 0);
 foreach ((array)$fragment->get_subPage_modules() as $file => $import) {

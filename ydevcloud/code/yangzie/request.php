@@ -475,15 +475,17 @@ class YZE_Request extends YZE_Object {
     private function get_auth_methods($controller_name, $type) {
         if (!$this->module_instance ()) return null;
         if ($type == "need") {
-            $auth_methods = @$this->module_instance ()->auths [$controller_name];
+            $auths = (array)$this->module_instance ()->auths;
+            $auth_methods = @$auths [$controller_name];
             if ($auth_methods) return $auth_methods;
 
-            if ($this->module_instance ()->auths=="*" || $this->module_instance ()->auths == ['*']) return '*';
+            if ($auths == ['*']) return '*';
         } elseif ($type == "noneed") {
-            $auth_methods = @$this->module_instance ()->no_auths [$controller_name];
+            $no_auths = (array)$this->module_instance ()->no_auths;
+            $auth_methods = @$no_auths [$controller_name];
             if ($auth_methods) return $auth_methods;
 
-            if ($this->module_instance ()->no_auths=="*" || $this->module_instance ()->no_auths == ['*']) return '*';
+            if ($no_auths == ['*']) return '*';
         }
         return null;
     }

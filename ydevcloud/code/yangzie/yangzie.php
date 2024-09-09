@@ -48,7 +48,7 @@ class YZE_Object{
 	 * @param $type INPUT_GET, INPUT_POST, INPUT_COOKIE, INPUT_SERVER, INPUT_ENV, INPUT_SESSION, or INPUT_REQUEST.
 	 * @return unknown
 	 */
-	public static function filter_special_chars($array=array(),$type){
+	public static function filter_special_chars($array=array(),$type=INPUT_GET){
 		$definition = array();
 		foreach($array as $name=>$value){
 			$definition[$name]['filter'] 	= FILTER_CALLBACK;

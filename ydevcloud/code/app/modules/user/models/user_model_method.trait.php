@@ -18,7 +18,7 @@ trait User_Model_Method{
      * @param type $fromsite 那个网站
      * @param type $openid
      */
-    public function findUserOfOpenid($fromsite, $openid){
+    public static function findUserOfOpenid($fromsite, $openid){
         return self::from()->where("fromsite=:site and openid=:openid")->get_Single([":site"=>$fromsite, ":openid"=>$openid]);
     }
 

@@ -288,8 +288,8 @@ trait Page_Model_Method{
      */
     public function get_save_path($target){
         if (strtolower($target) == "html"){
-            if ($this->page_type == 'popup'){
-                return 'popup/' . $this->get_export_file_name($target).".html";
+            if ($this->page_type != 'page'){
+                return $this->page_type.'/' . $this->get_export_file_name($target).".html";
             }else{
                 $module = $this->get_module();
                 $folder = $module->folder ?: $module->name;

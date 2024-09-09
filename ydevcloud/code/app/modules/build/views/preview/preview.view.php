@@ -1601,7 +1601,10 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @return void
      */
     protected function add_used_variable($argName){
-        $this->usedVariables[] = $argName;
+        preg_match_all('/\b[a-zA-Z]+\b/', $argName, $matches);
+        foreach($matches[0] as $arg){
+            $this->usedVariables[] = $arg;
+        }
     }
     protected function get_event_arg_names($event_name) {
         $args = [

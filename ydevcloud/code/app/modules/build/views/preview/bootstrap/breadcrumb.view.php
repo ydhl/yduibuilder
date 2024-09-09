@@ -23,14 +23,9 @@ class Breadcrumb_View extends ValueList_View {
         $inputDataNameString = $isArr ? "alpinejs_get_value(\$el, '{$inputDataName}')" : $inputDataName;
 
         echo $this->indent(1) . '<li';
+        $this->build_event_listen();
         echo $this->wrap_output(':class', "{'breadcrumb-item': true, 'active':{$inputDataNameString}=={$xValue}}");
-        echo '>' . PHP_EOL;
-        echo $this->indent(2) . '<template';
-        echo $this->wrap_output("x-if", "{$inputDataNameString} != {$xValue}");
-        echo '>' . PHP_EOL;
-        echo $this->indent(2) . "<a href='javascript:;'";
-        echo $this->wrap_output('class', $this->foregroundCss());
-        echo $this->wrap_output('style', $this->foregroundStyle());
+
         echo $this->wrap_output('data-root', $myid);
         if ($outputData) {
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
@@ -42,23 +37,20 @@ class Breadcrumb_View extends ValueList_View {
             echo $this->wrap_output('data-value', $staticValue);
         }
 
+        echo '>' . PHP_EOL;
+        echo $this->indent(2) . '<template';
+        echo $this->wrap_output("x-if", "{$inputDataNameString} != {$xValue}");
+        echo '>' . PHP_EOL;
+        echo $this->indent(2) . "<a href='javascript:;'";
+        echo $this->wrap_output('class', $this->foregroundCss());
+        echo $this->wrap_output('style', $this->foregroundStyle());
         echo ">{$staticName}</a>" . PHP_EOL;
         echo $this->indent(2) . "</template>" . PHP_EOL;
 
         echo $this->indent(2) . '<template';
         echo $this->wrap_output("x-if", "{$inputDataNameString} == {$xValue}");
         echo '>' . PHP_EOL;
-        echo $this->indent(2) . "<span";
-        echo $this->wrap_output('data-root', $myid);
-        if ($outputData) {
-            echo $this->wrap_output(':data-value', $xValue);
-            echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
-            echo $this->wrap_output('x-text', $xText);
-        }else{
-            echo $this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null);
-            echo $this->wrap_output('data-value', $staticValue);
-        }
-        echo ">{$staticName}</span>" . PHP_EOL;
+        echo $this->indent(2) . "<span>{$staticName}</span>" . PHP_EOL;
         echo $this->indent(2) . "</template>" . PHP_EOL;
 
         echo $this->indent(1)."</li>".PHP_EOL;
@@ -67,7 +59,7 @@ class Breadcrumb_View extends ValueList_View {
         $space =  $this->indent();
 
         echo "{$space}<ol";
-        echo $this->build_main_attrs();
+        echo $this->build_main_attrs(false);
         echo ">".PHP_EOL;
     }
     protected function build_ui_end(){

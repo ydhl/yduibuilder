@@ -542,6 +542,7 @@ INTERVAL;
             $codeLines[] = '// NOT DEFINED MUTATION ';
             return;
         }
+//        $codeLines[] = 'debugger ';
         foreach ($mutations as $mutation){
             $bindData = $mutation->get_from_data();
             $expression = $mutation->get_expression();

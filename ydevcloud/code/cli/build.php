@@ -51,9 +51,13 @@ function buildProject($server, $loginUser, $data) {
         $server->push($e->getMessage());
         return;
     }
-    $url = \yangzie\yze_move_file($url, YZE_UPLOAD_PATH.basename($url));
-    $server->push(sprintf(__('compile finished please: <a href="%s">download</a>'), UPLOAD_SITE_URI.\yangzie\yze_remove_path($url, YZE_UPLOAD_PATH)));
-    
+
+    if (preg_match("{^".YZE_INSTALL_PATH."}", $url)){
+        $url = \yangzie\yze_move_file($url, YZE_UPLOAD_PATH.basename($url));
+        $server->push(sprintf(__('compile finished please: <a href="%s">download</a>'), UPLOAD_SITE_URI.\yangzie\yze_remove_path($url, YZE_UPLOAD_PATH)));
+    }else {
+        $server->push(sprintf(__('compile finished please: <a href="%s">download</a>'), getOssLink($url)));
+    }
     $server->push("done");
 }
 
@@ -231,7 +235,7 @@ function closeClient(Swoole\Http\Response $ws){
     }
 }
 
-echo swoole_version()." waiting for client\r\n";
+echo "swooe version:".swoole_version()." waiting for client\r\n";
 
 // 重启server后，重置页面用户在线记录
 $dba = \yangzie\YZE_DBAImpl::get_instance();

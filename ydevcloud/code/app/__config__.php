@@ -22,8 +22,6 @@ define("SITE_URI", "http://ydecloud-os.local.com/");
 define("UPLOAD_SITE_URI", "http://ydecloud-os.local.com/upload/");
 define("UI_BUILDER_URI", "http://localhost:9999/");
 define("API_BUILDER_URI", "http://localhost:9998/");
-// Build SOCKET_HOST
-define("SOCKET_HOST", "ws://localhost:8888");
 
 /**
  * 开发环境true还是生产环境（false）
@@ -32,7 +30,7 @@ define("YZE_DEVELOP_MODE",  false );
 /**
  * 错误报告级别
  */
-ini_set('error_reporting', E_ALL & ~E_STRICT & ~E_DEPRECATED & ~E_NOTICE);
+ini_set('error_reporting', E_ALL & ~E_STRICT & ~E_DEPRECATED & ~E_NOTICE & ~E_WARNING);
 /**
  * 时区
  */

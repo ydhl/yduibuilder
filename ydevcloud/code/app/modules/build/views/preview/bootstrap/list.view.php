@@ -20,6 +20,7 @@ class List_View extends ValueList_View {
         // 动态数据
         if ($outputData){
             echo $this->indent(1) . "<a href='javascript:;'";
+            $this->build_event_listen();
             echo $this->wrap_output(':class', $this->item_theme($xValue));
             echo $this->wrap_output(':style', $this->item_style($xValue));
             echo PHP_EOL;
@@ -34,8 +35,9 @@ class List_View extends ValueList_View {
         }
         // 静态数据
         $staticValue = strlen($staticData['value'])?$staticData['value']:$staticData['name'];
-        echo $this->indent(1) . "<a href='javascript:;'"
-            .$this->wrap_output(':class', $this->item_theme(null, $staticValue))
+        echo $this->indent(1) . "<a href='javascript:;'";
+            $this->build_event_listen();
+        echo $this->wrap_output(':class', $this->item_theme(null, $staticValue))
             .$this->wrap_output(':style', $this->item_style(null, $staticValue))
             .$this->wrap_output('data-root', $myid)
             .$this->wrap_output("data-value", $staticValue)
@@ -48,7 +50,7 @@ class List_View extends ValueList_View {
     {
         $space =  $this->indent();
         echo "{$space}<div";
-        $this->build_main_attrs();
+        $this->build_main_attrs(false); // 事件都绑到内部到列表元素上
         echo ">".PHP_EOL;
     }
     protected function build_ui_end()
