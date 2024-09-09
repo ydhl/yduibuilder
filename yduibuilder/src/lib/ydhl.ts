@@ -15,12 +15,10 @@ import * as monaco from 'monaco-editor'
 declare const YDJS: YDJSStatic
 export default {
   version: '1.0.16-220207',
-  api: 'http://ydecloud-os.local.com/',
+  api: 'http://localhost:8080/',
   apiBuilder: 'http://localhost:9998',
   modelDesign: 'http://localhost:9997',
   socket: 'ws://localhost:8888',
-  // api: 'https://ydecloud.yidianhulian.com/',
-  // socket: 'wss://ydecloud.yidianhulian.com:8888',
 
   save (store: any, newVersion = false, message = '') {
     if (store.state.design.saving) return

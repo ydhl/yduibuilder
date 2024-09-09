@@ -452,6 +452,7 @@ class YZE_Request extends YZE_Object {
      */
     public function get_var($key, $default = null) {
         $vars = $this->vars;
+        if (!$vars) return $default;
         return @array_key_exists ( $key, $vars ) ? $vars [$key] : $default;
     }
     /**

@@ -33,10 +33,10 @@ CREATE TABLE `action` (
   `modified_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_deleted` tinyint NOT NULL DEFAULT '0',
   `uuid` varchar(45) NOT NULL,
-  `type` enum('output','redirect','popup','call','webapi','emit','mutation','closepopup') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'output',
+  `type` enum('output','redirect','popup','call','webapi','emit','mutation','closepopup') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'output',
   `redirect` varchar(2995) NOT NULL DEFAULT '',
-  `redirect_type` enum('inside','outside','unset') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'unset',
-  `popup_type` enum('page','alert','unset') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'unset',
+  `redirect_type` enum('inside','outside','unset') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'unset',
+  `popup_type` enum('page','alert','unset') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'unset',
   `popupPageId` varchar(45) NOT NULL DEFAULT '',
   `call_uiid` varchar(45) DEFAULT NULL,
   `input` text,
@@ -48,7 +48,7 @@ CREATE TABLE `action` (
   `page_id` int NOT NULL,
   `emit_event_id` int DEFAULT NULL,
   `index` tinyint NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- 转存表中的数据 `action`
@@ -77,7 +77,7 @@ CREATE TABLE `activity` (
   `project_member_id` int NOT NULL,
   `content` text COMMENT '日志内容，可包含html',
   `type` varchar(45) DEFAULT NULL COMMENT '活动类型'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='项目活动日志表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='项目活动日志表';
 
 --
 -- 转存表中的数据 `activity`
@@ -107,7 +107,7 @@ CREATE TABLE `api_folder` (
   `comment` varchar(145) DEFAULT NULL COMMENT '备注',
   `project_id` int NOT NULL,
   `index` tinyint NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='api的目录';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='api的目录';
 
 --
 -- 转存表中的数据 `api_folder`
@@ -131,7 +131,7 @@ CREATE TABLE `code` (
   `target` varchar(45) DEFAULT NULL,
   `code` varchar(45) DEFAULT NULL,
   `expirein` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -151,7 +151,7 @@ CREATE TABLE `file` (
   `upload_date` datetime DEFAULT NULL,
   `type` varchar(45) DEFAULT NULL,
   `project_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- 转存表中的数据 `file`
@@ -176,7 +176,7 @@ CREATE TABLE `function` (
   `name` varchar(45) DEFAULT NULL,
   `desc` varchar(245) DEFAULT NULL,
   `screen` varchar(145) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='功能';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='功能';
 
 --
 -- 转存表中的数据 `function`
@@ -201,7 +201,7 @@ CREATE TABLE `label` (
   `pinyin` varchar(200) DEFAULT NULL,
   `pinyin_sort` varchar(45) DEFAULT NULL,
   `project_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -218,7 +218,7 @@ CREATE TABLE `label_target` (
   `label_id` int NOT NULL,
   `target_class` varchar(45) DEFAULT NULL,
   `target_id` varchar(45) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -240,7 +240,7 @@ CREATE TABLE `log` (
   `request_url` text COMMENT '访问地址',
   `client_info` text COMMENT '终端信息，如浏览器，操作系统',
   `client_ip` varchar(45) DEFAULT NULL COMMENT '终端ip'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -260,7 +260,7 @@ CREATE TABLE `log_column` (
   `db_type` enum('C','R','U','D') DEFAULT 'R' COMMENT '数据库操作类型',
   `table` varchar(45) DEFAULT NULL,
   `log_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -278,7 +278,7 @@ CREATE TABLE `module` (
   `project_id` int NOT NULL,
   `desc` varchar(245) DEFAULT NULL,
   `folder` varchar(45) DEFAULT NULL COMMENT '模块存储目录名'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='项目中的模块';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='项目中的模块';
 
 --
 -- 转存表中的数据 `module`
@@ -299,13 +299,13 @@ CREATE TABLE `mutation` (
   `modified_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_deleted` tinyint NOT NULL DEFAULT '0',
   `uuid` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `mutation_from_uuid` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `mutation_from_uuid` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `mutation_data_id` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `mutation_data_name` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `mutation_data_type` varchar(45) DEFAULT NULL,
   `action_id` int NOT NULL,
   `expression` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- 转存表中的数据 `mutation`
@@ -353,7 +353,7 @@ CREATE TABLE `page` (
   `function_id` int DEFAULT NULL,
   `last_member_id` int NOT NULL DEFAULT '-1' COMMENT '最新的保存者',
   `last_version_id` int NOT NULL DEFAULT '-1' COMMENT '最新一个版本',
-  `page_type` enum('page','popup','master','subpage','component') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'page',
+  `page_type` enum('page','popup','master','subpage','component') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'page',
   `ref_page_id` int NOT NULL DEFAULT '0' COMMENT '当前页面引用的目标页面id',
   `create_user_id` int NOT NULL,
   `project_id` int NOT NULL,
@@ -361,7 +361,7 @@ CREATE TABLE `page` (
   `component_end_kind` enum('pc','mobile') NOT NULL DEFAULT 'pc' COMMENT '跨项目共享的终端类型',
   `component_uiid` varchar(45) NOT NULL DEFAULT '' COMMENT '作为组件的根元素id',
   `create_user_is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '作者是否删除'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='项目中的页面';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='项目中的页面';
 
 --
 -- 转存表中的数据 `page`
@@ -396,7 +396,7 @@ CREATE TABLE `page_bind_api` (
   `version` int NOT NULL DEFAULT '1',
   `bind_class` varchar(45) DEFAULT NULL COMMENT '调用api的对象',
   `bind_uuid` varchar(45) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='绑定的接口';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='绑定的接口';
 
 --
 -- 转存表中的数据 `page_bind_api`
@@ -424,7 +424,7 @@ CREATE TABLE `page_bind_api_action` (
   `mode` enum('setting','code') NOT NULL DEFAULT 'setting',
   `code` text,
   `expression` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='页面绑定的行为';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='页面绑定的行为';
 
 --
 -- 转存表中的数据 `page_bind_api_action`
@@ -465,7 +465,7 @@ CREATE TABLE `page_bind_data` (
   `action` enum('ReadOnly','WriteOnly','ReadWrite') NOT NULL DEFAULT 'ReadWrite' COMMENT '动作',
   `mock` varchar(45) NOT NULL DEFAULT '',
   `initLength` tinyint UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='绑定的数据';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='绑定的数据';
 
 --
 -- 转存表中的数据 `page_bind_data`
@@ -494,7 +494,7 @@ CREATE TABLE `page_bind_event` (
   `uiid` varchar(445) DEFAULT NULL COMMENT '绑定的uiid',
   `uicomponent_event_id` int DEFAULT NULL,
   `desc` varchar(45) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='页面事件绑定';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='页面事件绑定';
 
 --
 -- 转存表中的数据 `page_bind_event`
@@ -519,12 +519,12 @@ CREATE TABLE `page_bind_io` (
   `page_id` int NOT NULL,
   `type` enum('in','out') NOT NULL DEFAULT 'in',
   `data_id` varchar(45) NOT NULL,
-  `uiid` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `uiid` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `from_class` varchar(45) NOT NULL,
   `from_uuid` varchar(45) NOT NULL,
   `output_as` varchar(45) DEFAULT NULL COMMENT '输出绑定到ui到哪个属性（label，value）上',
   `bound_as` varchar(45) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- 转存表中的数据 `page_bind_io`
@@ -581,7 +581,7 @@ CREATE TABLE `page_bind_style` (
   `page_id` int DEFAULT NULL,
   `style_id` int NOT NULL,
   `uiid` varchar(45) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -630,7 +630,7 @@ CREATE TABLE `page_user` (
   `page_id` int NOT NULL,
   `member_id` int NOT NULL,
   `fd` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='当前打开页面的用户';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='当前打开页面的用户';
 
 -- --------------------------------------------------------
 
@@ -650,7 +650,7 @@ CREATE TABLE `page_version` (
   `screen` varchar(145) DEFAULT NULL COMMENT '截屏地址',
   `index` int NOT NULL,
   `message` varchar(999) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='页面版本';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='页面版本';
 
 --
 -- 转存表中的数据 `page_version`
@@ -677,7 +677,7 @@ CREATE TABLE `project` (
   `desc` varchar(145) DEFAULT NULL COMMENT '简要描述',
   `home_page_id` int NOT NULL DEFAULT '0' COMMENT '默认主页id',
   `end_kind` enum('pc','mobile') NOT NULL DEFAULT 'pc' COMMENT '终端类型'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户的项目';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户的项目';
 
 --
 -- 转存表中的数据 `project`
@@ -706,7 +706,7 @@ CREATE TABLE `project_member` (
   `last_page_id` int NOT NULL DEFAULT '0' COMMENT '最近编辑的页面id',
   `last_function_id` int NOT NULL DEFAULT '0' COMMENT '最近编辑的功能',
   `is_invited` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否正在邀请'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='项目成员';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='项目成员';
 
 --
 -- 转存表中的数据 `project_member`
@@ -730,8 +730,8 @@ CREATE TABLE `project_setting` (
   `uuid` varchar(45) NOT NULL,
   `project_id` int NOT NULL,
   `name` varchar(45) DEFAULT NULL,
-  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='项目设置';
+  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='项目设置';
 
 --
 -- 转存表中的数据 `project_setting`
@@ -767,7 +767,7 @@ INSERT INTO `project_setting` (`id`, `created_on`, `modified_on`, `is_deleted`, 
 (27, '2024-06-11 22:22:34', '2024-06-11 14:22:34', 0, '0bcfc188-27fe-11ef-800d-382e3fb0b88a', 1, 'logo', ''),
 (28, '2024-06-11 22:41:24', '2024-06-11 14:41:24', 0, 'ad422c2a-2800-11ef-800d-382e3fb0b88a', 1, 'logo', 'user/35dc97ea-27f8-11ef-800d-382e3fb0b88a/2461166686200a8ab3.png'),
 (29, '2024-06-11 22:41:46', '2024-06-11 14:41:46', 0, 'ba79e0fe-2800-11ef-800d-382e3fb0b88a', 2, 'logo', 'user/35dc97ea-27f8-11ef-800d-382e3fb0b88a/2461166686220d33e7.png'),
-(30, '2024-06-12 08:52:24', '2024-06-12 00:52:24', 0, '083eb9a4-2856-11ef-800d-382e3fb0b88a', 1, 'api_env', '{\"测试\":\"http:\\/\\/ydecloud-os.local.com\\/test\"}');
+(30, '2024-06-12 08:52:24', '2024-06-12 00:52:24', 0, '083eb9a4-2856-11ef-800d-382e3fb0b88a', 1, 'api_env', '{\"测试\":\"http:\\/\\/localhost:8080\\/test\"}');
 
 -- --------------------------------------------------------
 
@@ -784,7 +784,7 @@ CREATE TABLE `style` (
   `class_name` varchar(45) DEFAULT NULL,
   `meta` text,
   `project_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='共享的样式class';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='共享的样式class';
 
 -- --------------------------------------------------------
 
@@ -819,7 +819,7 @@ CREATE TABLE `uicomponent_instance` (
   `page_id` int NOT NULL COMMENT '实例页面',
   `uicomponent_page_id` int NOT NULL COMMENT '组件',
   `instance_uuid` varchar(45) NOT NULL COMMENT '实例uiid'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -847,7 +847,7 @@ CREATE TABLE `user` (
   `account_duedate` date DEFAULT NULL COMMENT '到期时间，null表示不过期',
   `account_setting` varchar(1000) DEFAULT NULL COMMENT '账户设置',
   `account_type` varchar(45) NOT NULL DEFAULT 'base'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- 转存表中的数据 `user`
@@ -867,23 +867,23 @@ CREATE TABLE `web_api` (
   `created_on` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_deleted` tinyint NOT NULL DEFAULT '0',
-  `uuid` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `name` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'api名称',
-  `method` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'api方法',
-  `path` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '请求路径',
-  `status` enum('develop','test','deprecated','released') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '状态',
+  `uuid` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'api名称',
+  `method` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'api方法',
+  `path` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '请求路径',
+  `status` enum('develop','test','deprecated','released') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '状态',
   `api_folder_id` int DEFAULT NULL COMMENT '目录',
   `project_member_id` int DEFAULT NULL COMMENT '负责人',
-  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci COMMENT '说明',
-  `requestBodyType` enum('none','form-data','x-www-form-urlencoded','json','xml','raw','binary','GraphQL','msgpack') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'form-data',
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '说明',
+  `requestBodyType` enum('none','form-data','x-www-form-urlencoded','json','xml','raw','binary','GraphQL','msgpack') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'form-data',
   `project_id` int NOT NULL,
   `index` tinyint NOT NULL DEFAULT '0',
-  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `major` tinyint NOT NULL DEFAULT '0',
   `minor` smallint NOT NULL DEFAULT '0',
   `revision` smallint NOT NULL DEFAULT '1',
   `version` int NOT NULL DEFAULT '1',
-  `commit_msg` varchar(145) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+  `commit_msg` varchar(145) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

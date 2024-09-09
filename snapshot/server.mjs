@@ -142,7 +142,7 @@ function removeDisconnectedBrowser() {
  * @returns 启动浏览器并放入BROWSER_LIST
  */
 function launchBrowser(){
-    puppeteer.launch({headless:true,
+    puppeteer.launch({headless:'shell',
         // devtools: true,
         ignoreHTTPSErrors: true,
         args: [

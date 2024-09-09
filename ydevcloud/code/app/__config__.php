@@ -15,11 +15,11 @@ define("YZE_DB_CRYPT_KEY",  "");
 /**
  * 网站地址
  */
-define("SITE_URI", "http://ydecloud-os.local.com/");
+define("SITE_URI", "http://localhost:8080/");
 /**
  * 上传内容的访问地址，如果有cdn，填写cdn地址
  */
-define("UPLOAD_SITE_URI", "http://ydecloud-os.local.com/upload/");
+define("UPLOAD_SITE_URI", "http://localhost:8080/upload/");
 define("UI_BUILDER_URI", "http://localhost:9999/");
 define("API_BUILDER_URI", "http://localhost:9998/");
 
@@ -100,13 +100,13 @@ class App_Module extends \yangzie\YZE_Base_Module{
 	protected function config()
 	{
 		return [
-			'default_db' => 'ydecloud_os', // 默认链接的数据库名，请填写项目实际的数据库名
+			'default_db' => 'ydecloud', // 默认链接的数据库名，请填写项目实际的数据库名
 			'db_connections' => [
-				'ydecloud_os' => [
+				'ydecloud' => [
 					'db_type' => 'mysql',
 					'db_host' => '127.0.0.1',
 					'db_user' => 'root',
-					'db_psw'  => '12345678',
+					'db_psw'  => 'ydecloud',
 					'db_port' => '3306',
 					'db_params' => [\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY=>true],
 					'db_charset'=> 'utf8'
