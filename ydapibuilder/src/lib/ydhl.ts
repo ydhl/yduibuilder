@@ -2,7 +2,7 @@ import { createPopper, Placement, VirtualElement } from '@popperjs/core'
 import { nextTick } from 'vue'
 import { layer } from '@layui/layui-vue'
 import axios from 'axios'
-import { DataStruct } from '@/store/model'
+
 axios.interceptors.response.use(function (response) {
   return response.data
 })

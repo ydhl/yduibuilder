@@ -12,6 +12,7 @@
         <ul class="navbar-nav me-auto">
           <li class="nav-item"><a :class="{'nav-link': true, 'ydapi-active': activeMenu=='uibuilder'}" :href="'/?projectId='+project.id" >UIBuilder</a></li>
           <li class="nav-item"><a :class="{'nav-link': true, 'ydapi-active': activeMenu=='apibox'}" :href="ssoapi+'?url='+apiBuilder+'/sso&projectId='+project.id" >APIBox</a></li>
+          <li class="nav-item"><a :class="{'nav-link': true, 'ydapi-active': activeMenu=='modeldesign'}" :href="ssoapi+'?url='+modelDesign+'/sso&projectId='+project.id" >Model Design</a></li>
         </ul>
         <div class="form-inline my-2 my-lg-0">
           <ul class="navbar-nav me-auto">

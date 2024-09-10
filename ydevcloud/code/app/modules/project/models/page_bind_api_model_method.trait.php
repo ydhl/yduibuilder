@@ -171,14 +171,14 @@ trait Page_Bind_Api_Model_Method{
                     $info[] = $uiconfig->meta->title ? '「'.$uiconfig->meta->title.'」' :  '';
                     $info[] = $event->event;
                 }
-                return vsprintf(__('The API is called when %s trigger event 「%s」 '), $info);
+                return sprintf(__('The API is called when %s trigger event 「%s」 '), $info);
             case Page_Bind_API_Action_Model::CLASS_NAME:
                 $bind_action = Page_Bind_API_Action_Model::find_by_uuid($this->bind_uuid);
                 return $bind_action->get_condition_info();
             default:
                 if ($this->bind_uuid && !$this->bind_class) {// 看着ui中触发
                    $uiItem = $this->get_page()->find_ui_item($this->bind_uuid);
-                   return $uiItem ? vsprintf(__('trigger in ui %s'), $uiItem->meta->value ?: $uiItem->meta->title) : '';
+                   return $uiItem ? sprintf(__('trigger in ui %s'), $uiItem->meta->value ?: $uiItem->meta->title) : '';
                 }
         }
         return '';

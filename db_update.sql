@@ -38,4 +38,4 @@ CREATE TABLE IF NOT EXISTS `validate_data` (
 ALTER TABLE `ydecloud`.`action` 
 CHANGE COLUMN `type` `type` ENUM('output', 'redirect', 'popup', 'call', 'webapi', 'emit', 'mutation', 'closepopup', 'interval', 'validate', 'break') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL DEFAULT 'output' ;
 
-
+ALTER TABLE `page_bind_data` ADD `invalidMsg` VARCHAR(45) NULL DEFAULT NULL;

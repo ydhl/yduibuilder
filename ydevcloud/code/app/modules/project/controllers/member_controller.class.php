@@ -121,7 +121,7 @@ class Member_Controller extends YZE_Resource_Controller {
         $data = [
             'project_id'=>$project->id,
             'member_id'=>$myMember->id,
-            'content'=> vsprintf(__('Remove Project Member: %s'), $removeMember->get_user()->nickname),
+            'content'=> sprintf(__('Remove Project Member: %s'), $removeMember->get_user()->nickname),
             'type'=>'member'];
         YZE_Hook::do_hook(YDE_CLOUD_PROJECT_ACTIVITY, $data);
         $removeMember->set('is_deleted', 1)->save();
@@ -201,7 +201,7 @@ class Member_Controller extends YZE_Resource_Controller {
                 ->save();
         }
         if ($project->get_member($user->id)){
-            throw new YZE_FatalException(vsprintf(__('%s is a member already'), $cellphone_email));
+            throw new YZE_FatalException(sprintf(__('%s is a member already'), $cellphone_email));
         }
 
         if ($cellphone){

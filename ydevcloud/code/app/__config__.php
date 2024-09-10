@@ -22,6 +22,7 @@ define("SITE_URI", "http://localhost:8080/");
 define("UPLOAD_SITE_URI", "http://localhost:8080/upload/");
 define("UI_BUILDER_URI", "http://localhost:9999/");
 define("API_BUILDER_URI", "http://localhost:9998/");
+define("SOCKET_HOST", "ws://localhost:8888");
 
 /**
  * 开发环境true还是生产环境（false）

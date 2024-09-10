@@ -17,7 +17,7 @@ $oauth_user = $_SESSION['oauth_user'];
                     <img src="<?= $oauth_user->avatar?>" style="width: 20px;">
                 </div>
             </h5>
-            <h6 class="card-subtitle mb-2 mt-3 text-muted"><?= vsprintf(__("Hi %s, Please input your cellphone"), $oauth_user->displayName) ?></h6>
+            <h6 class="card-subtitle mb-2 mt-3 text-muted"><?= sprintf(__("Hi %s, Please input your cellphone"), $oauth_user->displayName) ?></h6>
             <div class="input-group mb-3">
                 <select class="form-control flex-grow-0" style="width: 8rem;" id="region">
                     <option value="86"><?= __('中国 +86')?></option>

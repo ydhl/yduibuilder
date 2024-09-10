@@ -140,7 +140,7 @@ export default {
       isFileSelectorOpen.value = true
       files.value = []
 
-      const loadingId = layer.open({ shade: 0.4, title: '', type: 1, closeBtn: 0, content: t('page.loading') })
+      const loadingId = layer.open({ shade: true, shadeOpacity: '0.4', type: 1, closeBtn: false, content: t('page.loading') })
       ydhl.get(`api/${props.projectId}/file?type=${props.type}&q=${fileSearchWord.value}`, false, true).then((rst: any) => {
         layer.close(loadingId)
         // console.log(rst)

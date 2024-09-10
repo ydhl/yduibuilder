@@ -158,7 +158,7 @@ class Save_Controller extends YZE_Resource_Controller {
             $data = [
                 'project_id'=>$member->project_id,
                 'member_id'=>$member->id,
-                'content'=> ($currPage->screen ? '<img src="/download?file='.urlencode($currPage->screen).'" style="width: 50px"/>' : '').vsprintf(__('Save UI, Version: %s'), $last_version->index),
+                'content'=> ($currPage->screen ? '<img src="/download?file='.urlencode($currPage->screen).'" style="width: 50px"/>' : '').sprintf(__('Save UI, Version: %s'), $last_version->index),
                 'type'=>'ui'];
             YZE_Hook::do_hook(YDE_CLOUD_PROJECT_ACTIVITY, $data);
         }

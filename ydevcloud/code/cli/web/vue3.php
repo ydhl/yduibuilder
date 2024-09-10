@@ -82,7 +82,7 @@ class web_vue3 extends Base_Factory{
             }
         }
 
-        $this->server->push(vsprintf(__('generating %s'), 'src/assets/index.scss'));
+        $this->server->push(sprintf(__('generating %s'), 'src/assets/index.scss'));
         $includeCSSFiles = [];
         foreach ($this->includeCSSFiles as $package => $files) {
             foreach ($files as $file => $isVendorFile){
@@ -95,7 +95,7 @@ class web_vue3 extends Base_Factory{
         }
         $this->zip->addFromString('src/assets/index.scss', join("\r\n", $includeCSSFiles));
 
-        $this->server->push(vsprintf(__('generating %s'), 'public/index.html'));
+        $this->server->push(sprintf(__('generating %s'), 'public/index.html'));
         $globalFiles = [];
         foreach ($this->globalFiles as $package => $typeFiles) {
             foreach ($typeFiles as $type => $files){

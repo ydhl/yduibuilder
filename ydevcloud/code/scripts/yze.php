@@ -146,7 +146,7 @@ if not need signature please press enter
 	$key_path = trim(get_input());
 	if ($key_path){
 		while (!file_exists(($key_path = YZE_INSTALL_PATH."tmp/".$key_path))){
-			echo get_colored_text(wrap_output(vsprintf(__("\t%s file not exist:  "), $key_path)), "red");
+			echo get_colored_text(wrap_output(sprintf(__("\t%s file not exist:  "), $key_path)), "red");
 		}
 	}
 

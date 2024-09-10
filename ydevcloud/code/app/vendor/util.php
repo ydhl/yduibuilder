@@ -1,5 +1,5 @@
 <?php
-
+use app\App_Module;
 use yangzie\YZE_FatalException;
 use yangzie\YZE_Hook;
 use function yangzie\yze_isimage;
@@ -63,12 +63,18 @@ function post_snapshot_message($isFullPage, $pageid, $preview_url, $file_path,  
         'sub'=>$loginUser->uuid,
         'jti'=>md5(uniqid('JWT').time()));
     $token = \app\vendor\Jwt::getToken($payload);
+
+    $app_module = new App_Module();
+    $db_name = $app_module->get_module_config('default_db');
+    $db_connection = $app_module->get_module_config('db_connections')[$db_name];
+
+
     $data = [
-        "mysql_user"=> YZE_DB_USER,
-        "mysql_host"=> YZE_DB_HOST_M,
-        "mysql_db"  => YZE_DB_DATABASE,
-        "mysql_port"=> YZE_DB_PORT,
-        "mysql_pass"=> YZE_DB_PASS,
+        "mysql_user"=> $db_connection['db_user'],
+        "mysql_host"=> $db_connection['db_host'],
+        "mysql_db"  => $db_name,
+        "mysql_port"=> $db_connection['db_port'],
+        "mysql_pass"=> $db_connection['db_psw'],
         "save_path" => $file_path,
         "preview_url" => $preview_url,
         "pageid"    => $pageid,

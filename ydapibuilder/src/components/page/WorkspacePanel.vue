@@ -52,7 +52,7 @@ import ydhl from '@/lib/ydhl'
 import { useStore } from 'vuex'
 import { layer } from '@layui/layui-vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 const ConfirmRemove = defineAsyncComponent(() => import('@/components/common/ConfirmRemove.vue'))
 const APIAdd = defineAsyncComponent(() => import('./APIAdd.vue'))
 const APIDetail = defineAsyncComponent(() => import('./APIDetail.vue'))
@@ -78,7 +78,6 @@ export default {
     const head = ref(null)
     const store = useStore()
     const router = useRouter()
-    const route = useRoute()
     const { t } = useI18n()
 
     const leftSidebarWidth = computed(() => store.state.design.leftSidebarWidth)
@@ -138,7 +137,7 @@ export default {
     }
 
     const openCooperationTip = () => {
-      layer.open({ shade: 0.4, title: 'Tips', content: t('common.somebodyComeInTip') })
+      layer.open({ shade: true, shadeOpacity: '0.4', title: 'Tips', content: t('common.somebodyComeInTip') })
     }
 
     watch(leftSidebars, () => {

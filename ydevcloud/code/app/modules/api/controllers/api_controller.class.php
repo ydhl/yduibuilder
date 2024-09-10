@@ -60,7 +60,7 @@ class Api_Controller extends YZE_Resource_Controller {
     }
     private function assert_not_empty($column) {
         return function ($model, $value) use ($column) {
-            if (!$value) throw new YZE_FatalException(vsprintf(__("%s can not be empty"), $column));
+            if (!$value) throw new YZE_FatalException(sprintf(__("%s can not be empty"), $column));
         };
     }
     public function post_save(){

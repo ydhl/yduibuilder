@@ -17,7 +17,7 @@ class UIComponent_View extends Preview_View {
         foreach ((array)@$this->childViews as $view){
             $data = $view->get_datas();
             if (@$data['subPageDeleted']){
-                $view->get_build()->output_code(vsprintf(__("UI COMPONENT [%s] HAS BEEN DELETED"), $data['meta']['title']));
+                $view->get_build()->output_code(sprintf(__("UI COMPONENT [%s] HAS BEEN DELETED"), $data['meta']['title']));
             }else{
                 $view->output();
             }

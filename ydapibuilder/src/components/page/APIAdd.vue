@@ -191,7 +191,6 @@ import Body from '@/components/request/Body.vue'
 import { API, ResponseCode, ResponseFormat } from '@/store/model'
 import ResponseData from '@/components/response/ResponseData.vue'
 import ydhl from '@/lib/ydhl'
-declare const bootstrap: any
 
 export default {
   name: 'APIAdd',

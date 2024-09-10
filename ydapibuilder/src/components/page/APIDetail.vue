@@ -107,7 +107,6 @@ import Body from '@/components/request/BodyReadonly.vue'
 import { API, ResponseCode, ResponseFormat } from '@/store/model'
 import ResponseData from '@/components/response/ResponseDataReadonly.vue'
 import ydhl from '@/lib/ydhl'
-declare const bootstrap: any
 
 export default {
   name: 'APIDetail',

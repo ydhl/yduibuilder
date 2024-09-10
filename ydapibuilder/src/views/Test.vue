@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import Sub from '@/views/Sub.vue'
 
 export default {

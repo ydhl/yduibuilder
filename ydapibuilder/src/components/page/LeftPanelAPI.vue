@@ -4,6 +4,12 @@
       <a :class="{'item': true, 'active': currSidebar==='SidebarApi'}" @click="changeSidebar('SidebarApi')">
         <i class="iconfont icon-api mb-1" />{{ t('common.apiManage') }}
       </a>
+      <a :class="{'item': true, 'active': currSidebar==='SidebarApiTest'}" @click="changeSidebar('SidebarApiTest')">
+        <i class="iconfont icon-test mb-1" />{{ t('common.apiTest') }}
+      </a>
+      <a :class="{'item': true, 'active': currSidebar==='SidebarSetting'}" @click="changeSidebar('SidebarSetting')">
+        <i class="iconfont icon-setting mb-1" />{{ t('common.setting') }}
+      </a>
       <div class="flex-grow-1 item" ></div>
       <div class="item text-muted p-1 text-center"><small>{{version}}</small></div>
     </template>

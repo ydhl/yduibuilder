@@ -104,7 +104,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineAsyncComponent, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, ref } from 'vue'
 import ydhl from '@/lib/ydhl'
 import { useI18n } from 'vue-i18n'
 

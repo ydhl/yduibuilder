@@ -1,5 +1,3 @@
-import ydhl from '@/lib/ydhl'
-import router from '@/router'
 import { WorkspaceTab } from '@/store/model'
 
 function cleanState (state) {

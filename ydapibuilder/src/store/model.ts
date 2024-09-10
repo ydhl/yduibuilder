@@ -188,7 +188,7 @@ export interface OAuth2Setting extends AuthSetting{
 export interface HawkAuthSetting extends AuthSetting{
     hawkAuthId?: string;
     hawkAuthKey?: string;
-    algorithm?: Algorithm;
+    algorithm?: string;
     user?: string;
     nonce?: string;
     ext?: string;

@@ -4,7 +4,7 @@
 </template>
 
 <script lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { ref } from 'vue'
 
 export default {
   name: 'Sub',

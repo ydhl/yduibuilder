@@ -80,8 +80,8 @@ export default {
       let json
       try {
         json = JSON.parse(code)
-      } catch (e) {
-        ydhl.alert('Parse Error: ' + e.message, t('common.ok'))
+      } catch (e: any) {
+        ydhl.alert('Parse Error: ' + (e?.message || ''), t('common.ok'))
         return
       }
       layer.close(id)
