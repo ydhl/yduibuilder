@@ -78,9 +78,12 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
       1. 云盘中下载ydecloud.tar.zip: https://pan.baidu.com/s/1C_gyfu4yxWlNe5_KLcbm1A 提取码: ydhl 
       2. 解压的ydecloud.tar.zip文件；
       3. docker load -i PATH/TO/ydecloud.tar
-2. 运行镜像：docker run -it -p 8080:8080 -p 9999:9999 -p 9998:9998 -p 8888:8888 -v 你本地的目录:/var/www/html gzydhl/ydecloud /bin/bash
-   这里会把后台项目端口8080，yduibuilder项目端口9999，apibox项目端口9998，socket服务端口8888在主机和docker内部服务之间做个映射。
-   `你本地的目录`就是主机上下载的代码的根目录（包含ydevcloud，yduibuilder的目录）
+2. 运行镜像：
+   
+   **_docker run -it -p 8080:8080 -p 9999:9999 -p 9998:9998 -p 8888:8888 -v 你本地的目录:/var/www/html gzydhl/ydecloud /bin/bash_**
+   
+   1. 这里会把后台项目端口8080，yduibuilder项目端口9999，apibox项目端口9998，socket服务端口8888在主机和docker内部服务之间做个映射。
+   2. `你本地的目录`就是主机上下载的代码的根目录（包含ydevcloud，yduibuilder的目录）
 3. 启动apache2  service apache2 start
 4. 启动mariadb  service mariadb start
 5. 启动rabbitmq-server service rabbitmq-server start
@@ -89,16 +92,19 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
    2. 第一次需要执行： npm i 
    3. node --experimental-modules server.mjs
 7. 启动yduibuilder（9999端口）
-   1. 进入/var/www/html/yduibuilder目录 
-   2. 第一次需要执行：npm i
-   3. npm run serve
+   1. 新建一个命令行窗口，执行docker exec -it 你的容器ID /bin/bash
+   2. 进入/var/www/html/yduibuilder目录 
+   3. 第一次需要执行：npm i
+   4. npm run serve
 8.  启动ydapibuilder（9998端口）
-   1. 进入/var/www/html/ydapibuilder目录
-   2. 第一次需要执行：npm i 
-   3. npm run server
+    1.  新建一个命令行窗口，执行docker exec -it 你的容器ID /bin/bash
+    2.  进入/var/www/html/ydapibuilder目录
+    3.  第一次需要执行：npm i 
+    4.  npm run server
 9.  启动swoole 8888端口
-   1.  进入/var/www/html/ydevcloud/code/cli目录
-   2.  php build.php
+    1.  新建一个命令行窗口，执行docker exec -it 你的容器ID /bin/bash
+    2.  进入/var/www/html/ydevcloud/code/cli目录
+    3.  php build.php
 10. 在你主机浏览器上访问localhost:8080即可
 
 你也可以选择部分在docker容器，部分在自己的主机上运行，比如在自己的主机上用IDE打开yduibuilder，ydapibuilder；这需要参考下面具体项目的手动安装；
