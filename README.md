@@ -176,11 +176,16 @@ socket服务是用swoole写的，请先确保安装了对应的swoole扩展；�
 3. 启动rabbitmq /usr/local/sbin/rabbitmq-server
 4. 启动snapshot node --experimental-modules server.mjs
 
-## 效果截图
+## 效果截图及案例
 ![数据绑定](doc/1.gif)
 ![移动端](doc/uibuilder-mobile.gif)
 ![PC端](doc/uibuilder-pc.gif)
 ![构建代码](doc/build.gif)
+
+更多案例视频请抖音搜索易点互联或者关注易点互联的视频号
+
+![视频号](doc/weixin.jpg)
+![抖音](doc/douyin.png)
 
 ## 问题汇总
 1. 目前暂不支持php8，如果要使用php8，可根据提示修改相关保存代码
