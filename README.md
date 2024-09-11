@@ -27,6 +27,7 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 1. nodejs 18.20+
 2. npm 10.7
 3. php 7.3+
+4. rabbitmq
 
 ## 主体框架开发计划
 |      UI+框架       | UIBuilder | 预览器 | 编译器 |
@@ -40,7 +41,8 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 |   Layui + Vue3   |   ✅     | ⌛    | ⌛     |
 
 ## 更新日志
-1. 20240611 本次更新后不光只是做界面，还可以编译出功能代码，加入了数据和事件，数据可与UI进行绑定，可做完整的人机交互功能（数据的获取，接口的调用，响应数据的展示），事件及代码目前只支持HTML+Bootstrap。**本次更新未做数据库自动升级，需要删除原来的数据库后重新执行db_init.sql文件**
+1. 20240910 增加docker支持，一键安装；支持php 8；新增表单数据验证支持，并可自定义错误的展示方式；新增标签容器，可根据绑定的数据切换显示内容
+2. 20240611 本次更新后不光只是做界面，还可以编译出功能代码，加入了数据和事件，数据可与UI进行绑定，可做完整的人机交互功能（数据的获取，接口的调用，响应数据的展示），事件及代码目前只支持HTML+Bootstrap。**本次更新未做数据库自动升级，需要删除原来的数据库后重新执行db_init.sql文件**
    1. 前端交互事件
    2. 前端UI绑定数据的输入（展示数据）和输出（为数据赋值）
    3. API调用：可视化设置API的请求和相应处理
@@ -48,8 +50,8 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
    5. UI State：通过数据来决定UI的样式
    6. 新增YDAPIBuilder项目，管理API的输入和输出
    7. 支持UI 组件，UI组件可自定义事件
-2. 20240325 增加vue的支持
-3. 20240314 增加微信小程序的支持
+3. 20240325 增加vue的支持
+4. 20240314 增加微信小程序的支持
 
 
 ## 项目组成
@@ -65,14 +67,53 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 
 ## 安装
 
-### 准备
+### docker 安装（建议）
+所有服务运行在docker容器内（基于ubuntu系统），但代码在你主机上。
+容器内所有的服务和配套都已经按照好了，但node项目并没有上传node_modules, 所以node项目第一次运行的时候需要npm i按照需要的模块。
+同时各种服务建议都用一个终端运行，方便查看日志
+
+1. 下载镜像
+   1. 方法1: pull 镜像: docker pull gzydhl/ydecloud
+   2. 方法2: 
+      1. 解压目录中的ydecloud.tar.zip文件；
+      2. docker load -i PATH/TO/ydecloud.tar
+2. 运行镜像：docker run -it -p 8080:8080 -p 9999:9999 -p 9998:9998 -p 8888:8888 -v 你本地的目录:/var/www/html gzydhl/ydecloud /bin/bash
+   这里会把后台项目端口8080，yduibuilder项目端口9999，apibox项目端口9998，socket服务端口8888在主机和docker内部服务之间做个映射。
+   `你本地的目录`就是主机上下载的代码的根目录（包含ydevcloud，yduibuilder的目录）
+3. 启动apache2  service apache2 start
+4. 启动mariadb  service mariadb start
+5. 启动rabbitmq-server service rabbitmq-server start
+6. 启动截图服务 
+   1. 进入 /var/www/html/snapshot目录
+   2. 第一次需要执行： npm i 
+   3. node --experimental-modules server.mjs
+7. 启动yduibuilder（9999端口）
+   1. 进入/var/www/html/yduibuilder目录 
+   2. 第一次需要执行：npm i
+   3. npm run serve
+8.  启动ydapibuilder（9998端口）
+   1. 进入/var/www/html/ydapibuilder目录
+   2. 第一次需要执行：npm i 
+   3. npm run server
+9.  启动swoole 8888端口
+   1.  进入/var/www/html/ydevcloud/code/cli目录
+   2.  php build.php
+10. 在你主机浏览器上访问localhost:8080即可
+
+你也可以选择部分在docker容器，部分在自己的主机上运行，比如在自己的主机上用IDE打开yduibuilder，ydapibuilder；这需要参考下面具体项目的手动安装；
+同时需要修改下对应项目中配置的端口地址
+
+
+### 自己手动安装
+
+#### 准备
 1. 本地需要安装php 7.4+环境并安装swoole、openssl、zip、xml、gd2，json，iconv扩展，
 2. 安装mysql或者mariadb数据库
 3. windows上php需要配置系统环境，以便在命令行能访问php.exe
 4. 安装rabbitmq（可选，如果要生成页面截屏则安装）
 
 
-### 安装yduibuilder
+#### 安装yduibuilder
 1. 这是一个vue3项目，用你的开发工具打开项目`yduibuilder`
 2. 打开 src/lib/ydhl.ts，配置如下信息
    1. `api` 就是ydecloud管理后端的访问域名，也就是《安装ydecloud 管理后端》中的SITE_URI
@@ -83,7 +124,7 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 5. 默认情况 yduibuilder运行在9999端口上，如果有冲突，就修改package.json文件中scripts的对应设置，并修改《安装ydecloud 管理后端》中的UI_BUILDER_URI
 6. yduibuilder不要直接访问，他是通过后端ydecloud进入
 
-### 安装ydecloud 管理后端
+#### 安装ydecloud 管理后端
 1. 初始化数据库: 导入`db_init.sql`创建数据库, `db_update.sql` 执行数据库更新
 2. 修改`ydevcloud/code/app/__config__.php`中的配置, 在config方法中配置数据库信息
    1. `default_db`： 你的数据库名称
@@ -104,7 +145,7 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 6. 访问你的域名，剩下的自己探索吧
 
 
-### 安装ydapibuilder
+#### 安装ydapibuilder
 1. 这是一个vue3项目，用你的开发工具打开项目`ydapibuilder`
 2. 打开 src/lib/ydhl.ts，配置如下信息
    1. `api` 就是ydecloud管理后端的访问域名，也就是《安装ydecloud 管理后端》中的SITE_URI
@@ -115,12 +156,12 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 5. 默认情况 ydapibuilder运行在9998端口上，如果有冲突，就修改package.json文件中scripts的对应设置，并修改《安装ydecloud 管理后端》中的UI_BUILDER_URI
 6. ydapibuilder不要直接访问，他是通过后端ydecloud进入
 
-### 安装socket服务
+#### 安装socket服务
 
 socket服务是用swoole写的，请先确保安装了对应的swoole扩展；进入到ydevcloud/code/cli中
 运行 php build.php即可；如没有安装则不能打包下载项目代码
 
-### 安装截图服务（可选）
+#### 安装截图服务（可选）
 
 截图服务是snapshot，是nodejs开发
 1. 用你的开发工具打开snapshot
