@@ -75,8 +75,9 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 1. 下载镜像
    1. 方法1: pull 镜像: docker pull gzydhl/ydecloud
    2. 方法2: 
-      1. 解压目录中的ydecloud.tar.zip文件；
-      2. docker load -i PATH/TO/ydecloud.tar
+      1. 云盘中下载ydecloud.tar.zip: https://pan.baidu.com/s/1C_gyfu4yxWlNe5_KLcbm1A 提取码: ydhl 
+      2. 解压的ydecloud.tar.zip文件；
+      3. docker load -i PATH/TO/ydecloud.tar
 2. 运行镜像：docker run -it -p 8080:8080 -p 9999:9999 -p 9998:9998 -p 8888:8888 -v 你本地的目录:/var/www/html gzydhl/ydecloud /bin/bash
    这里会把后台项目端口8080，yduibuilder项目端口9999，apibox项目端口9998，socket服务端口8888在主机和docker内部服务之间做个映射。
    `你本地的目录`就是主机上下载的代码的根目录（包含ydevcloud，yduibuilder的目录）
