@@ -55,7 +55,7 @@ export default {
 
     const promise: Array<Promise<boolean>> = []
     for (const pageUuid in store.state.design.openedPages) {
-      const currPage = store.state.design.openedPages[pageUuid]
+      const currPage = pageUuid === store.state.design.page.meta.id ? store.state.design.page : store.state.design.openedPages[pageUuid]
       promise.push(new Promise((resolve) => {
         const currFunctionId = store.state.design.pageFunction[pageUuid]?.id || ''
         const versionId = store.state.design.pageVersionId[pageUuid]

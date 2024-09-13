@@ -24,7 +24,7 @@ class Button_View extends Preview_Button_View {
         }
         echo $this->build_main_attrs().'>';
         $this->wrap_icon(function(){
-            echo $this->data['meta']['title'] ?: $this->data['type'];
+            echo $this->data['meta']['title'] ?: '';
         }, null, 'view', 'view');
         echo "\r\n";
         echo $this->indent();

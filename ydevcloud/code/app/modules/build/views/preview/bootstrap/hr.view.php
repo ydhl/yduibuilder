@@ -46,7 +46,7 @@ class Hr_View extends Preview_View {
             if ($this->data['meta']['value']){
                 echo $this->indent(1)."<div"
                     .$this->wrap_output("class", $this->textCss()).">";
-                echo $this->data['meta']['value'];
+                echo htmlentities($this->data['meta']['value']);
                 echo "</div>".PHP_EOL;
             }
         }

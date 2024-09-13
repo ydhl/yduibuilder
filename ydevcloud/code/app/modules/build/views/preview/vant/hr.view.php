@@ -15,7 +15,7 @@ class Hr_View extends Preview_View {
         echo ">".PHP_EOL;
         if ($this->data['meta']['value']){
             echo $this->indent(1);
-            echo $this->data['meta']['value'];
+            echo htmlentities($this->data['meta']['value']);
             echo PHP_EOL;
         }
         echo $this->indent(1);

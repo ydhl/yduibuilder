@@ -32,9 +32,8 @@ class Text_View extends Preview_View {
         $space =  $this->indent();
         echo "{$space}<{$type}";
         echo $this->build_main_attrs();
-        echo ">\r\n";
-        echo $this->indent(1);
-        echo @$this->data['meta']['value'] ?: @$this->data['meta']['title'];
-        echo "\r\n{$space}</{$type}>\r\n";
+        echo ">";
+        echo htmlentities(@$this->data['meta']['value'] ?: @$this->data['meta']['title']);
+        echo "</{$type}>\r\n";
     }
 }

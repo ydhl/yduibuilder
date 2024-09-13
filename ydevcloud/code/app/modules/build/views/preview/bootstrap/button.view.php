@@ -23,7 +23,7 @@ class Button_View extends Preview_View {
             $this->build_main_attrs();
             echo '>';
             $this->wrap_icon(function(){
-                echo $this->data['meta']['title'] ?: $this->data['type'];
+                echo $this->data['meta']['title'] ?: '';
             });
             echo PHP_EOL;
             echo $space."</a>".PHP_EOL;
@@ -37,7 +37,7 @@ class Button_View extends Preview_View {
             $this->build_main_attrs();
             echo '>';
             $this->wrap_icon(function(){
-                echo $this->data['meta']['title'] ?: $this->data['type'];
+                echo $this->data['meta']['title'] ?: '';
             });
             echo PHP_EOL;
             echo $space."</button>".PHP_EOL;
