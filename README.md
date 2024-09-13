@@ -100,7 +100,7 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
     1.  新建一个命令行窗口，执行docker exec -it 你的容器ID /bin/bash
     2.  进入/var/www/html/ydapibuilder目录
     3.  第一次需要执行：npm i 
-    4.  npm run server
+    4.  npm run serve
 9.  启动swoole 8888端口
     1.  新建一个命令行窗口，执行docker exec -it 你的容器ID /bin/bash
     2.  进入/var/www/html/ydevcloud/code/cli目录
