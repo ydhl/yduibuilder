@@ -38,7 +38,7 @@ function findUIItemInfo (state: Record<any, any>, uiid: string) {
 
     return findStruct
   }
-  return _find(uiid, state.uiconfig)
+  return _find(uiid, state.page)
 }
 function isSubItem (targetId, uiconfig:UIBase|null) {
   if (!uiconfig) return false
@@ -56,12 +56,13 @@ const store = {
     /**
      * 页面下元素的的额外信息，key是id，value是自定义值，比如表格的数据
      * tableId: { header: footer: row }
+     * @deprecated 不再使用
      */
     extraInfo: {},
     /**
      * page的UIConfig
      */
-    uiconfig: null,
+    page: null,
     inlineEditItemId: '',
     /**
      * 所有已经加载完成的ui元素 id:boolean
@@ -129,6 +130,9 @@ const store = {
         state[name] = props[name]
       }
     },
+    updateProjectState (state: any, { name, value }) {
+      state.project[name] = value
+    },
     loaded (state: any, { id }) {
       if (!id) return
       state.loadedUIIds[id] = true
@@ -176,10 +180,6 @@ export default store
 export function pickStateFromDesign (pageid, designState) {
   const state:any = {}
   for (const item in store.state) {
-    if (item === 'uiconfig') {
-      state.uiconfig = designState.page
-      continue
-    }
     state[item] = designState[item]
   }
 

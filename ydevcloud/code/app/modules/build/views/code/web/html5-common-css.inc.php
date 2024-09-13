@@ -4,6 +4,7 @@ namespace app\build;
 use app\project\Page_Bind_Style_Model;
 use app\project\Page_Model;
 use app\project\Project_Model;
+use app\project\Project_Setting_Model;
 use app\project\Style_Model;
 use app\vendor\Env;
 
@@ -41,6 +42,19 @@ foreach (Page_Bind_Style_Model::from('bs')
 foreach ($styles as $selector=>$style){
     $build->output_code($selector.' {', 0);
     $build->output_code($style, 1);
+    $build->output_code('}', 0);
+}
+
+
+$globalCssVariable = Project_Setting_Model::get_setting_value($project->id, 'customColors');
+if ($globalCssVariable){
+    $build->output_code(':root{', 0);
+    foreach ($globalCssVariable as $variable) {
+        $build->output_code("--{$variable['uuid']}:{$variable['color']};", 1);
+        if ($variable['dark']){
+            $build->output_code("--{$variable['uuid']}-dark:{$variable['dark']};", 1);
+        }
+    }
     $build->output_code('}', 0);
 }
 ?>

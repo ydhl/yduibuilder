@@ -14,6 +14,8 @@
                @blur="isInEditPageTitle=false" :title="t('page.editPage')">
       </div>
       <div class="bg-light text-truncate active ps-1 pe-1 text-muted rounded user-select-none" data-bs-toggle="tooltip" :title="t('page.boxModelTip')"><i class="iconfont icon-boxmodel"></i> <small>{{t('page.boxModel')}}</small></div>
+      <div :class="{'item': true,'disabled':!canUndo}" data-bs-toggle="tooltip" :title="t('common.undo')" @click="canUndo ? undo() : ''"><i class="iconfont icon-undo"></i></div>
+      <div :class="{'item': true,'disabled':!canRedo}" data-bs-toggle="tooltip" :title="t('common.redo')" @click="canRedo ? redo() : ''"><i class="iconfont icon-redo"></i></div>
       <div class="item" data-bs-toggle="tooltip" :title="t('page.copyPage')" @click="copyPage"><i class="iconfont icon-copy"></i></div>
       <div class="item" data-bs-toggle="tooltip" :title="t('page.deletePage')" @click="deletePage"><i class="iconfont icon-remove"></i></div>
       <div class="item" data-bs-toggle="tooltip" :title="t('page.code')" @click="openExportCodeDialog"><i class="iconfont icon-code"></i></div>
@@ -84,6 +86,20 @@ export default {
     const pageScale = computed(() => store.state.design.scale)
     const versionId = computed(() => store.state.design.pageVersionId[props.uiconfig.meta.id])
     const codeTypes = computed(() => store.state.design.codeTypes)
+    const stackIndex = computed(() => {
+      const index = store.state.design.pageStackIndex[props.uiconfig.meta.id]
+      return index !== undefined ? index : -1
+    })
+    const canRedo = computed(() => {
+      const stacks = store.state.design.pageStacks[props.uiconfig.meta.id]
+      if (!stacks) return false
+      return stacks.length - 1 > stackIndex.value
+    })
+    const canUndo = computed(() => {
+      const stacks = store.state.design.pageStacks[props.uiconfig.meta.id]
+      if (!stacks) return false
+      return stackIndex.value > 0
+    })
     const currCodeType = ref('')
     watch(codeTypes, (v) => {
       if (codeTypes.value) {
@@ -245,6 +261,12 @@ export default {
       }
       return url
     })
+    const undo = () => {
+      store.commit('undo', { pageId: props.uiconfig.meta.id })
+    }
+    const redo = () => {
+      store.commit('redo', { pageId: props.uiconfig.meta.id })
+    }
     return {
       ...UIInit(),
       title,
@@ -265,7 +287,11 @@ export default {
       isHomePage,
       isPopup,
       pageUrl,
+      canRedo,
+      canUndo,
       copyPage,
+      undo,
+      redo,
       openExportCodeDialog,
       loadCode,
       deletePage,

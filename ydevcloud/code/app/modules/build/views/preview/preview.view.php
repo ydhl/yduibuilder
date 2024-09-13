@@ -429,7 +429,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         $styleArray = $this->style_map();
 
         if ($styleArray) {
-            $this->styles[$key] =  join(';'.PHP_EOL, array_values($styleArray)).';';
+            $this->styles[$key] =  join(' !important;'.PHP_EOL, array_values($styleArray)).' !important;';
         }
 
         $this->style_of_state();

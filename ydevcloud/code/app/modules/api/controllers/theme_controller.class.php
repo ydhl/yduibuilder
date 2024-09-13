@@ -38,9 +38,10 @@ class Theme_Controller extends YZE_Resource_Controller {
         $defaultFontSize = floatval($request->get_from_post("defaultFontSize"));
         $defaultSpacer = floatval($request->get_from_post("defaultSpacer"));
         $fontFaces = $request->get_from_post("fontFace");
+        $customColors = $request->get_from_post("customColors");
 
         Project_Setting_Model::from()
-            ->where("project_id=:pid and name in ('color','colorDark','supportDarkMode','defaultFontSize','defaultSpacer','fontFace')")
+            ->where("project_id=:pid and name in ('color','colorDark','customColors','supportDarkMode','defaultFontSize','defaultSpacer','fontFace')")
             ->delete([':pid'=>$project->id]);
         $colorMode = new Project_Setting_Model();
         $colorMode->set('uuid', Project_Setting_Model::uuid())
@@ -71,6 +72,38 @@ class Theme_Controller extends YZE_Resource_Controller {
         $colorMode->set('uuid', Project_Setting_Model::uuid())
             ->set('project_id', $project->id)->set('name', 'fontFace')
             ->set('value', json_encode($fontFaces))->save();
+
+        $_ = [];
+        foreach ($customColors as $key => $customColor){
+            $_[$key] = json_decode(html_entity_decode($customColor));
+        }
+        $customColorSetting = new Project_Setting_Model();
+        $customColorSetting->set('uuid', Project_Setting_Model::uuid())
+            ->set('project_id', $project->id)->set('name', 'customColors')
+            ->set('value', json_encode($_))->save();
+
+        return YZE_JSON_View::success($this);
+    }
+
+    public function post_item() {
+        $request = $this->request;
+        $this->layout = '';
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        $project_uuid = trim($data["project_uuid"]);
+        $project = find_by_uuid(Project_Model::CLASS_NAME, $project_uuid);
+        if (!$project) throw new YZE_FatalException(__('project not found'));
+
+
+        Project_Setting_Model::from()
+            ->where("project_id=:pid and name=:name")
+            ->delete([':pid'=>$project->id,':name'=>$data['name']]);
+
+
+        $setting = new Project_Setting_Model();
+        $setting->set('uuid', Project_Setting_Model::uuid())
+            ->set('project_id', $project->id)->set('name', $data['name'])
+            ->set('value', json_encode($data['value']))->save();
 
         return YZE_JSON_View::success($this);
     }

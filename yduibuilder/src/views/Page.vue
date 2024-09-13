@@ -55,7 +55,7 @@ import { YDJSStatic } from '@/lib/ydjs'
 import { Boot, ISelectMenu, IButtonMenu } from '@wangeditor/editor'
 import Upload from '@/components/common/Upload.vue'
 import UIExport from '@/components/sidebar/UIExport.vue'
-import _ from "lodash"
+import _, {forEach} from "lodash"
 
 declare const YDJS: YDJSStatic
 declare const ports: any
@@ -144,7 +144,7 @@ export default {
   setup (props: any, context: any) {
     const store = useStore()
     const route = useRoute()
-    const currPage = computed(() => store.state.page.uiconfig)
+    const currPage = computed(() => store.state.page.page)
     const project = computed(() => store.state.page.project)
     const pageIsLoaded = ref(false)
     const isPopup = computed(() => currPage.value?.pageType === 'popup')
@@ -161,10 +161,13 @@ export default {
     const dragoverUIItemId = computed(() => store.state.page.dragoverUIItemId)
     const dragoverPlacement = computed(() => store.state.page.dragoverPlacement)
     const dragoverInParent = computed(() => store.state.page.dragoverInParent)
-    const selectedPageId = computed(() => store.state.page.uiconfig?.meta?.id)
+    const selectedPageId = computed(() => store.state.page.page?.meta?.id)
     const showEventPanel = computed(() => store.state.page.showEventPanel)
     const backdropVisible = computed(() => store.state.page.backdropVisible)
+    const assets = computed(() => project.value?.assets || [])
+    const customColors = computed(() => project.value?.customColors || [])
     const { t } = useI18n()
+
     const popPlacementStyle = computed(() => {
       // 弹窗时页面元素是Modal, 预览时通过page的布局定位其位置
       const rootUI = currPage.value
@@ -247,7 +250,16 @@ export default {
           src: url('${ydhl.api}font?uuid=${face.uuid}') format('${face.type}')
           }`)
       }
-      $(window.document.head).append(`<style id="custom-font-face">${fontFace.join('')}</style>`)
+
+      const style = [':root{']
+      for (const customColor of customColors.value){
+        style.push(`--${customColor.uuid}: ${customColor.color};`)
+        if (customColor.dark) {
+          style.push(`--${customColor.uuid}-dark: ${customColor.dark};`)
+        }
+      }
+      style.push('}')
+      $(window.document.head).append(`<style id="custom-font-face">${fontFace.join('')}${style.join('\r\n')}</style>`)
     }
     const onMessage = (data) => {
       // console.log('on page message', data)
@@ -259,9 +271,11 @@ export default {
         const project = data.state.page.project
         $(window.document.head).append(`<link href="${ydhl.api}vendor/uibuilder.css" rel="stylesheet">`)
         $(window.document.head).append(`<link href="${ydhl.api}vendor/${project.ui}@${project.ui_version}/index.css" rel="stylesheet">`)
-        $(window.document.head).append(`<link href="${ydhl.api}upload/project/${project.id}/iconfont/iconfont.css" rel="stylesheet">`)
+        for (const asset of assets.value?.style) {
+          $(window.document.head).append(`<link href="${asset}" rel="stylesheet">`)
+        }
         refreshFontFace()
-      } else if (data.type === 'updatePageState' || data.type === 'clearDragoverState' || data.type === 'switchEventShow') {
+      } else if (data.type === 'updatePageState' || data.type === 'clearDragoverState' || data.type === 'switchEventShow' || data.type === 'updateProjectState') {
         store.commit(data.type, data.payload)
         refreshFontFace()
       } else if (data.type === 'deleteItem') {
@@ -272,6 +286,10 @@ export default {
         cutItem()
       } else if (data.type === 'pasteItem') {
         pasteItem()
+      } else if (data.type === 'undo') {
+        postMessage({ type: 'undo', data: {} })
+      } else if (data.type === 'redo') {
+        postMessage({ type: 'redo', data: {} })
       }
     }
     const uiMouseEnter = (event: any) => {
@@ -382,6 +400,16 @@ export default {
         keyEvent.preventDefault()
         keyEvent.cancelBubble = true // IE
         postMessage({ type: 'save', data: {} })
+      })
+      keyevent.keydown([modKey, 'z'], (keyEvent) => {
+        keyEvent.preventDefault()
+        keyEvent.cancelBubble = true // IE
+        postMessage({ type: 'undo', data: { } })
+      })
+      keyevent.keydown([modKey, 'shift', 'z'], (keyEvent) => {
+        keyEvent.preventDefault()
+        keyEvent.cancelBubble = true // IE
+        postMessage({ type: 'redo', data: { } })
       })
 
       uidrag({

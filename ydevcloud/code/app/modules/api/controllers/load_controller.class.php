@@ -92,10 +92,15 @@ class Load_Controller extends YZE_Resource_Controller {
         $project_setting['framework'] = $project_setting['frontend_framework'] ? $package[$project_setting['frontend_framework']]['name'] : '';
         $project_setting['name'] = $project->name;
         $project_setting['endKind'] = $project->end_kind;
+        $assets = ['style'=>[],'javascript'=>[]];
+        if (file_exists(YZE_UPLOAD_PATH."/project/{$project->uuid}/iconfont/iconfont.css")){
+            $assets['style'] = UPLOAD_SITE_URI."/project/{$project->uuid}/iconfont/iconfont.css";
+        }
+
+        $project_setting['assets'] = $assets;
 
         $codeTypes = @$package[$project_setting['frontend_framework']]['codeType'];
         $state = [
-            "frontend"=> $project->frontend,
             "project"=>$project_setting,
             "versionId"=>$page->last_version_id ?: -1,
             "canEdit"=> $member->can_edit(),

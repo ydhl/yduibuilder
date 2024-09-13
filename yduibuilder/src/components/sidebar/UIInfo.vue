@@ -1,9 +1,9 @@
 <template>
-  <div v-if="!selectedUIItemId" class="d-flex flex-column h-100 text-muted justify-content-center align-content-center align-items-center">
+  <div v-if="!selectedUIItem" class="d-flex flex-column h-100 text-muted justify-content-center align-content-center align-items-center">
     <i class="iconfont icon-click" style="font-size: 6rem"></i>
     <div class="pe-2">{{t('common.pleaseSelectUIItem')}}</div>
   </div>
-  <div v-if="selectedUIItemId" class="style-panel">
+  <div v-if="selectedUIItem" class="style-panel">
     <p class="pt-2 d-flex align-items-center"><i :class="`iconfont text-primary icon-${selectedUIItem.type.toLowerCase()}`"></i>&nbsp;{{selectedUIItem.meta.title || selectedUIItem.type}}&nbsp;<small class="text-muted">#{{uiID}}</small></p>
     <div class="style-header"><i class="iconfont icon-tree-close"></i> {{t('style.base.name')}}</div>
     <div class="style-body d-none">

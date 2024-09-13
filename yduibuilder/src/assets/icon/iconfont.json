@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "22813535",
+      "name": "redo",
+      "font_class": "redo",
+      "unicode": "e64c",
+      "unicode_decimal": 58956
+    },
+    {
+      "icon_id": "22813547",
+      "name": "undo",
+      "font_class": "undo",
+      "unicode": "e64d",
+      "unicode_decimal": 58957
+    },
+    {
       "icon_id": "5810239",
       "name": "break",
       "font_class": "break",

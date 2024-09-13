@@ -142,6 +142,7 @@ export default {
 
         css.cssTranslate = rst.data.cssTranslate
         store.replaceState({ design, user, css })
+        store.commit('addStack')
         if (cb) cb()
       })
     }

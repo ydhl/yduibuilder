@@ -48,6 +48,32 @@ export default {
       this.save(store, true, value)
     })
   },
+  saveAll (store: any) {
+    if (store.state.design.saving) return
+    // 保存前通知处于内联编辑的UI先更新下value
+    store.commit('updatePageState', { updateInlineItemValue: true, saving: true })
+
+    const promise: Array<Promise<boolean>> = []
+    for (const pageUuid in store.state.design.openedPages) {
+      const currPage = store.state.design.openedPages[pageUuid]
+      promise.push(new Promise((resolve) => {
+        const currFunctionId = store.state.design.pageFunction[pageUuid]?.id || ''
+        const versionId = store.state.design.pageVersionId[pageUuid]
+
+        this.savePage(currFunctionId, currPage, versionId, (rst) => {
+          const data: any = { saving: false }
+          if (rst?.success) {
+            data.saved = 1
+            data.pageUuid = currPage.meta.id
+            data.versionId = rst.data.versionId
+          }
+          store.commit('updateSavedState', data)
+          resolve(true)
+        })
+      }))
+    }
+    Promise.all(promise).catch((reason) => { console.log(reason) })
+  },
   getRgbaInfo (str: string) {
     if (!str) return { r: 0, g: 0, b: 0, a: 1 }
     if (str.trim().match(/^#/)) {
@@ -655,13 +681,11 @@ export default {
     if (data.defaultValue) schema.default = data.defaultValue
     return schema
   },
-  getVariableSuggestions (variables: DataStruct[], prefix = '') {
+  getVariableSuggestions (variables: DataStruct[], prefix = '', needValidate = true) {
     const suggestions: any = []
     if (!variables) return []
     for (const variable of variables) {
       const name = prefix + (variable.name || '')
-      const errorKey = name.replace(/page\./, '')
-      const errorName = 'error.' + (errorKey.match(/\./) ? `['${errorKey}']` : errorKey)
       if (variable.name) {
         suggestions.push(
           {
@@ -672,15 +696,19 @@ export default {
             detail: variable.type + (variable.title || '')
           }
         )
-        suggestions.push(
-          {
-            label: errorName,
-            kind: monaco.languages.CompletionItemKind.Variable,
-            insertText: errorName,
-            documentation: 'Data validation has errors',
-            detail: 'boolean'
-          }
-        )
+        if (needValidate) {
+          const errorKey = name.replace(/page\./, '')
+          const errorName = 'error.' + (errorKey.match(/\./) ? `['${errorKey}']` : errorKey)
+          suggestions.push(
+            {
+              label: errorName,
+              kind: monaco.languages.CompletionItemKind.Variable,
+              insertText: errorName,
+              documentation: 'Data validation has errors',
+              detail: 'boolean'
+            }
+          )
+        }
       }
       if (variable.type === 'object' || variable.type === 'file' || variable.type === 'map') {
         const props = (variable as DataStructObject).props || []

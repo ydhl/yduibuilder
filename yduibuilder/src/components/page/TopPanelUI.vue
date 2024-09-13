@@ -82,7 +82,7 @@ export default {
       }
     })
     const save = function () {
-      ydhl.save(store)
+      ydhl.saveAll(store)
     }
     const saveAsVersion = function () {
       ydhl.saveAsVersion(store)

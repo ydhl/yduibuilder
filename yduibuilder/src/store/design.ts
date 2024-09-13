@@ -249,6 +249,36 @@ function closePage (state, pageUuid) {
     }
   }
 }
+function redo (state) {
+  const pageUuid = state.page.meta?.id
+  const stacks = state.pageStacks[pageUuid] || []
+  if (stacks?.length === 0) return
+  const stackIndex = state.pageStackIndex[pageUuid] !== undefined ? state.pageStackIndex[pageUuid] : stacks.length - 1
+  if (stackIndex >= stacks.length - 1) return
+  const stack = stacks[stackIndex + 1]
+  state.pageStackIndex[pageUuid] = stackIndex + 1
+  state.page = JSON.parse(stack)
+  state.pageSaved[pageUuid] = 0
+}
+function undo (state) {
+  const pageUuid = state.page.meta?.id
+  const stacks = state.pageStacks[pageUuid] || []
+  if (stacks?.length === 0) return
+  const stackIndex = state.pageStackIndex[pageUuid] !== undefined ? state.pageStackIndex[pageUuid] : stacks.length - 1
+  if (stackIndex <= 0) return
+  const stack = stacks[stackIndex - 1]
+  state.pageStackIndex[pageUuid] = stackIndex - 1
+  state.pageSaved[pageUuid] = 0
+  state.page = JSON.parse(stack)
+}
+function addStack (state) {
+  const pageUuid = state.page.meta?.id
+  const index = state.pageStackIndex[pageUuid] !== undefined ? state.pageStackIndex[pageUuid] : -1
+  if (!state.pageStacks[pageUuid]) state.pageStacks[pageUuid] = []
+  state.pageStacks[pageUuid].splice(index + 1) // 当前指针所在位置放，并清空后面的stack
+  state.pageStacks[pageUuid].push(JSON.stringify(state.page))
+  state.pageStackIndex[pageUuid] = index + 1
+}
 export default {
   state: {
     saving: false, // true 保存中
@@ -275,6 +305,7 @@ export default {
     /**
      * 页面下元素的的额外信息，key是id，value是自定义值，比如表格的数据
      * tableId: { header: footer: row }
+     * @deprecated 不再使用
      */
     extraInfo: {},
     /**
@@ -292,7 +323,7 @@ export default {
     leftSidebarWidth: 280, // 左边栏默认的宽度
     leftSidebarMinWidth: 280, // 左边栏最小的宽度
     /**
-     * 设计器中ui元素悬浮，拖动状态
+     * 设计器中ui元素状态：悬浮，拖动状态等
      */
     inlineEditItemId: '', // 当前处于内联编辑的元素id
     hoverUIItemId: '', // 鼠标悬浮的元素id
@@ -310,9 +341,15 @@ export default {
     mouseupInFrame: '', // 在iframe 中点击的事件通知,格式x_y
     selectedUIItemActiveState: { type: 'normal', state: 'normal' }, // ui style中当前选中的ui 切换的状态名
     previewStyleItem: {}, // 设置style selector时用于预览，也是uibase结构体, 但只用到其中到meta.style部分内容
-    declaredEvents: [] // 缓存当前组件页面的自定义事件
+    declaredEvents: [], // 缓存当前组件页面的自定义事件
+    pageStacks: {}, //  当前打开的页面及其config数组，用于redo/undo，格式{pageid:[]}
+    pageStackIndex: {} //  当前打开的页面stack的当前位置，用于redo/undo，格式{pageid:integer}
   },
   mutations: {
+    updateProjectState (state: any, { name, value, save = true }) {
+      state.project[name] = value
+      if (save) ydhl.postJson('api/theme/item.json', { project_uuid: state.project.id, name, value })
+    },
     updateSavedState (state: any, { pageUuid, saved, versionId, saving }) {
       state.pageSaved[pageUuid] = saved
       state.pageVersionId[pageUuid] = versionId
@@ -333,6 +370,7 @@ export default {
         state.pageVersionId[design.page.meta.id] = design.versionId
         state.openedPages[design.page.meta.id] = design.page
         switchPage(state, design.page)
+        addStack(state)
       } else {
         cleanWorkspaceState(state)
         state.module = design.module
@@ -347,6 +385,15 @@ export default {
      */
     switchPage (state: any, targetPage) {
       switchPage(state, targetPage)
+    },
+    redo (state: any) {
+      redo(state)
+    },
+    undo (state: any) {
+      undo(state)
+    },
+    addStack (state: any) {
+      addStack(state)
     },
     cleanWorkspaceState (state: any) {
       cleanWorkspaceState(state)
@@ -513,6 +560,7 @@ export default {
       sourceItemInfo?.parentConfig?.items?.splice(sourceItemInfo.index, 1)
 
       if (!sourceItemInfo.uiConfig) {
+        addStack(state)
         clean()
         return
       }
@@ -521,6 +569,7 @@ export default {
 
       addItemInfo(placement, sourceItemInfo.uiConfig, targetItemInfo)
       clean()
+      addStack(state)
     },
     /**
      * 在pageId页面的targetId元素的placement位置增加类型为type，指定meta的ui元素
@@ -546,6 +595,7 @@ export default {
       // 把添加的元素标记为选中
       if (rst) {
         state.selectedUIItemId = sourceItemInfo.meta.id
+        addStack(state)
       }
       state.pageSaved[state.page.meta.id] = 0
     },
@@ -565,6 +615,7 @@ export default {
       }
       state.selectedUIItemId = ''
       state.pageSaved[state.page.meta.id] = 0
+      addStack(state)
     },
     /**
      * 更新item的meta普通的内容，对于meta中的array，object等复合型属性通过type指定（比如style，custom，css），直接
@@ -587,6 +638,7 @@ export default {
       if (!item) return
 
       updateMeta(state, type, props, item, isMerge)
+      addStack(state)
     },
     /**
      * 更新预览style
@@ -606,7 +658,7 @@ export default {
     },
 
     /**
-     * 更新组件的属性, 非meta总的，如果meta中的信息请使用updateItemMeta
+     * 更新组件非meta中的的属性, 如果meta中的信息请使用updateItemMeta
      * @param state
      * @param itemid
      * @param pageId
@@ -626,6 +678,7 @@ export default {
         item[name] = props[name]
       }
       state.pageSaved[pageId] = 0
+      addStack(state)
     },
     /**
      * 添加事件绑定
@@ -639,6 +692,7 @@ export default {
       if (index === -1) return
       if (!uiConfig?.events) uiConfig.events = []
       uiConfig.events.push(eventId)
+      addStack(state)
     },
     /**
      * 删除UI的事件绑定
@@ -654,6 +708,7 @@ export default {
       const i = uiConfig.events.findIndex(item => item === bindId)
       if (i === -1) return
       uiConfig.events.splice(i, 1)
+      addStack(state)
     },
     /**
      * 创建子页面, 子页面作为itemid原始的内容，比如幻灯片的一张幻灯片
@@ -729,6 +784,7 @@ export default {
       if (uiConfig.meta.custom?.activeSlide === index) uiConfig.meta.custom.activeSlide = 0
       uiConfig.items.splice(index, 1)
       state.pageSaved[state.page.meta.id] = 0
+      addStack(state)
     }
   },
   actions: {

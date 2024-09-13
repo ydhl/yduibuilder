@@ -2,6 +2,7 @@
 namespace app\common;
 use app\project\Project_Model;
 use app\user\User_Model;
+use app\vendor\ydsms\Ydsms;
 use yangzie\YZE_Hook;
 use \yangzie\YZE_Resource_Controller;
 use \yangzie\YZE_Request;

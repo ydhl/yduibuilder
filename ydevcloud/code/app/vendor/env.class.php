@@ -95,7 +95,7 @@ class Env {
                 'type'=>'ui',
                 'desc'=>__('Quickly design and customize responsive mobile-first sites'),
                 'version'=>[
-                    '4.6.0'=>[]
+                    '4.6.0'=>['canCustomStyle'=>false]
                 ]
             ],
             'layui'=>[

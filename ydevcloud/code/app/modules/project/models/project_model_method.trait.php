@@ -84,12 +84,15 @@ trait Project_Model_Method{
         if (!$this->setting){
             $this->setting = [];
             foreach (Project_Setting_Model::from()->where('project_id=:id')->select([':id'=>$this->id]) as $item){
-                if (in_array($item->name, ['color', 'colorDark', 'fontFace'])) {
-                    $this->setting[$item->name] = json_decode(html_entity_decode($item->value));
+                if (in_array($item->name, ['color', 'colorDark', 'fontFace', 'api_env', 'customColors', 'colorHistory'])) {
+                    $this->setting[$item->name] = json_decode(html_entity_decode($item->value), true);
                 }else{
                     $this->setting[$item->name] = $item->value;
                 }
             }
+            $env = Env::package();
+            $canCustomStyle = $env[$this->setting['ui']]['version'][$this->setting['ui_version']]['canCustomStyle'];
+            $this->setting['canCustomStyle'] = !!$canCustomStyle;
         }
         return $this->setting;
     }

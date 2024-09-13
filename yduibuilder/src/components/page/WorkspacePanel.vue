@@ -211,6 +211,8 @@ export default {
     const userList = computed(() => store.state.design.userList)
     const openedPages = computed(() => store.state.design.openedPages || {})
     const pageSaved = computed(() => store.state.design.pageSaved || {})
+    const customColors = ref<Array<any>>(project.value.customColors || [])
+
     const endKind = computed(() => {
       return store.state.design.endKind
     })
@@ -305,6 +307,21 @@ export default {
       })
     }
 
+    const refreshCustomColor = (v: any) => {
+      const node = document.getElementById('custom-color')
+      if (node) {
+        node.remove()
+      }
+      const style = [':root{']
+      for (const customColor of v) {
+        style.push(`--${customColor.uuid}: ${customColor.color};`)
+        if (customColor.dark) {
+          style.push(`--${customColor.uuid}-dark: ${customColor.dark};`)
+        }
+      }
+      style.push('}')
+      $(window.document.head).append(`<style id="custom-color">${style.join('\r\n')}</style>`)
+    }
     const changeHeadMoreState = (type) => {
       if (!currPage.value) return // 当前没有页面的话，没有显示
 
@@ -377,6 +394,14 @@ export default {
         store.commit('updateState', { mouseXYInIframe: { x: data.data.clientX, y: data.data.clientY } })
         return
       }
+      if (data.type === 'undo') {
+        store.commit('undo', { pageId: selectedPageId.value })
+        return
+      }
+      if (data.type === 'redo') {
+        store.commit('redo', { pageId: selectedPageId.value })
+        return
+      }
       if (data.type === 'contextMenu' && data.data) {
         const rect = document.getElementById('wrapper' + selectedPageId.value)?.getBoundingClientRect()
         // console.log(rect?.left, rect?.top, data.data)
@@ -439,7 +464,7 @@ export default {
         return
       }
       if (data.type === 'save') {
-        ydhl.save(store)
+        ydhl.saveAll(store)
       }
     }
     const addPage = (id = '') => {
@@ -498,6 +523,7 @@ export default {
     })
 
     onMounted(() => {
+      refreshCustomColor(customColors.value)
       $('body').on('click', (event: any) => {
         if ($(event.target).parents('#zoomMenu').length === 0) {
           zoomMenuVisible.value = false
@@ -575,6 +601,16 @@ export default {
         event.cancelBubble = true
         ydhl.save(store)
       })
+      keyevent.keydown([modKey, 'z'], (event) => {
+        event.preventDefault()
+        event.cancelBubble = true
+        postMessage(selectedPageId.value, { type: 'undo' })
+      })
+      keyevent.keydown([modKey, 'shift', 'z'], (event) => {
+        event.preventDefault()
+        event.cancelBubble = true
+        postMessage(selectedPageId.value, { type: 'redo' })
+      })
     })
 
     const contextMenuOnPath = (data) => {
@@ -599,6 +635,7 @@ export default {
         store.commit('closePage', pageUuid)
       }
     }
+
     return {
       t,
       hoverUIItemId,

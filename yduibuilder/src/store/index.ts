@@ -23,13 +23,15 @@ const postMessage = (store) => {
       mutation.type === 'updateItemMeta' ||
       mutation.type === 'deleteSubpage' ||
       mutation.type === 'addUIEventBind' ||
+      mutation.type === 'redo' ||
+      mutation.type === 'undo' ||
       mutation.type === 'removeUIEventBind'
     ) { // 通知目标页面
       if (!ports?.[mutation.payload.pageId]) return
       const msg = {
         type: 'updatePageState',
         payload: {
-          uiconfig: findPageUIConfig(state, mutation.payload.pageId),
+          page: findPageUIConfig(state, mutation.payload.pageId),
           dragoverUIItemId: state.design.dragoverUIItemId,
           dragoverPlacement: state.design.dragoverPlacement,
           dragoverInParent: state.design.dragoverInParent,
@@ -46,7 +48,7 @@ const postMessage = (store) => {
         const msg = {
           type: 'updatePageState',
           payload: {
-            uiconfig: findPageUIConfig(state, mutation.payload.sourcePageId),
+            page: findPageUIConfig(state, mutation.payload.sourcePageId),
             dragoverUIItemId: state.design.dragoverUIItemId,
             dragoverPlacement: state.design.dragoverPlacement,
             dragoverInParent: state.design.dragoverInParent,
@@ -59,7 +61,7 @@ const postMessage = (store) => {
         const msg = {
           type: 'updatePageState',
           payload: {
-            uiconfig: findPageUIConfig(state, mutation.payload.targetPageId),
+            page: findPageUIConfig(state, mutation.payload.targetPageId),
             dragoverUIItemId: state.design.dragoverUIItemId,
             dragoverPlacement: state.design.dragoverPlacement,
             dragoverInParent: state.design.dragoverInParent,
@@ -70,7 +72,11 @@ const postMessage = (store) => {
       }
       return
     }
-    if (mutation.type === 'updatePageState' || mutation.type === 'clearDragoverState' || mutation.type === 'updateExtraInfo' || mutation.type === 'switchEventShow') { // 更新所有页面
+    if (mutation.type === 'updatePageState' ||
+      mutation.type === 'clearDragoverState' ||
+      mutation.type === 'updateExtraInfo' ||
+      mutation.type === 'switchEventShow' ||
+      mutation.type === 'updateProjectState') { // 更新所有页面
       const pageid = state.design?.page?.meta?.id
       if (ports?.[pageid]) ports[pageid](mutation)
     }

@@ -116,6 +116,7 @@ export default {
     })
     onMounted(() => {
       if (props.language === 'json' && props.schema) {
+        // console.log(props.schema)
         // json格式配置
         monaco.languages.json.jsonDefaults.setDiagnosticsOptions({
           validate: true,
@@ -195,7 +196,7 @@ export default {
       completionItemProvider = monaco.languages.registerCompletionItemProvider(props.language, {
         triggerCharacters: [' ', '.', '"'],
         provideCompletionItems: (model, position, context, token) => {
-          if (!model.uri.toString().includes(myUri)) {
+          if (!model.uri.toString().includes(myUri) || props.language === 'json') { // json 用schema不用代码提示
             return { suggestions: [] }
           }
           return { suggestions: suggestions }
@@ -246,12 +247,12 @@ export default {
         }
         clearTimeout(editTimer)
         // 延迟执行，避免被编辑器默认的markerts标记覆盖掉
-        editTimer = setTimeout(filterMarkers, 800)
+        editTimer = setTimeout(() => filterMarkers(editorInstance), 800)
       })
       editorInstance.setValue(myCode.value || '\n')
       editorInstance.getAction('editor.action.formatDocument').run()
       editorInstance.setValue(editorInstance.getValue())
-      suggestions.push(...ydhl.getVariableSuggestions(props.variables))
+      suggestions.push(...ydhl.getVariableSuggestions(props.variables, '', false))
       loadVariables()
     })
     const loadVariables = () => {
@@ -269,7 +270,7 @@ export default {
     watch(() => props.editStyle, () => {
       if (editorInstance) editorInstance.layout()
     })
-    const filterMarkers = () => {
+    const filterMarkers = (editorInstance) => {
       if (props.language === 'json') {
         const model = editorInstance.getModel()
         const markers = monaco.editor.getModelMarkers({ owner: props.language })
