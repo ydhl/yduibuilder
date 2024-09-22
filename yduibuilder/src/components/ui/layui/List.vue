@@ -2,7 +2,7 @@
   <ul :draggable='draggable' :class="[dragableCss, uiCss,'layui-list-group']"
       :style="uiStyle" :id="myId" :data-type="uiconfig.type"
       :data-pageid="pageid">
-    <li :class="[{'layui-list-group-item': true}, itemClass]" :style="`${itemStyle};${item.checked ? activeItemStyle : ''}`" v-for="(item, index) in values"
+    <li :class="[{'active': item.checked, 'layui-list-group-item': true, activeItemTheme: item.checked }, itemClass]" :style="`${itemStyle};${item.checked ? activeItemStyle : ''}`" v-for="(item, index) in values"
         :key="index" :value="item.value">{{item.name}}</li>
   </ul>
 </template>
@@ -61,6 +61,16 @@ export default {
       }
       return style.join(';')
     })
+
+    const activeItemTheme = computed(() => {
+      const cssMap = list.getUICss()
+      const arr: any = []
+      if (cssMap?.backgroundTheme) {
+        arr.push(cssMap?.backgroundTheme)
+        arr.push(store.getters.translate('borderColorClass', props.uiconfig.meta?.css?.backgroundTheme))
+      }
+      return arr.join(' ')
+    })
     const activeItemStyle = computed(() => {
       const style = list.getUIStyle()
       const newStyle: any = []
@@ -75,7 +85,7 @@ export default {
       if (bgcolor) {
         const rgba = ydhl.getRgbaInfo(bgcolor)
         rgba.a *= 0.75
-        newStyle.push(`background-color:rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a}) !important`)
+        newStyle.push(`background-color:rgba(${rgba.r},${rgba.g},${rgba.b},${rgba.a}) !important;border-color:${bgcolor} !important;`)
       }
       return newStyle.join(';')
     })
@@ -85,6 +95,7 @@ export default {
       itemClass,
       itemStyle,
       activeItemStyle,
+      activeItemTheme,
       uiStyle,
       uiCss
     }

@@ -36,7 +36,7 @@ class Download_Controller extends YZE_Resource_Controller {
         if ($uuid) $fileMode = find_by_uuid(File_Model::CLASS_NAME, $uuid);
         if (!$fileMode) throw new YZE_FatalException(__('Font not found'));
         $file = $fileMode->url;
-        $object = preg_replace("{^".OSS_BUCKET_HOST."/}", "", trim($file));
+        $object = trim($file);
         // 阿里云主账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM账号进行API访问或日常运维，请登录 https://ram.console.aliyun.com 创建RAM账号。
         $accessKeyId = OSS_RAM_ACCESSKEYID;
         $accessKeySecret = OSS_RAM_ACCESSKEYSECRET;
@@ -48,14 +48,23 @@ class Download_Controller extends YZE_Resource_Controller {
         }
         ob_clean();
         try{
-            $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
+            if ($accessKeyId){
+                $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
 
-            $objectMeta = $ossClient->getObjectMeta($bucket, $object);
-            $content = $ossClient->getObject($bucket, $object);
+                $objectMeta = $ossClient->getObjectMeta($bucket, $object);
+                $content = $ossClient->getObject($bucket, $object);
+                $contentLength = $objectMeta['content-length'];
+                $contentType = $objectMeta['content-type'];
+            }else{
+                $ext = pathinfo($file,PATHINFO_EXTENSION);
+                $contentLength = $fileMode->file_size;
+                $contentType = $this->get_download_mime_type($ext);
+                $content = file_get_contents(YZE_UPLOAD_PATH.$object);
+            }
 
-            header("Content-type: " . $objectMeta['content-type']);
+            header("Content-type: " . $contentType);
             header("Accept-Ranges: bytes");
-            header("Accept-Length: " . $objectMeta['content-length']);
+            header("Accept-Length: " . $contentLength);
             echo $content;
 
         } catch(OssException $e) {
@@ -72,7 +81,7 @@ class Download_Controller extends YZE_Resource_Controller {
         $uuid = trim($request->get_from_get("uuid"));
         if ($uuid) $fileMode = find_by_uuid(File_Model::CLASS_NAME, $uuid);
         if ($fileMode) $file = $fileMode->url;
-        $object = preg_replace("{^".OSS_BUCKET_HOST."/}", "", trim($file));
+        $object = trim($file);
         // 阿里云主账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM账号进行API访问或日常运维，请登录 https://ram.console.aliyun.com 创建RAM账号。
         $accessKeyId = OSS_RAM_ACCESSKEYID;
         $accessKeySecret = OSS_RAM_ACCESSKEYSECRET;
@@ -84,14 +93,22 @@ class Download_Controller extends YZE_Resource_Controller {
         }
         ob_clean();
         try{
-            $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
+            if ($accessKeyId){
+                $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
+                $objectMeta = $ossClient->getObjectMeta($bucket, $object);
+                $content = $ossClient->getObject($bucket, $object);
+                $contentType = $objectMeta['content-type'];
+                $contentLength = $objectMeta['content-length'];
+            }else{
+                $ext = pathinfo($file,PATHINFO_EXTENSION);
+                $contentLength = $fileMode->file_size;
+                $contentType = $this->get_download_mime_type($ext);
+                $content = file_get_contents(YZE_UPLOAD_PATH.$object);
+            }
 
-            $objectMeta = $ossClient->getObjectMeta($bucket, $object);
-            $content = $ossClient->getObject($bucket, $object);
-
-            header("Content-type: " . $objectMeta['content-type']);
+            header("Content-type: " . $contentType);
             header("Accept-Ranges: bytes");
-            header("Accept-Length: " . $objectMeta['content-length']);
+            header("Accept-Length: " . $contentLength);
             echo $content;
 
         } catch(OssException $e) {
@@ -107,7 +124,7 @@ class Download_Controller extends YZE_Resource_Controller {
         $pageid = trim($request->get_from_get("pageid"));
         $page = $pageid ? find_by_uuid(Page_Model::CLASS_NAME, $pageid) : null;
         $file = $page ? $page->screen : $file;
-        $object = preg_replace("{^".OSS_BUCKET_HOST."/}", "", trim($file));
+        $object = trim($file);
         // 阿里云主账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM账号进行API访问或日常运维，请登录 https://ram.console.aliyun.com 创建RAM账号。
         $accessKeyId = OSS_RAM_ACCESSKEYID;
         $accessKeySecret = OSS_RAM_ACCESSKEYSECRET;
@@ -116,37 +133,30 @@ class Download_Controller extends YZE_Resource_Controller {
 
         ob_clean();
         try{
-            if ($accessKeyId) {
+            if ($accessKeyId){
                 $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-
                 $objectMeta = $ossClient->getObjectMeta($bucket, $object);
-
                 $content = $ossClient->getObject($bucket, $object);
 
-                header("Content-type: " . $objectMeta['content-type']);
-                header("Accept-Ranges: bytes");
-                header("Accept-Length: " . $objectMeta['content-length']);
-                header("Cache-Control: max-age=86400");
-                header('Last-Modified: ' . $objectMeta['last-modified']);
-                header('Expires:' . gmdate('D, d M Y H:i:s', strtotime($objectMeta['last-modified']) + 86400) . ' GMT');
-                echo $content;
+                $contentType = $objectMeta['content-type'];
+                $contentLength = $objectMeta['content-length'];
+                $modified = $objectMeta['last-modified'];
             }else{
-                $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                $mimeMap = [
-                    'png'=> "image/png",
-                    "svg"=> "image/svg+xml",
-                    "gif"=> "image/gif",
-                    "bmp"=> "image/bmp",
-                    "ico"=>"image/x-icon",
-                    "jpeg"=>'image/jpeg',
-                    "jpg"=>'image/jpeg'
-                ];
-                header("Content-type: " . $mimeMap[$ext]?:'application/octet-stream');
-                header("Accept-Ranges: bytes");
-                header("Accept-Length: " . filesize(YZE_UPLOAD_PATH.$file));
-                header("Cache-Control: max-age=86400");
-                echo file_get_contents(YZE_UPLOAD_PATH.$file);
+                $ext = pathinfo($file,PATHINFO_EXTENSION);
+                $contentLength = filesize(YZE_UPLOAD_PATH.$object);
+                $contentType = $this->get_download_mime_type($ext);
+                $modified = filemtime(YZE_UPLOAD_PATH.$object);
+                $content = file_get_contents(YZE_UPLOAD_PATH.$object);
             }
+
+            header("Content-type: " . $contentType);
+            header("Accept-Ranges: bytes");
+            header("Accept-Length: " . $contentLength);
+            header("Cache-Control: max-age=86400");
+            header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $modified).' GMT');
+            header('Expires:' . gmdate('D, d M Y H:i:s', strtotime($modified)+86400).' GMT');
+            echo $content;
+
         } catch(\Exception $e) {
             header("Content-type: image/png");
             header("Accept-Ranges: bytes");
@@ -159,6 +169,20 @@ class Download_Controller extends YZE_Resource_Controller {
         }
         ob_end_flush();
         die();
+    }
+    function get_download_mime_type($ext) {
+        if (!\yangzie\yze_isimage($ext)) return "application/octet-stream";
+        $ext = strtolower($ext);
+        switch ($ext) {
+            case "png": return "image/png";
+            case "svg": return "image/svg+xml";
+            case "gif": return "image/gif";
+            case "bmp": return "image/bmp";
+            case "ico": return "image/x-icon";
+            case "jpeg":
+            case "jpg":
+            default :return "image/jpeg";
+        }
     }
     public function exception(\Exception $e) {
         $request = $this->request;

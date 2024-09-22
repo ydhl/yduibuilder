@@ -1,16 +1,21 @@
 <?php
 namespace app\modules\build\views\preview\layui;
 
-use app\build\Build_Model;
-
-
+use app\modules\build\views\preview\bootstrap\Page_View as Bootstrap_Page_View;
 use app\modules\build\views\preview\Preview_View;
 
-class Page_View extends Preview_View {
+class Page_View extends Bootstrap_Page_View {
     use Layui_Popup,Layui_Code_Helper;
+
+    protected function style_map($meta=null, $state = 'normal')
+    {
+        $map = Preview_View::style_map($meta, $state);
+        $map['flex-grow']= 'flex-grow:1'; # 17502
+        return $map;
+    }
     protected function css_map()
     {
-        $cssMap = parent::css_map();
+        $cssMap = Preview_View::css_map();
         $hasForm = false;
         foreach ((array)$this->data['items'] as $item) {
             if ($item['meta']['form']) {
@@ -22,18 +27,5 @@ class Page_View extends Preview_View {
             $cssMap['form'] = 'layui-form';
         }
         return $cssMap;
-    }
-    public function build_ui()
-    {
-        $space =  $this->indent();
-        echo "{$space}<div";
-        echo $this->build_main_attrs();
-        echo ">";
-        echo "\r\n";
-        foreach ($this->childViews as $view){
-            $view->output();
-        }
-
-        echo "{$space}</div>\r\n";
     }
 }

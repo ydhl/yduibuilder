@@ -62,10 +62,15 @@ class Progress_View extends Preview_View {
             $barStyle = ["width: {$value}%"];
         }
         $styleMap = parent::style_map();
+        $cssMap = parent::css_map();
+        $color = '';
         if ($styleMap['color']){
-            $barStyle[] = "background-color:".$this->data['meta']['style']['color']." !important";
+            $color = $this->data['meta']['style']['color'];
+        }else if($cssMap['foregroundTheme']) {
+            $color = $this->cssTranslate['themeColor'][$this->data['meta']['css']['foregroundTheme']];
         }
-        $style["[data-uiid={$myid}] .progress-bar"] = join(';', $barStyle);
+        if ($color) $barStyle[] = "background-color:{$color} !important";
+        $style["[data-uiid={$myid}] [role=progressbar]"] = join(';', $barStyle);
         return $style;
     }
     protected function css_map()

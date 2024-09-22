@@ -34,7 +34,9 @@ class Layui_factory extends Css_Factory{
             'borderColorClass'=> ['primary'=>'layui-border-primary', 'secondary'=>'layui-border-secondary', 'success'=>'layui-border-success-ext', 'info'=>'layui-border-info-ext','light'=>'layui-border-light-ext', 'danger'=>'layui-border-danger', 'warning'=>'layui-border-warning', 'dark'=>'layui-border-dark', 'default'=>''],
 
             'verticalAlignment' => ['inherit'=>'', 'top' => 'layui-align-top','middle' => 'layui-align-middle','bottom' => 'layui-align-bottom'],
-            'textAlignment' => ['inherit'=>'', 'left' => 'layui-text-left','center' => 'layui-text-center','right' => 'layui-text-right']
+            'textAlignment' => ['inherit'=>'', 'left' => 'layui-text-left','center' => 'layui-text-center','right' => 'layui-text-right'],
+            'fontSize' => ['default'=>'1','unit'=>'rem'],
+            'spacer' => ['default'=>'1','unit'=>'rem']
         ];
     }
 }

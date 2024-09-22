@@ -153,7 +153,6 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         if ($selector){
             $cssArray['__selector__'] = join(" ", $selector);
         }
-        $styleMap = $this->style_map();
         return $cssArray;
     }
     /**
@@ -338,9 +337,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
 //            伪类暂时不支持预定义css样式
 //            $this->fetch_css($styles['css'], $cssInfo);
 //            print_r($cssInfo);
-//            print_r($styles);
-            ;
-            $this->styles[$key.$pseudoState->state_name] = join(';'.PHP_EOL, $this->style_map($styles, $pseudoState->state_name)).';';
+            $this->styles[$key.$pseudoState->state_name] = join(' !important;'.PHP_EOL, $this->style_map($styles, $pseudoState->state_name)).' !important;';
         }
     }
 
@@ -406,7 +403,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             $styles = $this->build->get_uiid_bind_state_styles($this->myId(), $state->uuid);
             if (!$styles) continue;
 //            print_r($styles);
-            $this->styles[$key.'.'.$state_name] = join(';'.PHP_EOL, array_values($this->style_map($styles, $state_name))).';';
+            $this->styles[$key.'.'.$state_name] = join(' !important;'.PHP_EOL, array_values($this->style_map($styles, $state_name))).' !important;';
         }
     }
 
@@ -1004,18 +1001,18 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @param $includeEvent boolean 是否包含事件输出绑定
      * @return void
      */
-    protected function build_main_attrs($includeEvent = true) {
+    protected function build_main_attrs($includeEvent = true, $includeInputBind = true, $includeDataIndex=true) {
         $this->build_css_attrs();
         $myid = $this->myid();
         echo $this->wrap_output('data-uiid', $this->myid());
         echo $this->wrap_output('x-id', "['{$myid}']");
         echo $this->wrap_output('data-type', strtolower($this->data['type']));
-        echo $this->wrap_output(':data-index', $this->get_iterator_index_name());
+        if($includeDataIndex) echo $this->wrap_output(':data-index', $this->get_iterator_index_name());
         foreach ($this->_attrs as $name => $value){
             echo $this->wrap_output($name, $value);
         }
         $this->build_data_output_bind();
-        $this->build_data_input_bind();
+        if ($includeInputBind) $this->build_data_input_bind();
         if (!is_a($this, ValueList_View::class)){
             $boundDataNames = [];
             $boundDatas = $this->get_bound_datas($boundDataNames);
@@ -1142,12 +1139,12 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * <strong style="color:red">注意这部分内容只能在具体的表单元素的上进行调用输出，比如input，textarea等</strong>
      * @param false $notOutputId 默认输出表单元素id
      */
-    protected function build_form_attrs ($includeName = true) {
+    protected function build_form_attrs ($includeName = true, $includeUuid=true) {
         $myid = $this->myid();
         if ($includeName) {
             echo $this->wrap_output(':name', "\$id('{$myid}')");
         }
-        echo $this->wrap_output('data-uiid', $this->myId().$this->data['type']);
+        if($includeUuid) echo $this->wrap_output('data-uiid', $this->myId().$this->data['type']);
 
         if (@$this->data['meta']['form']['state']=='disabled'){
             echo ' disabled';
@@ -1168,36 +1165,37 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         $icon = $this->data['meta']['custom']['icon'];
         if (!$icon) {
             echo PHP_EOL;
-            echo $this->indent($indent ?: 1);
+            echo $this->indent($indent ?: 1, true);
             $outputInner();
             return;
         }
         echo PHP_EOL;
-        echo $this->indent($indent ?: 1);
+        echo $this->indent($indent ?: 1, true);
         switch ($this->data['meta']['custom']['icon-position']) {
             case 'top':{
+                echo $this->indent($indent ?: 1, true);
                 echo "<{$wrapTag}><{$iconTag} class='{$icon}'></{$iconTag}></{$wrapTag}>".PHP_EOL;
-                echo $this->indent($indent ?: 1);
+                echo $this->indent($indent ?: 1, true);
                 $outputInner();
                 return;
             }
             case 'bottom':{
                 $outputInner();
                 echo PHP_EOL;
-                echo $this->indent($indent ?: 1);
+                echo $this->indent($indent ?: 1, true);
                 echo "<{$wrapTag}><{$iconTag} class='{$icon}'></{$iconTag}></{$wrapTag}>";
                 return;
             }
             case 'right':{
                 $outputInner();
                 echo PHP_EOL;
-                echo $this->indent($indent ?: 1);
+                echo $this->indent($indent ?: 1, true);
                 echo "<{$iconTag} class='{$icon}'></{$iconTag}>";
                 return;
             }
             default:{
                 echo "<{$iconTag} class='{$icon}'></{$iconTag}>".PHP_EOL;
-                echo $this->indent($indent ?: 1);
+                echo $this->indent($indent ?: 1, true);
                 $outputInner();
             }
         }
@@ -1418,7 +1416,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @return bool
      */
     protected function is_iteration_ui(){
-        return in_array(strtolower($this->data['type']),['breadcrumb','carousel','checkbox','collapse','dropdown','list','nav','radio','select', 'table', 'pagination']);
+        return in_array(strtolower($this->data['type']),['breadcrumb','carousel','checkbox','collapse','dropdown','list','nav','radio','select', 'table']);
     }
 
     /**

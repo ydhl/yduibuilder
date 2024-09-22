@@ -1,11 +1,11 @@
 
-.layui-pagination-lg > *{
+.layui-pagination-lg > *, .layui-pagination-lg select, .layui-pagination-lg button, .layui-pagination-lg input{
     height: 48px !important;
     line-height: 48px !important;
-    padding: 0 30px !important;
     font-size: 18px !important;
 }
-.layui-pagination-sm > *{
+
+.layui-pagination-sm > *, .layui-pagination-sm select, .layui-pagination-sm button, .layui-pagination-sm input{
     height: 18px !important;
     line-height: 18px !important;
 }

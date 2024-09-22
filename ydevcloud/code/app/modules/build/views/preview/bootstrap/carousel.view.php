@@ -11,12 +11,12 @@ use app\modules\build\views\preview\ValueList_View;
 
 /**
  * <pre>
- * <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
- *  <ol class="carousel-indicators">
- *      <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
- *      <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
- *      <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
- *  </ol>
+ * <div id="carouselExampleIndicators" class="carousel slide">
+ *  <div class="carousel-indicators">
+ *      <button data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
+ *      <button data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
+ *      <button data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></button>
+ *  </div>
  *  <div class="carousel-inner">
  *      <div class="carousel-item active">
  *          <img src="..." class="d-block w-100" alt="...">
@@ -28,11 +28,11 @@ use app\modules\build\views\preview\ValueList_View;
  *          <img src="..." class="d-block w-100" alt="...">
  *      </div>
  *  </div>
- *  <button class="carousel-control-prev" type="button" data-target="#carouselExampleIndicators" data-slide="prev">
+ *  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
  *      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
  *      <span class="sr-only">Previous</span>
  *  </button>
- *  <button class="carousel-control-next" type="button" data-target="#carouselExampleIndicators" data-slide="next">
+ *  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
  *      <span class="carousel-control-next-icon" aria-hidden="true"></span>
  *      <span class="sr-only">Next</span>
  *  </button>
@@ -73,21 +73,23 @@ class Carousel_View extends ValueList_View {
 
         $this->build_ui_begin();
         if ( $this->data['meta']['custom']['showIndicator']) {
-            echo $this->indent(1).'<ol class="carousel-indicators"';
+            echo $this->indent(1).'<div class="carousel-indicators"';
             echo $this->wrap_output(':id', "alpinejs_get_index(\$el, '{$myid}', '-indicators')");
             echo '>'.PHP_EOL;
-            echo $this->indent(1)."</ol>".PHP_EOL;
             // bootstrap会把template当中一个元素，导致幻灯片的css 选择器错误，因为把template当中第0个幻灯片，
             // 所以把template放到外面，并通过 init 指定到ol中（x-for情况下x-teleport之后有一个被放到ol中）
             echo $this->indent(1).'<template x-for="(itemOf'.$itemName.', idxOf'.$itemName.') in '
                 .$iteratorName.'" :key="idxOf'.$itemName.'">'.PHP_EOL;
-            echo $this->indent(1)."<li";
-            echo $this->wrap_output(":data-target", "alpinejs_get_index(\$el, '#{$myid}')");
+            echo $this->indent(1)."<button";
+            echo $this->wrap_output(":data-bs-target", "alpinejs_get_index(\$el, '#{$myid}')");
             echo $this->wrap_output("class", "carousel-indicator");
-            echo $this->wrap_output(":data-slide-to", "idxOf{$itemName}");
+            echo $this->wrap_output("type", "button");
+            echo $this->wrap_output(":data-bs-slide-to", "idxOf{$itemName}");
             echo $this->wrap_output(':class', "{$activeExp} ? 'active' : ''");
-            echo "></li>".PHP_EOL;
+            echo "></button>".PHP_EOL;
             echo $this->indent(1).'</template>'.PHP_EOL;
+
+            echo $this->indent(1)."</div>".PHP_EOL;
         }
 
         echo $this->indent(1).'<div class="carousel-inner"';
@@ -102,7 +104,7 @@ class Carousel_View extends ValueList_View {
         echo $this->wrap_output('class', 'carousel-item');
         echo $this->wrap_output(':data-value', $value);
         echo $this->wrap_output('data-bound', $boundData);
-        echo $this->wrap_output('data-target', $myid);
+        echo $this->wrap_output('data-bs-target', $myid);
         echo $this->wrap_output(':class', "{'active': {$activeExp}}");
         if ($needLoadSubpage){
             echo $this->wrap_output(':id', "alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-item')");
@@ -137,18 +139,12 @@ class Carousel_View extends ValueList_View {
         $is_scale = $this->is_2d_scale_array($bindOutput) || $this->is_1d_scale_array($bindOutput);
 
         $loadSubpages = '';
-        $append = '';
-        if (!$is_scale) {
-            if ($this->is_iteration($bindOutput)) {
-                $append = $this->appendChild();
-            }
-        }else{
-            $append = $this->appendChild();
+        if ($is_scale) {
             // 处理子页加载
             $loadSubpages = <<< SUB_PAGES
 
     const {$myid} = {}; 
-    const {$myid}_subpages = document.querySelectorAll("[data-target='{$myid}'].carousel-item");
+    const {$myid}_subpages = document.querySelectorAll("[data-bs-target='{$myid}'].carousel-item");
     for( const subpage of {$myid}_subpages){
         if (!subpage.dataset.value)continue;
         const id = subpage.id;
@@ -161,7 +157,6 @@ SUB_PAGES;
 
         $nextTick = <<< TICK
 this.\$nextTick(() => {
-    {$append}
     {$loadSubpages}
 })
 TICK;
@@ -212,26 +207,28 @@ TICK;
         if ( ! $this->data['meta']['custom']['showIndicator']) return;
         $myid = $this->myid();
         echo $this->indent(1);
-        echo '<ol class="carousel-indicators">'.PHP_EOL;
+        echo '<div class="carousel-indicators">'.PHP_EOL;
         if ( ! $this->data['items']) {
             echo $this->indent(2);
-            echo "<li";
-            echo $this->wrap_output(":data-target", "alpinejs_get_index(\$el, '#{$myid}')");
-            echo $this->wrap_output("data-slide-to", 0);
+            echo "<button";
+            echo $this->wrap_output(":data-bs-target", "alpinejs_get_index(\$el, '#{$myid}')");
+            echo $this->wrap_output("data-bs-slide-to", 0);
             echo $this->wrap_output("class", 'active');
-            echo "></li>".PHP_EOL;
+            echo $this->wrap_output("type", 'button');
+            echo "></button>".PHP_EOL;
         }
         foreach ($this->data['items'] as $index => $item){
             echo $this->indent(2);
-            echo "<li";
-            echo $this->wrap_output("data-target", "alpinejs_get_index(\$el, '{$myid}')");
-            echo $this->wrap_output("data-slide-to", $index);
+            echo "<button";
+            echo $this->wrap_output("data-bs-target", "alpinejs_get_index(\$el, '{$myid}')");
+            echo $this->wrap_output("data-bs-slide-to", $index);
+            echo $this->wrap_output("type", 'button');
             echo $this->wrap_output("class", !isset($this->data['meta']['custom']['activeIndex']) && !$index || $this->data['meta']['custom']['activeIndex'] == $index ? 'active' : null);
-            echo "></li>".PHP_EOL;
+            echo "></button>".PHP_EOL;
         }
 
         echo $this->indent(1);
-        echo "</ol>".PHP_EOL;
+        echo "</div>".PHP_EOL;
     }
     private function build_static_slide(){
         echo $this->indent(1);
@@ -276,15 +273,15 @@ TICK;
         $myid = $this->myid();
 
         echo $this->indent(1).'<a class="carousel-control-prev" type="button"';
-        echo $this->wrap_output(":data-target", "alpinejs_get_index(\$el, '#{$myid}')");
-        echo $this->wrap_output("data-slide", "prev");
+        echo $this->wrap_output(":data-bs-target", "alpinejs_get_index(\$el, '#{$myid}')");
+        echo $this->wrap_output("data-bs-slide", "prev");
         echo ">".PHP_EOL;
         echo $this->indent(2).'<span class="carousel-control-prev-icon" aria-hidden="true"></span>'.PHP_EOL;
         echo $this->indent(1)."</a>".PHP_EOL;
 
         echo $this->indent(1).'<a class="carousel-control-next" type="button"';
-        echo $this->wrap_output(":data-target", "alpinejs_get_index(\$el,'#{$myid}')");
-        echo " data-slide='next'>".PHP_EOL;
+        echo $this->wrap_output(":data-bs-target", "alpinejs_get_index(\$el,'#{$myid}')");
+        echo " data-bs-slide='next'>".PHP_EOL;
         echo $this->indent(2).'<span class="carousel-control-next-icon" aria-hidden="true"></span>'.PHP_EOL;
         echo $this->indent(1)."</a>".PHP_EOL;
     }

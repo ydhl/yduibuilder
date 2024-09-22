@@ -24,7 +24,7 @@ class Button_View extends Preview_View {
             echo '>';
             $this->wrap_icon(function(){
                 echo $this->data['meta']['title'] ?: '';
-            });
+            },$this->get_build()->get_indent() + 1);
             echo PHP_EOL;
             echo $space."</a>".PHP_EOL;
         }else{
@@ -38,7 +38,7 @@ class Button_View extends Preview_View {
             echo '>';
             $this->wrap_icon(function(){
                 echo $this->data['meta']['title'] ?: '';
-            });
+            },$this->get_build()->get_indent() + 1);
             echo PHP_EOL;
             echo $space."</button>".PHP_EOL;
         }
@@ -104,7 +104,7 @@ class Button_View extends Preview_View {
         return $styleArray;
     }
 
-    private function buttonMeta () {
+    protected function buttonMeta () {
         $parentUI = $this->get_parent_UI();
         $type = strtolower($parentUI['type']);
         $parentIsNavbar = in_array($type, ['nav']);

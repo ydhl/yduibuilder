@@ -823,6 +823,12 @@ export default {
     navbar: 'Navbar',
     page: 'Page',
     pagination: 'Pagination',
+    pagi: {
+      total: 'total: {0} items',
+      itemPerPage: 'items/page',
+      goto: 'Goto',
+      page: 'Page'
+    },
     projectUIComponent: 'Project UI Component',
     projectUIComponentTip: 'Components let you reuse designs in your project, To create a component, right-click an UI element on the workspace and select "Create component".',
     progress: 'Progress',

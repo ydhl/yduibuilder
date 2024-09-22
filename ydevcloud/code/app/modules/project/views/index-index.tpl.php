@@ -73,7 +73,7 @@ $env = Env::package();
     <?= __('My Projects')?>
     <button data-url="/project/add" class="btn btn-primary yd-dialog"  data-title="<?= __("Add Project")?>"><?= __('Add Project')?></button>
 </h4>
-<div class="d-flex flex-wrap gap-2">
+<div class="d-flex flex-wrap gap-3">
 <?php foreach ($members as $project_member){
     $project = $project_member->get_project();
     $members = $project->get_members();
@@ -83,7 +83,7 @@ $env = Env::package();
     $ui = $project->get_setting_value(Env::UI).'@'.$project->get_setting_value(Env::UI_VERSION);
     $logo = $project->get_setting_value('logo');
     ?>
-    <div class="card">
+    <div class="card flex-grow-1 bg-light">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">

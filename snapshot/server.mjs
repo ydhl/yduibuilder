@@ -26,7 +26,7 @@ function rtrim(string, c) {
 
 function query (sql, params, callback) {
     if (!mysqlPool) {
-        mysqlPool = mysql.createPool({ host, user, password, database, port, socketPath: '/run/mysqld/mysql.sock' });
+        mysqlPool = mysql.createPool({ host, user, password, database, port});
     }
     mysqlPool.getConnection(function (err, conn){
         if (err) {
@@ -103,29 +103,54 @@ async function handleMessage (browser, msg) {
         }
         await page.screenshot(screenshotArgs);
         await page.close()
-        const distFile = rtrim(upload_path,'/') + save_path;
-        const __dirname = path.dirname(fileURLToPath(import.meta.url))
-        const sourceFile = path.join(__dirname, localfile);  
-        console.log(new Date().toLocaleString() + ': ' + preview_url + " finish, " + sourceFile + " move to " + distFile);
 
-        //2. 这里把截图上传到ydecloud中 
-        if (!fs.existsSync(path.dirname(distFile))) {  
-            fs.mkdirSync(path.dirname(distFile), { recursive: true });  
-        }
-        try {
-            fs.copyFileSync(sourceFile, distFile);
-            console.log('文件移动成功！');  
-          } catch (err) {  
-            console.error('文件移动失败：', err);  
-          }
+        if (accessKeyId){
+            console.log(new Date().toLocaleString() + ': ' + preview_url + " finish, put to oss ");
 
-        updateDB(pageid);
-        fs.unlink(localfile, (err) => {
-            if (err){
-                console.log(new Date().toLocaleString() + ":" + 'unlink file error: ' + err.message)
-                return;
+            //2. 这里把截图上传到oss中 
+            let client = new OSS({endpoint, accessKeyId, accessKeySecret, bucket });
+            try{
+                // object表示上传到OSS的Object名称，localfile表示本地文件或者文件路径
+                const ossResult = await client.put(save_path, localfile);
+                // console.log('oss put success: %j', ossResult);
+                // const fileurl = ossResult.url
+                console.log(new Date().toLocaleString() + ": " + ossResult.url);
+                updateDB(pageid);
+                fs.unlink(localfile, (err) => {
+                    if (err){
+                        console.log(new Date().toLocaleString() + ":" + 'unlink file error: ' + err.message)
+                        return;
+                    }
+                });
+                console.log(new Date().toLocaleString() + ": " + preview_url + ' [done] \r\n')
+            } catch (e) {
+                console.log(e)
             }
-        });
+        }else{
+            const distFile = rtrim(upload_path,'/') + save_path;
+            const __dirname = path.dirname(fileURLToPath(import.meta.url))
+            const sourceFile = path.join(__dirname, localfile);  
+            console.log(new Date().toLocaleString() + ': ' + preview_url + " finish, " + sourceFile + " move to " + distFile);
+
+            //2. 这里把截图上传到ydecloud中 
+            if (!fs.existsSync(path.dirname(distFile))) {  
+                fs.mkdirSync(path.dirname(distFile), { recursive: true });  
+            }
+            try {
+                fs.copyFileSync(sourceFile, distFile);
+                console.log('文件移动成功！');  
+            } catch (err) {  
+                console.error('文件移动失败：', err);  
+            }
+
+            updateDB(pageid);
+            fs.unlink(localfile, (err) => {
+                if (err){
+                    console.log(new Date().toLocaleString() + ":" + 'unlink file error: ' + err.message)
+                    return;
+                }
+            });
+        }
     }catch(err){
         console.log(new Date().toLocaleString() + ":" + "[x] Received '%s'",msg ? msg.content.toString() : '');
         console.log(err);

@@ -1,13 +1,13 @@
 <template>
   <template v-if="iconClass">
     <i :draggable='draggable'
-          :class="[ dragableCss, uiCss, iconClass]" :style="uiStyle" :id="myId" :data-type="uiconfig.type"
-          :data-pageid="pageid"></i>
+       :class="[ dragableCss, uiCss, iconClass]" :style="uiStyle" :id="myId" :data-type="uiconfig.type"
+       :data-pageid="pageid"></i>
   </template>
   <template v-else>
-    <div :draggable='!inlineEditItemId'
-       :class="[ dragableCss, uiCss]" :style="uiStyle" :id="myId" :data-type="uiconfig.type"
-       :data-pageid="pageid">{{t('style.icon.notChooseIconTip')}}</div>
+    <div :draggable='draggable'
+         :class="[ dragableCss, uiCss]" :style="uiStyle" :id="myId" :data-type="uiconfig.type"
+         :data-pageid="pageid">{{t('style.icon.notChooseIconTip')}}</div>
   </template>
 </template>
 

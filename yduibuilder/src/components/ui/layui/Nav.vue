@@ -13,7 +13,7 @@
       </ul>
     </div>
   </template>
-  <template v-else-if="uiconfig.meta.custom?.type==='tab'">
+  <template v-else>
     <div :draggable='draggable'
          :class="['layui-tab',dragableCss, uiCss]"
          :style="uiStyle" :id="myId" :data-type="uiconfig.type"
@@ -25,19 +25,6 @@
           <UIBase :uiconfig="item" :pageid="pageid" :is-readonly="myIsReadonly" :is-lock="myIsLock"></UIBase>
         </li>
       </ul>
-    </div>
-  </template>
-  <template v-else>
-    <div :draggable='draggable'
-         :class="[dragableCss, uiCss]"
-         :style="uiStyle" :id="myId" :data-type="uiconfig.type"
-         :data-isContainer="true"
-         :data-pageid="pageid">
-      <button type="button" :class="['layui-nav-item layui-btn', item.checked ? pillCheckedTheme : foreTheme + ' layui-btn-primary layui-border-0 ']" v-for="(item, index) in values"
-           :key="index" :style="foreStyle">{{item.name}}</button>
-      <div :class="['layui-nav-item layui-d-flex layui-align-items-center layui-justify-content-center', foreTheme]" v-for="(item, index) in uiconfig.items" :key="index" :style="foreStyle">
-        <UIBase :uiconfig="item" :pageid="pageid" :is-readonly="myIsReadonly" :is-lock="myIsLock"></UIBase>
-      </div>
     </div>
   </template>
 </template>

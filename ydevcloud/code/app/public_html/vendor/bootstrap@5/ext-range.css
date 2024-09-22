@@ -1,0 +1,95 @@
+.form-control-range{
+    -webkit-appearance: none;
+    background: -webkit-linear-gradient(#767676, #767676) no-repeat, #efefef;
+    background-size: 50% 100%;
+    outline: none;
+    height: 10px;
+    border: 1px solid #767676;
+}
+
+.form-control-range-sm{
+    height: 5px;
+}
+.form-control-range-lg{
+    height: 20px;
+}
+
+.range-primary{
+    background: -webkit-linear-gradient(var(--bs-blue), var(--bs-blue)) no-repeat, #efefef;
+    border: 1px solid var(--bs-blue);
+}
+.range-secondary{
+    background: -webkit-linear-gradient(var(--bs-secondary), var(--bs-secondary)) no-repeat, #efefef;
+    border: 1px solid var(--bs-secondary);
+}
+.range-success{
+    background: -webkit-linear-gradient(var(--bs-success), var(--bs-success)) no-repeat, #efefef;
+    border: 1px solid var(--bs-success);
+}
+.range-danger{
+    background: -webkit-linear-gradient(var(--bs-danger), var(--bs-danger)) no-repeat, #efefef;
+    border: 1px solid var(--bs-danger);
+}
+.range-warning{
+    background: -webkit-linear-gradient(var(--bs-warning), var(--bs-warning)) no-repeat, #efefef;
+    border: 1px solid var(--bs-warning);
+}
+.range-info{
+    background: -webkit-linear-gradient(var(--bs-info), var(--bs-info)) no-repeat, #efefef;
+    border: 1px solid var(--bs-info) ;
+}
+.range-light{
+    background: -webkit-linear-gradient(var(--bs-light), var(--bs-light)) no-repeat, #efefef;
+    border: 1px solid var(--bs-light);
+}
+.range-dark{
+    background: -webkit-linear-gradient(var(--bs-dark), var(--bs-dark)) no-repeat, #efefef;
+    border: 1px solid var(--bs-dark) ;
+}
+
+
+
+.form-control-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    background: #767676;
+    border-radius: 50%;
+}
+.form-control-range:hover::-webkit-slider-thumb {
+    box-shadow:0 0 0 1px #fff
+}
+
+.form-control-range-sm::-webkit-slider-thumb {
+    height: 15px;
+    width: 15px;
+}
+.form-control-range-lg::-webkit-slider-thumb {
+    height: 30px;
+    width: 30px;
+}
+
+.range-primary::-webkit-slider-thumb{
+    background: var(--bs-blue);
+}
+.range-secondary::-webkit-slider-thumb{
+    background: var(--bs-secondary);
+}
+.range-success::-webkit-slider-thumb{
+    background: var(--bs-success);
+}
+.range-danger::-webkit-slider-thumb{
+    background:  var(--bs-danger);
+}
+.range-warning::-webkit-slider-thumb{
+    background: var(--bs-warning);
+}
+.range-info::-webkit-slider-thumb{
+    background: var(--bs-info);
+}
+.range-light::-webkit-slider-thumb{
+    background: var(--bs-light);
+}
+.range-dark::-webkit-slider-thumb{
+    background: var(--bs-dark);
+}

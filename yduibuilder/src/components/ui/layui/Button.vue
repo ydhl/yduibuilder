@@ -60,6 +60,10 @@ export default {
         myStyle['background-color'] = backgroundColor
         myStyle['border-color'] = backgroundColor
       }
+      if (buttonMeta.value.custom?.isOutline) {
+        delete myStyle['background-color']
+        delete myStyle['background-image']
+      }
       return button.appendImportant(myStyle)
     })
 

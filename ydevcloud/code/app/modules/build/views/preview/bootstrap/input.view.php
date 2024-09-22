@@ -12,9 +12,8 @@ use yangzie\YZE_View_Component;
 
 /**
  * <pre>
- * <div class="form-control justify-content-between align-items-center d-flex">
- *  <input type="text" class="w-100 border-0 bg-transparent input">
- * </div>
+ * <input class="form-control">
+ * <div class='action'></div>
  * </pre>
  */
 class Input_View extends Preview_View implements Valuable_View {
@@ -36,15 +35,16 @@ class Input_View extends Preview_View implements Valuable_View {
         $eventHandlers = $this->get_event_listen_props();
 
         echo "{$space}<div";
-        $this->build_main_attrs();
+        echo $this->wrap_output("style", "position: relative;");
+        echo $this->wrap_output(":data-index", $this->get_iterator_index_name());
         echo ">";
         echo $this->indent(1);
         $this->wrap_icon(function() use($iteratorDataName, $isArr, $outputDataName, $inputDataName, $eventHandlers){
             echo '<input'.$this->wrap_output('type', @$this->data['meta']['custom']['inputType'] ?: 'text');
-            echo ' class="w-100 border-0 bg-transparent input" ';// input 用于前端jas处理时找input元素
+            $this->build_main_attrs(true, true, false);
             echo $this->wrap_output("autocomplete", $this->data['meta']['custom']['autocomplete']?:NULL);
             echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength']?:NULL);
-            echo $this->build_form_attrs();
+            echo $this->build_form_attrs(true, false);
 
             echo $this->wrap_output('@blur', $eventHandlers['@blur']);
             echo $this->wrap_output('@focus', $eventHandlers['@focus']);
@@ -58,18 +58,27 @@ class Input_View extends Preview_View implements Valuable_View {
                 echo $this->wrap_output(':value', $isArr ? $iteratorDataName : $outputDataName['VALUE']);
             }
             echo ">".PHP_EOL;
-        },1);
+        },$this->get_build()->get_indent() + 1);
 
+        if (@$this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
+            echo $this->indent(1) . '<div';
+            echo $this->wrap_output('style', $this->get_action_style());
+            echo $this->wrap_output('class', $this->get_action_class());
+            echo '>'.PHP_EOL;
+        }
         if (@$this->data['meta']['custom']['wordCountVisible']){
-            echo $this->indent(1) . "<div class='ml-1'><span class='word-count' x-text='alpinejs_get_value(\$el, \"{$myid}_wordCount{$indexSuffix}\")'></span>";
+            echo $this->indent(2) . "<span class='word-count' x-text='alpinejs_get_value(\$el, \"{$myid}_wordCount{$indexSuffix}\")'></span>";
             if (@$this->data['meta']['custom']['maxLength']){
                 echo "/".$this->data['meta']['custom']['maxLength'];
             }
-            echo "</div>".PHP_EOL;
+            echo PHP_EOL;
         }
 
         if (@$this->data['meta']['custom']['clearButtonVisible']){
-            echo $this->indent(1) . "<div @click='".$this->myid()."_clear' class='cursor ml-1' x-show='alpinejs_get_value(\$el, \"{$myid}_clearButtonVisible{$indexSuffix}\")'>×</div>".PHP_EOL;
+            echo $this->indent(2) . "<div @click='".$this->myid()."_clear' class='cursor' x-show='alpinejs_get_value(\$el, \"{$myid}_clearButtonVisible{$indexSuffix}\")'>×</div>".PHP_EOL;
+        }
+        if (@$this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
+            echo $this->indent(1) . "</div>".PHP_EOL;
         }
 
         echo "{$space}</div>".PHP_EOL;
@@ -77,7 +86,7 @@ class Input_View extends Preview_View implements Valuable_View {
     public function build_style($justSelf = true)
     {
         $style = parent::build_style($justSelf);
-        $style['[data-uiid='.$this->myid().$this->data['type'].']'] = 'font-style: inherit !important;color: inherit;';
+        $style['[data-uiid='.$this->myid().'] .action'] = 'position: absolute; right: 10px; display: flex;column-gap: 10px;top: 0px;height: 100%;line-height: 2.4;';
         return $style;
     }
     public function build_code(): Base_Code_Fragment
@@ -138,12 +147,16 @@ class Input_View extends Preview_View implements Valuable_View {
         $styleMap = parent::style_map();
         if ($styleMap['background-color']) unset($css['backgroundTheme']);
         if ($styleMap['color']) unset($css['foregroundTheme']);
-        $myCss[] = 'form-control justify-content-between align-items-center';
+        $myCss[] = 'form-control input';
         if (@$this->data['meta']['css']['formSizing'] && $this->data['meta']['css']['formSizing']!='normal'){
             $myCss[] = 'form-control-'.$this->data['meta']['css']['formSizing'];
         }
         if (@$this->data['meta']['custom']['borderless']){
             $myCss[] = 'border-0';
+        }
+
+        if (@$this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
+            $myCss[] = 'pe-5';
         }
 
         if (@$this->data['meta']['form']['state']=='disabled'){
@@ -154,10 +167,23 @@ class Input_View extends Preview_View implements Valuable_View {
         }
         if (@$this->data['meta']['form']['state']=='hidden'){
             $myCss[] = 'd-none';
-        }else{
-            $myCss[] = 'd-flex';
         }
         $css['-'] = join(' ', $myCss);
         return $css;
+    }
+    protected function get_action_style(){
+        $style = [];
+        if ($this->data['meta']['style']['color']){
+            $style[] = 'color: '.$this->data['meta']['style']['color'];
+        }
+        $style[] = "position:absolute;right:10px;top:0px;height:100%;align-items:center;display:flex;gap:10px";
+        return join(';', $style);
+    }
+    protected function get_action_class(){
+        $cssMap = $this->css_map();
+        if (!$this->data['meta']['style']['color'] && $cssMap['foreground']){
+            return $cssMap['foreground'];
+        }
+        return null;
     }
 }

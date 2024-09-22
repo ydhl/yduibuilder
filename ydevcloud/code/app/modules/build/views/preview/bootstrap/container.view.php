@@ -10,7 +10,7 @@ class Container_View extends Preview_View {
     use Bootstrap_Popup,Html_Code_Helper, Alpine {
         Alpine::build_code as alpineBuildCode;
     }
-    private $subset = [];
+    protected $subset = [];
     protected function output_as_prop($outputAs, $outputData)
     {
         if (strtolower($outputAs) == 'value') return null;

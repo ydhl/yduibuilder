@@ -39,8 +39,8 @@ class Asset_Controller extends YZE_Resource_Controller {
         }
         $query = File_Model::from()->where($where)->order_By('id', 'DESC');
 
-        $total = $query->count('id', [':pid'=>$project->id]);
         $files = $query->limit(($page - 1) * 20, 20)->select([':pid'=>$project->id]);
+        $total = $query->count('id', [':pid'=>$project->id]);
 
         $this->set_View_Data('files', $files);
         $this->set_View_Data('menu', 'asset');

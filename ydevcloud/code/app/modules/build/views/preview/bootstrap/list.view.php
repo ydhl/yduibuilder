@@ -62,14 +62,7 @@ class List_View extends ValueList_View {
     {
         $arrMap = parent::css_map();
         unset($arrMap['backgroundTheme'], $arrMap['foregroundTheme']);
-        $arr = [];
-        if (@$this->data['meta']['custom']['horizontal']){
-            $arr[] = 'list-group-horizontal';
-        }
-        if (@$this->data['meta']['custom']['flush']){
-            $arr[] = 'list-group-flush';
-        }
-        $arr[] = 'list-group';
+        $arr = ['list-group'];
         $arrMap['-'] = join(' ', $arr);
         return $arrMap;
     }
@@ -80,7 +73,7 @@ class List_View extends ValueList_View {
         return $styleArray;
     }
 
-    private function item_theme($valueName, $staticValue='') {
+    protected function item_theme($valueName, $staticValue='') {
         $inputDataName = $this->get_input_data_name($isArr);
         $styleMap = Preview_View::style_map();
         $cssMap = Preview_View::css_map();
@@ -99,7 +92,7 @@ class List_View extends ValueList_View {
         }
         return "{".join(', ', $css)."}";
     }
-    private function item_style($valueName, $staticValue='') {
+    protected function item_style($valueName, $staticValue='') {
         $inputDataName = $this->get_input_data_name($isArr);
         $inputDataNameString = $isArr ? "alpinejs_get_value(\$el, '{$inputDataName}')" : $inputDataName;
         $styleMap = parent::style_map();

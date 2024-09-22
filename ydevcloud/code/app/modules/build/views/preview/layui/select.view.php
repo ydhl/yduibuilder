@@ -2,8 +2,6 @@
 namespace app\modules\build\views\preview\layui;
 
 
-
-
 use app\modules\build\views\preview\Preview_View;
 
 class Select_View extends Preview_View {

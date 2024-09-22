@@ -15,7 +15,10 @@ $invitedCount = $this->get_data('invitedCount');
 $loginUser = YZE_Hook::do_hook(YZE_HOOK_GET_LOGIN_USER);
 $env = Env::package();
 ?>
-<h4 class="border-bottom pb-2 text-muted"><?= __('Recently Projects')?></h4>
+<h4 class="border-bottom pb-2 text-muted d-flex justify-content-between">
+    <?= __('Recently Projects')?>
+    <button data-url="/project/add" type="button" data-title="<?= __('Add Project')?>" class="btn btn-primary yd-dialog"><?= __('Add Project')?></button>
+</h4>
 <div class="d-flex pt-2 flex-wrap">
     <?php if ($invitedCount){?>
         <div class="card me-3 mb-3 border-primary" style="width: 20rem">
@@ -51,9 +54,4 @@ $env = Env::package();
         </div>
     </div>
     <?php }?>
-    <div class="card me-3 mb-3 border" style="width: 20rem">
-        <div class="card-body d-flex justify-content-center align-items-center">
-            <button data-url="/project/add" type="button" data-title="<?= __('Add Project')?>" class="btn btn-primary yd-dialog"><?= __('Add Project')?></button>
-        </div>
-    </div>
 </div>

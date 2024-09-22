@@ -109,3 +109,9 @@
 .layui-mb-auto{margin-bottom: auto !important;}
 
 .cursor{cursor: pointer;}
+#ydecloud-app {
+    display: flex;
+    align-items: stretch;
+    align-content: stretch;
+    min-height: 100vh;
+}

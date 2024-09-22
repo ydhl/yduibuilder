@@ -10,8 +10,8 @@
              :required="uiconfig.meta?.form?.required"
              :value="uiconfig.meta.value">
       </IconWrapper>
-      <div v-if="uiconfig.meta?.custom?.wordCountVisible" class="ml-3">0{{uiconfig.meta?.custom?.maxLength ? '/' + uiconfig.meta?.custom?.maxLength : ''}}</div>
-      <div v-if="uiconfig.meta?.custom?.clearButtonVisible" class="cursor ml-3">×</div>
+      <div v-if="uiconfig.meta?.custom?.wordCountVisible" class="ms-3">0{{uiconfig.meta?.custom?.maxLength ? '/' + uiconfig.meta?.custom?.maxLength : ''}}</div>
+      <div v-if="uiconfig.meta?.custom?.clearButtonVisible" class="cursor ms-3">×</div>
     </div>
 </template>
 

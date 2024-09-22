@@ -61,9 +61,8 @@ class Upload_Controller extends YZE_Resource_Controller {
             $filepath = \yangzie\yze_remove_path($res, YZE_UPLOAD_PATH);
         }
         if (!$filepath) return YZE_JSON_View::error($this,  __("Upload Failed"));
-       $url = ltrim($filepath, '/');
-        // $url = upload2oss($res, ltrim($filepath, '/'));
-        // @unlink($res);
+        $url = upload2oss($res, ltrim($filepath, '/'));
+        if(OSS_ACCESSKEYID) @unlink($res); // 用oss的话删除本地文件
         $ext = strtoupper(pathinfo($_FILES[$upload_file_name]['name'], PATHINFO_EXTENSION));
         $file = new File_Model();
         $file->set(File_Model::F_CREATED_ON, date('Y-m-d H:i:s'))

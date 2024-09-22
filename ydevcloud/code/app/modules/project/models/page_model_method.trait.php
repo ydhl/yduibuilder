@@ -561,8 +561,8 @@ trait Page_Model_Method{
             $set['uiid'] = $old2newIDs[$model->uiid] ?: $model->uiid;
             $set['style'] = html_entity_decode($model->style);
             $set['expression'] = html_entity_decode($model->expression);
-            $set = array_map(function($item){
-                return is_null($item) ? 'NULL' : "'{$item}'";
+            $set = array_map(function($item) use($dba){
+                return is_null($item) ? 'NULL' : $dba->quote($item);
             }, $set);
             $set['uuid'] = 'uuid()';
             $set['page_id'] = $this->id;

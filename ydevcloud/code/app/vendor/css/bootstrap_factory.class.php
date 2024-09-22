@@ -3,7 +3,7 @@ namespace app\vendor\css;
 class Bootstrap_factory extends Css_Factory{
     public function cssTranslat($version){
         return [
-            'themeColor'=> ['primary'=>'#007bff', 'secondary'=>'#6c757d', 'success'=>'#28a745', 'danger'=>'#dc3545', 'warning'=>'#ffc107', 'info'=>'#17a2b8', 'light'=>'#f8f9fa', 'dark'=>'#343a40', 'default'=>''],
+            'themeColor'=> ['primary'=>'var(--bs-primary)', 'secondary'=>'var(--bs-secondary)', 'success'=>'var(--bs-success)', 'danger'=>'var(--bs-danger)', 'warning'=>'var(--bs-warning)', 'info'=>'var(--bs-info)', 'light'=>'var(--bs-light)', 'dark'=>'var(--bs-dark)', 'default'=>''],
             'foregroundTheme'=> ['primary'=>'text-primary', 'secondary'=>'text-secondary', 'success'=>'text-success', 'danger'=>'text-danger', 'warning'=>'text-warning', 'info'=>'text-info', 'light'=>'text-light', 'dark'=>'text-dark', 'default'=>''],
             'backgroundTheme'=> ['primary'=>'bg-primary', 'secondary'=>'bg-secondary', 'success'=>'bg-success', 'danger'=>'bg-danger', 'warning'=>'bg-warning', 'info'=>'bg-info', 'light'=>'bg-light', 'dark'=>'bg-dark', 'default'=>''],
 
@@ -31,15 +31,15 @@ class Bootstrap_factory extends Css_Factory{
             ],
             'margin'=> [ 'inherit'=> '', 'm-0'=> 'm-0', 'm-1'=> 'm-1', 'm-2'=> 'm-2', 'm-3'=> 'm-3', 'm-4'=> 'm-4', 'm-5'=> 'm-5', 'm-auto'=> 'm-auto' ],
             'margin-top'=> [ 'inherit'=> '', 'mt-0'=> 'mt-0', 'mt-1'=> 'mt-1', 'mt-2'=> 'mt-2', 'mt-3'=> 'mt-3', 'mt-4'=> 'mt-4', 'mt-5'=> 'mt-5', 'mt-auto'=> 'mt-auto' ],
-            'margin-right'=> [ 'inherit'=> '', 'mr-0'=> 'mr-0', 'mr-1'=> 'mr-1', 'mr-2'=> 'mr-2', 'mr-3'=> 'mr-3', 'mr-4'=> 'mr-4', 'mr-5'=> 'mr-5', 'mr-auto'=> 'mr-auto' ],
+            'margin-right'=> [ 'inherit'=> '', 'me-0'=> 'me-0', 'me-1'=> 'me-1', 'me-2'=> 'me-2', 'me-3'=> 'me-3', 'me-4'=> 'me-4', 'me-5'=> 'me-5', 'me-auto'=> 'me-auto' ],
             'margin-bottom'=> [ 'inherit'=> '', 'mb-0'=> 'mb-0', 'mb-1'=> 'mb-1', 'mb-2'=> 'mb-2', 'mb-3'=> 'mb-3', 'mb-4'=> 'mb-4', 'mb-5'=> 'mb-5', 'mb-auto'=> 'mb-auto' ],
-            'margin-left'=> [ 'inherit'=> '', 'ml-0'=> 'ml-0', 'ml-1'=> 'ml-1', 'ml-2'=> 'ml-2', 'ml-3'=> 'ml-3', 'ml-4'=> 'ml-4', 'ml-5'=> 'ml-5', 'ml-auto'=> 'ml-auto' ],
+            'margin-left'=> [ 'inherit'=> '', 'ms-0'=> 'ms-0', 'ms-1'=> 'ms-1', 'ms-2'=> 'ms-2', 'ms-3'=> 'ms-3', 'ms-4'=> 'ms-4', 'ms-5'=> 'ms-5', 'ms-auto'=> 'ms-auto' ],
 
             'padding'=> [ 'inherit'=> '', 'p-0'=> 'p-0', 'p-1'=> 'p-1', 'p-2'=> 'p-2', 'p-3'=> 'p-3', 'p-4'=> 'p-4', 'p-5'=> 'p-5' ],
             'padding-top'=> [ 'inherit'=> '', 'pt-0'=> 'pt-0', 'pt-1'=> 'pt-1', 'pt-2'=> 'pt-2', 'pt-3'=> 'pt-3', 'pt-4'=> 'pt-4', 'pt-5'=> 'pt-5'],
-            'padding-right'=> [ 'inherit'=> '', 'pr-0'=> 'pr-0', 'pr-1'=> 'pr-1', 'pr-2'=> 'pr-2', 'pr-3'=> 'pr-3', 'pr-4'=> 'pr-4', 'pr-5'=> 'pr-5'],
+            'padding-right'=> [ 'inherit'=> '', 'pe-0'=> 'pe-0', 'pe-1'=> 'pe-1', 'pe-2'=> 'pe-2', 'pe-3'=> 'pe-3', 'pe-4'=> 'pe-4', 'pe-5'=> 'pe-5'],
             'padding-bottom'=> [ 'inherit'=> '', 'pb-0'=> 'pb-0', 'pb-1'=> 'pb-1', 'pb-2'=> 'pb-2', 'pb-3'=> 'pb-3', 'pb-4'=> 'pb-4', 'pb-5'=> 'pb-5'],
-            'padding-left'=> [ 'inherit'=> '', 'pl-0'=> 'pl-0', 'pl-1'=> 'pl-1', 'pl-2'=> 'pl-2', 'pl-3'=> 'pl-3', 'pl-4'=> 'pl-4', 'pl-5'=> 'pl-5'],
+            'padding-left'=> [ 'inherit'=> '', 'ps-0'=> 'ps-0', 'ps-1'=> 'ps-1', 'ps-2'=> 'ps-2', 'ps-3'=> 'ps-3', 'ps-4'=> 'ps-4', 'ps-5'=> 'ps-5'],
 
             'borderColorClass'=> ['primary'=>'border-primary', 'secondary'=>'border-secondary', 'success'=>'border-success', 'danger'=>'border-danger', 'warning'=>'border-warning', 'info'=>'border-info', 'light'=>'border-light', 'dark'=>'border-dark', 'default'=>''],
 

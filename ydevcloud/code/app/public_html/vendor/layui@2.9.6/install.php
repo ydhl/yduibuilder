@@ -179,7 +179,7 @@ class layui_install{
      */
     public static function jsForPreview() {
         return [
-            'iife'=>['layui.js','keyboard-adapter.js']
+            'iife'=>['layui.js','util.js']
         ];
     }
 }

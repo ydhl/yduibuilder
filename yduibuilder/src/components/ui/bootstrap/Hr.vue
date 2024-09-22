@@ -3,7 +3,7 @@
           :class="[dragableCss, uiCss, 'd-flex justify-content-center align-items-center']" :style="uiStyle" :id="myId" :data-type="uiconfig.type"
          :data-pageid="pageid">
       <div :class="['flex-grow-1', lineCss]" :style="lineStyle"></div>
-      <div v-if="uiconfig.meta.value" :class="['flex-shrink-0 pl-2 pr-2', textCss]" :style="textStyle">{{uiconfig.meta.value}}</div>
+      <div v-if="uiconfig.meta.value" :class="['flex-shrink-0 ps-2 pe-2', textCss]" :style="textStyle">{{uiconfig.meta.value}}</div>
       <div :class="['flex-grow-1', lineCss]" :style="lineStyle"></div>
     </div>
 </template>

@@ -1,10 +1,22 @@
 <template>
-    <ul :draggable='!inlineEditItemId' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
-        :data-pageid="pageid" :class="['pagination', dragableCss, uiCss]">
-      <li :class="{'page-item': true, [activeItemCss]: page===1}" v-for="page in totalPage" :key="page">
-        <a :class="{[activeLinkCss]: page===1, [linkCss]: page!==1, 'page-link': true}" :style="page===1 ? activeLinkStyle : linkStyle" href="javascript:;">{{page}}</a>
-      </li>
+  <nav :draggable='!inlineEditItemId' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
+       :data-pageid="pageid" :class="['d-flex gap-2 align-items-center', dragableCss, uiCss]">
+    <ul :class="'pagination mb-0 pagination-'+size">
+      <template  v-for="(page, index) in totalPage" :key="index">
+        <li :class="{'page-item': true, [activeItemCss]: page===1}">
+          <a :class="{[activeLinkCss]: page===1, [linkCss]: page!==1, 'page-link': true}" :style="page===1 ? activeLinkStyle : linkStyle" href="javascript:;">{{page}}</a>
+        </li>
+      </template>
     </ul>
+    <div>{{t('ui.pagi.total', [total])}}</div>
+    <select :class="'form-select form-select-' + size" style="width: 100px">
+      <option>{{pageSize}} {{t('ui.pagi.itemPerPage')}}</option>
+    </select>
+    <div class="d-flex align-items-center gap-1">
+      <input type="number" min="1" :class="'form-control form-control-' + size" style="width: 100px">
+      <button type="button" :class="'btn btn-light btn-' + size">{{t('common.ok')}}</button>
+    </div>
+  </nav>
 </template>
 
 <script lang="ts">
@@ -25,6 +37,9 @@ export default {
   },
   setup (props: any, context: any) {
     const pagination = new Pagination(props, context, useStore())
+    const total = computed(() => Math.max(parseInt(props.uiconfig.meta?.custom?.total || 100), 1))
+    const pageSize = computed(() => Math.max(parseInt(props.uiconfig.meta?.custom?.pageSize || 10), 1))
+    const size = computed(() => props.uiconfig.meta?.css?.paginationSizing || '')
     const uiStyle = computed(() => {
       const style = pagination.getUIStyle()
       delete style['background-color']
@@ -64,7 +79,12 @@ export default {
     const totalPage = computed(() => {
       const total = Math.max(parseInt(props.uiconfig.meta?.custom?.total || 100), 1)
       const size = Math.max(parseInt(props.uiconfig.meta?.custom?.pageSize || 10), 1)
-      return Math.ceil(total / size)
+      const page = Math.ceil(total / size)
+      const pages: any = []
+      for (let i = 1; i <= Math.min(10, page); i++) {
+        pages.push(i)
+      }
+      return pages
     })
     return {
       ...pagination.setup(),
@@ -75,7 +95,10 @@ export default {
       activeLinkCss,
       activeLinkStyle,
       linkStyle,
-      activeItemCss
+      activeItemCss,
+      size,
+      total,
+      pageSize
     }
   }
 }

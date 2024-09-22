@@ -70,7 +70,7 @@ class Select_View extends ValueList_View {
 
     private function select_css() {
         $styleMap = parent::style_map();
-        $css[] = 'form-control input';
+        $css[] = 'form-select input';
         if (@$this->data['meta']['css']['formSizing'] && $this->data['meta']['css']['formSizing'] != 'normal' ){
             $css[] = 'form-control-'.$this->data['meta']['css']['formSizing'];
         }

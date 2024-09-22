@@ -336,3 +336,19 @@ function alpinejs_input_clear(page, el, uiid, inputName){
     if(page.alpinejs_get_value(el, `${uiid}_wordCount${suffix}`) != undefined) page.alpinejs_set_value(el, `${uiid}_wordCount${suffix}`, 0);
     if(page.alpinejs_get_value(el, `${uiid}_clearButtonVisible${suffix}`) != undefined) page.alpinejs_set_value(el, `${uiid}_clearButtonVisible${suffix}`, false);
 }
+
+function alpinejs_pagination_pages(pageObj, el, totalPage, outputData, inputData){
+    const pages = [];
+    const maxPage = outputData || totalPage;
+    let startPage = inputData || 1;
+    startPage = Math.max(startPage - 2, 1);
+    const endPage = Math.min(startPage + 9, maxPage);
+    if (endPage - startPage < 10){
+        startPage = Math.max(endPage - 9, 1)
+    }
+    for (let i = startPage; i <= endPage; i++) {
+        pages.push(i)
+    }
+    // console.log(pages)
+    return pages;
+}

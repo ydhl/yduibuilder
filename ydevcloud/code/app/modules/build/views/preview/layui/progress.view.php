@@ -1,11 +1,10 @@
 <?php
 namespace app\modules\build\views\preview\layui;
 
-
-
+use app\modules\build\views\preview\bootstrap\Progress_View as Bootstrap_Progress_View;
 use app\modules\build\views\preview\Preview_View;
 
-class Progress_View extends Preview_View {
+class Progress_View extends Bootstrap_Progress_View {
     use Layui_Popup,Layui_Code_Helper;
 
     private function bar_class() {
@@ -21,61 +20,59 @@ class Progress_View extends Preview_View {
         }
         return join(' ', $class);
     }
-    private function bar_Style() {
-        $cssMap = parent::css_map();
-        $uiStyle = parent::style_map();
-        $value = $this->data['meta']['value']?:50;
-        $style = [];
-        $style[] = "width:{$value}% !important";
-        $color = '';
-        if (@$uiStyle['color']){
-            $color = $uiStyle['color'];
-        }else if($cssMap['foregroundTheme']) {
-            $color = $this->cssTranslate['themeColor'][$this->data['meta']['css']['foregroundTheme']];
-        }
-
-        if ($color){
-            $style[] = "background-color:{$color} !important";
-        }
-        if (@$uiStyle['height']){
-            $style[] = $uiStyle['height'];
-        }
-        return join(';', $style);
-    }
-    protected function style_map($meta=null, $state = 'normal')
-    {
-        $style = parent::style_map($meta, $state);
-        unset($style['color']);
-        return $style;
-    }
-
     protected function css_map()
     {
-        $cssMap = parent::css_map();
+        $cssMap = Preview_View::css_map();
         //前景色作为进度条颜色
         unset($cssMap['foregroundTheme']);
         $cssMap['-'] = 'layui-progress';
         return $cssMap;
     }
 
+    public function build_style($justSelf = true)
+    {
+        $style = parent::build_style($justSelf);
+        $myid = $this->myid();
+        $style["[data-uiid={$myid}] [role=progressbar]"] .= ';height: 100%';
+        return $style;
+    }
+
     public function build_ui()
     {
+        $outputDatas = $this->get_output_datas($outputDataNames);
+
         $space =  $this->indent();
         echo "{$space}<div";
         echo $this->build_main_attrs();
-        echo ">\r\n";
+        echo ">".PHP_EOL;
 
         echo $this->indent(1).'<div';
+        echo $this->wrap_output('role', 'progressbar');
         echo $this->wrap_output('class', $this->bar_class());
-        echo $this->wrap_output('style', $this->bar_style());
+
         $value = $this->data['meta']['value']?:50;
-        echo ' lay-percent="'.$value.'%"';
-        echo ">\r\n";
+        if ($outputDatas['VALUE']){
+            $valueDataName = $this->get_output_data_name('VALUE', $outputDatas['VALUE'], $outputDataNames['VALUE']);
+            echo $this->wrap_output(':lay-percent', "`\${{$valueDataName}}%`");
+            echo $this->wrap_output(':style', "`width:\${{$valueDataName}}%`");
+        }else{
+            echo $this->wrap_output('lay-percent', "{$value}%");
+        }
+        echo ">".PHP_EOL;
 
         if (@$this->data['meta']['custom']['label']){
-            echo $this->indent(2)."<div>{$value}%</div>\r\n";
+            echo $this->indent(2)."<div ";
+            $textDataName = $this->get_output_data_name('TEXT', $outputDatas['TEXT'], $outputDataNames['TEXT']);
+            if ($textDataName && $valueDataName){
+                echo $this->wrap_output('x-text', "`\${{$textDataName}}:\${{$valueDataName}}%`");
+            }else if ($textDataName){
+                echo $this->wrap_output('x-text', $textDataName);
+            }else if ($valueDataName){
+                echo $this->wrap_output('x-text', "`\${{$valueDataName}}%`");
+            }
+            echo ">{$value}%</div>".PHP_EOL;
         }
-        echo $this->indent(1)."</div>\r\n";
-        echo "{$space}</div>\r\n";
+        echo $this->indent(1)."</div>".PHP_EOL;
+        echo "{$space}</div>".PHP_EOL;
     }
 }

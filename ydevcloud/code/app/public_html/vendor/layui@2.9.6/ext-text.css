@@ -19,6 +19,9 @@
 .layui-text-justify{
   text-align: justify !important;
 }
+.layui-text-muted{
+  color: #CCCCCC !important;
+}
 
 
 .layui-font-italic{

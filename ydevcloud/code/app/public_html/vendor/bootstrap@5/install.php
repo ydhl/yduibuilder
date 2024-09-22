@@ -1380,8 +1380,8 @@ class bootstrap_install{
          */
         return [
             // 主体部分通过npm安装
-            'devDependencies'=>["@types/bootstrap"=>"^4.6.0"],
-            'dependencies'=>['bootstrap'=>"^4.6.0",'bootstrap-icons'=>'^1.5.0'],
+            'devDependencies'=>["@types/bootstrap"=>"^5.3.3"],
+            'dependencies'=>['bootstrap'=>"^5.3.3",'bootstrap-icons'=>'^1.5.0'],
             // 需要打包导出的文件, 并会导出到src/assert/[包名下面]
             'exportFiles'=>[
             ],
@@ -1405,7 +1405,7 @@ class bootstrap_install{
      */
     public static function installInHtml5() {
         return [
-            'iife'=>['bootstrap.bundle.min.js', 'ydpopup.js']
+            'iife'=>['/js/bootstrap.bundle.min.js', 'ydpopup.js']
         ];
     }
     /**
@@ -1414,7 +1414,7 @@ class bootstrap_install{
      */
     public static function jsForPreview() {
         return [
-            'iife'=>['bootstrap.bundle.min.js', 'ydpopup.js']
+            'iife'=>['/js/bootstrap.bundle.min.js', 'ydpopup.js']
         ];
     }
 }

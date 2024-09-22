@@ -13,7 +13,7 @@ input:focus-visible,textarea:focus-visible{
     outline: none !important;
 }
 body {
-    font-family: var(--font-family-sans-serif), "PingFang SC";
+    font-family: var(--bs-font-sans-serif), "PingFang SC";
 }
 #ydecloud-app{
     display: flex;
@@ -37,4 +37,9 @@ body {
 /*iconfont字体跟随父级设置*/
 .iconfont {
     font-size: inherit !important;
+}
+/*ydecloud在输出pagination时第一个元素时template*/
+[data-uiid] .page-item:nth-child(2) .page-link {
+    border-top-left-radius: var(--bs-pagination-border-radius);
+    border-bottom-left-radius: var(--bs-pagination-border-radius);
 }

@@ -10,14 +10,16 @@ use app\modules\build\views\preview\ValueList_View;
 /**
  * <pre>
  * <div class="accordion" id="accordionExample">
- *  <div class="card">
- *      <div class="card-header" id="headingOne">
- *          <h2 class="mb-0">
- *              <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Collapsible Group Item #1</button>
- *          </h2>
- *      </div>
- *      <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
- *          Some placeholder content for the first accordion panel. This panel is shown by default, thanks to the <code>.show</code> class.
+ *  <div class="accordion-item">
+ *      <h2 class="accordion-header">
+ *          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+ *              Accordion Item #1
+ *          </button>
+ *      </h2>
+ *      <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+ *          <div class="accordion-body">
+ *              <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+ *          </div>
  *      </div>
  *  </div>
  * </div>
@@ -40,25 +42,25 @@ class Collapse_View extends ValueList_View {
         }
 
         foreach ($this->childViews as $index => $view){
-            echo $this->indent(1).'<div class="card">'.PHP_EOL;
-            echo $this->indent(2).'<div class="card-header" id="'.$this->myid(true).'heading'.$index.'">'.PHP_EOL;
-            echo $this->indent(3).'<h2 class="mb-0">'.PHP_EOL;
-            echo $this->indent(4).'<button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"';
+            echo $this->indent(1).'<div class="accordion-item">'.PHP_EOL;
+            echo $this->indent(2).'<div class="accordion-header" id="'.$this->myid(true).'heading'.$index.'">'.PHP_EOL;
+            echo $this->indent(3).'<button class="accordion-button" type="button" data-bs-toggle="collapse"';
             echo $this->wrap_output('data-value', $index);
             $this->build_event_listen();
-            echo ' data-target="#'.$this->myid(true).'collapse'.$index.'" aria-expanded="true" :aria-controls="'.$this->myid(true).'collapse'.$index.'">';
+            echo ' data-bs-target="#'.$this->myid(true).'collapse'.$index.'" aria-expanded="true" :aria-controls="'.$this->myid(true).'collapse'.$index.'">';
             echo $view->data['meta']['title'];
             echo "</button>".PHP_EOL;
-            echo $this->indent(3)."</h2>".PHP_EOL;
             echo $this->indent(2)."</div>".PHP_EOL;
-            echo $this->indent(2).'<div id="'.$this->myid(true).'collapse'.$index.'" class="collapse';
+            echo $this->indent(2).'<div id="'.$this->myid(true).'collapse'.$index.'" class="accordion-collapse collapse';
             echo !isset($this->data['meta']['custom']['activeItem']) && !$index || $this->data['meta']['custom']['activeItem'] == $index ? 'show' : '';
             echo '" aria-labelledby="'.$this->myid(true).'heading'.$index.'" data-parent="#'.$this->myid(true).'">'.PHP_EOL;
+            echo $this->indent(3).'<div class="accordion-body">'.PHP_EOL;
 
-
-            $view->increase_indent(2);
+            $view->increase_indent(3);
             $view->output();
 
+            echo $this->indent(3);
+            echo "</div>".PHP_EOL;
             echo $this->indent(2);
             echo "</div>".PHP_EOL;
             echo $this->indent(1);
@@ -118,7 +120,7 @@ class Collapse_View extends ValueList_View {
         $nextTick = <<< TICK
 this.\$nextTick(() => {
     const {$myid} = {}; 
-    const {$myid}_subpages = document.querySelectorAll("[data-target='{$myid}'].collapse");
+    const {$myid}_subpages = document.querySelectorAll("[data-bs-target='{$myid}'].collapse");
     for( const subpage of {$myid}_subpages){
         if (!subpage.dataset.value)continue;
         const id = subpage.id;
@@ -151,24 +153,24 @@ TICK;
         ob_start();
         $this->build_event_listen();
         $eventListen = ob_get_clean();
-        $headerText = $needLoadSubpage ? "decodeURIComponent(this.\$store.loadSubPages[{$xValue}])" : $xTitle;
+        $headerText = $needLoadSubpage ? "decodeURIComponent(\$store.loadSubPages[{$xValue}])" : $xTitle;
         if (!$needLoadSubpage){
             $bodyAttr = ' x-text="'.$xTitle.'"';
         }
 
         $html = <<<HTML
-<div class="card">
-    <div class="card-header" :id="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-header')">
-        <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-bound="{$boundData}"
-            :data-value="{$xValue}"{$eventListen} :data-target="alpinejs_get_index(\$el, '#{$myid}', idxOf{$itemName} + '-collapse')"
+<div class="accordion-item">
+    <div class="accordion-header" :id="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-header')">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bound="{$boundData}"
+            :data-value="{$xValue}"{$eventListen} :data-bs-target="alpinejs_get_index(\$el, '#{$myid}', idxOf{$itemName} + '-collapse')"
             aria-expanded="true" :aria-controls="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-collapse')"
-            x-text="{$headerText}"></button>
-        </h2>
+            x-text="{$headerText}">
+        </button>
     </div>
-    <div :id="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-collapse')" :class="{'collapse': true, 'show': {$activeExp}}"
-        :aria-labelledby="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-header')" :data-value="{$xValue}" data-target="{$myid}"
-        :data-parent="alpinejs_get_index(\$el, '#{$myid}')"{$bodyAttr}>
+    <div :id="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-collapse')" :class="{'accordion-collapse collapse': true, 'show': {$activeExp}}"
+        :aria-labelledby="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-header')" :data-value="{$xValue}" data-bs-target="{$myid}"
+        :data-parent="alpinejs_get_index(\$el, '#{$myid}')">
+        <div {$bodyAttr} class="accordion-body"></div>
     </div>
 </div>
 HTML;
@@ -176,24 +178,20 @@ HTML;
     }
     private function emptyContent(){
         echo $this->indent(1);
-        echo '<div class="card">'.PHP_EOL;
+        echo '<div class="accordion-item">'.PHP_EOL;
         echo $this->indent(2);
-        echo '<div class="card-header" id="'.$this->myid(true).'heading0">'.PHP_EOL;
+        echo '<div class="accordion-header" id="'.$this->myid(true).'heading0">'.PHP_EOL;
         echo $this->indent(3);
-        echo '<h2 class="mb-0">'.PHP_EOL;
-        echo $this->indent(4);
-        echo '<button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
-                    data-target="#'.$this->myid(true).'collapse0" aria-expanded="true" :aria-controls="'.$this->myid(true).'collapse0">';
+        echo '<button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#'.$this->myid(true).'collapse0" aria-expanded="true" :aria-controls="'.$this->myid(true).'collapse0">';
         echo "According Header";
         echo "</button>".PHP_EOL;
-        echo $this->indent(3);
-        echo "</h2>".PHP_EOL;
         echo $this->indent(2);
         echo "</div>".PHP_EOL;
         echo $this->indent(2);
-        echo '<div id="'.$this->myid(true).'collapse0" class="collapse show" aria-labelledby="'.$this->myid(true).'heading0" data-parent="#'.$this->myid(true).'">'.PHP_EOL;
+        echo '<div id="'.$this->myid(true).'collapse0" class="accordion-collapse collapse show" aria-labelledby="'.$this->myid(true).'heading0" data-parent="#'.$this->myid(true).'">'.PHP_EOL;
         echo $this->indent(3);
-        echo '<div class="card-body p-0">'.PHP_EOL;
+        echo '<div class="accordion-body p-0">'.PHP_EOL;
         echo "According body, you can add item from Style Panel".PHP_EOL;
         echo "</div>".PHP_EOL;
         echo $this->indent(2);

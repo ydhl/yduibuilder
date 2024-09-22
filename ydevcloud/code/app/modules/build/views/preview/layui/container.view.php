@@ -1,12 +1,11 @@
 <?php
 namespace app\modules\build\views\preview\layui;
 
+use app\modules\build\views\preview\bootstrap\Container_View as Bootstrap_Container_View;
 
-
-use app\modules\build\views\preview\Preview_View;
-
-class Container_View extends Preview_View {
+class Container_View extends Bootstrap_Container_View {
     use Layui_Popup,Layui_Code_Helper;
+
     protected function css_map()
     {
         $cssMap = parent::css_map();
@@ -21,19 +20,5 @@ class Container_View extends Preview_View {
             $cssMap['form'] = 'layui-form';
         }
         return $cssMap;
-    }
-
-    public function build_ui()
-    {
-        $space =  $this->indent();
-        echo "{$space}<div";
-        echo $this->build_main_attrs();
-        echo ">\r\n";
-
-        foreach ((array)@$this->childViews as $view){
-            $view->output();
-        }
-
-        echo "{$space}</div>\r\n";
     }
 }

@@ -9,41 +9,18 @@ use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 use app\modules\build\views\preview\Valuable_View;
 use app\modules\build\views\preview\ValueList_View;
+use function yangzie\__;
 
 
-class Pagination_View extends ValueList_View {
+class Pagination_View extends Preview_View implements Valuable_View{
     use Bootstrap_Popup,Html_Code_Helper, Alpine{
         Alpine::build_code as alpineBuildCode;
-    }
-    public function build_code(): Base_Code_Fragment
-    {
-        $fragment = $this->alpineBuildCode();
-        $myid = $this->myid();
-        $outputData = $this->get_output_datas($outputDataNames);
-        if ($outputData['VALUELIST']){
-            $nextTick = <<<NEXT_TICK
-this.\$watch("{$outputDataNames['VALUELIST']}", (value, oldValue) => {
-    let elements = document.querySelectorAll("[data-uiid='{$myid}']");
-    if (!elements) return;
-    for(const element of elements){
-        let items = element.querySelectorAll(".page-item");
-        let fragment = document.createDocumentFragment();
-        items.forEach(function(item) {
-            fragment.appendChild(item);
-        });
-        let targetElement = element.querySelector(".pagination");
-        targetElement.appendChild(fragment);
-    }
-})
-NEXT_TICK;
-            $fragment->add_code(Alpinejs_Code_Fragment::SECTION_INIT, $this->build->indent_code(0, $nextTick));
-        }
-        return $fragment;
     }
     protected function css_map()
     {
         $cssArray = parent::css_map();
-        unset($cssArray['backgroundTheme'],$cssArray['foregroundTheme']);
+        unset($cssArray['backgroundTheme'],$cssArray['foregroundTheme'],$cssArray['paginationSizing']);
+        $cssArray['-'] = 'd-flex gap-2 align-items-center';
         return $cssArray;
     }
     protected function style_map($meta=null, $state = 'normal')
@@ -94,58 +71,119 @@ NEXT_TICK;
         $rst .= "}";
         return $rst;
     }
-    protected function demo_values() {
-        $total = intval($this->data['meta']['custom']['total']);
-        $size = intval($this->data['meta']['custom']['pageSize']);
-        $total = $total <= 0 ? 100 : $total;
-        $size = $size <= 0 ? 10 : $size;
-        return range(1, ceil($total / $size));
-    }
 
-    protected function build_ui_begin($iteratorName = null)
+    public function build_ui()
     {
         $outputData = $this->get_output_datas($outputDataNames);
         $space =  $this->indent();
+        $total = intval($this->data['meta']['custom']['total']);
+        $size = intval($this->data['meta']['custom']['pageSize']);
+        if($total<=0) $total = 100;
+        if($size<=0) $size = 10;
+        $outputDataName = $this->get_output_data_name('VALUE', $outputData['VALUE'], $outputDataNames['VALUE']);
 
         echo "{$space}<nav";
         echo $this->build_main_attrs(false);// 在下面输出事件
         echo $this->wrap_output(':data-default', $this->get_iterator_data_name()?:$outputDataNames['VALUE']);
         echo ">".PHP_EOL;
-        echo $this->indent(1) . '<ul class="pagination">'.PHP_EOL;
-        if ($outputData['VALUELIST']){
-            echo $this->indent(1) . "</ul>".PHP_EOL;
-        }
-    }
+        echo $this->indent(1) . '<ul';
+        echo $this->wrap_output('class', $this->get_pagination_css());
+        echo '>'.PHP_EOL;
 
-    protected function build_ui_end()
-    {
+        $this->build_item();
+
         $space =  $this->indent();
-        $outputData = $this->get_output_datas($outputDataNames);
-        if (!$outputData['VALUELIST']){
-            echo $this->indent(1) . "</ul>".PHP_EOL;
+        echo $this->indent(1) . "</ul>".PHP_EOL;
+
+        // total
+        echo $this->indent(1) . '<div x-text="';
+        echo $outputDataName ? sprintf(__('`${%s} items`'), $outputDataName) : sprintf(__("'%s items'"), $total);
+        echo '">';
+        echo "</div>".PHP_EOL;
+
+        // pagesize
+        $limits = [10,20,30,50,100];
+        if (!in_array($size, $limits)) {
+            $limits[] = $size;
         }
+        sort($limits);
+        $selectSize = "";
+        $inputSize = "";
+        $btnSize = "";
+        if ($this->data['meta']['css']['paginationSizing']){
+            $selectSize = 'form-select-'.$this->data['meta']['css']['paginationSizing'];
+            $inputSize = 'form-control-'.$this->data['meta']['css']['paginationSizing'];
+            $btnSize = 'btn-'.$this->data['meta']['css']['paginationSizing'];
+        }
+        echo $this->indent(1) . '<select class="form-select '.$selectSize.'" style="width: 100px">';
+        foreach ($limits as $limit){
+            echo "<option value='{$limit}'>";
+            echo sprintf(__("%s item/page"), $limit);
+            echo "</option>";
+        }
+        echo "</select>".PHP_EOL;
+
+
+        echo $this->indent(1) . '<div class="d-flex align-items-center gap-1">';
+        echo __("goto");
+        echo '<input type="number" min="1" class="form-control '.$inputSize.'" style="width: 100px">';
+        echo '<button type="button" class="btn btn-light '.$btnSize.'">';
+        echo __("OK");
+        echo '</button>';
+        echo "</div>".PHP_EOL;
+
         echo "{$space}</nav>".PHP_EOL;
     }
-
-    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex = null, $iteratorName = '')
-    {
-        $inputDataName = $this->get_input_data_name($inputIsArr);
-        echo $this->indent(1) . '<li';
-        echo $this->wrap_output(':class',  $this->itemCss($inputDataName, $itemName?"itemOf{$itemName}":"'{$staticData}'"));
-        echo '>'.PHP_EOL;
-        echo $this->indent(2) . '<a';
-        echo $this->wrap_output(':class', $this->linkCss($inputDataName, $itemName?"itemOf{$itemName}":"'{$staticData}'"));
-        if ($itemName){
-            echo $this->wrap_output(':data-value', "itemOf{$itemName}");
-            echo $this->wrap_output('x-text',  "itemOf{$itemName}");
-        }else{
-            echo $this->wrap_output('data-value', $staticData);
-            echo $this->wrap_output('x-text',  $staticData);
+    private function get_pagination_css(){
+        $class = ["pagination mb-0"];
+        $cssMap = parent::css_map();
+        if ($cssMap['paginationSizing']){
+            $class[] = $cssMap['paginationSizing'];
         }
+        return join(' ', $class);
+    }
+    private function build_item()
+    {
+        $outputData = $this->get_output_datas($outputDataNames);
+        $inputDataName = $this->get_input_data_name($inputIsArr);
+        $myid = $this->myid();
+
+        $total = intval($this->data['meta']['custom']['total']);
+        $size = intval($this->data['meta']['custom']['pageSize']);
+        if($total<=0) $total = 100;
+        if($size<=0) $size = 10;
+        $page = ceil($total / $size);
+        $outputDataName = $this->get_output_data_name('VALUE', $outputData['VALUE'], $outputDataNames['VALUE']);
+
+        echo $this->indent(1).'<template x-for="item in '.$myid.'_pages($el, '.$page.', '.($outputDataName?:"null").', '.$inputDataName.')" :key="item">'.PHP_EOL;
+        echo $this->indent(1) . '<li';
+        echo $this->wrap_output(':class',  $this->itemCss($inputDataName, "item"));
+        echo '>'.PHP_EOL;
+
+        echo $this->indent(2) . '<a';
+        echo $this->wrap_output(':class', $this->linkCss($inputDataName, "item"));
+        echo $this->wrap_output(':data-value', "item");
+        echo $this->wrap_output('x-text',  "item");
         $this->build_event_listen();
         echo PHP_EOL;
-        echo $this->indent(2).$this->wrap_output(":style", $this->linkStyle($inputDataName, $itemName?"itemOf{$itemName}":"'{$staticData}'"));
+        echo $this->indent(2).$this->wrap_output(":style", $this->linkStyle($inputDataName, "item"));
         echo ' href="javascript:;"></a>'.PHP_EOL;
+
         echo $this->indent(1) . '</li>'.PHP_EOL;
+
+        echo $this->indent(1).'</template>'.PHP_EOL;
+    }
+    public function build_code(): Base_Code_Fragment
+    {
+        $fragment = $this->alpineBuildCode();
+        $myid = $this->myid();
+        $code = <<<PAGINATION
+{$myid}_pages(el, page, outputDataName, inputDataName){
+    return alpinejs_pagination_pages(this, el, page, outputDataName, inputDataName);
+},
+PAGINATION;
+
+        $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $code);
+        return $fragment;
     }
 }

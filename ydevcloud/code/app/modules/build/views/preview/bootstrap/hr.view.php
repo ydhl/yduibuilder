@@ -92,10 +92,10 @@ class Hr_View extends Preview_View {
         return parent::output_as_prop($outputAs, $outputData);
     }
 
-    private function lineStyle() {
+    protected function lineStyle() {
         $styles = parent::style_map();
         $newStyle = [];
-        $height = $styles['height'] ?: '1px';
+        $height = $this->data['meta']['style']['height'] ?: '1px';
         $style = $this->data['meta']['custom']['style'] ?: 'solid';
         if ($style == 'double' && intval($height) < 3){
             $height = '3px';
@@ -110,14 +110,14 @@ class Hr_View extends Preview_View {
         }
         return join(';', $newStyle);
     }
-    private function lineCss() {
+    protected function lineCss() {
         $css = ['flex-grow-1 line'];
         if (!$this->data['meta']['style']['background-color'] && $this->data['meta']['css']['backgroundTheme']){
             $css[] = $this->cssTranslate['borderColorClass'][$this->data['meta']['css']['backgroundTheme']];
         }
         return join(' ', $css);
     }
-    private function textStyle() {
+    protected function textStyle() {
         $styles = parent::style_map();
         $newStyle = [];
 
@@ -126,9 +126,9 @@ class Hr_View extends Preview_View {
         }
       return join(";", $newStyle)?:NULL;
     }
-    private function textCss() {
+    protected function textCss() {
         $map = parent::css_map();
-        $css =[ 'flex-shrink-0 pl-2 pr-2 text'];
+        $css =[ 'flex-shrink-0 ps-2 pr-2 text'];
 
         if (!$this->data['meta']['style']['color']){
             $css[] = $map['foregroundTheme'];

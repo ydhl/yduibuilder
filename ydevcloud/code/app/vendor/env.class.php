@@ -95,25 +95,25 @@ class Env {
                 'type'=>'ui',
                 'desc'=>__('Quickly design and customize responsive mobile-first sites'),
                 'version'=>[
-                    '4.6.0'=>['canCustomStyle'=>false]
+                    '5'=>['canCustomStyle'=>true]
                 ]
             ],
-            'layui'=>[
-                'name'=>'LayUI',
-                'type'=>'ui',
-                'desc'=>__('由职业前端倾情打造，面向全层次的前后端开发者，易上手开箱即用的 Web UI 组件库, https://www.layuiweb.com/index.htm'),
-                'version'=>[
-                    '2.9.6'=>[]
-                ]
-            ],
-            'weui'=>[
-                'name'=>__('WEUI(微信官方UI库)'),
-                'desc'=>'',
-                'type'=>'ui',
-                'version'=>[
-                    '2.5.1'=>['require'=>['zepto@1.2.0']]
-                ]
-            ],
+//            'layui'=>[
+//                'name'=>'LayUI',
+//                'type'=>'ui',
+//                'desc'=>__('由职业前端倾情打造，面向全层次的前后端开发者，易上手开箱即用的 Web UI 组件库, https://www.layuiweb.com/index.htm'),
+//                'version'=>[
+//                    '2.9.6'=>[]
+//                ]
+//            ],
+//            'weui'=>[
+//                'name'=>__('WEUI(微信官方UI库)'),
+//                'desc'=>'',
+//                'type'=>'ui',
+//                'version'=>[
+//                    '2.5.1'=>['require'=>['zepto@1.2.0']]
+//                ]
+//            ],
             'vant' => [
                 'name'=>__('Vant'),
                 'desc'=>'',
@@ -226,7 +226,7 @@ class Env {
                 'desc'=>'',
                 'type'=>'framework',
                 'rewrite'=>false,
-                'ui'=>['bootstrap','layui'],
+                'ui'=>['bootstrap'],
                 'codeType'=>['html'=>'html','css'=>'css','js'=>'javascript'],
                 'language'=>['javascript'],
                 'version'=>[ '5.0'=>[
@@ -239,7 +239,7 @@ class Env {
                 'desc'=>'',
                 'rewrite'=>true,
                 'type'=>'framework',
-                'ui'=>['weui','vant'],
+                'ui'=>['vant'],
                 'codeType'=>['wxml'=>'xml','wxss'=>'css','json'=>'json','js'=>'javascript'],
                 'language'=>['javascript'],
                 'version'=>[ '2.x'=>[] ]

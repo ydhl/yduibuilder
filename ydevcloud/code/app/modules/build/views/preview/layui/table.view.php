@@ -5,9 +5,6 @@ use app\modules\build\views\preview\Preview_View;
 use app\common\File_Model;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use yangzie\YZE_Hook;
-use yangzie\YZE_JSON_View;
-use function yangzie\__;
 
 class Table_View extends Preview_View {
     use Layui_Popup,Layui_Code_Helper;

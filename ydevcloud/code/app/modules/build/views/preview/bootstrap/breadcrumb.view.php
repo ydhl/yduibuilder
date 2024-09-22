@@ -30,7 +30,6 @@ class Breadcrumb_View extends ValueList_View {
         if ($outputData) {
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$xValue} : ''" : null);
             echo $this->wrap_output(':data-value', $xValue);
-            echo $this->wrap_output('x-text', $xText);
             echo $this->wrap_output('data-bound', $boundData);
         }else{
             echo $this->wrap_output('data-default', $staticData['checked'] ? $staticValue : null);
@@ -44,13 +43,16 @@ class Breadcrumb_View extends ValueList_View {
         echo $this->indent(2) . "<a href='javascript:;'";
         echo $this->wrap_output('class', $this->foregroundCss());
         echo $this->wrap_output('style', $this->foregroundStyle());
+        echo $this->wrap_output('x-text', $xText);
         echo ">{$staticName}</a>" . PHP_EOL;
         echo $this->indent(2) . "</template>" . PHP_EOL;
 
         echo $this->indent(2) . '<template';
         echo $this->wrap_output("x-if", "{$inputDataNameString} == {$xValue}");
         echo '>' . PHP_EOL;
-        echo $this->indent(2) . "<span>{$staticName}</span>" . PHP_EOL;
+        echo $this->indent(2) . "<span";
+        echo $this->wrap_output('x-text', $xText);
+        echo ">{$staticName}</span>" . PHP_EOL;
         echo $this->indent(2) . "</template>" . PHP_EOL;
 
         echo $this->indent(1)."</li>".PHP_EOL;
@@ -82,7 +84,7 @@ class Breadcrumb_View extends ValueList_View {
         unset($map['color']);
         return $map;
     }
-    private function foregroundCss(){
+    protected function foregroundCss(){
         $css = [];
         $cssMap = parent::css_map();
         $styleMap = parent::style_map();
@@ -91,7 +93,7 @@ class Breadcrumb_View extends ValueList_View {
         }
         return join(' ', $css)?:NULL;
     }
-    private function foregroundStyle() {
+    protected function foregroundStyle() {
         $styleMap = parent::style_map();
         $style = [];
         if ($styleMap['color']) {

@@ -168,8 +168,7 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     kind: ['pc'],
     name: 'ui.pagination',
     isValuable: true,
-    isIterable: true,
-    outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE']
+    outputAs: ['VALUE', 'STYLE', 'CSS', 'KEYVALUE']
   },
   Progress: {
     type: 'Progress',

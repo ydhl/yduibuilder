@@ -127,7 +127,7 @@ export default {
     const splitBtnStyle = computed(() => {
       const style = dropdown.getUIStyle()
       // 分割线颜色
-      let color = '#fff'
+      let color = 'rgba(255, 255, 255, 0.5)'
       if (style['border-color']) {
         color = style['border-color']
       }

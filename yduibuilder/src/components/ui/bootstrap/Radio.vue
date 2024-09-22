@@ -3,7 +3,7 @@
         :data-pageid="pageid"
         :class="[dragableCss, bodyCss, uiCss,{'overflow-hidden':true, 'hidden-preview':uiconfig.meta?.form?.state==='hidden'}]">
     <template v-for="(item, index) in values" :key="index" >
-      <div :class="{'form-check d-flex mr-3 align-items-center': true}">
+      <div :class="{'form-check d-flex me-3 align-items-center': true}">
         <input type="radio" :checked="item.checked" class="form-check-input"
                :id="uiconfig.meta.id+item.value"
                :disabled="uiconfig.meta?.form?.state==='disabled'"

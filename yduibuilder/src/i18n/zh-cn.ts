@@ -823,6 +823,12 @@ export default {
     navbar: '导航栏',
     page: '页面',
     pagination: '分页',
+    pagi: {
+      total: '共{0}条',
+      itemPerPage: '条/页',
+      goto: '到第',
+      page: '页'
+    },
     projectUIComponent: '项目UI组件',
     projectUIComponentTip: '组件方便你在项目中重用UI设计, 可右键点击UI来创建组件',
     progress: '进度条',

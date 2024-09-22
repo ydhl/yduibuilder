@@ -2,8 +2,6 @@
 namespace app\modules\build\views\preview\layui;
 
 use app\modules\build\views\code\Base_Code_Fragment;
-
-
 use app\modules\build\views\preview\Preview_View;
 
 class Input_View extends Preview_View {

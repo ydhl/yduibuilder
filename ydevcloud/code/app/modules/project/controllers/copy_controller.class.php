@@ -257,7 +257,7 @@ class Copy_Controller extends YZE_Resource_Controller {
         $format = $request->get_output_format();
         if (!$request->is_get() || strcasecmp ( $format, "json" )==0){
         	$this->layout = '';
-        	return YZE_JSON_View::error($this, $e->getMessage());
+        	return YZE_JSON_View::error($this, /*$e->getTraceAsString().*/$e->getMessage());
         }
     }
 }

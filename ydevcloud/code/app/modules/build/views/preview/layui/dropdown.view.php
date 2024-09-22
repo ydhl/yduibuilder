@@ -2,19 +2,20 @@
 namespace app\modules\build\views\preview\layui;
 
 use app\modules\build\views\code\Base_Code_Fragment;
+use app\modules\build\views\preview\Alpine;
+use app\modules\build\views\preview\Html_Code_Fragment;
+use app\modules\build\views\preview\ValueList_View;
 
-
-use app\modules\build\views\preview\Preview_View;
-
-class Dropdown_View extends Preview_View {
-    use Layui_Popup,Layui_Code_Helper;
+class Dropdown_View extends ValueList_View {
+    use Layui_Popup,Layui_Code_Helper, Alpine{
+        Alpine::build_code as alpineBuildCode;
+    }
 
     private function dropdown_meta() {
         $parentUI = $this->get_parent_UI();
         $type = strtolower($parentUI['type']);
-        $parentIsButtonGroup = $type == 'buttongroup';
-        $parentIsNavbar = in_array($type, ['nav', 'navbar']);
-        if ($parentIsButtonGroup || $parentIsNavbar) {
+        $parentIsNavbar = in_array($type, ['nav']);
+        if ($parentIsNavbar) {
             return $parentUI['meta'];
         }
         return $this->data['meta'];
@@ -139,7 +140,7 @@ class Dropdown_View extends Preview_View {
                 $style['border-color'] = "border-color:{$backgroundColor} !important";
             }
         }
-        return join(";", $style);
+        return $style ? join(";", $style) : null;
     }
     /**
      * 分体式左侧按钮css
@@ -165,7 +166,7 @@ class Dropdown_View extends Preview_View {
      */
     private function right_split_btn_style(){
         $style = parent::style_map();
-        $color = '#fff';
+        $color = 'rgba(255, 255, 255, 0.5)';
         if ($style['border-color']){
             $color = $style['border-color'];
         }
@@ -219,83 +220,108 @@ class Dropdown_View extends Preview_View {
         }
         return $style;
     }
+    public function build_split_ui(){
+        $space =  $this->indent();
+        echo $space . '<div ';
+        echo $this->build_main_attrs();
+        echo ">".PHP_EOL;
+        echo $this->indent(1) . '<span';
+        echo $this->wrap_output('class', $this->left_split_btn_css());
+        echo $this->wrap_output('style', $this->btn_style());
+        echo '>';
+        $this->wrap_icon(function(){
+            echo $this->data['meta']['title'] ?: $this->data['type'];
+            echo PHP_EOL;
+        }, $this->build->get_indent() + 2);
+        echo $this->indent(1) . "</span>".PHP_EOL;
+        echo $this->indent(1) . '<span data-uiid="'.$this->myId().'-split" data-root="'.$this->myId().'"';
+        echo $this->wrap_output('class', $this->right_split_btn_css());
+        echo $this->wrap_output('style', $this->right_split_btn_style());
+        echo '>';
+        echo '<i class="layui-icon layui-font-12 ';
+        echo $this->get_icon();
+        echo '"></i>';
+        echo "</span>".PHP_EOL;
+        echo $space."</div>".PHP_EOL;
+    }
 
+    public function build_normal_ui(){
+        $space =  $this->indent();
+        echo $space . '<div ';
+        echo $this->build_main_attrs();
+        echo ">";
+        $this->wrap_icon(function(){
+            echo $this->data['meta']['title'] ?: $this->data['type'];
+        }, $this->build->get_indent() + 2);
+        echo '<i class="layui-icon layui-font-12 ';
+        echo $this->get_icon();
+        echo '"></i>';
+        echo "</div>".PHP_EOL;
+    }
     public function build_ui()
     {
-        $space =  $this->indent();
-
         if (@$this->data['meta']['custom']['isSplit']){
-            echo $space . '<div ';
-            echo $this->build_main_attrs();
-            echo " >\r\n";
-            echo $this->indent(1) . '<span type="button" ';
-            echo $this->wrap_output('class', $this->left_split_btn_css());
-            echo $this->wrap_output('style', $this->btn_style());
-            echo '>';
-            $this->wrap_icon(function(){
-                echo $this->data['meta']['title'] ?: $this->data['type'];
-            }, $this->build->get_indent() + 2);
-            echo "</span>\r\n";
-            echo $this->indent(1) . '<span id="'.$this->myId(true).'-split"';
-            echo $this->wrap_output('class', $this->right_split_btn_css());
-            echo $this->wrap_output('style', $this->right_split_btn_style());
-            echo ' type="button">';
-            echo '<i class="layui-icon layui-font-12 ';
-            echo $this->get_icon();
-            echo '"></i>';
-            echo "</span>\r\n";
-            echo $space."</div>\r\n";
+            $this->build_split_ui();
         }else{
-            echo $space . '<div ';
-            echo $this->build_main_attrs();
-            echo ">";
-            $this->wrap_icon(function(){
-                echo $this->data['meta']['title'] ?: $this->data['type'];
-            }, $this->build->get_indent() + 2);
-            echo '<i class="layui-icon layui-font-12 ';
-            echo $this->get_icon();
-            echo '"></i>';
-            echo "</div>\r\n";
+            $this->build_normal_ui();
         }
 
     }
+
+    protected function build_ui_begin($iteratorName = null)
+    {
+        // layui dropdown 是代码生成的，非静态生成的，这里不用重载
+    }
+
+    protected function build_ui_end()
+    {
+        // layui dropdown 是代码生成的，非静态生成的，这里不用重载
+    }
+
+    protected function build_valuelist($outputData, $itemName, $staticData = null, $staticDataIndex = null, $iteratorName = '')
+    {
+        // layui dropdown 是代码生成的，非静态生成的，这里不用重载
+    }
+
     public function build_code():Base_Code_Fragment
     {
-        parent::build_code();
-        $values = @$this->data['meta']['values']?:[[ "name"=> 'Sample 1', "value"=> 'value1', 'type'=>'action' ], [ "name"=> 'Sample 2', "value"=> 'value2', 'type'=>'action'  ]];
+        $fragment = $this->alpineBuildCode();
+
+        $myid = $this->data['meta']['custom']['isSplit'] ? $this->myId().'-split' : $this->myId();
+        $menuAlign = $this->data['meta']['custom']['menuAlign'];
+
+        $inputDataName = $this->get_input_data_name($inputIsArr, $inputDataConfig);
+        $outputDataNames = [];
+        $outputDatas = $this->get_output_datas($outputDataNames);
+
+        $values = $this->data['meta']['values'] ?: $this->demo_values();
         $dropdItems = [];
-        foreach ($values as $index => $value) {
+        foreach ($values as $value) {
             $item = [
-                'title'=>$value['text'],
-                'id'=>$index
+                'title'=>$value['name'],
+                'id'=>$value['value']?:$value['name']
             ];
             switch ($value['type']) {
-                case 'action':
-                    $item['href'] = $value['value'];
-                    break;
                 case 'header':
                     $item['type'] = 'group';
                     break;
                 case 'divider':
                     $item['type'] = '-';
+                case 'action':
+                default:
+                    break;
             }
             $dropdItems[] = $item;
         }
-        $this->get_code_Fragment()->add_use('dropdown');
-        ob_start();
-?>
+        $staticDatas = json_encode($dropdItems, JSON_UNESCAPED_UNICODE);
 
-var dropdown = layui.dropdown;
-dropdown.render({
-    elem: '#<?= $this->data['meta']['custom']['isSplit'] ? $this->myId(true).'-split' : $this->myId(true)?>'
-    ,data: <?= json_encode($dropdItems) ?>
-    ,align: '<?= $this->data['meta']['custom']['menuAlign']?>'
-    ,click: function(obj){
-        console.log(obj)
-    }
+        $code = <<<DROPDOWN
+this.\$nextTick(() => {
+    layui_dropdown_init("{$myid}","{$menuAlign}",{$staticDatas}, "{$outputDataNames['VALUELIST']}","{$inputDataName}", Alpine);
 })
-<?php
-        $this->get_code_Fragment()->add_code(ob_get_clean());
-        return $this->get_code_fragment();
+DROPDOWN;
+        $fragment->add_code(Html_Code_Fragment::SECTION_INIT, $code);
+        return $fragment;
     }
+
 }

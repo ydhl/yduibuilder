@@ -312,7 +312,7 @@ class Table_View extends ValueList_View {
 
     private function build_static_table($staticData=null){
         $headerRow = $this->data['meta']['custom']['headless'] ? 0 : (intval($this->data['meta']['custom']['headerRow'])?:1);
-        $footerRow = $this->data['meta']['custom']['footless'] ? 0 : intval($this->data['meta']['custom']['footerRow'])?:1;
+        $footerRow = $this->data['meta']['custom']['footless'] ? 0 : (intval($this->data['meta']['custom']['footerRow'])?:1);
         $bodyRow = intval($this->data['meta']['custom']['bodyRow'])?:1;
         $columnCount = intval($this->data['meta']['custom']['columnCount'])?:2;
         $columnConfig = $this->data['meta']['custom']['columnConfig'];

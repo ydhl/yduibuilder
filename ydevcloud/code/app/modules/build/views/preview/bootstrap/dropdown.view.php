@@ -12,7 +12,7 @@ use app\modules\build\views\preview\ValueList_View;
  * <pre>
  * 单体按钮：
  * <div class="btn-group">
- *  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+ *  <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
  *  Action
  *  </button>
  *  <div class="dropdown-menu">
@@ -29,7 +29,7 @@ use app\modules\build\views\preview\ValueList_View;
  * <pre>
  * <div class="btn-group">
  *  <button type="button" class="btn btn-danger">Action</button>
- *  <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-expanded="false">
+ *  <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
  *  <span class="sr-only">Toggle Dropdown</span>
  * </button>
  * <div class="dropdown-menu">
@@ -66,7 +66,7 @@ class Dropdown_View extends ValueList_View {
         }
         // 静态数据
         if (@$staticData['type']=='text'){
-            echo '<div class="pl-4 pr-4 text-muted"><p>'.$staticData['name'].'</p></div>';
+            echo '<div class="ps-3 pr-3 text-muted"><p>'.$staticData['name'].'</p></div>';
         }elseif (@$staticData['type']=='header'){
             echo "<h6 class='dropdown-header'>{$staticData['name']}</h6>";
         }elseif (@$staticData['type']=='divider'){
@@ -101,17 +101,16 @@ class Dropdown_View extends ValueList_View {
             $this->wrap_icon(function(){
                 $text = ($this->data['meta']['title'] ?: $this->data['type']);
                 echo "<span>{$text}</span>";
-
-            }, 2);
+            }, $this->get_build()->get_indent() + 2);
             echo PHP_EOL;
             echo $this->indent(1) . "</button>".PHP_EOL;
             echo $this->indent(1) . '<button role="button"';
             echo $this->wrap_output('class', $this->splitBtnCss());
             echo $this->wrap_output('style', $this->btyStyle());
-            echo ' data-toggle="dropdown" aria-expanded="false">';
+            echo ' data-bs-toggle="dropdown" aria-expanded="false">';
             echo "</button>".PHP_EOL;
         }else{
-            echo $this->indent(1) . '<button role="button" type="button" data-toggle="dropdown" aria-expanded="false"';
+            echo $this->indent(1) . '<button role="button" type="button" data-bs-toggle="dropdown" aria-expanded="false"';
             echo $this->wrap_output('class', 'dropdown-toggle '.$this->btnCss());
             echo $this->wrap_output('style', $this->btyStyle());
             echo '>';

@@ -20,7 +20,7 @@ class Radio_View extends ValueList_View {
         $inputDataName = $this->get_input_data_name($inputIsArr);
 
         echo $this->indent(1)."<div";
-        echo $this->wrap_output('class', "form-check d-flex mr-3 align-items-center");
+        echo $this->wrap_output('class', "form-check d-flex me-3 align-items-center");
         echo $this->wrap_output('x-id', "['{$myid}-item']");
 
         if ($value){

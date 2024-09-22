@@ -164,7 +164,7 @@ class Save_Controller extends YZE_Resource_Controller {
         }
 
         $screen_path = "/screen/{$project->uuid}/{$pageConfig->meta->id}-{$last_version->id}.jpg";
-        $currPage->set(Page_Model::F_SCREEN, OSS_BUCKET_HOST.$screen_path)->save();
+        $currPage->set(Page_Model::F_SCREEN, $screen_path)->save();
         $last_version->set(Page_Model::F_SCREEN, $currPage->screen)->save();
 
         $member->set('last_page_id', $currPage->id)
