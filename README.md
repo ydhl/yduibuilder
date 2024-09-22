@@ -72,7 +72,7 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 1. 下载镜像
    1. 方法1: pull 镜像: docker pull gzydhl/ydecloud
    2. 方法2: 
-      1. 云盘中下载ydecloud.tar.zip: https://pan.baidu.com/s/1C_gyfu4yxWlNe5_KLcbm1A 提取码: ydhl 
+      1. 云盘中下载ydecloud.tar.zip: https://pan.baidu.com/s/1OfvHzY0qoLcgLnoKwIR7bw 提取码: m3kf 
       2. 解压的ydecloud.tar.zip文件；
       3. docker load -i PATH/TO/ydecloud.tar
 2. 运行镜像：
