@@ -25,11 +25,9 @@ class Container_View extends Preview_View {
         $outputDatas = $this->get_output_datas($dataNames);
         if (!$dataNames['VALUE'] || !$this->subset){
             echo "{$space}<div";
-            $this->build_main_attrs();
+            $this->output_main_attrs();
             echo ">".PHP_EOL;
-            foreach ((array)@$this->childViews as $view){
-                $view->output();
-            }
+            $this->container_body();
             echo "{$space}</div>".PHP_EOL;
         }else{
             $subsetActive = @$this->data['meta']['custom']['subsetActive'];
@@ -37,13 +35,11 @@ class Container_View extends Preview_View {
             foreach ($subset as $subsetName => $views){
                 echo $space.'<template x-if="'.$outputDataName.'==\''.$subsetName.'\'">'.PHP_EOL;
                 echo "{$space}<div";
-                $this->build_main_attrs();
+                $this->output_main_attrs();
                 echo ">".PHP_EOL;
                 // 对于当前处于激活的subset，meta items中的可能是最新的
                 if ($subsetActive == $subsetName){
-                    foreach ((array)@$this->childViews as $view){
-                        $view->output();
-                    }
+                    $this->container_body();
                 }else{
                     foreach ($views as $view){
                         $view->output();
@@ -97,8 +93,19 @@ class Container_View extends Preview_View {
         }
         return $this->styles;
     }
+    protected function container_body(){
+        $outputDatas = $this->get_output_datas($dataName);
+        if ($outputDatas) {
+            $htmlDataName = $this->get_output_data_name('HTML', $outputDatas['HTML'], $dataName['HTML']);
+        }
+        // 绑定了html属性输出则忽略子组件
+        if ($htmlDataName) return;
+        foreach ((array)@$this->childViews as $view){
+            $view->output();
+        }
+    }
 
-    private function get_subset(){
+    protected function get_subset(){
         foreach ((array)@$this->data['meta']['custom']['subset'] as $subsetName => $items){
             foreach ((array)@$items as $index => $item) {
                 if (!$item) continue;

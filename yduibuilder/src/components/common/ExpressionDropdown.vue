@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex align-items-center justify-content-center w-100">
+  <div class="d-flex align-items-center justify-content-center">
     <template v-if="hasMutationOperator">
       <AdvanceSelect :options="mutationOperators" btn-size="btn-xs" :default-text="myDefaultMutationOperator || t('expression.operator')" @change="(option) => updateMutationOperator(option.value)">
         <template #input>
@@ -12,10 +12,10 @@
       <div v-if="readonly" class="text-success w-75 text-truncate">{{myExpression.literal}}</div>
       <template v-else>
         <template v-if="leftValue?.enumValue">
-          <AdvanceSelect :options="formatEnumValue" :default-text="myExpression.literal" @change="(option)=>changeEnumValue(option.value)"></AdvanceSelect>
+          <AdvanceSelect :options="formatEnumValue" :default-text="myExpression.literal || t('common.choose')" @change="(option)=>changeEnumValue(option.value)"></AdvanceSelect>
         </template>
         <template v-else>
-          <button type="button" @click="openCodeEditor('literal')" class="btn btn-xs text-success me-1 fs-7 w-75 text-truncate">{{myExpression?.literal || t('action.notSet')}}</button>
+          <div @click="openCodeEditor('literal')" class="text-success me-1 fs-7 w-75 text-truncate pointer">{{myExpression?.literal || t('action.notSet')}}</div>
         </template>
       </template>
     </template>
@@ -23,7 +23,7 @@
       <template v-if="!hideArrow">←</template>
       <div class="text-success w-75 text-truncate fs-7" v-if="readonly">{{myExpression.code}}</div>
       <template v-else>
-        <button type="button" @click="openCodeEditor('code')" class="btn btn-xs text-success me-1 fs-7 w-75 text-truncate">{{myExpression?.code || t('action.notSet')}}</button>
+        <div @click="openCodeEditor('code')" class="me-1 fs-7 w-75 text-truncate pointer">{{myExpression?.code || t('action.notSet')}}</div>
       </template>
     </template>
     <div v-else-if="myExpression?.type == 'connect'" :title="myExpression.data?.path ? myExpression.data?.path : ''" @click="!readonly ? connectDataDialogVisible=true : ''" class="pointer text-danger w-50 text-truncate">
@@ -54,7 +54,7 @@
                  :checked-uuid="myExpression.data?.id" :page-uuid="selectedPageId"/>
     </div>
   </lay-layer>
-  <CodeEditorDialog v-model="codeDlgVisible" :left-operator="defaultMutationOperator" :language="codeType === 'literal' ? 'json' : 'javascript'"
+  <CodeEditorDialog v-model="codeDlgVisible" :left-operator="defaultMutationOperator" :language="codeType === 'literal' ? 'json' : 'jsAndJson'"
               :left-value-path="leftValuePath" :left-data="leftValue" :variables="variables"
               :schema="leftValueSchema" :code="code" @update="updateCode"></CodeEditorDialog>
 </template>
@@ -73,7 +73,7 @@ import CustomModifier from '@/components/common/CustomModifier.vue'
 export default {
   name: 'ExpressionDropdown',
   props: {
-    variables: Object, // 本地变量
+    variables: Array, // 本地变量
     readonly: Boolean,
     expression: Object,
     leftValue: Object, // 左值
@@ -94,6 +94,14 @@ export default {
     const connectDataDialogVisible = ref(false)
     const codeDlgVisible = ref(false)
     const codeType = ref('expression')
+    const varNames = computed(() => {
+      if (!props.variables) return ''
+      const names: any = []
+      for (const variable of props.variables) {
+        names.push(variable.name)
+      }
+      return names.join(', ')
+    })
     const mutationTypes = computed(() => {
       const menu = [
         { name: t('variable.rightValue') + ':', disabled: true },
@@ -118,7 +126,7 @@ export default {
         _.push({ name: '.unshift(@)', value: '.unshift(@)', desc: t('variable.unshiftDesc') })
       }
       _.push({ header: t('common.custom') })
-      _.push({ name: t('common.custom'), value: '', desc: t('expression.customOperator'), input: true })
+      _.push({ name: t('common.custom'), value: '', desc: t('expression.customOperator', [varNames.value]), input: true })
       return _
     })
     const connectDataDialogButtons = ref([
@@ -158,7 +166,7 @@ export default {
       if (!props.leftValue || !props.leftValue.enumValue) return []
       const rst: any = []
       for (const name in props.leftValue.enumValue) {
-        rst.push({ name, value: name, desc: props.leftValue.enumValue[name] })
+        rst.push({ name, value: `"${name}"`, desc: props.leftValue.enumValue[name] })
       }
       return rst
     })
@@ -180,7 +188,7 @@ export default {
       context.emit('updateExpression', myExpression.value, myExpressionDesc.value)
     }
     const updateChecked = ({ scope, path, data, rootDataId }) => {
-      if (props.leftValue && data.type !== props.leftValue?.type && props.leftValue?.type !== 'any') {
+      if (data.type !== 'any' && props.leftValue && data.type !== props.leftValue?.type && props.leftValue?.type !== 'any') {
         ydhl.alert(t('variable.boundTypeMismatch', [props.leftValue.type]))
       }
       myExpression.value.data = {

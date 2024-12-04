@@ -9,11 +9,7 @@ class ydecloud_install{
             'devDependencies'=>[],
             'dependencies'=>[],
             // 这部分的文件会被编译到index.js中到{{globalFiles}}部分
-            'globalFiles'=>[
-                'js'=>[
-                    'ydecloud-vue-0.0.1.js',
-                ]
-            ]
+            'globalFiles'=>[]
         ];
     }
     /**

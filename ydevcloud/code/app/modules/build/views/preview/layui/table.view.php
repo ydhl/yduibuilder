@@ -215,7 +215,7 @@ class Table_View extends Preview_View {
         $data = $this->get_table_data();
         $space =  $this->indent();
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">\r\n";
         echo $this->indent(1) . "<table";
         echo $this->wrap_output('lay-size', $this->data['meta']['custom']['small']?'sm':null);

@@ -32,7 +32,7 @@ class Radio_View extends ValueList_View {
         $space =  $this->indent();
         echo "{$space}<div";
         echo $this->wrap_output('role', $this->type.'group');
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         echo ">".PHP_EOL;
     }
     protected function build_ui_end()

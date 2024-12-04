@@ -11,7 +11,7 @@ class Icon_View extends Preview_View {
     {
         $space =  $this->indent();
         echo "{$space}<i";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo "></i>".PHP_EOL;
     }
 

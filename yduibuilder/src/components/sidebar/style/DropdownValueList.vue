@@ -9,7 +9,7 @@
               <div :class="{'p-1 d-flex justify-content-between align-items-center': true,'dropdown-item':item.type=='action','dropdown-header':item.type=='header'}" v-for="(item, index) in valueItems" :key="index">
                 <div><i class="iconfont icon-drag" style="cursor: move;"></i></div>
                 <label class="flex-grow-1 m-0 text-truncate d-flex align-items-center">
-                  <template v-if="item.type=='divider'"><hr class="m-3"/></template>
+                  <template v-if="item.type=='divider'"><div style="height: 1px;background-color: #cccccc;width: 100%"></div></template>
                   <template v-if="item.type=='action'">
                     <input type="radio" :checked="item.checked" @click="updateChecked(index)" class="me-1" :name="selectedUIItemId+'defaultValue'">
                     {{item.name}} ({{item.value}})

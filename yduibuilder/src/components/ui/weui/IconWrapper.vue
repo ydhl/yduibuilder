@@ -27,7 +27,7 @@ export default {
   },
   setup (props: any, context: any) {
     const icon = computed(() => props.uiconfig.meta?.custom?.icon)
-    const position = computed(() => props.uiconfig.meta?.custom?.['icon-position'])
+    const position = computed(() => props.uiconfig.meta?.custom?.iconPosition)
     return {
       icon,
       position

@@ -3,7 +3,7 @@
     <div class="style-header d-flex align-items-center justify-content-between">
       <div class="fs-6 text-muted flex-grow-1">
         <i class="iconfont icon-data"></i>&nbsp;{{dataTitle}}&nbsp;
-        <small class="fs-7" v-if="!datas || datas.length > 0">{{datas.length}} items</small>
+        <small class="fs-7" v-if="!datas || datas.length > 0">{{datas?.length || 0}} items</small>
       </div>
       <div v-if="!openState" @click.stop="openState=true"><i class="iconfont hover-primary icon-expandall"></i></div>
       <div v-if="openState" @click.stop="openState=false"><i class="iconfont hover-primary icon-collapseall"></i></div>
@@ -24,83 +24,69 @@
   </lay-layer>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
-import Data from '@/components/common/Data.vue'
+import DataComp from '@/components/common/Data.vue'
 import { layer } from '@layui/layer-vue'
 import AddData from '@/components/common/AddData.vue'
 import ydhl from '@/lib/ydhl'
 // 数据结构展示
-export default {
-  name: 'DataStruct',
-  emits: ['update', 'remove'],
-  props: {
-    datas: Array,
-    fromType: { // 数据来源那个表
-      type: String,
-      default: 'bind_data'
-    },
-    types: {
-      type: Array,
-      default: () => ['string', 'integer', 'number', 'boolean', 'object', 'array', 'map', 'null', 'any', 'file']
-    },
-    canMutation: Boolean, // 能否修改数据
-    canInput: Boolean, // 能绑定ui提供输入
-    canOutput: Boolean, // 能绑定ui作为输出
-    dataTitle: String
+const emit = defineEmits(['update', 'remove'])
+const { datas, fromType, types, canMutation, canInput, canOutput, dataTitle } = defineProps({
+  datas: Array,
+  fromType: { // 数据来源那个表
+    type: String,
+    default: 'bind_data'
   },
-  components: { AddData, DataComp: Data },
-  setup (props: any, context: any) {
-    const { t } = useI18n()
-    const dialogVisible = ref(false)
-    const currData = ref<any>({ type: 'string', uuid: ydhl.uuid(), isRoot: true })
-    const myDatas = computed<any>(() => props.datas)
-    const openState = ref(false)
-    const buttons = ref([
-      {
-        text: t('common.add'),
-        callback: () => {
-          if (!currData.value.name) {
-            layer.msg(t('api.pleaseInputName'))
-            return
-          }
-          if (!currData.value.name.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) {
-            layer.msg(t('api.inputNameInvalid'))
-            return
-          }
-          context.emit('update', JSON.parse(JSON.stringify(currData.value)), -1)
-          currData.value = { type: 'string', uuid: ydhl.uuid() }
-          dialogVisible.value = false
-        }
-      },
-      {
-        text: t('common.cancel'),
-        callback: () => {
-          dialogVisible.value = false
-        }
+  types: {
+    type: Array,
+    default: () => ['string', 'integer', 'number', 'boolean', 'object', 'array', 'map', 'null', 'any', 'file']
+  },
+  canMutation: Boolean, // 能否修改数据
+  canInput: Boolean, // 能绑定ui提供输入
+  canOutput: Boolean, // 能绑定ui作为输出
+  dataTitle: String
+})
+const { t } = useI18n()
+const dialogVisible = ref(false)
+const currData = ref<any>({ type: 'string', uuid: ydhl.uuid(), isRoot: true })
+const myDatas = computed<any>(() => datas)
+const openState = ref(false)
+const buttons = ref([
+  {
+    text: t('common.add'),
+    callback: () => {
+      if (!currData.value.name) {
+        layer.msg(t('api.pleaseInputName'))
+        return
       }
-    ])
-    const removeItem = (index) => {
-      removeData(myDatas.value[index], index)
+      if (!currData.value.name.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) {
+        layer.msg(t('api.inputNameInvalid'))
+        return
+      }
+      // 新增
+      emit('update', JSON.parse(JSON.stringify(currData.value)), -1, [])
+      currData.value = { type: 'string', uuid: ydhl.uuid() }
+      dialogVisible.value = false
     }
-    const updateItem = (index: number, item: any) => {
-      context.emit('update', item, index)
-    }
-
-    const removeData = (data, index) => {
-      context.emit('remove', data, index)
-    }
-
-    return {
-      t,
-      currData,
-      dialogVisible,
-      buttons,
-      openState,
-      removeItem,
-      updateItem
+  },
+  {
+    text: t('common.cancel'),
+    callback: () => {
+      dialogVisible.value = false
     }
   }
+])
+
+const removeItem = (index) => {
+  removeData(myDatas.value[index], index)
+}
+const updateItem = (index: number, item: any, nameChanged: Record<string, string>) => {
+  emit('update', item, index, nameChanged)
+}
+
+const removeData = (data, index) => {
+  emit('remove', data, index)
 }
 </script>

@@ -69,11 +69,20 @@ function alpinejs_find_index(el){
     }while (parent)
     return index.reverse()
 }
-function alpinejs_get_input_data_name(el, valueName){
+
+/**
+ *
+ * @param el
+ * @param valueName
+ * @param ignoreSelf boolean false 则表示获取上层ui绑定的数据名
+ * @return {*}
+ */
+function alpinejs_get_input_data_name(el, valueName, ignoreSelf){
     if (valueName.match(/\[-1\]/)) {
         const index = alpinejs_find_index(el)
         valueName = valueName.replace(/\[-1\]$/, '')
         if (index.length > 0) {
+            if (ignoreSelf) index.pop()
             for (const idx of index) {
                 valueName += '?.[' + idx + ']';
             }
@@ -100,12 +109,23 @@ function alpinejs_init_iterator_value(el, expression, evaluate, isArrayData=fals
             // 最后一个数据项是数组的（checkbox, select的multiple才是数组）其他定义为undefined
             evaluate(`if(!${tmp}) ${tmp} = ${!isArrayData ? 'undefined' : '[]'}`);
         }else{
-            evaluate(`if(!${tmp}) ${tmp} = []`);
+            evaluate(`if(!${tmp}) {
+    ${tmp} = []
+}else if(!Array.isArray(${tmp})){
+    ${tmp} = [${tmp}]
+}`);
         }
     }
     return tmp;
 }
-
+function toCamelCaseWithHyphen(str){
+    const matches = str.match(/[A-Z]/g)
+    if (!matches) return str
+    for (const word of matches) {
+        str = str.replaceAll(word, "-" + word.toLowerCase())
+    }
+    return str
+}
 /**
  * 把value的值初始化给绑定的数据
  * @param el
@@ -124,10 +144,13 @@ function alpinejs_init_bind_value(uitype, el, expression, evaluate, effect, eval
         // 绑定的输入值没有数据的情况下，同步输出到输入
         const inputEl = el.querySelector('.input') || el;
         const value = inputEl.value;
+        // console.log(xInputExp)
         if (value){
             const code = `
 if (${xInputExp} instanceof String) {
     if(!${xInputExp}.length)  ${xInputExp} = "${value}";
+}else if (Array.isArray(${xInputExp}) && ${xInputExp}.length==0){
+    ${xInputExp} = "${value}";
 }else if (!${xInputExp}){
     ${xInputExp} = "${value}";
 }
@@ -200,7 +223,7 @@ function alpinejs_init_directive(Alpine){
             let style = []
             if (Object.prototype.toString.call(keyValue) === '[object Object]'){
                 for(const key in keyValue){
-                    style.push(`${key}: ${keyValue[key]}`)
+                    style.push(toCamelCaseWithHyphen(key) + ':' + keyValue[key])
                 }
             }else if (Object.prototype.toString.call(keyValue) === '[object Array]') {
                 style = keyValue
@@ -228,10 +251,10 @@ function alpinejs_init_directive(Alpine){
         const uiType = el.dataset.type;
         if (!uiType) return;
         let isArrayData = false
-        if (el.hasAttribute('data-index')){// ui被循环输出时
-            isArrayData = !!((uiType === 'select' && el.querySelector("[multiple]")) || uiType === 'checkbox')
+        if (el.closest('[data-index]')){// ui被循环输出时
+            isArrayData = !!((uiType === 'file' && el.querySelector("[multiple]")) || (uiType === 'select' && el.querySelector("[multiple]")) || uiType === 'checkbox')
         }else{// 绑定了数组数据
-            isArrayData = !!expression.match(/[-1]/)
+            isArrayData = !!expression.match(/\[-1\]/)
         }
 
         Alpine.nextTick(() => {
@@ -305,8 +328,15 @@ function alpinejs_init_directive(Alpine){
         }else if ('file' === uiType){
             Alpine.bind(el, { '@change'(event) {
                 const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, isArrayData);
-                const isArray = expression.match(/\[-1\]/)
-                execExp(exp, isArray ? Array.from(event.target.files) : event.target.files?.[0]);
+                const files = []
+                for(const file of event.target.files){
+                    files.push(file)
+                }
+                if (isArrayData){
+                    evaluate(`${exp} = checkedFiles`, { scope: { checkedFiles: files }});
+                }else{
+                    evaluate(`${exp} = checkedFile`, { scope: { checkedFile: files?.[0] }});
+                }
             }})
         }else{
             // 其他迭代类元素
@@ -322,7 +352,7 @@ function alpinejs_init_directive(Alpine){
 }
 function alpinejs_input_keyup(page, el, uiid, inputName){
     const value = el.value;
-    const suffix = inputName.match(/[-1]/) ? '[-1]' : ''
+    const suffix = inputName.match(/\[-1\]/) ? '[-1]' : ''
     page.alpinejs_set_value(el,`${uiid}_wordCount${suffix}`, value?.length||'');
     if (value?.length>0){
         page.alpinejs_set_value(el, `${uiid}_clearButtonVisible${suffix}`, true);
@@ -332,14 +362,18 @@ function alpinejs_input_keyup(page, el, uiid, inputName){
 }
 function alpinejs_input_clear(page, el, uiid, inputName){
     page.alpinejs_set_value(el, inputName, "");
-    const suffix = inputName.match(/[-1]/) ? '[-1]' : ''
+    let suffix = ''
+    if (inputName.match(/\[-1\]/)){
+        suffix = '[-1]';
+    }
+    el.closest('[data-root]').querySelector('.input').value = ''
     if(page.alpinejs_get_value(el, `${uiid}_wordCount${suffix}`) != undefined) page.alpinejs_set_value(el, `${uiid}_wordCount${suffix}`, 0);
     if(page.alpinejs_get_value(el, `${uiid}_clearButtonVisible${suffix}`) != undefined) page.alpinejs_set_value(el, `${uiid}_clearButtonVisible${suffix}`, false);
 }
 
-function alpinejs_pagination_pages(pageObj, el, totalPage, outputData, inputData){
+function alpinejs_pagination_pages(totalCount, outputData, inputData, pageSize=10){
     const pages = [];
-    const maxPage = outputData || totalPage;
+    const maxPage = Math.ceil((outputData || totalCount) / pageSize)
     let startPage = inputData || 1;
     startPage = Math.max(startPage - 2, 1);
     const endPage = Math.min(startPage + 9, maxPage);

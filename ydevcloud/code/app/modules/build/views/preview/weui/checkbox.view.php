@@ -36,7 +36,7 @@ class Checkbox_View extends Radio_View {
 
         echo $this->indent(2)."<div class='weui-cell__hd'>".PHP_EOL;
         echo $this->indent(3)."<input type='{$this->type}'";
-        $this->build_form_attrs();
+        $this->output_form_attrs();
         if ($value){
             echo $this->wrap_output(':value', $value);
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$value} : ''" : null);

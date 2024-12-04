@@ -41,12 +41,12 @@ class Textarea_View extends Input_View {
         $iteratorDataName = $this->get_iterator_data_name();
         $myid = $this->myid();
         echo "{$space}<div";
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         echo ">".PHP_EOL;
         echo $this->indent(1);
         echo '<textarea class="van-field__control"';
         echo $this->wrap_output('style', $this->data['meta']['custom']['autoRow'] ? 'resize: none' : NULL);
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
         echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength'] ?: NULL);
         echo $this->wrap_output('rows', $this->data['meta']['custom']['row']);
 

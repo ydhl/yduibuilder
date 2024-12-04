@@ -21,8 +21,8 @@
       </li>
     </template>
   </TopPanelBase>
-  <lay-layer v-model="isOpenBuildDialog" :title="t('common.build')" :shade="true" :area="['500px', '500px']">
-    <div class="p-3" style="height: 360px">
+  <lay-layer v-model="isOpenBuildDialog" :title="t('common.build')" :shade="true" :area="['800px', '500px']">
+    <div class="p-3" style="height: 400px">
       <div v-if="!socket">{{t('common.socketNotConnect')}}</div>
       <pre id="build-log" class="overflow-auto" style="height:100%;"></pre>
     </div>

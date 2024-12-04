@@ -308,6 +308,7 @@ class Action_Controller extends YZE_Resource_Controller {
         $action_uuid = trim($postData["uuid"]);
         $redirect = trim($postData["redirect"])?:'';//外部
         $redirect_type = trim($postData["redirect_type"]);
+        $popup_target = trim($postData["popup_target"]);
         $popup_page_type = trim($postData["popup_page_type"])?:'unset';
         $popupPageId = trim($postData["popupPageId"]);// 内部
         $input = $postData["input"];
@@ -324,6 +325,7 @@ class Action_Controller extends YZE_Resource_Controller {
             ->set('input', json_encode($input))
             ->set('popup_type', Action_Model::POPUP_TYPE_UNSET)
             ->set('popup_page_type', $popup_page_type)
+            ->set('popup_target', $popup_target)
             ->save();
         $action_records = $action->get_records();
         unset($action_records['id'],$action_records['is_deleted'],$action_records['created_on'],$action_records['modified_on']);

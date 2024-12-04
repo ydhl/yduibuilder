@@ -16,14 +16,14 @@ class Modal_View extends Preview_View {
         return $css_map;
     }
 
-    private function body_class(){
+    protected function body_class(){
         $css = ['modal-content shadow'];
         $cssMap = parent::css_map();
         $css[] = $cssMap['backgroundTheme'];
         $css[] = $cssMap['foregroundTheme'];
         return join(' ', $css);
     }
-    private function body_style()
+    protected function body_style()
     {
         $map = parent::style_map();
         $newMap = [];
@@ -48,12 +48,13 @@ class Modal_View extends Preview_View {
     }
     public function build_style($justSelf = true)
     {
+        $myid = $this->myid();
         $style = parent::build_style($justSelf);
 
         $position = $this->data['meta']['custom']['position'];
         $items = [ "top"=> 'flex-start', "center"=> 'center', "bottom"=> 'flex-end' ];
         $justify = [ "left"=> 'flex-start', "center"=> 'center', "right"=> 'flex-end' ];
-        $style['.model-position'] = 'pointer-events:none;width: 100%;height: 100%;display:flex;justify-content:'.($justify[$position[0]?:'center']).'; align-items:'.($items[$position[1]?:'center']);
+        $style["[data-uiid={$myid}] .model-position"] = 'pointer-events:none;width: 100%;height: 100%;display:flex;justify-content:'.($justify[$position[0]?:'center']).'; align-items:'.($items[$position[1]?:'center']);
 
         return $style;
     }
@@ -76,7 +77,7 @@ class Modal_View extends Preview_View {
 
         echo $this->indent().'<div';
         echo $this->wrap_output('id', $pageid);
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         echo $this->indent(1);
@@ -99,7 +100,7 @@ class Modal_View extends Preview_View {
             echo $this->indent(5);
             echo "</div>".PHP_EOL;
             echo $this->indent(5);
-            echo '<button type="button" onclick="YDECloud.closeSelf(this)" class="close" ><span>×</span></button>'."".PHP_EOL;
+            echo '<button type="button" onclick="YDECloud.closeSelf(this)" data-bs-dismiss="modal" class="btn-close" ></button>'."".PHP_EOL;
 
             echo $this->indent(4);
             echo "</div>".PHP_EOL;
@@ -132,8 +133,7 @@ class Modal_View extends Preview_View {
         echo "</div>".PHP_EOL;
         echo $this->indent(2);
         echo "</div>".PHP_EOL;
-        echo $this->indent(1);
-        echo $this->indent()."</div>".PHP_EOL;
+        echo $this->indent(1)."</div>".PHP_EOL;
 
         echo $this->indent()."</div>".PHP_EOL;
     }

@@ -105,8 +105,8 @@
   <DataInfo :data="myModel" v-model="detailDlgVisible"></DataInfo>
 </template>
 
-<script lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+<script lang="ts" setup>
+import { computed, nextTick, onMounted, ref, watch, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { layer } from '@layui/layer-vue'
 import ConfirmRemove from '@/components/common/ConfirmRemove.vue'
@@ -120,623 +120,569 @@ import DataInfo from '@/components/common/DataInfo.vue'
 import CodeEditorDialog from '@/components/common/CodeEditorDialog.vue'
 import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 // 数据模型展示，可绑定ui
-export default {
-  name: 'DataComp',
-  components: { AdvanceSelect, CodeEditorDialog, DataInfo, AddData, ConfirmRemove },
-  emits: ['remove', 'update'],
-  props: {
-    model: Object,
-    index: Number,
-    path: {
-      default: () => [],
-      type: Array
-    },
-    canInput: Boolean,
-    canOutput: Boolean,
-    open: Boolean, // 默认是否打开
-    fromId: String, // 该数据来源于哪里
-    fromType: String, // 数据来源那个表
-    isArrayItem: Boolean, // 数组结点标识,用于标识数组的第一个结点
-    canMutation: Boolean, // 是否能编辑和删除
-    intent: Number // 缩进次数
+const emit = defineEmits(['remove', 'update'])
+
+const props = defineProps({
+  model: Object,
+  index: Number,
+  path: {
+    default: () => [],
+    type: Array
   },
-  setup (props: any, context: any) {
-    const editModel = ref()
-    const myModel = computed<any>(() => props.model)
-    const { t } = useI18n()
-    const editDlgVisible = ref(false)
-    const tip = ref('')
-    const confirmRemove = ref(false)
-    const showBoundPop = ref(false)
-    const showOutputTypeMenu = ref(false)
-    const detailDlgVisible = ref(false)
-    const codeEditorVisible = ref(false)
-    const myCanMutation = computed(() => {
-      if (myModel.value.readonly) return false
-      return props.canMutation
-    })
-    const boundPop = ref()
-    const outputTypeMenu = ref()
-    const drawFromEl = ref()
-    const currBindOutUI = ref()
-    const isAddProps = ref(false)
-    const codeType = ref<string>('view') // view || import
-    const isOpen = ref(props.open)
-    const showBoundType = ref('')
-    const code = ref('')
-    const store = useStore()
-    const XYInIframe = computed(() => store.state.design.mouseXYInIframe)
-    const mouseupInFrame = computed(() => store.state.design.mouseupInFrame)
-    const pageScale = computed(() => store.state.design.scale)
-    const currFunctionId = computed(() => store.state.design.function.id)
-    const currPage = computed(() => store.state.design.page)
-    const versionId = computed(() => store.state.design.pageVersionId[currPage.value.meta.id])
-    const myCanInput = computed(() => {
-      // 数组项，复杂数组或者上级指定不能绑定输入的
-      const canNot = props.isArrayItem ||
-        myModel.value.type === 'map' || myModel.value.type === 'object' ||
-        !props.canInput ||
-        (myModel.value.type === 'array' && ['array', 'map'].indexOf(myModel.value.item.type) !== -1)
-      return !canNot
-    })
-    const myCanOutput = computed(() => {
-      // 上级指定不能绑定输出的
-      if (!props.canOutput) return false
-      if (props.isArrayItem) {
-        // 数组子项是数组的能，其他不能
-        return myModel.value.type === 'array'
-      }
-      return props.canOutput
-    })
-    const dataInfo = computed(() => {
-      return [
-        { name: 'type', value: '' }
-      ]
-    })
-    const enumValues = computed(() => {
-      if (!myModel.value.enumValue) {
-        return ''
-      }
-      const enumValue: any = []
-      for (const key in myModel.value.enumValue) {
-        enumValue.push(key)
-      }
-      return enumValue.join(' | ')
-    })
-    const boundUIItems = computed(() => {
-      let items: any = []
-      if (showBoundType.value === 'in') {
-        if (myModel.value.in) items.push(myModel.value.in)
-      } else if (showBoundType.value === 'out') {
-        items = myModel.value.out ? Object.keys(myModel.value.out) : []
-      }
-      const rst: any = []
-      for (const itemid of items) {
-        const { uiConfig } = store.getters.getUIItem(itemid)
-        if (uiConfig) rst.push(uiConfig)
-      }
-      return rst
-    })
-    const currBindType = ref('')
-    const hoverUIItemId = computed({
-      get: () => store.state.design?.hoverUIItemId || undefined,
-      set: (v) => {
-        store.commit('updatePageState', { hoverUIItemId: v })
-      }
-    })
-    const selectedUIItemId = computed(() => store.state.design?.selectedUIItemId || undefined)
-    const selectedPageId = computed(() => store.state.design?.page?.meta?.id)
-    const outputTypeStyle = computed(() => {
-      if (!showOutputTypeMenu.value || !mouseupInFrame.value || !outputTypeMenu.value) return ''
-      const rect = outputTypeMenu.value.getBoundingClientRect()
-      const position = mouseupInFrame.value.split('_')
-      const top = Math.max(0, rect.height + parseFloat(position[1]) > document.body.clientHeight ? (document.body.clientHeight - rect.height - 30) : parseFloat(position[1]))
-      return `position:fixed; left:${position[0]}px; top:${top}px; z-index:12;background-color: transparent !important;`
-    })
-    const hoverUIItem = computed(() => {
-      if (!hoverUIItemId.value) return null
-      const { uiConfig } = store.getters.getUIItemInPage(hoverUIItemId.value, selectedPageId.value)
-      return uiConfig
-    })
-    const save = (index) => {
-      if (!props.isArrayItem) {
-        if (!editModel.value.name) {
-          layer.msg(t('api.pleaseInputName'))
-          return
-        }
-        if (!editModel.value.name.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) {
-          layer.msg(t('api.inputNameInvalid'))
-          return
-        }
-      }
-      editDlgVisible.value = false
-      if (isAddProps.value) { // 添加对象节点
-        if (!myModel.value.props) myModel.value.props = []
-        myModel.value.props.push(editModel.value)
-        context.emit('update', index, JSON.parse(JSON.stringify(myModel.value)))
-      } else { // 修改
-        const data = JSON.parse(JSON.stringify(editModel.value))
-        if (index === -1) { // 复制时把绑定关系全部去掉，并重新生成所有的uuid
-          rebuildInOutUuid(data)
-        }
-        context.emit('update', index, data)
-      }
-    }
-    const rebuildInOutUuid = (data: any) => {
-      if (!data) return
-      data.uuid = ydhl.uuid()
+  canInput: Boolean,
+  canOutput: Boolean,
+  open: Boolean, // 默认是否打开
+  fromId: String, // 该数据来源于哪里
+  fromType: String, // 数据来源那个表
+  isArrayItem: Boolean, // 数组结点标识,用于标识数组的第一个结点
+  canMutation: Boolean, // 是否能编辑和删除
+  intent: Number // 缩进次数
+})
+const { index, path, canInput, canOutput, fromId, fromType, isArrayItem, canMutation, intent } = props
+const editModel = ref()
+const myModel = toRef<any>(props, 'model')
+const { t } = useI18n()
+const editDlgVisible = ref(false)
+const tip = ref('')
 
-      if (data.in) data.in = null
-      if (data.out) data.out = null
-      if (data.bound) data.bound = null
-      if (data.item) {
-        rebuildInOutUuid(data.item)
-      }
-      if (data.props) {
-        for (const prop of data.props) {
-          rebuildInOutUuid(prop)
-        }
-      }
-    }
-    const buttons = computed(() => {
-      const btns = [
-        {
-          text: t('common.save'),
-          callback: () => save(props.index)
-        },
-        {
-          text: t('common.cancel'),
-          callback: () => {
-            editDlgVisible.value = false
-          }
-        }
-      ]
-      if (myModel.value.isRoot) {
-        btns.splice(1, 0,
-          {
-            text: t('common.copy'),
-            callback: () => {
-              save(-1)
-            }
-          })
-      }
-      return btns
-    })
+const showBoundPop = ref(false)
+const showOutputTypeMenu = ref(false)
+const detailDlgVisible = ref(false)
+const codeEditorVisible = ref(false)
+const myCanMutation = computed(() => {
+  if (myModel.value.readonly) return false
+  return canMutation
+})
+const boundPop = ref()
+const outputTypeMenu = ref()
+const drawFromEl = ref()
+const currBindOutUI = ref()
+const isAddProps = ref(false)
+const codeType = ref<string>('view') // view || import
+const isOpen = toRef(props, 'open')
+const showBoundType = ref('')
+const code = ref('')
+let nameChanged: any = {}
+const store = useStore()
+const XYInIframe = computed(() => store.state.design.mouseXYInIframe)
+const mouseupInFrame = computed(() => store.state.design.mouseupInFrame)
+const pageScale = computed(() => store.state.design.scale)
+const currFunctionId = computed(() => store.state.design.function.id)
+const currPage = computed(() => store.state.design.page)
+const versionId = computed(() => store.state.design.pageVersionId[currPage.value.meta.id])
+const myCanInput = computed(() => {
+  // 数组项，复杂数组或者上级指定不能绑定输入的
+  const canNot = isArrayItem ||
+    myModel.value.type === 'map' || myModel.value.type === 'object' ||
+    !canInput ||
+    (myModel.value.type === 'array' && ['array', 'map'].indexOf(myModel.value.item.type) !== -1)
+  return !canNot
+})
+const myCanOutput = computed(() => {
+  // 上级指定不能绑定输出的
+  if (!canOutput) return false
+  if (isArrayItem) {
+    // 数组子项是数组的能，其他不能
+    return myModel.value.type === 'array'
+  }
+  return canOutput
+})
 
-    watch(selectedUIItemId, (n, o) => {
-      if (n !== o) showOutputTypeMenu.value = false
-    })
-    watch(() => props.open, (n) => {
-      isOpen.value = n
-    })
-    watch(XYInIframe, (v) => {
-      if (canvas.getDrawFromId() !== props.model.uuid) return
-      const ifrmae = document.getElementById('wrapper' + selectedPageId.value)
-      if (ifrmae) {
-        const { x, y } = ifrmae.getBoundingClientRect()
-        // console.log(v.x, v.y, x, y)
-        canvas.mouseoverInIframe(v.x * pageScale.value + x, v.y * pageScale.value + y)
-      }
-    })
-    // 在某个ui上松开后结束画线,并设置绑定关系
-    watch(mouseupInFrame, (v) => {
-      if (!canvas.isDrawline() || canvas.getDrawFromId() !== props.model.uuid) return
-      canvas.stopDrawline()
-      currBindOutUI.value = hoverUIItem.value
-      if (currBindType.value === 'in') {
-        if (!baseUIDefines[hoverUIItem.value.type].isValuable) {
-          ydhl.alert(t('variable.bindInputInvalid'))
-          return
-        }
-        if (hoverUIItem.value?.dataIn) {
-          ydhl.alert(t('variable.hasBoundInput'))
-          return
-        }
-        saveBound(hoverUIItem.value, currBindType.value, '', hoverUIItem.value.type)
-      } else {
-        const items = outputAsItems(hoverUIItem.value)
-        if (items.length === 0) {
-          ydhl.alert(t('variable.cannotBindOutput'))
-          return
-        }
-        showOutputTypeMenu.value = true
-      }
-    })
-    const boundAsItems = computed(() => {
-      return [
-        { name: 'None', value: 'none' },
-        { name: 'Value', value: 'VALUE', desc: t('variable.boundAsValue') },
-        { name: 'Bound', value: 'BOUND', desc: t('variable.boundAsBound') }
-      ]
-    })
-    const hasSubItem = computed(() => {
-      return myModel.value.type === 'array' || myModel.value.type === 'object' || myModel.value.type === 'file' || myModel.value.type === 'blob'
-    })
-    const outputAsItems = (uiItem) => {
-      if (!uiItem) return []
-      const uiType = uiItem.type
-      const _: any = []
-      const map: any = {
-        Iterable: {
-          HTML: [],
-          TEXT: [],
-          VALUELIST: ['map', 'object', 'array'],
-          STYLE: ['string', 'number', 'integer', 'map', 'object', 'array'],
-          NONE: ['array'],
-          CSS: ['string', 'number', 'integer', 'map', 'object', 'array'],
-          TITLE: ['string', 'number', 'integer', 'map', 'object', 'array'],
-          ALT: ['string', 'number', 'integer', 'map', 'object', 'array'],
-          KEYVALUE: ['map', 'object']
-        },
-        unIterable: {
-          HTML: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
-          TEXT: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
-          VALUELIST: [],
-          VALUE: ['string', 'number', 'integer', 'array'],
-          STYLE: ['string', 'number', 'integer', 'map', 'object', 'array'],
-          CSS: ['string', 'number', 'integer', 'map', 'object', 'array'],
-          TITLE: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
-          ALT: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
-          NONE: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
-          KEYVALUE: ['object', 'map', 'array']
-        }
-      }
-      const dataType = myModel.value.type
-      const scaleTypes = ['string', 'number', 'integer']
-      const is2DArray = myModel.value.type === 'array' && myModel.value.item.type === 'array'
-      const isScale = scaleTypes.indexOf(dataType) !== -1
-      const isObject = ['object', 'map'].indexOf(dataType) !== -1
-      const isArray = myModel.value.type === 'array'
-      const is1DArray = myModel.value.type === 'array' && myModel.value.item.type !== 'array'
-      const is1DObjectMapArray = myModel.value.type === 'array' && ['object', 'map'].indexOf(myModel.value.item.type) !== -1
-      const is1DObjectArray = myModel.value.type === 'array' && myModel.value.item.type === 'object'
-      const is1DScaleArray = myModel.value.type === 'array' && scaleTypes.indexOf(myModel.value.item.type) !== -1
-      const is2DScaleArray = is2DArray && scaleTypes.indexOf(myModel.value.item.item.type) !== -1
-      const iterate = baseUIDefines[uiType].isIterable ? 'Iterable' : 'unIterable'
-      for (const output of baseUIDefines[uiType].outputAs) {
-        if (map[iterate][output].indexOf(dataType) === -1) continue
-        // css 输出不支持object和map
-        if (output === 'CSS' && isObject) continue
-        if (iterate === 'Iterable') {
-          if (output === 'STYLE' && !isObject && !is1DScaleArray && !isScale) continue
-          if (output === 'CSS' && !is1DScaleArray && !isScale) continue
-          if (output === 'NONE') {
-            if (uiType === 'Table') {
-              if (!is1DObjectArray) continue
-            } else {
-              if (!is2DArray) continue
-            }
-          }
-          if (output === 'VALUELIST' && ['Collapse', 'Carousel'].indexOf(uiType) !== -1 && (isObject || is1DObjectMapArray || (is2DArray && !is2DScaleArray))) continue
-          if (output === 'VALUELIST' && uiType === 'Table' && !is2DArray) continue
-        } else {
-          if (output === 'VALUE' && !isScale && !is1DScaleArray) continue
-          if (output === 'STYLE' && !isScale && !isObject && !is1DArray && (is2DArray && !is2DScaleArray)) continue
-          if (output === 'CSS' && !isScale && !is1DScaleArray && (is2DArray && !is2DScaleArray)) continue
-          if (output === 'KEYVALUE' && !isObject && !is1DObjectMapArray) continue
-          if (output === 'NONE' && !isArray) continue
-        }
-        _.push({ name: output + (uiItem.dataOut?.[output] ? ` (${t('variable.hasBeenBound')})` : ''), value: output, desc: t('variable.output.' + output), disabled: !!uiItem.dataOut?.[output] })
-      }
-      return _
+const enumValues = computed(() => {
+  if (!myModel.value.enumValue) {
+    return ''
+  }
+  const enumValue: any = []
+  for (const key in myModel.value.enumValue) {
+    enumValue.push(key)
+  }
+  return enumValue.join(' | ')
+})
+const boundUIItems = computed(() => {
+  let items: any = []
+  if (showBoundType.value === 'in') {
+    if (myModel.value.in) items.push(myModel.value.in)
+  } else if (showBoundType.value === 'out') {
+    items = myModel.value.out ? Object.keys(myModel.value.out) : []
+  }
+  const rst: any = []
+  for (const itemid of items) {
+    const { uiConfig } = store.getters.getUIItem(itemid)
+    if (uiConfig) rst.push(uiConfig)
+  }
+  return rst
+})
+const currBindType = ref('')
+const hoverUIItemId = computed({
+  get: () => store.state.design?.hoverUIItemId || undefined,
+  set: (v) => {
+    store.commit('updatePageState', { hoverUIItemId: v })
+  }
+})
+const selectedUIItemId = computed(() => store.state.design?.selectedUIItemId || undefined)
+const selectedPageId = computed(() => store.state.design?.page?.meta?.id)
+const outputTypeStyle = computed(() => {
+  if (!showOutputTypeMenu.value || !mouseupInFrame.value || !outputTypeMenu.value) return ''
+  const rect = outputTypeMenu.value.getBoundingClientRect()
+  const position = mouseupInFrame.value.split('_')
+  const top = Math.max(0, rect.height + parseFloat(position[1]) > document.body.clientHeight ? (document.body.clientHeight - rect.height - 30) : parseFloat(position[1]))
+  return `position:fixed; left:${position[0]}px; top:${top}px; z-index:12;background-color: transparent !important;`
+})
+const hoverUIItem = computed(() => {
+  if (!hoverUIItemId.value) return null
+  const { uiConfig } = store.getters.getUIItemInPage(hoverUIItemId.value, selectedPageId.value)
+  return uiConfig
+})
+const save = (index) => {
+  if (!isArrayItem) {
+    if (!editModel.value.name) {
+      layer.msg(t('api.pleaseInputName'))
+      return
     }
-    const outputAndBoundItems = (uiItem) => {
-      const items: any = outputAsItems(uiItem)
-      if (hasBoundAs(uiItem.type)) {
-        items.splice(0, 0, { header: t('api.outputAS') })
-        items.push({ header: t('api.boundAS') })
-        items.push({ name: 'VALUE', value: 'VALUE', type: 'bound', desc: t('variable.boundAsValue') })
-        items.push({ name: 'BOUND', value: 'BOUND', type: 'bound', desc: t('variable.boundAsBound') })
-      }
-      return items
+    if (!editModel.value.name.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) {
+      layer.msg(t('api.inputNameInvalid'))
+      return
     }
-    const hasOutputAs = (uiType) => {
-      if (showBoundPop.value && showBoundType.value !== 'out') return false
-      if (baseUIDefines[uiType].outputAs.length === 0) return false
-      return true
+  }
+  editDlgVisible.value = false
+  if (isAddProps.value) { // 添加对象节点
+    if (!myModel.value.props) myModel.value.props = []
+    myModel.value.props.push(editModel.value)
+    emit('update', index, JSON.parse(JSON.stringify(myModel.value)), [])
+  } else { // 修改
+    const data = JSON.parse(JSON.stringify(editModel.value))
+    if (index === -1) { // 复制时把绑定关系全部去掉，并重新生成所有的uuid
+      rebuildInOutUuid(data)
     }
-    const hasBoundAs = (uiType) => {
-      if (!hasOutputAs(uiType)) return false
-      if (baseUIDefines[uiType].isForm) return false
-      if (baseUIDefines[uiType].isIterable) return false
-      return true
-    }
-    const changeOutputAs = (item, type, boundType) => {
-      showOutputTypeMenu.value = false
-      saveBound(item, boundType, type, item.type)
-    }
-    const changeBoundAs = (item, boundAs) => {
-      showOutputTypeMenu.value = false
-      saveBound(item, 'out', myModel.value.out?.[item.meta.id] || 'NONE', item.type, boundAs)
-    }
-    const changeOutputOrBound = (uiItem, option) => {
-      if (option?.type === 'bound') {
-        changeBoundAs(uiItem, option.value)
-      } else {
-        changeOutputAs(uiItem, option.value, 'out')
-      }
-    }
+    emit('update', index, data, nameChanged)
+  }
+}
+watch(() => editModel.value?.name, (v, oldValue) => {
+  if (v === myModel.value.name) {
+    nameChanged = {}
+    return
+  }
+  nameChanged = { dataId: editModel.value.uuid, new: v, old: oldValue }
+})
+const rebuildInOutUuid = (data: any) => {
+  if (!data) return
+  data.uuid = ydhl.uuid()
 
-    const startDrag = (bool: boolean) => {
-      // console.log('mousedown')
-      canvas.setStartDrag(bool)
-    }
-    const beginDraw = (event, type) => {
-      if (!canvas.isDrag() || canvas.isDrawline()) return
-      // console.log(props.model.name, props.model.type, props.model.uuid, type)
-      currBindType.value = type
-      drawFromEl.value = event.target
-      canvas.startDrawline(event.clientX, event.clientY, props.model.uuid)
-    }
-
-    const edit = () => {
-      isAddProps.value = false
-      editModel.value = JSON.parse(JSON.stringify(props.model))
-      editDlgVisible.value = true
-    }
-    const add = () => {
-      isAddProps.value = true
-      editModel.value = { type: 'string', uuid: ydhl.uuid() }
-      editDlgVisible.value = true
-    }
-    const showComment = () => {
-      layer.confirm(props.model.comment, { title: 'YDUIBuilder' })
-    }
-
-    // 删除根级数据
-    const remove = () => {
-      context.emit('remove', props.index)
-    }
-    // 删除数据中的数据
-    const removeItem = (index: number) => {
-      myModel.value.props.splice(index, 1)
-      context.emit('update', props.index, myModel.value) // 通知最顶层通过接口更新后端
-    }
-    const updateItem = (index: number, item: any) => {
-      if (myModel.value.type === 'array') {
-        myModel.value.item = item
-      } else {
-        myModel.value.props[index] = item
-      }
-      context.emit('update', props.index, myModel.value) // 通知最顶层通过接口更新后端
-    }
-    // 高亮显示绑定的元素
-    const highlight = (type, uuid = null) => {
-      if (uuid) {
-        store.commit('updatePageState', { highlightUIItemIds: [uuid] })
-        return
-      }
-      let items: any = []
-      if (type === 'in') {
-        if (myModel.value.in) items.push(myModel.value.in)
-      } else {
-        items = myModel.value.out ? Object.keys(myModel.value.out) : []
-      }
-      store.commit('updatePageState', { highlightUIItemIds: items })
-    }
-    const offlight = () => {
-      store.commit('updatePageState', { highlightUIItemIds: [] })
-    }
-    const showBound = (event: any, type: string) => {
-      if (canvas.isDrawline()) return
-      showBoundType.value = type
-      // 由于阻止了时间冒泡，所以这里通过触发body上的click来通知其他的data.vue中的弹窗关闭
-      $('body').trigger('click')
-      nextTick(() => {
-        ydhl.togglePopper(showBoundPop, event.target, boundPop, 'bottom')
-      })
-    }
-    const viewDetail = () => {
-      detailDlgVisible.value = true
-    }
-
-    const saveBound = (uiItem, type, outputAs, uiType, boundAs = '') => {
-      const uiid = uiItem.meta.id
-      ydhl.savePage(currFunctionId.value, currPage.value, versionId.value, (rst) => {
-        const data: any = { saving: false }
-        if (rst?.success) {
-          data.saved = 1
-          data.pageUuid = currPage.value.meta.id
-          data.versionId = rst.data.versionId
-        }
-        store.commit('updateSavedState', data)
-        const output = hasOutputAs(uiType) ? outputAs : ''
-        ydhl.post('api/bind/io.json', {
-          data_id: myModel.value.uuid,
-          page_uuid: selectedPageId.value,
-          ui_id: uiid,
-          type,
-          output_as: output,
-          bound_as: boundAs,
-          from_uuid: props.fromId
-        }, [], (rst) => {
-          if (!rst || !rst.success) {
-            ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
-            return
-          }
-          const metaProps: any = {}
-          const path = [...props.path]// 断掉引用
-          path.push(myModel.value.name)
-
-          if (type === 'out') {
-            if (!myModel.value.out) myModel.value.out = {}
-            if (!myModel.value.bound) myModel.value.bound = {}
-            const oldOutput = myModel.value.out[uiid]
-            myModel.value.out[uiid] = output
-            // 删除原来的输入类型，改成新的输入类型
-            const old = uiItem.dataOut ? JSON.parse(JSON.stringify(uiItem.dataOut)) : {}
-            delete old[oldOutput]
-            old[output] = path.join('.')
-            metaProps.dataOut = old
-
-            if (boundAs) {
-              const oldBound = myModel.value.bound[uiid]
-              myModel.value.bound[uiid] = boundAs
-              const _old = uiItem.dataBound ? JSON.parse(JSON.stringify(uiItem.dataBound)) : {}
-              delete _old[oldBound]
-              _old[boundAs] = path.join('.')
-              metaProps.dataBound = _old
-            }
-          } else {
-            if (myModel.value.in) {
-              // 数据只能有一个ui提供输入，删除原来的输入绑定ui
-              const { uiConfig } = store.getters.getUIItem(myModel.value.in)
-              if (uiConfig) {
-                store.commit('updateUIInfo', {
-                  itemid: myModel.value.in,
-                  pageId: selectedPageId.value,
-                  props: {
-                    dataIn: null
-                  }
-                })
-              }
-            }
-
-            myModel.value.in = uiid
-            metaProps.dataIn = { path: path.join('.') }
-          }
-          context.emit('update', props.index, myModel.value) // 通知最顶层通过接口更新后端
-          store.commit('updateUIInfo', {
-            itemid: uiid,
-            pageId: selectedPageId.value,
-            props: metaProps
-          })
-        }
-        , 'json')
-      })
-    }
-    const removeBind = (uiItem: any, type: string) => {
-      const uiid = uiItem.meta.id
-      const outputAs = myModel.value.out?.[uiid]
-      ydhl.post('api/bind/remove.json', { ui_id: uiid, type, data_id: props.model.uuid, page_uuid: selectedPageId.value }, [], (rst) => {
-        if (!rst.success) {
-          ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
-          return
-        }
-        if (type === 'in') {
-          myModel.value.in = null
-        } else {
-          delete myModel.value.out?.[uiid]
-          if (ydhl.isEmptyObject(myModel.value.out)) myModel.value.out = null
-          context.emit('update', props.index, myModel.value) // 通知最顶层通过接口更新后端
-        }
-
-        const metaProps: any = {}
-        if (type === 'out') {
-          delete uiItem.dataOut?.[outputAs]
-          metaProps.dataOut = uiItem.dataOut ? JSON.parse(JSON.stringify(uiItem.dataOut)) : {}
-        } else {
-          uiItem.dataIn = null
-          metaProps.dataIn = null
-        }
-        store.commit('updateUIInfo', {
-          itemid: uiid,
-          pageId: selectedPageId.value,
-          props: metaProps
-        })
-      })
-    }
-
-    const closeDropmenu = () => {
-      if (!boundPop.value) return
-      boundPop.value.querySelectorAll('.dropdown-toggle').forEach((el) => el.classList.remove('show'))
-      boundPop.value.querySelectorAll('.dropdown-menu').forEach((el) => el.classList.remove('show'))
-    }
-    const openCodeEditor = (newCode, type) => {
-      codeEditorVisible.value = true
-      codeType.value = type
-      if (type === 'import') {
-        const mockJson = ydhl.mockJson(myModel.value)
-        code.value = JSON.stringify(mockJson[myModel.value.name])
-        tip.value = t('api.model.importTip')
-        editModel.value = JSON.parse(JSON.stringify(myModel.value))
-      } else {
-        tip.value = ''
-        code.value = newCode
-      }
-    }
-    const importData = (newCode) => {
-      let json
-      try {
-        json = JSON.parse(newCode)
-      } catch (e: any) {
-        ydhl.alert('Parse Error: ' + e.message, t('common.ok'))
-        return
-      }
-
-      const type = Object.prototype.toString.call(json).slice(8, -1).toLowerCase()
-      if (type !== myModel.value.type) {
-        ydhl.alert(t('variable.typeMismatch', [myModel.value.type, type]), t('common.ok'))
-        return
-      }
-      codeEditorVisible.value = false
-      const oldUuid = editModel.value.uuid
-      editModel.value = ydhl.parseJsonData(myModel.value.name, myModel.value.isRoot, json)
-      editModel.value.uuid = oldUuid
-      save(props.index)
-    }
-
-    onMounted(() => {
-      document.body.addEventListener('click', (event: any) => {
-        showBoundPop.value = false
-        showOutputTypeMenu.value = false
-      }, {})
-    })
-    return {
-      editModel,
-      t,
-      codeEditorVisible,
-      codeType,
-      enumValues,
-      editDlgVisible,
-      isOpen,
-      confirmRemove,
-      detailDlgVisible,
-      dataInfo,
-      myModel,
-      buttons,
-      isAddProps,
-      code,
-      outputAsItems,
-      outputAndBoundItems,
-      baseUIDefines,
-      boundUIItems,
-      currBindType,
-      myCanInput,
-      myCanOutput,
-      removeItem,
-      updateItem,
-      showComment,
-      highlight,
-      offlight,
-      openCodeEditor,
-      edit,
-      add,
-      remove,
-      startDrag,
-      changeOutputOrBound,
-      changeOutputAs,
-      changeBoundAs,
-      beginDraw,
-      removeBind,
-      viewDetail,
-      importData,
-      showBoundType,
-      showOutputTypeMenu,
-      outputTypeStyle,
-      boundAsItems,
-      currBindOutUI,
-      hasSubItem,
-      boundPop,
-      showBoundPop,
-      outputTypeMenu,
-      tip,
-      myCanMutation,
-      closeDropmenu,
-      showBound,
-      hasOutputAs,
-      hasBoundAs
+  if (data.in) data.in = null
+  if (data.out) data.out = null
+  if (data.bound) data.bound = null
+  if (data.item) {
+    rebuildInOutUuid(data.item)
+  }
+  if (data.props) {
+    for (const prop of data.props) {
+      rebuildInOutUuid(prop)
     }
   }
 }
+const buttons = computed(() => {
+  const btns = [
+    {
+      text: t('common.save'),
+      callback: () => save(index)
+    },
+    {
+      text: t('common.cancel'),
+      callback: () => {
+        editDlgVisible.value = false
+      }
+    }
+  ]
+  if (myModel.value.isRoot) {
+    btns.splice(1, 0,
+      {
+        text: t('common.copy'),
+        callback: () => {
+          save(-1)
+        }
+      })
+  }
+  return btns
+})
+
+watch(selectedUIItemId, (n, o) => {
+  if (n !== o) showOutputTypeMenu.value = false
+})
+
+watch(XYInIframe, (v) => {
+  if (canvas.getDrawFromId() !== myModel.value.uuid) return
+  const ifrmae = document.getElementById('wrapper' + selectedPageId.value)
+  if (ifrmae) {
+    const { x, y } = ifrmae.getBoundingClientRect()
+    // console.log(v.x, v.y, x, y)
+    canvas.mouseoverInIframe(v.x * pageScale.value + x, v.y * pageScale.value + y)
+  }
+})
+// 在某个ui上松开后结束画线,并设置绑定关系
+watch(mouseupInFrame, (v) => {
+  if (!canvas.isDrawline() || canvas.getDrawFromId() !== myModel.value.uuid) return
+  canvas.stopDrawline()
+  currBindOutUI.value = hoverUIItem.value
+  if (currBindType.value === 'in') {
+    if (!baseUIDefines[hoverUIItem.value.type].isValuable) {
+      ydhl.alert(t('variable.bindInputInvalid'))
+      return
+    }
+    if (hoverUIItem.value?.dataIn) {
+      ydhl.alert(t('variable.hasBoundInput'))
+      return
+    }
+    saveBound(hoverUIItem.value, currBindType.value, '', hoverUIItem.value.type)
+  } else {
+    const items = outputAsItems(hoverUIItem.value)
+    if (items.length === 0) {
+      ydhl.alert(t('variable.cannotBindOutput'))
+      return
+    }
+    showOutputTypeMenu.value = true
+  }
+})
+const boundAsItems = computed(() => {
+  return [
+    { name: 'None', value: 'none' },
+    { name: 'Value', value: 'VALUE', desc: t('variable.boundAsValue') },
+    { name: 'Bound', value: 'BOUND', desc: t('variable.boundAsBound') }
+  ]
+})
+const hasSubItem = computed(() => {
+  return myModel.value.type === 'array' || myModel.value.type === 'object' || myModel.value.type === 'file' || myModel.value.type === 'blob'
+})
+const outputAsItems = (uiItem) => {
+  if (!uiItem) return []
+  const uiType = uiItem.type
+  const _: any = []
+  const map: any = {
+    Iterable: {
+      HTML: [],
+      TEXT: [],
+      VALUELIST: ['map', 'object', 'array'],
+      STYLE: ['string', 'number', 'integer', 'map', 'object', 'array'],
+      NONE: ['array'],
+      CSS: ['string', 'number', 'integer', 'map', 'object', 'array'],
+      TITLE: ['string', 'number', 'integer', 'map', 'object', 'array'],
+      ALT: ['string', 'number', 'integer', 'map', 'object', 'array'],
+      KEYVALUE: ['map', 'object']
+    },
+    unIterable: {
+      HTML: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
+      TEXT: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
+      VALUELIST: [],
+      VALUE: ['string', 'number', 'integer', 'array'],
+      STYLE: ['string', 'number', 'integer', 'map', 'object', 'array'],
+      CSS: ['string', 'number', 'integer', 'map', 'object', 'array'],
+      TITLE: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
+      ALT: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
+      NONE: ['string', 'number', 'integer', 'map', 'object', 'array', 'boolean', 'any'],
+      KEYVALUE: ['object', 'map', 'array']
+    }
+  }
+  const dataType = myModel.value.type
+  const scaleTypes = ['string', 'number', 'integer']
+  const is2DArray = myModel.value.type === 'array' && myModel.value.item.type === 'array'
+  const isScale = scaleTypes.indexOf(dataType) !== -1
+  const isObject = ['object', 'map'].indexOf(dataType) !== -1
+  const isArray = myModel.value.type === 'array'
+  const is1DArray = myModel.value.type === 'array' && myModel.value.item.type !== 'array'
+  const is1DObjectMapArray = myModel.value.type === 'array' && ['object', 'map'].indexOf(myModel.value.item.type) !== -1
+  const is1DObjectArray = myModel.value.type === 'array' && myModel.value.item.type === 'object'
+  const is1DScaleArray = myModel.value.type === 'array' && scaleTypes.indexOf(myModel.value.item.type) !== -1
+  const is2DScaleArray = is2DArray && scaleTypes.indexOf(myModel.value.item.item.type) !== -1
+  const iterate = baseUIDefines[uiType].isIterable ? 'Iterable' : 'unIterable'
+  for (const output of baseUIDefines[uiType].outputAs) {
+    if (map[iterate][output].indexOf(dataType) === -1) continue
+    // css 输出不支持object和map
+    if (output === 'CSS' && isObject) continue
+    if (iterate === 'Iterable') {
+      if (output === 'STYLE' && !isObject && !is1DScaleArray && !isScale) continue
+      if (output === 'CSS' && !is1DScaleArray && !isScale) continue
+      if (output === 'NONE') {
+        if (uiType === 'Table') {
+          if (!is1DObjectArray) continue
+        } else {
+          if (!is2DArray) continue
+        }
+      }
+      if (output === 'VALUELIST' && uiType === 'Collapse' && !is1DObjectMapArray) continue
+      if (output === 'VALUELIST' && uiType === 'Carousel' && (isObject || is1DObjectMapArray || (is2DArray && !is2DScaleArray))) continue
+      if (output === 'VALUELIST' && uiType === 'Table' && !is2DArray) continue
+    } else {
+      if (output === 'VALUE' && !isScale && !is1DScaleArray) continue
+      if (output === 'STYLE' && !isScale && !isObject && !is1DArray && (is2DArray && !is2DScaleArray)) continue
+      if (output === 'CSS' && !isScale && !is1DScaleArray && (is2DArray && !is2DScaleArray)) continue
+      if (output === 'KEYVALUE' && !isObject && !is1DObjectMapArray) continue
+      if (output === 'NONE' && !isArray) continue
+    }
+    _.push({ name: output + (uiItem.dataOut?.[output] ? ` (${t('variable.hasBeenBound')})` : ''), value: output, desc: t('variable.output.' + output), disabled: !!uiItem.dataOut?.[output] })
+  }
+  return _
+}
+const outputAndBoundItems = (uiItem) => {
+  const items: any = outputAsItems(uiItem)
+  if (hasBoundAs(uiItem.type)) {
+    items.splice(0, 0, { header: t('api.outputAS') })
+    items.push({ header: t('api.boundAS') })
+    items.push({ name: 'VALUE', value: 'VALUE', type: 'bound', desc: t('variable.boundAsValue') })
+    items.push({ name: 'BOUND', value: 'BOUND', type: 'bound', desc: t('variable.boundAsBound') })
+  }
+  return items
+}
+const hasOutputAs = (uiType) => {
+  if (showBoundPop.value && showBoundType.value !== 'out') return false
+  if (baseUIDefines[uiType].outputAs.length === 0) return false
+  return true
+}
+const hasBoundAs = (uiType) => {
+  if (!hasOutputAs(uiType)) return false
+  if (baseUIDefines[uiType].isForm) return false
+  if (baseUIDefines[uiType].isIterable) return false
+  return true
+}
+const changeOutputAs = (item, type, boundType) => {
+  showOutputTypeMenu.value = false
+  saveBound(item, boundType, type, item.type)
+}
+const changeBoundAs = (item, boundAs) => {
+  showOutputTypeMenu.value = false
+  saveBound(item, 'out', myModel.value.out?.[item.meta.id] || 'NONE', item.type, boundAs)
+}
+const changeOutputOrBound = (uiItem, option) => {
+  if (option?.type === 'bound') {
+    changeBoundAs(uiItem, option.value)
+  } else {
+    changeOutputAs(uiItem, option.value, 'out')
+  }
+}
+
+const startDrag = (bool: boolean) => {
+  // console.log('mousedown')
+  canvas.setStartDrag(bool)
+}
+const beginDraw = (event, type) => {
+  if (!canvas.isDrag() || canvas.isDrawline()) return
+  // console.log(props.model.name, props.model.type, props.model.uuid, type)
+  currBindType.value = type
+  drawFromEl.value = event.target
+  canvas.startDrawline(event.clientX, event.clientY, myModel.value.uuid)
+}
+
+const edit = () => {
+  isAddProps.value = false
+  editModel.value = JSON.parse(JSON.stringify(myModel.value))
+  nameChanged = {}
+  editDlgVisible.value = true
+}
+const add = () => {
+  isAddProps.value = true
+  editModel.value = { type: 'string', uuid: ydhl.uuid() }
+  nameChanged = {}
+  editDlgVisible.value = true
+}
+const showComment = () => {
+  layer.confirm(myModel.value.comment, { title: 'YDUIBuilder' })
+}
+
+// 删除根级数据
+const remove = () => {
+  emit('remove', index)
+}
+// 删除数据中的数据
+const removeItem = (index: number) => {
+  myModel.value.props.splice(index, 1)
+  emit('update', index, myModel.value) // 通知最顶层通过接口更新后端
+}
+const updateItem = (index: number, item: any, nameChanged: Record<string, string>) => {
+  if (myModel.value.type === 'array') {
+    myModel.value.item = item
+  } else {
+    myModel.value.props[index] = item
+  }
+  emit('update', index, myModel.value, nameChanged) // 通知最顶层通过接口更新后端
+}
+// 高亮显示绑定的元素
+const highlight = (type, uuid = null) => {
+  if (uuid) {
+    store.commit('updatePageState', { highlightUIItemIds: [uuid] })
+    return
+  }
+  let items: any = []
+  if (type === 'in') {
+    if (myModel.value.in) items.push(myModel.value.in)
+  } else {
+    items = myModel.value.out ? Object.keys(myModel.value.out) : []
+  }
+  store.commit('updatePageState', { highlightUIItemIds: items })
+}
+const offlight = () => {
+  store.commit('updatePageState', { highlightUIItemIds: [] })
+}
+const showBound = (event: any, type: string) => {
+  if (canvas.isDrawline()) return
+  showBoundType.value = type
+  // 由于阻止了时间冒泡，所以这里通过触发body上的click来通知其他的data.vue中的弹窗关闭
+  $('body').trigger('click')
+  nextTick(() => {
+    ydhl.togglePopper(showBoundPop, event.target, boundPop, 'bottom')
+  })
+}
+const viewDetail = () => {
+  detailDlgVisible.value = true
+}
+
+const saveBound = (uiItem, type, outputAs, uiType, boundAs = '') => {
+  const uiid = uiItem.meta.id
+  ydhl.savePage(currFunctionId.value, currPage.value, versionId.value, (rst) => {
+    const data: any = { saving: false }
+    if (rst?.success) {
+      data.saved = 1
+      data.pageUuid = currPage.value.meta.id
+      data.versionId = rst.data.versionId
+    }
+    store.commit('updateSavedState', data)
+    const output = hasOutputAs(uiType) ? outputAs : ''
+    ydhl.post('api/bind/io.json', {
+      data_id: myModel.value.uuid,
+      page_uuid: selectedPageId.value,
+      ui_id: uiid,
+      type,
+      output_as: output,
+      bound_as: boundAs,
+      from_uuid: fromId
+    }, [], (rst) => {
+      if (!rst || !rst.success) {
+        ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
+        return
+      }
+      const metaProps: any = {}
+      const myPath = [...path]// 断掉引用
+      myPath.push(myModel.value.name)
+
+      if (type === 'out') {
+        if (!myModel.value.out) myModel.value.out = {}
+        if (!myModel.value.bound) myModel.value.bound = {}
+        const oldOutput = myModel.value.out[uiid]
+        myModel.value.out[uiid] = output
+        // 删除原来的输入类型，改成新的输入类型
+        const old = uiItem.dataOut ? JSON.parse(JSON.stringify(uiItem.dataOut)) : {}
+        delete old[oldOutput]
+        old[output] = myPath.join('.')
+        metaProps.dataOut = old
+
+        if (boundAs) {
+          const oldBound = myModel.value.bound[uiid]
+          myModel.value.bound[uiid] = boundAs
+          const _old = uiItem.dataBound ? JSON.parse(JSON.stringify(uiItem.dataBound)) : {}
+          delete _old[oldBound]
+          _old[boundAs] = myPath.join('.')
+          metaProps.dataBound = _old
+        }
+      } else {
+        if (myModel.value.in) {
+          // 数据只能有一个ui提供输入，删除原来的输入绑定ui
+          const { uiConfig } = store.getters.getUIItem(myModel.value.in)
+          if (uiConfig) {
+            store.commit('updateUIInfo', {
+              itemid: myModel.value.in,
+              pageId: selectedPageId.value,
+              props: {
+                dataIn: null
+              }
+            })
+          }
+        }
+
+        myModel.value.in = uiid
+        metaProps.dataIn = { path: myPath.join('.') }
+      }
+      emit('update', index, myModel.value) // 通知最顶层通过接口更新后端
+      store.commit('updateUIInfo', {
+        itemid: uiid,
+        pageId: selectedPageId.value,
+        props: metaProps
+      })
+    }
+    , 'json')
+  })
+}
+const removeBind = (uiItem: any, type: string) => {
+  const uiid = uiItem.meta.id
+  const outputAs = myModel.value.out?.[uiid]
+  ydhl.post('api/bind/remove.json', { ui_id: uiid, type, data_id: myModel.value.uuid, page_uuid: selectedPageId.value }, [], (rst) => {
+    if (!rst.success) {
+      ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
+      return
+    }
+    if (type === 'in') {
+      myModel.value.in = null
+    } else {
+      delete myModel.value.out?.[uiid]
+      if (ydhl.isEmptyObject(myModel.value.out)) myModel.value.out = null
+      emit('update', index, myModel.value) // 通知最顶层通过接口更新后端
+    }
+
+    const metaProps: any = {}
+    if (type === 'out') {
+      delete uiItem.dataOut?.[outputAs]
+      metaProps.dataOut = uiItem.dataOut ? JSON.parse(JSON.stringify(uiItem.dataOut)) : {}
+    } else {
+      uiItem.dataIn = null
+      metaProps.dataIn = null
+    }
+    store.commit('updateUIInfo', {
+      itemid: uiid,
+      pageId: selectedPageId.value,
+      props: metaProps
+    })
+  })
+}
+
+const closeDropmenu = () => {
+  if (!boundPop.value) return
+  boundPop.value.querySelectorAll('.dropdown-toggle').forEach((el) => el.classList.remove('show'))
+  boundPop.value.querySelectorAll('.dropdown-menu').forEach((el) => el.classList.remove('show'))
+}
+const openCodeEditor = (newCode, type) => {
+  codeEditorVisible.value = true
+  codeType.value = type
+  if (type === 'import') {
+    const mockJson = ydhl.mockJson(myModel.value)
+    code.value = JSON.stringify(mockJson[myModel.value.name])
+    tip.value = t('api.model.importTip')
+    editModel.value = JSON.parse(JSON.stringify(myModel.value))
+  } else {
+    tip.value = ''
+    code.value = newCode
+  }
+}
+const importData = (newCode) => {
+  let json
+  try {
+    json = JSON.parse(newCode)
+  } catch (e: any) {
+    ydhl.alert('Parse Error: ' + e.message, t('common.ok'))
+    return
+  }
+
+  const type = Object.prototype.toString.call(json).slice(8, -1).toLowerCase()
+  if (type !== myModel.value.type) {
+    ydhl.alert(t('variable.typeMismatch', [myModel.value.type, type]), t('common.ok'))
+    return
+  }
+  codeEditorVisible.value = false
+  const oldUuid = editModel.value.uuid
+  editModel.value = ydhl.parseJsonData(myModel.value.name, myModel.value.isRoot, json)
+  editModel.value.uuid = oldUuid
+  save(index)
+}
+
+onMounted(() => {
+  document.body.addEventListener('click', (event: any) => {
+    showBoundPop.value = false
+    showOutputTypeMenu.value = false
+  }, {})
+})
 </script>

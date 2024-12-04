@@ -36,7 +36,7 @@ class Rangeinput_View extends Preview_View implements Valuable_View {
         $handleTheme = $this->handleTheme();
         $myId = $this->myid();
         ob_start();
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         $attr = ob_get_clean();
         $inputDataName = $this->get_input_data_name();
 

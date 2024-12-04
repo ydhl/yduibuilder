@@ -20,7 +20,7 @@ class File_View extends Preview_File_View {
         echo "<view class='weui-uploader__input-box'>\r\n";
         echo $this->indent(6);
         echo '<view class="weui-uploader__input" bindtap="'.$this->myId().'_ChooseFile"';
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
 
         echo "></view>\r\n";
         echo $this->indent(5);

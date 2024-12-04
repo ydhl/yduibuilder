@@ -40,7 +40,7 @@ this.setData({
             echo @$this->data['meta']['custom']['inputType'] ?: 'text';
             echo '" class="weui-input" ';
             echo 'bindinput="'.$this->myId().'Input"';
-            echo $this->build_form_attrs();
+            echo $this->output_form_attrs();
             if (@$this->data['meta']['custom']['maxLength']){
                 echo ' maxlength="'.$this->data['meta']['custom']['maxLength'].'"';
             }

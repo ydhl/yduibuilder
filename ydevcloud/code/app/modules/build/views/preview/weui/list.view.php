@@ -11,7 +11,7 @@ class List_View extends ValueList_View {
     {
         $space =  $this->indent();
         echo "{$space}<div ";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
     }
 

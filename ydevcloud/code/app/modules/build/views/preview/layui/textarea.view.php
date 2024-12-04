@@ -75,7 +75,7 @@ document.querySelector('#<?= $this->myId(true)?> .layui-reset').addEventListener
             if (@$this->data['meta']['custom']['autoRow']){
                 echo $this->wrap_output('style', 'resize: none');
             }
-            echo $this->build_form_attrs();
+            echo $this->output_form_attrs();
             if (@$this->data['meta']['custom']['maxLength']){
                 echo $this->wrap_output('length', $this->data['meta']['custom']['maxLength']);
             }

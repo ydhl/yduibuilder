@@ -34,14 +34,15 @@ class Textarea_View extends Input_View {
 
         echo "{$space}<div";
         echo $this->wrap_output("style", "position: relative;");
+        echo $this->wrap_output("data-root", null, true);
         echo $this->wrap_output(":data-index", $this->get_iterator_index_name());
         echo ">".PHP_EOL;
         echo $this->indent(1);
         echo '<textarea';
-        echo $this->build_main_attrs(true, true, false);
+        echo $this->output_main_attrs(true, true, false);
         echo $this->wrap_output('style',$this->data['meta']['custom']['autoRow'] ? 'resize: none' : null);
         echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength']?:NULL);
-        $this->build_form_attrs(true, false);
+        $this->output_form_attrs(true, false);
         echo $this->wrap_output('@keyup', ($wordCountVisible || $clearButtonVisible) ? $this->myid().'_keyup' : null);
         echo $this->wrap_output('rows', @$this->data['meta']['custom']['row']);
 
@@ -69,7 +70,7 @@ class Textarea_View extends Input_View {
             echo $this->indent(2);
             echo "<span class='word-count' x-text='alpinejs_get_value(\$el, \"{$myid}_wordCount{$indexSuffix}\")'></span>";
             if (@$this->data['meta']['custom']['maxLength']){
-                echo "/".$this->data['meta']['custom']['maxLength'];
+                echo " / ".$this->data['meta']['custom']['maxLength'];
             }
             echo PHP_EOL;
         }

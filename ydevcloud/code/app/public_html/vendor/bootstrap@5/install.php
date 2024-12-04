@@ -1380,22 +1380,26 @@ class bootstrap_install{
          */
         return [
             // 主体部分通过npm安装
-            'devDependencies'=>["@types/bootstrap"=>"^5.3.3"],
+            'devDependencies'=>["@types/bootstrap"=>"^5.2.10"],
             'dependencies'=>['bootstrap'=>"^5.3.3",'bootstrap-icons'=>'^1.5.0'],
             // 需要打包导出的文件, 并会导出到src/assert/[包名下面]
             'exportFiles'=>[
             ],
             // index.css代码中include包含的文件, 格式：文件 => 是否是本库里面的文件; 本库的文件会导出到src/assert/[包名下面]，非本库的文件通过npm安装
             'includeCSSFiles'=>[
-                '~bootstrap/scss/bootstrap.scss' => false,
-                '~bootstrap-icons/font/bootstrap-icons.css' => false,
                 'ext-misc.css' => true,
                 'ext-range.css' => true,
                 'ext-modal.css' => true,
                 'wangEditor/adapter.css' => true,
             ],
             // 这部分的文件会被编译到index.js中到{{globalFiles}}部分, 并会导出到public/[包名下面]
-            'globalFiles'=>[]
+            'globalFiles'=>[],
+            'main.ts'=>[
+                'import'=>
+"import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-icons/font/bootstrap-icons.min.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'"
+            ]
         ];
     }
 
@@ -1405,7 +1409,7 @@ class bootstrap_install{
      */
     public static function installInHtml5() {
         return [
-            'iife'=>['/js/bootstrap.bundle.min.js', 'ydpopup.js']
+            'iife'=>['js/bootstrap.bundle.min.js', 'ydpopup.js']
         ];
     }
     /**
@@ -1414,7 +1418,7 @@ class bootstrap_install{
      */
     public static function jsForPreview() {
         return [
-            'iife'=>['/js/bootstrap.bundle.min.js', 'ydpopup.js']
+            'iife'=>['js/bootstrap.bundle.min.js', 'ydpopup.js']
         ];
     }
 }

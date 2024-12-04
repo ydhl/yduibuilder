@@ -101,7 +101,7 @@ export default {
 
     return {
       r: matches?.groups?.r,
-      g: matches?.groups?.b,
+      g: matches?.groups?.g,
       b: matches?.groups?.b,
       a: matches?.groups?.a !== undefined ? matches?.groups?.a : 1
     }

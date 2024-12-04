@@ -2,7 +2,7 @@
   <template  v-if="buttonType=='link'">
     <a :draggable='draggable' :class="[btnCss, dragableCss]" :style="btnStyle"
        :id="myId" :data-type="uiconfig.type"
-       :data-isContainer="false" href="#"
+       :data-isContainer="false" href="javascript:void(0)"
        @dblclick.stop.prevent="inlineEditItemId=uiconfig.meta.id"  @keyup.enter="inlineEditItemId=''"
        :contenteditable="inlineEditItemId==uiconfig.meta.id"
        :data-pageid="pageid">

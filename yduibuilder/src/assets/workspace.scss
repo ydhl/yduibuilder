@@ -228,3 +228,28 @@ div.hover-text:hover{
   background-image: url("data:image/svg+xml,%3Csvg%20t=%221721208892477%22%20class=%22icon%22%20viewBox=%220%200%201024%201024%22%20version=%221.1%22%20xmlns=%22http://www.w3.org/2000/svg%22%20p-id=%225079%22%20width=%22200%22%20height=%22200%22%3E%3Cpath%20d=%22M938.666667%20938.666667h-85.333334v-85.333334h85.333334v85.333334m0-170.666667h-85.333334v-85.333333h85.333334v85.333333m-170.666667%20170.666667h-85.333333v-85.333334h85.333333v85.333334m0-170.666667h-85.333333v-85.333333h85.333333v85.333333m-170.666667%20170.666667h-85.333333v-85.333334h85.333333v85.333334m341.333334-341.333334h-85.333334v-85.333333h85.333334v85.333333z%22%20fill=%22%22%20p-id=%225080%22%3E%3C/path%3E%3C/svg%3E");
   background-size: 15px 15px;
 }
+.comma:not(:last-child)::after {
+  content: ',';
+  padding: 0px 2px 0px  0px;
+}
+
+.context-menu-container{
+  position: fixed;top:0;bottom: 0px;left: 0px;right: 0px;
+}
+.context-menu{
+  position: absolute;
+  z-index: 999;
+  border: 1px solid #ccc;
+  box-shadow: 3px 5px 7px 0rem rgb(45 47 52 / 75%);
+}
+.context-menu .item{
+  padding: 5px 10px;
+  background-color: #efefef;
+  font-size: 14px;
+  word-break: keep-all;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.context-menu .item:hover{
+  background-color: #ffffff;
+}

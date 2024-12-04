@@ -18,7 +18,7 @@ class Progress_View extends Preview_Progress_View {
         $space =  $this->indent();
         $value = $this->data['meta']['value']?:50;
         echo "{$space}<view";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">\r\n";
 
         echo $this->indent(1).'<view';

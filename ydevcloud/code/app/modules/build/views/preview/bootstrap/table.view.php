@@ -13,14 +13,14 @@ use function yangzie\__;
 
 class Table_View extends ValueList_View {
     use Bootstrap_Popup,Html_Code_Helper;
-    private $columnItems = [];
+    protected $columnItems = [];
     public function build_valuelist_static()
     {
         $this->build_ui_begin();
         $this->build_static_table($this->get_table_data());
         $this->build_ui_end();
     }
-    public function build_valuelist_iterator($outputData, $outDataName, $iteratorName, $itemName, $is2D = false, $firstIndex = '')
+    protected function build_valuelist_iterator($outputData, $outDataName, $iteratorName, $itemName, $is2D = false, $firstIndex = '')
     {
         // table的第一维是行，第二维是列
         $this->build_ui_begin($outputData);
@@ -103,7 +103,7 @@ class Table_View extends ValueList_View {
         $footerRow = !$this->data['meta']['custom']['footless'] ? intval($this->data['meta']['custom']['footerRow'])?:1 : 1;
 
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
         echo $this->indent(1)."<table";
         if ($outputData){
@@ -173,7 +173,7 @@ class Table_View extends ValueList_View {
         return $data;
     }
 
-    private function get_table_data() {
+    protected function get_table_data() {
         $excelData = $this->data['meta']['custom']['data'];
         if ($excelData) return $excelData;
 
@@ -188,11 +188,12 @@ class Table_View extends ValueList_View {
         $styleMap = $this->data['meta']['style'];
         if ($this->data['meta']['custom']['header']){
             return "background-color:".$this->data['meta']['custom']['header'];
-        }else{
+        }else if($styleMap['background-color']){
             return "background-color:".$styleMap['background-color'];
         }
+        return '';
     }
-    private function header_css() {
+    protected function header_css() {
         $css = [];
         if (@$this->data['meta']['css']['header'] && $this->data['meta']['css']['header']!='default'){
             $css[] = 'table-'.$this->data['meta']['css']['header'];
@@ -203,11 +204,12 @@ class Table_View extends ValueList_View {
         $styleMap = @$this->data['meta']['style'];
         if ($this->data['meta']['custom']['footer']){
             return "background-color:".$this->data['meta']['custom']['footer'];
-        }else{
+        }else if($styleMap['background-color']){
             return "background-color:".$styleMap['background-color'];
         }
+        return '';
     }
-    private function footer_css() {
+    protected function footer_css() {
         $css = [];
         if (@$this->data['meta']['css']['footer']){
             $css[] = 'table-'.$this->data['meta']['css']['footer'];
@@ -227,7 +229,7 @@ class Table_View extends ValueList_View {
         $newStyle[] = 'overflow:hidden';
         return join(';', $newStyle);
     }
-    private function table_class()
+    protected function table_class()
     {
         $cssArray = parent::css_map();
         $styleMap = parent::style_map();
@@ -262,7 +264,7 @@ class Table_View extends ValueList_View {
         }
         return $newCss ? join(' ',$newCss) : null;
     }
-    private function td_css(){
+    protected function td_css(){
         $css = parent::css_map();
         $newCss = [];
         if (@$css['verticalAlignment']){
@@ -273,7 +275,7 @@ class Table_View extends ValueList_View {
         }
         return $newCss ? join(' ', $newCss) : null;
     }
-    private function get_column_items() {
+    protected function get_column_items() {
         if ($this->columnItems) return $this->columnItems;
         if (!$this->childViews) return [];
         $items = [];
@@ -288,10 +290,10 @@ class Table_View extends ValueList_View {
         $this->columnItems = $items;
         return $this->columnItems;
     }
-    private function output_td_content($row, $column, $indent, $staticData=[]) {
+    protected function output_td_content($row, $column, $indent, $staticData=[]) {
         $columnItems = $this->get_column_items();
         if (!$columnItems[$row][$column]){
-            echo $this->indent(4) . @$staticData[$row][$column]['name'] . PHP_EOL;
+            echo $this->indent(3) . @$staticData[$row][$column]['name'] . PHP_EOL;
             return;
         }
 
@@ -301,16 +303,16 @@ class Table_View extends ValueList_View {
         }
 
     }
-    private function get_td_width($column){
+    protected function get_td_width($column){
         $size = @$this->data['meta']['custom']['size']['width'][$column];
-        return $size ? "width:${size}px": "";
+        return $size ? "width:${size}px": null;
     }
-    private function get_tr_height($row){
+    protected function get_tr_height($row){
         $size = @$this->data['meta']['custom']['size']['height'][$row];
-        return $size ? "height:${size}px": "";
+        return $size ? "height:${size}px": null;
     }
 
-    private function build_static_table($staticData=null){
+    protected function build_static_table($staticData=null){
         $headerRow = $this->data['meta']['custom']['headless'] ? 0 : (intval($this->data['meta']['custom']['headerRow'])?:1);
         $footerRow = $this->data['meta']['custom']['footless'] ? 0 : (intval($this->data['meta']['custom']['footerRow'])?:1);
         $bodyRow = intval($this->data['meta']['custom']['bodyRow'])?:1;
@@ -319,112 +321,111 @@ class Table_View extends ValueList_View {
 
         //header
         if (!$this->data['meta']['custom']['headless']){
-            echo $this->indent(2);
+            echo $this->indent(1);
             echo "<thead";
             echo $this->wrap_output('class', $this->header_css())
                 .">".PHP_EOL;
             for($row=0; $row < $headerRow; $row++){
-                echo $this->indent(3)."<tr";
+                echo $this->indent(2)."<tr";
                 echo $this->wrap_output('style', $this->get_tr_height($row));
                 echo ">".PHP_EOL;
                 for($column=0; $column < $columnCount; $column++){
                     if ($columnConfig[$row][$column]['isMerged']) continue;
-                    echo $this->indent(4)."<th";
+                    echo $this->indent(3)."<th";
                     echo $this->wrap_output('class', $this->td_css());
                     echo $this->wrap_output('style', $this->get_td_width($column));
                     echo $this->wrap_output('colspan', $columnConfig[$row][$column]['colspan']);
                     echo $this->wrap_output('rowspan', $columnConfig[$row][$column]['rowspan']);
                     echo ">".PHP_EOL;
-                    $this->output_td_content($row, $column, 4, $staticData);
-                    echo $this->indent(4) . "</th>".PHP_EOL;
+                    $this->output_td_content($row, $column, 3, $staticData);
+                    echo $this->indent(3) . "</th>".PHP_EOL;
                 }
-                echo $this->indent(3)."</tr>".PHP_EOL;
+                echo $this->indent(2)."</tr>".PHP_EOL;
             }
 
-            echo $this->indent(2)."</thead>".PHP_EOL;
+            echo $this->indent(1)."</thead>".PHP_EOL;
         }
 
         // row
-        $outputDatas = $this->get_output_datas($dataNames);
-        if ($dataNames['NONE']){
-            $this->build_data_bind_body($headerRow,$columnCount,$columnConfig,$outputDatas, $dataNames);
-        }else{
-            $this->build_static_body($headerRow,$bodyRow,$columnCount,$columnConfig,$staticData);
-        }
+        $this->build_static_body($headerRow,$bodyRow,$columnCount,$columnConfig,$staticData);
 
         //footer
         if (!$this->data['meta']['custom']['footless']){
-            echo $this->indent(2);
+            echo $this->indent(1);
             echo "<tfoot";
             echo $this->wrap_output('class', $this->footer_css()).">".PHP_EOL;
             for($row=0; $row < $footerRow; $row++) {
-                echo $this->indent(3) . "<tr";
+                echo $this->indent(2) . "<tr";
                 echo $this->wrap_output('style', $this->get_tr_height($row + $bodyRow + $headerRow));
                 echo ">".PHP_EOL;
                 for($column=0; $column < $columnCount; $column++){
                     if ($columnConfig[$row + $bodyRow + $headerRow][$column]['isMerged']) continue;
-                    echo $this->indent(4) . "<th";
+                    echo $this->indent(3) . "<th";
                     echo $this->wrap_output('class', $this->td_css());
                     echo $this->wrap_output('colspan', $columnConfig[$row + $bodyRow + $headerRow][$column]['colspan']);
                     echo $this->wrap_output('rowspan', $columnConfig[$row + $bodyRow + $headerRow][$column]['rowspan']);
                     echo ">".PHP_EOL;
-                    $this->output_td_content($row + $headerRow + $bodyRow, $column, 4, $staticData);
-                    echo $this->indent(4) . "</th>" . PHP_EOL;
+                    $this->output_td_content($row + $headerRow + $bodyRow, $column, 3, $staticData);
+                    echo $this->indent(3) . "</th>" . PHP_EOL;
                 }
-                echo $this->indent(3) . "</tr>" . PHP_EOL;
+                echo $this->indent(2) . "</tr>" . PHP_EOL;
             }
-            echo $this->indent(2)."</tfoot>".PHP_EOL;
+            echo $this->indent(1)."</tfoot>".PHP_EOL;
         }
     }
-    private function build_static_body($headerRow,$bodyRow,$columnCount,$columnConfig,$staticData) {
-        echo $this->indent(2);
+    protected function build_static_body($headerRow,$bodyRow,$columnCount,$columnConfig,$staticData) {
+        echo $this->indent(1);
         echo "<tbody>".PHP_EOL;
         for($row=0; $row < $bodyRow; $row++) {
-            echo $this->indent(3) . "<tr";
+            echo $this->indent(2) . "<tr";
             echo $this->wrap_output('style', $this->get_tr_height($row + $headerRow));
             echo ">".PHP_EOL;
             for ($column=0; $column < $columnCount; $column++) {
                 if ($columnConfig[$row + $headerRow][$column]['isMerged']) continue;
-                echo $this->indent(4). "<td";
+                echo $this->indent(3). "<td";
                 echo $this->wrap_output('style', $this->get_td_width($column));
                 echo $this->wrap_output('class', $this->td_css());
                 echo $this->wrap_output('colspan', $columnConfig[$row + $headerRow][$column]['colspan']);
                 echo $this->wrap_output('rowspan', $columnConfig[$row + $headerRow][$column]['rowspan']);
                 echo ">".PHP_EOL;
-                $this->output_td_content($row + $headerRow, $column, 4, $staticData);
-                echo $this->indent(4) . "</td>" . PHP_EOL;
+                $this->output_td_content($row + $headerRow, $column, 3, $staticData);
+                echo $this->indent(3) . "</td>" . PHP_EOL;
             }
-            echo $this->indent(3) . "</tr>" . PHP_EOL;
+            echo $this->indent(2) . "</tr>" . PHP_EOL;
         }
-        echo $this->indent(2)."</tbody>".PHP_EOL;
+        echo $this->indent(1)."</tbody>".PHP_EOL;
     }
-    private function build_data_bind_body($headerRow,$columnCount,$columnConfig,$outputDatas, $dataNames) {
-        echo $this->indent(2);
+    protected function build_data_bind_body($headerRow,$columnCount,$columnConfig,$outputDatas, $dataNames) {
+        echo $this->indent(1);
         echo "<tbody>".PHP_EOL;
         $dataName = $dataNames['NONE'];
         $iterateDataName = $outputDatas['NONE']['name'] ?: $dataName;
 
-        echo $this->indent(3) . '<template x-for="(itemOf'.$iterateDataName.', idxOf'.$iterateDataName.') in '.$dataName.'" :key="idxOf'.$iterateDataName.'">'.PHP_EOL;
+        echo $this->indent(2) . '<template x-for="(itemOf'.$iterateDataName.', idxOf'.$iterateDataName.') in '.$dataName.'" :key="idxOf'.$iterateDataName.'">'.PHP_EOL;
         $this->set_iterator_index_name("idxOf{$iterateDataName}");
         $this->set_iterator_data_name("itemOf{$iterateDataName}");
 
-        echo $this->indent(3) . "<tr";
+        echo $this->indent(2) . "<tr";
         echo $this->wrap_output('style', $this->get_tr_height($headerRow));
         echo ">".PHP_EOL;
         for ($column=0; $column < $columnCount; $column++) {
             if ($columnConfig[$headerRow][$column]['isMerged']) continue;
-            echo $this->indent(4). "<td";
+            echo $this->indent(3). "<td";
             echo $this->wrap_output('style', $this->get_td_width($column));
             echo $this->wrap_output('class', $this->td_css());
             echo $this->wrap_output('colspan', $columnConfig[$headerRow][$column]['colspan']);
             echo $this->wrap_output('rowspan', $columnConfig[$headerRow][$column]['rowspan']);
             echo ">".PHP_EOL;
             $this->output_td_content($headerRow, $column, 4, []);
-            echo $this->indent(4) . "</td>" . PHP_EOL;
+            echo $this->indent(3) . "</td>" . PHP_EOL;
         }
-        echo $this->indent(3) . "</tr>" . PHP_EOL;
-        echo $this->indent(3) . "</template>" . PHP_EOL;
+        echo $this->indent(2) . "</tr>" . PHP_EOL;
+        echo $this->indent(2) . "</template>" . PHP_EOL;
 
-        echo $this->indent(2)."</tbody>".PHP_EOL;
+        echo $this->indent(1)."</tbody>".PHP_EOL;
+    }
+
+    public function is_input_ui() {
+        return false;
     }
 }

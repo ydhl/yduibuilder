@@ -112,7 +112,8 @@ function post_snapshot_message($isFullPage, $pageid, $preview_url, $file_path,  
  */
 function upload2oss($fullpath, $oss_file_name) {
     if (!OSS_ACCESSKEYID) {
-        \yangzie\yze_move_file($fullpath, YZE_UPLOAD_PATH.ltrim($oss_file_name,'/'));
+        $dist_dir = YZE_UPLOAD_PATH.dirname(ltrim($oss_file_name,'/'));
+        \yangzie\yze_move_file($fullpath, $dist_dir);
         return ltrim($oss_file_name,'/');
     }
     $ossClient = new OssClient(OSS_ACCESSKEYID, OSS_ACCESSKEYSECRET, OSS_ENDPOINT);
@@ -477,4 +478,60 @@ function uuid ($len = 0, $radix = 0, $prefix = '') {
     }
     return ($prefix ?: '') . join('', $uuid);
 }
-
+function reserve_words(){
+    return [
+        'break',
+        'case',
+        'catch',
+        'class',
+        'const',
+        'continue',
+        'debugger',
+        'default',
+        'delete',
+        'do',
+        'else',
+        'enum', // 保留字，但在ES中没有实际功能
+        'export',
+        'extends',
+        'finally',
+        'for',
+        'function',
+        'if',
+        'implements', // 保留字，但在ES中没有实际功能
+        'import',
+        'in',
+        'instanceof',
+        'interface', // 保留字，但在ES中没有实际功能
+        'let',
+        'new',
+        'package', // 保留字，但在ES中没有实际功能
+        'private', // 提案中的关键字，尚未在ES规范中正式定义
+        'protected', // 提案中的关键字，尚未在ES规范中正式定义
+        'public', // 提案中的关键字，尚未在ES规范中正式定义
+        'reject',
+        'resolve',
+        'return',
+        'rst',
+        'static',
+        'super',
+        'switch',
+        'this',
+        'throw',
+        'try',
+        'typeof',
+        'var',
+        'void',
+        'while',
+        'with',
+        'yield',
+        'async',
+        'await',
+        'true',
+        'false',
+        'null',
+        'undefined',
+        'NaN',
+        'Infinity'
+    ];
+}

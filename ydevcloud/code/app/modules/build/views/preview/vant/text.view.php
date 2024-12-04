@@ -14,7 +14,7 @@ class Text_View extends Preview_View {
 
         $space =  $this->indent();
         echo "{$space}<{$type}";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">";
         echo htmlentities(@$this->data['meta']['value'] ?: @$this->data['meta']['title']);
         echo "</{$type}>".PHP_EOL;

@@ -13,14 +13,15 @@ const eventMap = {
   data: {
     onChange: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
-        { type: 'string', name: 'oldValue', uuid: 'oldValue' },
+        { type: 'any', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'oldValue', uuid: 'oldValue' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onInput: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     }
@@ -28,22 +29,25 @@ const eventMap = {
   keyboard: {
     onKeyUp: {
       args: [
+        { type: 'any', name: 'event', uuid: 'event' },
         { type: 'string', name: 'keyCode', uuid: 'keyCode' },
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onKeyDown: {
       args: [
+        { type: 'any', name: 'event', uuid: 'event' },
         { type: 'string', name: 'keyCode', uuid: 'keyCode' },
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onKeyPress: {
       args: [
+        { type: 'any', name: 'event', uuid: 'event' },
         { type: 'string', name: 'keyCode', uuid: 'keyCode' },
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     }
@@ -51,55 +55,64 @@ const eventMap = {
   mouse: {
     onClick: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onDblClick: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onMouseDown: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onMouseUp: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onMouseOver: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onMouseOut: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onMouseMove: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onMouseEnter: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     },
     onMouseLeave: {
       args: [
-        { type: 'string', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
         { type: 'any', name: 'boundData', uuid: 'boundData' }
       ]
     }
@@ -258,8 +271,20 @@ const eventMap = {
   },
   other: {
     onScroll: {},
-    onBlur: {},
-    onFocus: {}
+    onBlur: {
+      args: [
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'boundData', uuid: 'boundData' }
+      ]
+    },
+    onFocus: {
+      args: [
+        { type: 'any', name: 'event', uuid: 'event' },
+        { type: 'any', name: 'value', uuid: 'value' },
+        { type: 'any', name: 'boundData', uuid: 'boundData' }
+      ]
+    }
   }
 }
 export function hasEvent (ui: UIDefine, event: string, uiConfig: UIBase | null = null) {

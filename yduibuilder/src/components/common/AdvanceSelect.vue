@@ -16,7 +16,7 @@
         <div v-else><hr class="dropdown-divider"></div>
       </template>
       <div><hr class="dropdown-divider"></div>
-      <div><div class="ps-3 pe-3 text-muted fs-7">{{ desc}}&nbsp;</div></div>
+      <div><div class="ps-3 pe-3 text-muted fs-7" style="min-height: 40px">{{ desc}}&nbsp;</div></div>
     </div>
   </template>
   <template v-else>
@@ -62,7 +62,7 @@
           </template>
         </template>
         <div><hr class="dropdown-divider"></div>
-        <div><div class="ps-3 pe-3 text-muted fs-7">{{ desc }}&nbsp;</div></div>
+        <div><div class="ps-3 pe-3 text-muted fs-7" style="min-height: 40px">{{ desc }}&nbsp;</div></div>
       </div>
     </div>
   </template>

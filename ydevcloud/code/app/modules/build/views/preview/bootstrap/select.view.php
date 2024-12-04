@@ -45,14 +45,23 @@ class Select_View extends ValueList_View {
     }
     public function build_ui_begin($iteratorName=null){
         $space =  $this->indent();
+
+        $inputDataName = $this->get_input_data_name($inputIsArr, $inputData);
+        $outputDatas = $this->get_output_datas($outputDataName);
+
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
+        echo $this->wrap_output('data-root', null, true);
         echo ">".PHP_EOL;
         echo $this->indent(1)."<select";
         echo $this->wrap_output('size', $this->data['meta']['custom']['size']?:NULL);
         echo $this->wrap_output('multiple', NULL, $this->data['meta']['custom']['multiple']);
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
+        $eventHandlers = $this->get_event_listen_props();
+        if($eventHandlers['@blur']) echo $this->wrap_output("@blur", $eventHandlers['@blur']);
+        if($eventHandlers['@focus']) echo $this->wrap_output("@focus", $eventHandlers['@focus']);
         echo $this->wrap_output('class', $this->select_css());
+        $this->output_init_input();
         echo ">".PHP_EOL;
     }
     public function build_ui_end(){
@@ -68,7 +77,7 @@ class Select_View extends ValueList_View {
         return $style;
     }
 
-    private function select_css() {
+    protected function select_css() {
         $styleMap = parent::style_map();
         $css[] = 'form-select input';
         if (@$this->data['meta']['css']['formSizing'] && $this->data['meta']['css']['formSizing'] != 'normal' ){

@@ -10,7 +10,7 @@ class Holder_View extends Preview_View {
     {
         echo $this->indent();
         echo "<view";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo "></view>\r\n";
     }
 }

@@ -64,7 +64,7 @@ this.setData({
         $this->add_attr('src', $imgSrc);
 
         echo "{$space}<image";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo "/>\r\n";
 
     }

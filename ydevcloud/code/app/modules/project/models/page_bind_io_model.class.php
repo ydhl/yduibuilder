@@ -97,7 +97,7 @@ class Page_Bind_Io_Model extends YZE_Model{
       'uuid'       => ['type' => 'string', 'null' => false,'length' => '45','default'	=> ''],
       'page_id'    => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
       'type'       => ['type' => 'enum', 'null' => false,'length' => '','default'	=> 'in'],
-      'data_id'    => ['type' => 'string', 'null' => false,'length' => '45','default'	=> ''],
+      'data_id'    => ['type' => 'string', 'null' => false,'length' => '95','default'	=> ''],
       'uiid'       => ['type' => 'string', 'null' => false,'length' => '45','default'	=> ''],
       'from_class' => ['type' => 'string', 'null' => false,'length' => '45','default'	=> ''],
       'from_uuid'  => ['type' => 'string', 'null' => false,'length' => '45','default'	=> ''],

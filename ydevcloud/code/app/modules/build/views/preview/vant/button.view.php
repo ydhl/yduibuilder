@@ -23,7 +23,7 @@ class Button_View extends Preview_View {
         if (@$meta['custom']['type']=='link'){
             echo $this->wrap_output('href', $this->data['meta']['custom']['linkHref']);
         }
-        echo $this->build_main_attrs().'>';
+        echo $this->output_main_attrs().'>';
         $this->wrap_icon(function(){
             echo $this->data['meta']['title'] ?: '';
         });

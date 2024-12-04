@@ -21,7 +21,7 @@ class Nav_View extends Preview_Nav_View {
         $values = @$this->data['meta']['values']?:[[ "name"=> 'Sample 1', "value"=> '#' ], [ "name"=> 'Sample 2', "value"=> '#', 'checked'=> true ]];
         $space =  $this->indent();
         echo "{$space}<view ";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">\r\n";
 
         foreach ((array)@$values as $item){

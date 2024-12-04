@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex align-items-center justify-content-between mb-2 pt-2">
+  <div class="d-flex align-items-center justify-content-between mb-2 pt-2 sticky-top bg-white pb-1">
     <div class="fs-6 text-muted user-select-none"><i class="iconfont icon-event"></i>&nbsp;{{t('common.event')}}</div>
     <div class="d-flex align-items-center">
       <button type="button" class="btn btn-primary btn-xs" @click.stop="openEventBindDlg">{{t('event.bind')}}</button>
@@ -10,10 +10,12 @@
     {{t('page.loading')}}
   </div>
   <template v-else>
-    <div class="style-panel pt-1">
+    <div class="style-panel">
       <template v-for="(events, key) in boundEvents" :key="key">
         <div class="style-header d-flex align-items-center justify-content-between">
-          <span class="d-flex align-items-center"><i class="iconfont icon-tree-close"></i> {{t('event.'+key)}}&nbsp;<span class="badge bg-primary" v-if="events && events.length>0">{{events.length}}</span></span>
+          <span class="d-flex align-items-center">
+            <i class="iconfont icon-tree-close"></i> {{t('event.'+key)}}&nbsp;
+            <span class="badge bg-primary" v-if="events && events.length>0">{{events.length}}</span></span>
           <template v-if="events && events.length>0">
             <div v-if="!openState[key]" @click.stop="openState[key]=true"><i class="iconfont hover-primary icon-expandall"></i></div>
             <div v-if="openState[key]" @click.stop="openState[key]=false"><i class="iconfont hover-primary icon-collapseall"></i></div>
@@ -23,10 +25,14 @@
           <small v-if="!events || events.length===0" class="text-muted"><i class="iconfont icon-empty"></i> {{t('event.notBindEvent')}}</small>
           <template  v-for="(event, index) in events" :key="index">
             <div class="d-flex align-items-center">
-              <i @mousedown="startDrag(true)" @mouseup="startDrag(false)" @click.stop.prevent="showBoundUI($event, event)" @mousemove="beginDraw($event, event)" @mouseover="highlight(event.uiid)" @mouseleave="offlight()"
+              <i @mousedown="startDrag(true)" v-if="key!='page'" @mouseup="startDrag(false)" @click.stop.prevent="showBoundUI($event, event)"
+                 @mousemove="beginDraw($event, event)" @mouseover="highlight(event.uiid)" @mouseleave="offlight()"
                  :class="{'iconfont icon-data-input bind-icon flex-shrink-0': true, 'bound': event.uiid.length>0}"
                  data-bs-toggle="tooltip" :title="t('event.bindTip')"></i>
-              <div class="flex-grow-1 fw-bold text-truncate">&nbsp;{{event.event}}<span class="text-muted fs-7 fw-light">{{getEventArgName(key, event.event)}}</span>
+              <i v-else style="width: 16px;height: 16px"></i>
+              <div class="flex-grow-1 fw-bold text-truncate">&nbsp;{{event.event}}
+                <span class="text-primary fs-7 fw-light">{{event.modifier.length>0?'.':''}}{{event.modifier?.join('.')}}{{event.customKey?'.'+event.customKey:''}}</span>
+                <span class="text-muted fs-7 fw-light">{{getEventArgName(key, event.event)}}</span>
                 <span class="fs-7 text-muted ms-1 fw-light" v-if="event.actions && event.actions.length>0 && !openState[key]">{{event.actions.length}} Action</span>
                 <span class="fs-7 text-muted ms-1" v-if="event.desc">{{event.desc}}</span>
               </div>
@@ -42,7 +48,7 @@
                   <div v-for="(action, actIdx) in event.actions" :key="action.uuid"
                        class="list-group-item p-1 pe-0 ps-3 list-group-item-action d-flex align-items-center border-0">
                     <div class="me-1"><i class="iconfont icon-drag text-muted" style="cursor: move"></i><i :class="'iconfont text-danger icon-' + action.type"></i></div>
-                    <EventAction :event-name="event.event" :action="action" :variables="allEvents[key]?.[event.event]?.args" bind-type="bind_event" :bind-uuid="event.uuid"></EventAction>
+                    <EventAction :event-name="event.event" :action="action" :variables="eventMap[key]?.[event.event]?.args" bind-type="bind_event" :bind-uuid="event.uuid"></EventAction>
                     <ConfirmRemove icon=" icon-remove" @remove="deleteAction(event, actIdx, action)"></ConfirmRemove>
                   </div>
                 </transition-group>
@@ -127,7 +133,7 @@
     </a>
   </div>
   <!-- bind event Dialog -->
-  <lay-layer v-model="addEventBindDlgVisible" layer-classes="layui-layer-content-overflow"  :title="t('event.bind')" :shade="true" :area="['420px', '300px']" :btn="addEventBindButtons">
+  <lay-layer v-model="addEventBindDlgVisible" layer-classes="layui-layer-content-overflow" resize  :title="t('event.bind')" :shade="true" :area="['580px', '600px']" :btn="addEventBindButtons">
     <div class="ps-4 pe-4 pt-2 pb-2">
       <div class="row g-3 mt-1 align-items-center">
         <div class="col-sm-2">
@@ -157,6 +163,54 @@
         </div>
         <div class="col-sm-10">
           <AdvanceSelect btn-size="btn-sm btn-light" :options="actionTypes" :default-text="bindAction.name || t('action.add')" @change="(option)=>bindAction = option"></AdvanceSelect>
+        </div>
+      </div>
+      <div class="row g-3 mt-1 align-items-center">
+        <div class="col-sm-2 pointer">
+          <label @click="openModifierDoc">{{t('event.modifier')}} <i class="iconfont icon-info"></i></label>
+        </div>
+        <div class="col-sm-10">
+          <div class="text-muted fs-7">{{t('event.modifierEvent')}}:</div>
+          <div class="d-flex gap-2 flex-wrap">
+            <label class=" form-check-label text-truncate d-block" v-for="item in ['stop', 'prevent', 'self', 'capture', 'once', 'passive']" :key="item">
+              <input type="checkbox" v-model="currBoundEvent.modifier" :value="item">&nbsp;{{item}}&nbsp;
+            </label>
+          </div>
+          <div class="text-muted mt-2 fs-7">{{t('event.modifierKey')}}:</div>
+          <div class="d-flex gap-2 flex-wrap">
+            <label class=" form-check-label text-truncate d-block" v-for="item in ['enter', 'tab', 'delete', 'esc', 'space', 'up', 'down', 'left', 'right', 'ctrl', 'alt', 'shift', 'meta']" :key="item">
+              <input type="checkbox" v-model="currBoundEvent.modifier" :value="item">&nbsp;{{item}}&nbsp;
+            </label>
+            <input type="text" class="form-control form-control-sm" v-model="currBoundEvent.customKey" placeholder="custom key code such as A">
+          </div>
+          <div class="text-muted mt-2 fs-7">{{t('event.modifierMouseButton')}}:</div>
+          <div class="d-flex gap-2 flex-wrap">
+            <label class=" form-check-label text-truncate d-block" v-for="item in ['left', 'right', 'middle']" :key="item">
+              <input type="checkbox" v-model="currBoundEvent.modifier" :value="item">&nbsp;{{item}}&nbsp;
+            </label>
+          </div>
+          <div class="text-muted mt-2 fs-7">{{t('event.modifierOther')}}:</div>
+          <div class="d-flex gap-2 flex-wrap">
+            <label class=" form-check-label text-truncate d-block" v-for="item in ['debounce', 'throttle']" :key="item">
+              <input type="checkbox" v-model="debounceThrottle" :value="item">&nbsp;{{item}}&nbsp;
+            </label>
+          </div>
+          <div class="input-group input-group-sm" v-if="currBoundEvent.modifier.indexOf('debounce')!=-1 || currBoundEvent.modifier.indexOf('throttle')!=-1">
+            <div class="input-group-text">{{t('event.timeout')}}</div>
+            <input type="number" class="form-control-sm form-control" v-model="currBoundEvent.timeout"/>
+            <div class="input-group-text">
+              {{t('common.millisecond')}}
+              <label class="ms-2" v-if="currBoundEvent.modifier.indexOf('debounce')!=-1"><input type="checkbox" :value="1" v-model="currBoundEvent.immediate">{{t('common.immediate')}}</label>
+            </div>
+          </div>
+
+          <draggable class="d-flex flex-wrap mb-2 p-2" v-model="currBoundEvent.modifier">
+            <transition-group>
+              <div v-for="(modifier, idx) in currBoundEvent.modifier" :key="idx" class="text-success" style="cursor: move;">
+                .{{modifier}}
+              </div>
+            </transition-group>
+          </draggable>
         </div>
       </div>
     </div>
@@ -226,6 +280,23 @@
       <input type="text" class="form-control form-control-sm" v-model.trim="declareEvent.desc">
       <DataStruct :can-mutation="true" :can-output="false" :can-input="false" :data-title="t('event.args')"
                   :datas="declareEvent.args" @remove="removeArg" @update="updateArg"></DataStruct>
+    </div>
+  </lay-layer>
+  <!-- 修饰符号说明文档 -->
+  <lay-layer v-model="openModifierVisible" :title="t('event.modifier')" :shade="true" :area="['500px', '500px']">
+    <div class="p-2">
+      <ol>
+        <li><strong>stop</strong>: {{t('event.modifierDesc.stop')}}</li>
+        <li><strong>prevent</strong>: {{t('event.modifierDesc.prevent')}}</li>
+        <li><strong>self</strong>: {{t('event.modifierDesc.self')}}</li>
+        <li><strong>capture</strong>: {{t('event.modifierDesc.capture')}}</li>
+        <li><strong>once</strong>: {{t('event.modifierDesc.once')}}</li>
+        <li><strong>passive</strong>: {{t('event.modifierDesc.passive')}}</li>
+        <li><strong>meta</strong>: {{t('event.modifierDesc.meta')}}</li>
+        <li><strong>exact</strong>: {{t('event.modifierDesc.exact')}}</li>
+        <li><strong>debounce</strong>: {{t('event.modifierDesc.debounce')}}</li>
+        <li><strong>throttle</strong>: {{t('event.modifierDesc.throttle')}}</li>
+      </ol>
     </div>
   </lay-layer>
 </template>
@@ -302,6 +373,7 @@ export default {
     const declareEventDialogVisible = ref(false)
     const addCustomBindDlgVisible = ref(false)
     const viewCustomBindDlgVisible = ref(false)
+    const openModifierVisible = ref(false)
     const boundUIDialogVisible = ref(false)
     const currCustomEvent = ref<any>({})
     const currBoundEvent = ref<any>({})
@@ -446,7 +518,7 @@ export default {
       }
     })
     watch(mouseupInFrame, (v) => {
-      if (!canvas.isDrawline() || canvas.getDrawFromId() !== currBoundEvent.value?.uuid) return
+      if (!info.hoverUIItem.value || !canvas.isDrawline() || canvas.getDrawFromId() !== currBoundEvent.value?.uuid) return
       if (!hasEvent(baseUIDefines[info.hoverUIItem.value.type], currBoundEvent.value?.event, info.hoverUIItem.value)) {
         ydhl.alert(t('event.uiNotSupportEvent', [info.hoverUIItem.value.type, currBoundEvent.value?.event]))
         return
@@ -492,7 +564,7 @@ export default {
       ydhl.togglePopper(boundUIDialogVisible, event.target, boundPop, 'bottom')
     }
     const openEventBindDlg = () => {
-      currBoundEvent.value = { event: 'onClick' }
+      currBoundEvent.value = { event: 'onClick', modifier: [] }
       addEventBindDlgVisible.value = true
     }
     const editEvent = (event) => {
@@ -566,7 +638,11 @@ export default {
           uiid: info.selectedUIItemId.value || '',
           event: currBoundEvent.value.event,
           type: bindAction.value.value,
-          desc: currBoundEvent.value.desc || ''
+          desc: currBoundEvent.value.desc || '',
+          modifier: currBoundEvent.value.modifier?.join(',') || '',
+          immediate: currBoundEvent.value.immediate || 0,
+          customKey: currBoundEvent.value.customKey || 0,
+          timeout: currBoundEvent.value.timeout || 0
         }, [], (rst) => {
           ydhl.closeLoading(dialodId)
           if (!rst.success) {
@@ -640,6 +716,7 @@ export default {
       declareEventDialogVisible.value = true
     }
     const updateArg = (data: any, index: number) => {
+      if (!declareEvent.value.args) declareEvent.value.args = []
       if (index < 0) {
         declareEvent.value.args.push(data)
       } else {
@@ -674,6 +751,7 @@ export default {
         event.actions.splice(index, 1)
       })
     }
+
     const sortEventAction = (bindEvent, { moved }) => {
       const index = {}
       for (const idx in bindEvent.actions) {
@@ -686,8 +764,8 @@ export default {
     const getEventArgName = (type, event) => {
       const names: any = []
 
-      if (!allEvents.value[type]?.[event]?.args) return ''
-      for (const arg of allEvents.value[type]?.[event]?.args) {
+      if (!eventMap[type]?.[event]?.args) return ''
+      for (const arg of eventMap[type]?.[event]?.args) {
         names.push(arg.name)
       }
       return names.length > 0 ? '(' + names.join(', ') + ')' : ''
@@ -695,12 +773,47 @@ export default {
     const pageIsPopup = computed(() => {
       return selectedPage.value.bePopup || selectedPage.value.pageType === 'popup'
     })
+    const debounceThrottle = computed<Array<string>>({
+      get () {
+        let index = currBoundEvent.value.modifier.findIndex((item) => item === 'throttle')
+        if (index !== -1) {
+          return ['throttle']
+        }
+
+        index = currBoundEvent.value.modifier.findIndex((item) => item === 'debounce')
+        if (index !== -1) {
+          return ['debounce']
+        }
+        return []
+      },
+      set (v) {
+        const last = v.pop()
+        if (last === 'debounce') {
+          const index = currBoundEvent.value.modifier.findIndex((item) => item === 'throttle')
+          if (index !== -1) currBoundEvent.value.modifier.splice(index, 1)
+          currBoundEvent.value.modifier.push('debounce')
+        } else if (last === 'throttle') {
+          const index = currBoundEvent.value.modifier.findIndex((item) => item === 'debounce')
+          if (index !== -1) currBoundEvent.value.modifier.splice(index, 1)
+          currBoundEvent.value.modifier.push('throttle')
+        } else {
+          let index = currBoundEvent.value.modifier.findIndex((item) => item === 'debounce')
+          if (index !== -1) currBoundEvent.value.modifier.splice(index, 1)
+          index = currBoundEvent.value.modifier.findIndex((item) => item === 'throttle')
+          if (index !== -1) currBoundEvent.value.modifier.splice(index, 1)
+        }
+      }
+    })
+    const openModifierDoc = () => {
+      openModifierVisible.value = true
+    }
     return {
       t,
       ...info,
       loading,
       editEvent,
       addEventBindDlgVisible,
+      openModifierVisible,
       addActionDlgVisible,
       addEventBindButtons,
       addActionButtons,
@@ -726,6 +839,7 @@ export default {
       declaredEvents,
       openState,
       pageIsPopup,
+      eventMap,
       refresh,
       loadDeclaredEvent,
       addEventBind,
@@ -747,11 +861,13 @@ export default {
       showBoundUI,
       updateArg,
       removeArg,
+      openModifierDoc,
       deleteEventBound,
       editDeclareEvent,
       removeDeclareEvent,
       sortEventAction,
-      getEventArgName
+      getEventArgName,
+      debounceThrottle
     }
   }
 }

@@ -23,7 +23,7 @@
     "popper.js": "^1.16.1",
     "rollup": "^4.20.0",
     "scenejs": "^1.10.3",
-    "vue": "^3.4.35",
+    "vue": "^3.5.13",
     "vue-class-component": "^8.0.0-0",
     "vue-draggable-next": "^2.2.1",
     "vue-i18n": "^9.13.1",

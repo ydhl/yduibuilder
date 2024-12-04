@@ -223,7 +223,7 @@ class Dropdown_View extends ValueList_View {
     public function build_split_ui(){
         $space =  $this->indent();
         echo $space . '<div ';
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
         echo $this->indent(1) . '<span';
         echo $this->wrap_output('class', $this->left_split_btn_css());
@@ -248,7 +248,7 @@ class Dropdown_View extends ValueList_View {
     public function build_normal_ui(){
         $space =  $this->indent();
         echo $space . '<div ';
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">";
         $this->wrap_icon(function(){
             echo $this->data['meta']['title'] ?: $this->data['type'];

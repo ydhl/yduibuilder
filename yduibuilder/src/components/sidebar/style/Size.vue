@@ -4,8 +4,7 @@
     <i class="iconfont icon-point text-danger" v-if="hasSet"></i>
     <i class="iconfont icon-point text-success" v-if="hasInherit"></i>
   </div>
-  <div class="style-body d-none">
-
+  <div :class="{'style-body': true, ' d-none': !autoOpen}">
     <div class="row mt-3">
       <div class="col-sm-9 offset-sm-3">
         <table class="table table-sm m-0">
@@ -60,7 +59,8 @@ import { useI18n } from 'vue-i18n'
 export default {
   name: 'StyleSize',
   props: {
-    previewMode: Boolean
+    previewMode: Boolean,
+    autoOpen: Boolean
   },
   setup (props: any, context: any) {
     const info = initUI()

@@ -42,9 +42,9 @@ export default {
       return select.appendImportant(style)
     })
     const bodyCss = computed(() => {
-      const arr: any = ['form-control']
+      const arr: any = ['form-select']
       if (props.uiconfig.meta?.css?.formSizing && props.uiconfig.meta?.css?.formSizing !== 'normal') {
-        arr.push('form-control-' + props.uiconfig.meta.css.formSizing)
+        arr.push('form-select-' + props.uiconfig.meta.css.formSizing)
       }
       const backgroundTheme = props.uiconfig.meta?.css?.backgroundTheme
       if (backgroundTheme) {

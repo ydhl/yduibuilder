@@ -72,11 +72,9 @@ class Nav_View extends ValueList_View {
         }
     protected function build_ui_begin($iteratorName=null)
     {
-        $inputDataName = $this->get_input_data_name();
         $space =  $this->indent();
         echo "{$space}<div ";
-        $this->build_main_attrs();
-        echo $this->wrap_output('x-input', $inputDataName);
+        $this->output_main_attrs();
         echo ">".PHP_EOL;
     }
     protected function build_ui_end()

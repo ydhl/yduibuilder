@@ -1,6 +1,7 @@
 <?php
 namespace app\modules\build\views\preview\bootstrap;
 
+use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 
@@ -24,7 +25,7 @@ class Hr_View extends Preview_View {
 
         $space =  $this->indent();
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         // 左侧线段
@@ -40,7 +41,7 @@ class Hr_View extends Preview_View {
             $outputDataName = $this->get_output_data_name($outputAs, $outputData, $outputDataName);
             echo $this->indent(1)."<div"
                 .$this->wrap_output("class", $this->textCss());
-            echo $this->wrap_output(parent::output_as_prop($outputAs, $outputData), $outputDataName);
+            echo $this->wrap_output($outputAs=='HTML' ? 'x-html' :'x-text', $outputDataName);
             echo "></div>".PHP_EOL;
         }else{
             if ($this->data['meta']['value']){

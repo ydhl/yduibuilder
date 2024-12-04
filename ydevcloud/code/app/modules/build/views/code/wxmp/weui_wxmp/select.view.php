@@ -44,7 +44,7 @@ class Select_View extends Preview_Select_View {
         echo $this->wrap_output('indicator-style', $this->indicator_style());
         echo $this->wrap_output('mask-style', $this->mask_style());
         echo $this->wrap_output('value', "{{".$this->myId()."Value}}");
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
         echo $this->wrap_output('class', $this->get_css());
         echo ">\r\n";
 

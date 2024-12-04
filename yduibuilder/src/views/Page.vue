@@ -39,9 +39,9 @@
   <div class="full-backdrop" v-if="backdropVisible"></div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 /* eslint-disable */
-import { computed, onMounted, onUpdated, ref } from 'vue'
+import {computed, onMounted, onUpdated, ref, watch} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
@@ -54,8 +54,7 @@ import UIEventBadge from '@/components/ui/UIEventBadge.vue'
 import { YDJSStatic } from '@/lib/ydjs'
 import { Boot, ISelectMenu, IButtonMenu } from '@wangeditor/editor'
 import Upload from '@/components/common/Upload.vue'
-import UIExport from '@/components/sidebar/UIExport.vue'
-import _, {forEach} from "lodash"
+import _ from "lodash"
 
 declare const YDJS: YDJSStatic
 declare const ports: any
@@ -92,12 +91,11 @@ class WangEditorImageMenu implements ISelectMenu {
 
   exec (editor, value) {
     const el = document.getElementById(value)
-    const event = document.createEvent('HTMLEvents')
-    event.initEvent('click', false, true)
-    event.preventDefault()
-    if (el) el.dispatchEvent(event)
+    // const event = document.createEvent('HTMLEvents')
+    // event.initEvent('click', false, true)
+    // event.preventDefault()
+    if (el) el.click()
     globalEditor = editor
-    // $("#test1").trigger('click', )
     // editor.insertText(value) // value 即 this.getValue(editor) 的返回值
   }
 
@@ -138,735 +136,711 @@ class WangEditorQuitMenu implements IButtonMenu {
     globalEditor = null
   }
 }
-export default {
-  name: 'Page',
-  components: { UIExport, Upload, UIEventBadge, UIBase },
-  setup (props: any, context: any) {
-    const store = useStore()
-    const route = useRoute()
-    const currPage = computed(() => store.state.page.page)
-    const project = computed(() => store.state.page.project)
-    const pageIsLoaded = ref(false)
-    const isPopup = computed(() => currPage.value?.pageType === 'popup')
-    const isEmptyPopup = computed( () => {
-      return isPopup.value && (!currPage.value.items || currPage.value.items.length===0)
-    })
-    const inlineEditItemId = computed(() => store.state.page.inlineEditItemId)
-    const selectedUIItemId = computed(() => store.state.page.selectedUIItemId)
-    const selectedUIItem = computed(() => {
-      if (!selectedUIItemId.value) return null
-      const { uiConfig } = store.getters.getUIItemInPage(selectedUIItemId.value, selectedPageId.value)
-      return uiConfig
-    })
-    const dragoverUIItemId = computed(() => store.state.page.dragoverUIItemId)
-    const dragoverPlacement = computed(() => store.state.page.dragoverPlacement)
-    const dragoverInParent = computed(() => store.state.page.dragoverInParent)
-    const selectedPageId = computed(() => store.state.page.page?.meta?.id)
-    const showEventPanel = computed(() => store.state.page.showEventPanel)
-    const backdropVisible = computed(() => store.state.page.backdropVisible)
-    const assets = computed(() => project.value?.assets || [])
-    const customColors = computed(() => project.value?.customColors || [])
-    const { t } = useI18n()
+const store = useStore()
+const route = useRoute()
+const currPage = computed(() => store.state.page.page)
+const project = computed(() => store.state.page.project)
+const pageIsLoaded = ref(false)
+const isPopup = computed(() => currPage.value?.pageType === 'popup')
+const isEmptyPopup = computed( () => {
+  return isPopup.value && (!currPage.value.items || currPage.value.items.length===0)
+})
+const inlineEditItemId = computed(() => store.state.page.inlineEditItemId)
+const selectedUIItemId = computed(() => store.state.page.selectedUIItemId)
+const selectedUIItem = computed(() => {
+  if (!selectedUIItemId.value) return null
+  const { uiConfig } = store.getters.getUIItemInPage(selectedUIItemId.value, selectedPageId.value)
+  return uiConfig
+})
+const dragoverUIItemId = computed(() => store.state.page.dragoverUIItemId)
+const dragoverPlacement = computed(() => store.state.page.dragoverPlacement)
+const dragoverInParent = computed(() => store.state.page.dragoverInParent)
+const selectedPageId = computed(() => store.state.page.page?.meta?.id)
+const showEventPanel = computed(() => store.state.page.showEventPanel)
+const backdropVisible = computed(() => store.state.page.backdropVisible)
+const assets = computed(() => project.value?.assets || [])
+const customColors = computed(() => project.value?.customColors || [])
+const { t } = useI18n()
 
-    const popPlacementStyle = computed(() => {
-      // 弹窗时页面元素是Modal, 预览时通过page的布局定位其位置
-      const rootUI = currPage.value
-      const placements  = rootUI?.meta?.custom?.position || ['center', 'center']
-      let showBackdrop = rootUI?.meta?.custom?.backdrop
-      showBackdrop = showBackdrop === undefined || showBackdrop !== 'no' ? true : false
-      const items = {
-        top: 'start',
-        center: 'center',
-        bottom: 'end'
-      }
-      const justify = {
-        left: 'start',
-        center: 'center',
-        right: 'end'
-      }
-      return `align-items:${items[placements[1]]};justify-content:${justify[placements[0]]};${(showBackdrop ? 'background-color:rgba(0,0,0,0.5)' : '')}`
-    })
-    const projectId = computed(() => store.state.page.project.id)
+const popPlacementStyle = computed(() => {
+  // 弹窗时页面元素是Modal, 预览时通过page的布局定位其位置
+  const rootUI = currPage.value
+  const placements  = rootUI?.meta?.custom?.position || ['center', 'center']
+  let showBackdrop = rootUI?.meta?.custom?.backdrop
+  showBackdrop = showBackdrop === undefined || showBackdrop !== 'no' ? true : false
+  const items = {
+    top: 'start',
+    center: 'center',
+    bottom: 'end'
+  }
+  const justify = {
+    left: 'start',
+    center: 'center',
+    right: 'end'
+  }
+  return `align-items:${items[placements[1]]};justify-content:${justify[placements[0]]};${(showBackdrop ? 'background-color:rgba(0,0,0,0.5)' : '')}`
+})
+const projectId = computed(() => store.state.page.project.id)
+const themeColorPreview = computed(() => store.state.page.themeColorPreview)
 
-    const image = computed({
-      get () {
-        return {}
-      },
-      set (v: any) {
-        // { url, id, name }
-        globalEditor.dangerouslyInsertHtml(`<img src="${v.url}">`)
-      }
+const image = computed({
+  get () {
+    return {}
+  },
+  set (v: any) {
+    // { url, id, name }
+    globalEditor.focus()
+    globalEditor.dangerouslyInsertHtml(`<img src="${v.url}">`)
+  }
+})
+let checkUpdated
+Boot.registerMenu({
+  key: 'imageMenu',
+  factory () {
+    return new WangEditorImageMenu(t('ui.image'), t('common.upload'), t('common.selectFile'))
+  }
+})
+Boot.registerMenu({
+  key: 'quitMenu',
+  factory () {
+    return new WangEditorQuitMenu(t('common.quit'), () => {
+      store.commit('updatePageState', { selectedUIItemId: '' })
     })
-    let checkUpdated
-    Boot.registerMenu({
-      key: 'imageMenu',
-      factory () {
-        return new WangEditorImageMenu(t('ui.image'), t('common.upload'), t('common.selectFile'))
-      }
-    })
-    Boot.registerMenu({
-      key: 'quitMenu',
-      factory () {
-        return new WangEditorQuitMenu(t('common.quit'), () => {
-          store.commit('updatePageState', { selectedUIItemId: '' })
-        })
-      }
-    })
+  }
+})
 
-    const deleteItem = () => {
-      // 如果当前处于某个元素双击后的内部编辑状态
-      // console.log($(event.target))
-      if (inlineEditItemId.value || !selectedUIItemId.value) return
-      // key事件是绑定到document上的，event.target是document，当某些能响应事件的元素，比如按钮，event.target是自己
-      // if (!selectedUIItemId.value || ($(event.target).find('#' + selectedUIItemId.value).length === 0 && $(event.target).attr('id') !== selectedUIItemId.value)) return
-      // console.log('test')
-      postMessage({ type: 'deleteItem', data: { ids: [selectedUIItemId.value] }, pageId: selectedPageId.value })
-    }
-    const copyItem = () => {
-      if (inlineEditItemId.value || !selectedUIItemId.value) return
-      postMessage({ type: 'copyItem', data: { ids: [selectedUIItemId.value] }, pageId: selectedPageId.value })
-    }
-    const cutItem = () => {
-      if (inlineEditItemId.value || !selectedUIItemId.value) return
-      postMessage({ type: 'cutItem', data: { ids: [selectedUIItemId.value] }, pageId: selectedPageId.value })
-    }
-    const pasteItem = () => {
-      if (inlineEditItemId.value || !selectedUIItemId.value) return
-      postMessage({ type: 'pasteItem', data: { ids: [selectedUIItemId.value] }, pageId: selectedPageId.value })
-    }
-    const postMessage = (msg) => {
-      // 这时ports是WorkspacePanel中的onMessage回调
-      if (ports.parent) ports.parent(msg)
-    }
-    const refreshFontFace = () => {
-      const node = document.getElementById('custom-font-face')
-      if (node){
-        node.remove()
-      }
-      const fontFace:any = []
-      for (const face of currPage.value?.meta.custom?.fontFace || []) {
-        fontFace.push(`@font-face{
+const deleteItem = () => {
+  // 如果当前处于某个元素双击后的内部编辑状态
+  // console.log($(event.target))
+  if (inlineEditItemId.value || !selectedUIItemId.value) return
+  // key事件是绑定到document上的，event.target是document，当某些能响应事件的元素，比如按钮，event.target是自己
+  // if (!selectedUIItemId.value || ($(event.target).find('#' + selectedUIItemId.value).length === 0 && $(event.target).attr('id') !== selectedUIItemId.value)) return
+  // console.log('test')
+  postMessage({ type: 'deleteItem', data: { ids: [selectedUIItemId.value] }, pageId: selectedPageId.value })
+}
+const copyItem = () => {
+  if (inlineEditItemId.value || !selectedUIItemId.value) return
+  postMessage({ type: 'copyItem', data: { ids: [selectedUIItemId.value] }, pageId: selectedPageId.value })
+}
+const cutItem = () => {
+  if (inlineEditItemId.value || !selectedUIItemId.value) return
+  postMessage({ type: 'cutItem', data: { ids: [selectedUIItemId.value] }, pageId: selectedPageId.value })
+}
+const pasteItem = () => {
+  if (inlineEditItemId.value || !selectedUIItemId.value) return
+  postMessage({ type: 'pasteItem', data: { ids: [selectedUIItemId.value] }, pageId: selectedPageId.value })
+}
+const postMessage = (msg) => {
+  // 这时ports是WorkspacePanel中的onMessage回调
+  if (ports.parent) ports.parent(msg)
+}
+const refreshFontFace = () => {
+  const node = document.getElementById('custom-font-face')
+  if (node){
+    node.remove()
+  }
+  const fontFace:any = []
+  for (const face of currPage.value?.meta.custom?.fontFace || []) {
+    fontFace.push(`@font-face{
           font-family: "${face.uuid}";
           src: url('${ydhl.api}font?uuid=${face.uuid}') format('${face.type}')
           }`)
-      }
+  }
 
-      const style = [':root{']
-      for (const customColor of customColors.value){
-        style.push(`--${customColor.uuid}: ${customColor.color};`)
-        if (customColor.dark) {
-          style.push(`--${customColor.uuid}-dark: ${customColor.dark};`)
-        }
-      }
-      style.push('}')
-      $(window.document.head).append(`<style id="custom-font-face">${fontFace.join('')}${style.join('\r\n')}</style>`)
+  const style = [':root{']
+  for (const customColor of customColors.value){
+    style.push(`--${customColor.uuid}: ${customColor.color};`)
+    if (customColor.dark) {
+      style.push(`--${customColor.uuid}-dark: ${customColor.dark};`)
     }
-    const onMessage = (data) => {
-      // console.log('on page message', data)
-      // console.log(event)
-      if (!data) return
-      if (data.type === 'state') {
-        store.replaceState(data.state)
-        // console.log(store.state)
-        const project = data.state.page.project
-        $(window.document.head).append(`<link href="${ydhl.api}vendor/uibuilder.css" rel="stylesheet">`)
-        $(window.document.head).append(`<link href="${ydhl.api}vendor/${project.ui}@${project.ui_version}/index.css" rel="stylesheet">`)
-        for (const asset of assets.value?.style) {
-          $(window.document.head).append(`<link href="${asset}" rel="stylesheet">`)
-        }
-        refreshFontFace()
-      } else if (data.type === 'updatePageState' || data.type === 'clearDragoverState' || data.type === 'switchEventShow' || data.type === 'updateProjectState') {
-        store.commit(data.type, data.payload)
-        refreshFontFace()
-      } else if (data.type === 'deleteItem') {
-        deleteItem()
-      } else if (data.type === 'copyItem') {
-        copyItem()
-      } else if (data.type === 'cutItem') {
-        cutItem()
-      } else if (data.type === 'pasteItem') {
-        pasteItem()
-      } else if (data.type === 'undo') {
-        postMessage({ type: 'undo', data: {} })
-      } else if (data.type === 'redo') {
-        postMessage({ type: 'redo', data: {} })
-      }
+  }
+  style.push('}')
+  $(window.document.head).append(`<style id="custom-font-face">${fontFace.join('')}${style.join('\r\n')}</style>`)
+}
+const onMessage = (data) => {
+  // console.log('on page message', data)
+  // console.log(event)
+  if (!data) return
+  if (data.type === 'state') {
+    store.replaceState(data.state)
+    // console.log(store.state)
+    const project = data.state.page.project
+    $(window.document.head).append(`<link href="${ydhl.api}vendor/uibuilder.css" rel="stylesheet">`)
+    $(window.document.head).append(`<link href="${ydhl.api}vendor/${project.ui}@${project.ui_version}/index.css" rel="stylesheet">`)
+    for (const asset of assets.value?.style) {
+      $(window.document.head).append(`<link href="${asset}" rel="stylesheet">`)
     }
-    const uiMouseEnter = (event: any) => {
-      let el = $(event.target)
-      if (!el.hasClass('ui')) el = el.parents('.ui')
-      if (el.length === 0) return
+    refreshFontFace()
+  } else if (data.type === 'updatePageState' || data.type === 'clearDragoverState' || data.type === 'switchEventShow' || data.type === 'updateProjectState') {
+    store.commit(data.type, data.payload)
+    refreshFontFace()
+  } else if (data.type === 'deleteItem') {
+    deleteItem()
+  } else if (data.type === 'copyItem') {
+    copyItem()
+  } else if (data.type === 'cutItem') {
+    cutItem()
+  } else if (data.type === 'pasteItem') {
+    pasteItem()
+  } else if (data.type === 'undo') {
+    postMessage({ type: 'undo', data: {} })
+  } else if (data.type === 'redo') {
+    postMessage({ type: 'redo', data: {} })
+  }
+}
+const uiMouseEnter = (event: any) => {
+  let el = $(event.target)
+  if (!el.hasClass('ui')) el = el.parents('.ui')
+  if (el.length === 0) return
 
-      postMessage({ type: 'update', data: { hoverUIItemId: el.attr('id') } })
-      el.addClass('hover')
-    }
-    const uiMouseLeave = (event: any) => {
-      let el = $(event.target)
-      if (!el.hasClass('ui')) el = el.parents('.ui')
-      if (el.length === 0) return
+  postMessage({ type: 'update', data: { hoverUIItemId: el.attr('id') } })
+  el.addClass('hover')
+}
+const uiMouseLeave = (event: any) => {
+  let el = $(event.target)
+  if (!el.hasClass('ui')) el = el.parents('.ui')
+  if (el.length === 0) return
 
-      postMessage({ type: 'update', data: { hoverUIItemId: '' } })
-      el.removeClass('hover')
-    }
-    const mousemove = (event: any) => {
-      postMessage({ type: 'mouseover', data: { clientX: event.clientX, clientY: event.clientY } })
-    }
-    const mouseup =  _.debounce((event) => {
-      postMessage({ type: 'mouseup', data: event.clientX + '_' + event.clientY })
-    }, 300)
-    const uiClick = (event: any) => {
-      uiChange($(event.target))
-    }
-    const uiChange = (el: any) => {
-      if (!el.hasClass('ui')) el = el.parents('.ui')
-      if (el.length === 0) {
-        // 如果没有选择ui元素 重置选择的元素，如果当前有内部编辑元素，则也退出（UIBase.ts中watch selectedUIItemId），另外一个重置的地方是page.vue
-        // 如果处于富文本编辑，那么只有点击富文本上的退出才退出
-        if (selectedUIItem.value?.type === 'RichText' && selectedUIItem.value?.meta.id === inlineEditItemId.value) return
-        postMessage({ type: 'update', data: { selectedUIItemId: '' } })
+  postMessage({ type: 'update', data: { hoverUIItemId: '' } })
+  el.removeClass('hover')
+}
+const mousemove = (event: any) => {
+  postMessage({ type: 'mouseover', data: { clientX: event.clientX, clientY: event.clientY } })
+}
+const mouseup =  _.debounce((event) => {
+  postMessage({ type: 'mouseup', data: event.clientX + '_' + event.clientY })
+}, 300)
+const uiClick = (event: any) => {
+  uiChange($(event.target))
+}
+const uiChange = (el: any) => {
+  if (!el.hasClass('ui')) el = el.parents('.ui')
+  if (el.length === 0) {
+    // 如果没有选择ui元素 重置选择的元素，如果当前有内部编辑元素，则也退出（UIBase.ts中watch selectedUIItemId），另外一个重置的地方是page.vue
+    // 如果处于富文本编辑，那么只有点击富文本上的退出才退出
+    if (selectedUIItem.value?.type === 'RichText' && selectedUIItem.value?.meta.id === inlineEditItemId.value) return
+    postMessage({ type: 'update', data: { selectedUIItemId: '' } })
+    return
+  }
+  // 更换当前选择的元素，如果当前元素处于内部编辑，则退出
+  postMessage({ type: 'update', data: { selectedUIItemId: el.attr('id') } })
+}
+const rightClick = (event: any) => {
+  if (inlineEditItemId.value) return
+  if(event.button===2){
+    event.returnValue = false
+    event.stopPropagation()
+    event.preventDefault()
+    uiChange($(event.target))
+    postMessage({ type: 'contextMenu', data: { x: event.pageX, y: event.pageY } })
+    return false
+  }
+}
+
+onMounted(() => {
+  //该页面是效果展示页面，但是和uibuilder共同使用index.html，所以要把uibuilder使用的相关css和script移出
+  const needRemoveds = $('[data-use="uibuilder"]')
+  for (const needRemoved of needRemoveds) {
+    $(needRemoved).remove()
+  }
+  // 在WorkspacePanel 上注册自己的事件回调
+  const parentWindow: any = parent
+  parentWindow.ports[route.query.uuid as string] = onMessage
+  // 通知workspace自己准备好了，让其把事件回调向自己注册
+  parent.postMessage({ type: 'loaded', pageId: route.query.uuid }, document.location.origin)
+
+  $('body').on('mouseover', uiMouseEnter)
+  $('body').on('mouseout', uiMouseLeave)
+  $('body').on('mousemove', mousemove)
+  $('body').on('mouseup', mouseup)
+  $('body').on('click', uiClick)
+  // $('body').on('mousedown', rightClick)
+  $('body').on('contextmenu', rightClick)
+
+  const {userAgent} = navigator
+  const isMac = userAgent.includes('Macintosh')
+  const modKey = (isMac ? 'meta' : 'ctrl') // ⌘
+  keyevent.keydown('backspace', (keyEvent) => {
+    // console.log('page backspace')
+    if (inlineEditItemId.value || !selectedUIItemId.value) return
+    keyEvent.preventDefault()
+    keyEvent.cancelBubble = true // IE
+    deleteItem()
+  })
+  keyevent.keydown('delete', (keyEvent) => {
+    // console.log('page backspace')
+    if (inlineEditItemId.value || !selectedUIItemId.value) return
+    keyEvent.preventDefault()
+    keyEvent.cancelBubble = true // IE
+    deleteItem()
+  })
+  keyevent.keydown([modKey, 'c'], (keyEvent) => {
+    if (inlineEditItemId.value) return
+    keyEvent.preventDefault()
+    keyEvent.cancelBubble = true // IE
+    copyItem()
+  })
+  keyevent.keydown([modKey, 'x'], (keyEvent) => {
+    if (inlineEditItemId.value) return
+    keyEvent.preventDefault()
+    keyEvent.cancelBubble = true // IE
+    cutItem()
+  })
+  keyevent.keydown([modKey, 'v'], (keyEvent) => {
+    if (inlineEditItemId.value) return
+    keyEvent.preventDefault()
+    keyEvent.cancelBubble = true // IE
+    pasteItem()
+  })
+  keyevent.keydown([modKey, 's'], (keyEvent) => {
+    keyEvent.preventDefault()
+    keyEvent.cancelBubble = true // IE
+    postMessage({ type: 'save', data: {} })
+  })
+  keyevent.keydown([modKey, 'z'], (keyEvent) => {
+    keyEvent.preventDefault()
+    keyEvent.cancelBubble = true // IE
+    postMessage({ type: 'undo', data: { } })
+  })
+  keyevent.keydown([modKey, 'shift', 'z'], (keyEvent) => {
+    keyEvent.preventDefault()
+    keyEvent.cancelBubble = true // IE
+    postMessage({ type: 'redo', data: { } })
+  })
+
+  uidrag({
+    target: '.ui,.subui',
+    dragend: () => {
+      // console.log('workspace dragend')
+      postMessage({ type: 'update', data: { dragoverUIItemId: '', dragoverPlacement: '', dragoverInParent: '' } })
+    },
+    enter: (uiDragFromWhere, target: Element) => {
+      if (target.classList.contains('uicontiner')) {
         return
       }
-      // 更换当前选择的元素，如果当前元素处于内部编辑，则退出
-      postMessage({ type: 'update', data: { selectedUIItemId: el.attr('id') } })
-    }
-    const rightClick = (event: any) => {
-      if (inlineEditItemId.value) return
-      if(event.button===2){
-        event.returnValue = false
-        event.stopPropagation()
-        event.preventDefault()
-        uiChange($(event.target))
-        postMessage({ type: 'contextMenu', data: { x: event.pageX, y: event.pageY } })
-        return false
+      // 当可拖动的元素进入可放置的目标，高亮目标节点
+      if (target.classList.contains('ui')) {
+        target.classList.add('dragover-ui')
       }
-    }
-
-    onMounted(() => {
-      //该页面是效果展示页面，但是和uibuilder共同使用index.html，所以要把uibuilder使用的相关css和script移出
-      const needRemoveds = $('[data-use="uibuilder"]')
-      for (const needRemoved of needRemoveds) {
-        $(needRemoved).remove()
+    },
+    leave: (uiDragFromWhere, target: Element) => {
+      if (target.classList.contains('ui')) {
+        target.classList.remove('dragover-ui')
       }
-      // 在WorkspacePanel 上注册自己的事件回调
-      const parentWindow: any = parent
-      parentWindow.ports[route.query.uuid as string] = onMessage
-      // 通知workspace自己准备好了，让其把事件回调向自己注册
-      parent.postMessage({ type: 'loaded', pageId: route.query.uuid }, document.location.origin)
+    },
+    /**
+     * 悬浮在某个元素上面时，根据容器和元素的display属性，显示摆放提示符，提示
+     * 当前拖动的元素应该可以放在悬浮元素的那一边：
+     * 如果容器是flex column的，那么就只能放在上或者下
+     * 其他容器时如果悬浮元素是block的（块元素）也只能放上和下，inline的流模型的，就只能放左右
+     *
+     * 悬浮在自己之上则忽略
+     */
+    over: (uiDragFromWhere, reference: any, dragOverPosi: Record<string, boolean>, isContainer: boolean, placement: string, uidragged, placeInParent) => {
+      // console.log('page over')
+      const uIItemId: any = $(reference).attr('id')
+      // Tree拖入时不能拖入自己的子元素中
+      if (uiDragFromWhere === 'uiTree') {
+        const sourceId = $(uidragged).attr('data-uiid')
+        if ($(`[data-uiid='${uIItemId}']`).parents(`[data-uiid='${sourceId}']`).length > 0) {
+          return
+        }
+      }
+      if (dragoverUIItemId.value === uIItemId && dragoverPlacement.value === placement && placeInParent == dragoverInParent.value) return
+      // console.log('over postMessage ' + placement + '，' + placeInParent)
+      postMessage({ type: 'update', data: { dragoverUIItemId: uIItemId, dragoverPlacement: placement, dragoverInParent: placeInParent } })
+    },
+    /**
+     * drop处理
+     * @param sourceEl 被拖动的元素
+     * @param targetEl 目标元素
+     */
+    drop: (uiDragFromWhere, sourceEl: Element, targetEl: Element, placeInParent) => {
+      // console.log(sourceEl)
+      let sourceId = $(sourceEl).attr('id')
+      const sourcePageId = $(sourceEl).attr('data-pageid')
+      const targetId = $(targetEl).attr('id')
+      const targetPageId = $(targetEl).attr('data-pageid')
+      const placement = dragoverPlacement.value
+      // 从组件边栏拖入
+      if (uiDragFromWhere === 'uiItem') {
+        const uuid: any = $(sourceEl).attr('data-uuid') || ''// 自定义ui组件
+        const type: any = uuid ? 'UIComponent' : $(sourceEl).attr('data-type')
+        // console.log({ sourceId, sourcePageId, targetId, targetPageId })
+        const meta: any = {
+          id: ydhl.uuid(5, 0, targetPageId),
+          title: type,
+          form: baseUIDefines[type]?.isForm ? {} : undefined,
+          isContainer: baseUIDefines[type]?.isContainer || false,
+        }
 
-      $('body').on('mouseover', uiMouseEnter)
-      $('body').on('mouseout', uiMouseLeave)
-      $('body').on('mousemove', mousemove)
-      $('body').on('mouseup', mouseup)
-      $('body').on('click', uiClick)
-      // $('body').on('mousedown', rightClick)
-      $('body').on('contextmenu', rightClick)
-
-      const {userAgent} = navigator
-      const isMac = userAgent.includes('Macintosh')
-      const modKey = (isMac ? 'meta' : 'ctrl') // ⌘
-      keyevent.keydown('backspace', (keyEvent) => {
-        // console.log('page backspace')
-        if (inlineEditItemId.value || !selectedUIItemId.value) return
-        keyEvent.preventDefault()
-        keyEvent.cancelBubble = true // IE
-        deleteItem()
-      })
-      keyevent.keydown('delete', (keyEvent) => {
-        // console.log('page backspace')
-        if (inlineEditItemId.value || !selectedUIItemId.value) return
-        keyEvent.preventDefault()
-        keyEvent.cancelBubble = true // IE
-        deleteItem()
-      })
-      keyevent.keydown([modKey, 'c'], (keyEvent) => {
-        if (inlineEditItemId.value) return
-        keyEvent.preventDefault()
-        keyEvent.cancelBubble = true // IE
-        copyItem()
-      })
-      keyevent.keydown([modKey, 'x'], (keyEvent) => {
-        if (inlineEditItemId.value) return
-        keyEvent.preventDefault()
-        keyEvent.cancelBubble = true // IE
-        cutItem()
-      })
-      keyevent.keydown([modKey, 'v'], (keyEvent) => {
-        if (inlineEditItemId.value) return
-        keyEvent.preventDefault()
-        keyEvent.cancelBubble = true // IE
-        pasteItem()
-      })
-      keyevent.keydown([modKey, 's'], (keyEvent) => {
-        keyEvent.preventDefault()
-        keyEvent.cancelBubble = true // IE
-        postMessage({ type: 'save', data: {} })
-      })
-      keyevent.keydown([modKey, 'z'], (keyEvent) => {
-        keyEvent.preventDefault()
-        keyEvent.cancelBubble = true // IE
-        postMessage({ type: 'undo', data: { } })
-      })
-      keyevent.keydown([modKey, 'shift', 'z'], (keyEvent) => {
-        keyEvent.preventDefault()
-        keyEvent.cancelBubble = true // IE
-        postMessage({ type: 'redo', data: { } })
-      })
-
-      uidrag({
-        target: '.ui,.subui',
-        dragend: () => {
-          // console.log('workspace dragend')
+        if (uuid){
+          ydhl.loading(t('common.pleaseWait')).then((dialogId) => {
+            ydhl.post(`api/uicomponent/detail.json`,{ target_id: targetId, uuid, instance_uuid: meta.id, page_uuid: selectedPageId.value }, [], (rst) => {
+              ydhl.closeLoading(dialogId)
+              if (!rst || !rst.success){
+                postMessage({ type: 'alert', data: rst.msg || t('ui.error') })
+                return
+              }
+              meta.title = rst.data.meta.title
+              const item = rst.data
+              item.subPageId = uuid
+              const data = { type: 'UIComponent', items: [item], meta, placeInParent, pageId: targetPageId, placement, targetId }
+              postMessage({ type: 'addItem', data })
+            }, 'json')
+          })
+        } else {
+          postMessage({
+            type: 'addItem',
+            data: { type, meta, placeInParent, pageId: targetPageId, placement, targetId }
+          })
+        }
+        return
+      }
+      // 从outline拖入
+      if (uiDragFromWhere === 'uiTree') {
+        sourceId = $(sourceEl).attr('data-uiid')
+        // 不能拖入自己的子元素中
+        if ($(`#${targetId}`).parents(`#${sourceId}`).length > 0) {
           postMessage({ type: 'update', data: { dragoverUIItemId: '', dragoverPlacement: '', dragoverInParent: '' } })
+          return
+        }
+      }
+
+      postMessage({ type: 'moveItem', data: { sourceId, sourcePageId, targetId, targetPageId, placeInParent } })
+    }
+  })
+})
+const refreshHeight = () => {
+  const clientHeight = document.querySelector(`#${currPage.value.meta.id}`)?.clientHeight || 0
+  if (clientHeight > 50 && currPage.value) {
+    // console.log(currPage.value.meta.id + ':' + clientHeight)
+    postMessage({
+      type: 'updatePageContentHeight',
+      data: {
+        pageId: currPage.value.meta.id,
+        contentHeight: clientHeight
+      }
+    })
+  }
+}
+onUpdated(() => {
+  if (checkUpdated) clearInterval(checkUpdated)
+  checkUpdated = setInterval(() => {
+    refreshHeight()
+    clearInterval(checkUpdated)
+  }, 500)
+  $(function() {
+    pageIsLoaded.value = true
+  })
+})
+
+const dragoverHolderStyle = computed(() => {
+  if (!dragoverUIItemId.value) return
+  if (dragoverPlacement.value === 'in') return enterPlaceholderStyle.value
+  const dom = document.getElementById(dragoverUIItemId.value)
+  if (!dom) return
+  const rect = dom.getBoundingClientRect()
+  const styles: any = ['position:absolute;top:0;left:0;border:2px solid #dc3545;']
+  let x = rect.x
+  let y = rect.y
+  if (dragoverPlacement.value === 'left' || dragoverPlacement.value === 'right') {
+    styles.push(`height: ${rect.height + 4}px;`) // 4是outline的宽度
+    styles.push('width: 1px')
+    if (dragoverPlacement.value === 'right') {
+      x += rect.width
+    } else {
+      x -= 4
+    }
+    y -= 2
+  } else {
+    styles.push(`width: ${rect.width + 4}px;`)
+    styles.push('height: 1px')
+    if (dragoverPlacement.value === 'bottom') {
+      y += rect.height
+    } else {
+      y -= 4
+    }
+    x -= 2
+  }
+  styles.push(`transform:translateX(${x}px) translateY(${y}px)`)
+  // console.log(styles.join(';'))
+  return styles.join(';')
+})
+const enterPlaceholderStyle = computed(() => {
+  if (!dragoverUIItemId.value) return
+  const dom = document.getElementById(dragoverUIItemId.value)
+  if (!dom) return
+  const rect = dom.getBoundingClientRect()
+  const styles: any = ['position:absolute;top:0;left:0;pointer-events:none !important;border:4px solid #dc3545;']
+  styles.push(`width: ${rect.width}px !important;`)
+  styles.push(`height: ${rect.height}px !important;`)
+  styles.push(`transform:translateX(${rect.x}px) translateY(${rect.y}px) !important`)
+  return styles.join(';')
+})
+const backgroundImage = computed(() => {
+  // 当设计对话框页面时，背景展示打开该对话框当原始页面截图
+  const fromPageId = route.query.fromPageId
+  if (!fromPageId) return ''
+  return `background:url(${ydhl.api}api/screenshot?pageid=${fromPageId}) no-repeat;background-size: cover`
+})
+const addToastPopup = () => {
+  const pageId = currPage.value.meta.id
+
+  postMessage({
+    type: 'updateItemMeta',
+    data: {
+      itemid: pageId,
+      type: 'css',
+      pageId: selectedPageId.value,
+      props: {
+        backgroundTheme: 'bg-secondary'
+      }
+    }
+  })
+  postMessage({
+    type: 'updateItemMeta',
+    data: {
+      itemid: pageId,
+      type: 'custom',
+      pageId: selectedPageId.value,
+      props: {
+        headless: true,
+        footless: true
+      }
+    }
+  })
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Text',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        value: 'This is Toast',
+        css:{
+          foregroundTheme: 'light'
+        }
+      },
+      placement: 'in',
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+}
+const addConfirmPopup = () => {
+  const pageId = currPage.value.meta.id
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Text',
+      placeInParent: 'head',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        value: 'This is head',
+        type: 'h3'
+      },
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Text',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        value: 'This is body',
+      },
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Button',
+      placeInParent: 'foot',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        type: 'button',
+        title: 'OK',
+        css: {
+          backgroundTheme: 'primary'
+        }
+      },
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Button',
+      placeInParent: 'foot',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        type: 'button',
+        title: 'Cancel',
+        css: {
+          backgroundTheme: 'secondary'
+        }
+      },
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+}
+const addPromptPopup = () => {
+  const pageId = currPage.value.meta.id
+
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Text',
+      placeInParent: 'head',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        value: 'This is head',
+        type: 'h3'
+      },
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Input',
+      meta: {
+        title: 'Input',
+        custom: {
+          inputType: 'Textarea',
         },
-        enter: (uiDragFromWhere, target: Element) => {
-          if (target.classList.contains('uicontiner')) {
-            return
-          }
-          // 当可拖动的元素进入可放置的目标，高亮目标节点
-          if (target.classList.contains('ui')) {
-            target.classList.add('dragover-ui')
-          }
-        },
-        leave: (uiDragFromWhere, target: Element) => {
-          if (target.classList.contains('ui')) {
-            target.classList.remove('dragover-ui')
-          }
-        },
-        /**
-         * 悬浮在某个元素上面时，根据容器和元素的display属性，显示摆放提示符，提示
-         * 当前拖动的元素应该可以放在悬浮元素的那一边：
-         * 如果容器是flex column的，那么就只能放在上或者下
-         * 其他容器时如果悬浮元素是block的（块元素）也只能放上和下，inline的流模型的，就只能放左右
-         *
-         * 悬浮在自己之上则忽略
-         */
-        over: (uiDragFromWhere, reference: any, dragOverPosi: Record<string, boolean>, isContainer: boolean, placement: string, uidragged, placeInParent) => {
-          // console.log('page over')
-          const uIItemId: any = $(reference).attr('id')
-          // Tree拖入时不能拖入自己的子元素中
-          if (uiDragFromWhere === 'uiTree') {
-            const sourceId = $(uidragged).attr('data-uiid')
-            if ($(`[data-uiid='${uIItemId}']`).parents(`[data-uiid='${sourceId}']`).length > 0) {
-              return
-            }
-          }
-          if (dragoverUIItemId.value === uIItemId && dragoverPlacement.value === placement && placeInParent == dragoverInParent.value) return
-          // console.log('over postMessage ' + placement + '，' + placeInParent)
-          postMessage({ type: 'update', data: { dragoverUIItemId: uIItemId, dragoverPlacement: placement, dragoverInParent: placeInParent } })
-        },
-        /**
-         * drop处理
-         * @param sourceEl 被拖动的元素
-         * @param targetEl 目标元素
-         */
-        drop: (uiDragFromWhere, sourceEl: Element, targetEl: Element, placeInParent) => {
-          // console.log(sourceEl)
-          let sourceId = $(sourceEl).attr('id')
-          const sourcePageId = $(sourceEl).attr('data-pageid')
-          const targetId = $(targetEl).attr('id')
-          const targetPageId = $(targetEl).attr('data-pageid')
-          const placement = dragoverPlacement.value
-          // 从组件边栏拖入
-          if (uiDragFromWhere === 'uiItem') {
-            const uuid: any = $(sourceEl).attr('data-uuid') || ''// 自定义ui组件
-            const type: any = uuid ? 'UIComponent' : $(sourceEl).attr('data-type')
-            // console.log({ sourceId, sourcePageId, targetId, targetPageId })
-            const meta: any = {
-              id: ydhl.uuid(5, 0, targetPageId),
-              title: type,
-              form: baseUIDefines[type]?.isForm ? {} : undefined,
-              isContainer: baseUIDefines[type]?.isContainer || false,
-            }
-
-            if (uuid){
-              ydhl.loading(t('common.pleaseWait')).then((dialogId) => {
-                ydhl.post(`api/uicomponent/detail.json`,{ target_id: targetId, uuid, instance_uuid: meta.id, page_uuid: selectedPageId.value }, [], (rst) => {
-                  ydhl.closeLoading(dialogId)
-                  if (!rst || !rst.success){
-                    postMessage({ type: 'alert', data: rst.msg || t('ui.error') })
-                    return
-                  }
-                  meta.title = rst.data.meta.title
-                  const item = rst.data
-                  item.subPageId = uuid
-                  const data = { type: 'UIComponent', items: [item], meta, placeInParent, pageId: targetPageId, placement, targetId }
-                  postMessage({ type: 'addItem', data })
-                }, 'json')
-              })
-            } else {
-              postMessage({
-                type: 'addItem',
-                data: { type, meta, placeInParent, pageId: targetPageId, placement, targetId }
-              })
-            }
-            return
-          }
-          // 从outline拖入
-          if (uiDragFromWhere === 'uiTree') {
-            sourceId = $(sourceEl).attr('data-uiid')
-            // 不能拖入自己的子元素中
-            if ($(`#${targetId}`).parents(`#${sourceId}`).length > 0) {
-              postMessage({ type: 'update', data: { dragoverUIItemId: '', dragoverPlacement: '', dragoverInParent: '' } })
-              return
-            }
-          }
-
-          postMessage({ type: 'moveItem', data: { sourceId, sourcePageId, targetId, targetPageId, placeInParent } })
+        value: 'This is input',
+        id: ydhl.uuid(5, 0, pageId)
+      },
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Button',
+      placeInParent: 'foot',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        type: 'button',
+        title: 'OK',
+        css: {
+          backgroundTheme: 'primary'
         }
-      })
-    })
-    const refreshHeight = () => {
-      const clientHeight = document.querySelector(`#${currPage.value.meta.id}`)?.clientHeight || 0
-      if (clientHeight > 50 && currPage.value) {
-        // console.log(currPage.value.meta.id + ':' + clientHeight)
-        postMessage({
-          type: 'updatePageContentHeight',
-          data: {
-            pageId: currPage.value.meta.id,
-            contentHeight: clientHeight
-          }
-        })
+      },
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+}
+const addAlertPopup = () => {
+  const pageId = currPage.value.meta.id
+
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Text',
+      placeInParent: 'head',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        value: 'This is head',
+        type: 'h3'
+      },
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Text',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        value: 'This is body',
+      },
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Button',
+      placeInParent: 'foot',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        type: 'button',
+        title: 'OK',
+        css: {
+          backgroundTheme: 'primary'
+        }
+      },
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
+    }
+  })
+}
+const addCustomPopup = () => {
+  const pageId = currPage.value.meta.id
+  postMessage({
+    type: 'updateItemMeta',
+    data: {
+      itemid: pageId,
+      type: 'custom',
+      pageId: selectedPageId.value,
+      props: {
+        headless: true,
+        footless: true
       }
     }
-    onUpdated(() => {
-      if (checkUpdated) clearInterval(checkUpdated)
-      checkUpdated = setInterval(() => {
-          refreshHeight()
-          clearInterval(checkUpdated)
-      }, 500)
-      $(function() {
-        pageIsLoaded.value = true
-      })
-    })
+  })
 
-    const dragoverHolderStyle = computed(() => {
-      if (!dragoverUIItemId.value) return
-      if (dragoverPlacement.value === 'in') return enterPlaceholderStyle.value
-      const dom = document.getElementById(dragoverUIItemId.value)
-      if (!dom) return
-      const rect = dom.getBoundingClientRect()
-      const styles: any = ['position:absolute;top:0;left:0;border:2px solid #dc3545;']
-      let x = rect.x
-      let y = rect.y
-      if (dragoverPlacement.value === 'left' || dragoverPlacement.value === 'right') {
-        styles.push(`height: ${rect.height + 4}px;`) // 4是outline的宽度
-        styles.push('width: 1px')
-        if (dragoverPlacement.value === 'right') {
-          x += rect.width
-        } else {
-          x -= 4
+  postMessage({
+    type: 'addItem',
+    data: {
+      type: 'Container',
+      meta: {
+        id: ydhl.uuid(5, 0, pageId),
+        isContainer: true,
+        style:{
+          width: '300px',
+          height: '300px'
         }
-        y -= 2
-      } else {
-        styles.push(`width: ${rect.width + 4}px;`)
-        styles.push('height: 1px')
-        if (dragoverPlacement.value === 'bottom') {
-          y += rect.height
-        } else {
-          y -= 4
-        }
-        x -= 2
-      }
-      styles.push(`transform:translateX(${x}px) translateY(${y}px)`)
-      // console.log(styles.join(';'))
-      return styles.join(';')
-    })
-    const enterPlaceholderStyle = computed(() => {
-      if (!dragoverUIItemId.value) return
-      const dom = document.getElementById(dragoverUIItemId.value)
-      if (!dom) return
-      const rect = dom.getBoundingClientRect()
-      const styles: any = ['position:absolute;top:0;left:0;pointer-events:none !important;border:4px solid #dc3545;']
-      styles.push(`width: ${rect.width}px !important;`)
-      styles.push(`height: ${rect.height}px !important;`)
-      styles.push(`transform:translateX(${rect.x}px) translateY(${rect.y}px) !important`)
-      return styles.join(';')
-    })
-    const backgroundImage = computed(() => {
-      // 当设计对话框页面时，背景展示打开该对话框当原始页面截图
-      const fromPageId = route.query.fromPageId
-      if (!fromPageId) return ''
-      return `background:url(${ydhl.api}api/screenshot?pageid=${fromPageId}) no-repeat;background-size: cover`
-    })
-    const addToastPopup = () => {
-      const pageId = currPage.value.meta.id
-
-      postMessage({
-        type: 'updateItemMeta',
-        data: {
-          itemid: pageId,
-          type: 'css',
-          pageId: selectedPageId.value,
-          props: {
-            backgroundTheme: 'bg-secondary'
-          }
-        }
-      })
-      postMessage({
-        type: 'updateItemMeta',
-        data: {
-          itemid: pageId,
-          type: 'custom',
-          pageId: selectedPageId.value,
-          props: {
-            headless: true,
-            footless: true
-          }
-        }
-      })
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Text',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            value: 'This is Toast',
-            css:{
-              foregroundTheme: 'light'
-            }
-          },
-          placement: 'in',
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
+      },
+      items:[],
+      pageId: currPage.value.meta.id,
+      targetId: currPage.value.meta.id
     }
-    const addConfirmPopup = () => {
-      const pageId = currPage.value.meta.id
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Text',
-          placeInParent: 'head',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            value: 'This is head',
-            type: 'h3'
-          },
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Text',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            value: 'This is body',
-          },
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Button',
-          placeInParent: 'foot',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            type: 'button',
-            title: 'OK',
-            css: {
-              backgroundTheme: 'primary'
-            }
-          },
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Button',
-          placeInParent: 'foot',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            type: 'button',
-            title: 'Cancel',
-            css: {
-              backgroundTheme: 'secondary'
-            }
-          },
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-    }
-    const addPromptPopup = () => {
-      const pageId = currPage.value.meta.id
-
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Text',
-          placeInParent: 'head',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            value: 'This is head',
-            type: 'h3'
-          },
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Input',
-          meta: {
-            title: 'Input',
-            custom: {
-              inputType: 'Textarea',
-            },
-            value: 'This is input',
-            id: ydhl.uuid(5, 0, pageId)
-          },
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Button',
-          placeInParent: 'foot',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            type: 'button',
-            title: 'OK',
-            css: {
-              backgroundTheme: 'primary'
-            }
-          },
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-    }
-    const addAlertPopup = () => {
-      const pageId = currPage.value.meta.id
-
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Text',
-          placeInParent: 'head',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            value: 'This is head',
-            type: 'h3'
-          },
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Text',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            value: 'This is body',
-          },
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Button',
-          placeInParent: 'foot',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            type: 'button',
-            title: 'OK',
-            css: {
-              backgroundTheme: 'primary'
-            }
-          },
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-    }
-    const addCustomPopup = () => {
-      const pageId = currPage.value.meta.id
-      postMessage({
-        type: 'updateItemMeta',
-        data: {
-          itemid: pageId,
-          type: 'custom',
-          pageId: selectedPageId.value,
-          props: {
-            headless: true,
-            footless: true
-          }
-        }
-      })
-
-      postMessage({
-        type: 'addItem',
-        data: {
-          type: 'Container',
-          meta: {
-            id: ydhl.uuid(5, 0, pageId),
-            isContainer: true,
-            style:{
-              width: '300px',
-              height: '300px'
-            }
-          },
-          items:[],
-          pageId: currPage.value.meta.id,
-          targetId: currPage.value.meta.id
-        }
-      })
-    }
-    const addPopup = (type) => {
-      if (type === 'toast'){
-        addToastPopup()
-        return
-      }
-      if (type === 'alert'){
-        addAlertPopup()
-        return
-      }
-      if (type === 'confirm'){
-        addConfirmPopup()
-        return
-      }
-      if (type === 'prompt'){
-        addPromptPopup()
-        return
-      }
-      if (type === 'custom'){
-        addCustomPopup()
-        return
-      }
-    }
-
-    return {
-      postMessage,
-      addPopup,
-      pageIsLoaded,
-      backgroundImage,
-      isEmptyPopup,
-      isPopup,
-      currPage,
-      t,
-      dragoverUIItemId,
-      dragoverPlacement,
-      dragoverHolderStyle,
-      enterPlaceholderStyle,
-      popPlacementStyle,
-      showEventPanel,
-      projectId,
-      backdropVisible,
-      image
-    }
+  })
+}
+const addPopup = (type) => {
+  if (type === 'toast'){
+    addToastPopup()
+    return
+  }
+  if (type === 'alert'){
+    addAlertPopup()
+    return
+  }
+  if (type === 'confirm'){
+    addConfirmPopup()
+    return
+  }
+  if (type === 'prompt'){
+    addPromptPopup()
+    return
+  }
+  if (type === 'custom'){
+    addCustomPopup()
+    return
   }
 }
 </script>

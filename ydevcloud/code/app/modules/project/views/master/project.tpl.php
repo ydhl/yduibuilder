@@ -100,14 +100,6 @@ $packages = Env::package();
                 <i class="iconfont icon-database"></i>
                 <?= __("Database")?>
             </a>
-            <a href="/project/<?= $project->uuid?>/icon" class="list-group-item list-group-item-action <?= $menu == 'icon' ? "active" : ""?>">
-                <i class="iconfont icon-image"></i>
-                <?= __("Icon")?>
-            </a>
-            <a href="/project/<?= $project->uuid?>/lib" class="list-group-item list-group-item-action <?= $menu == 'lib' ? "active" : ""?>">
-                <i class="iconfont icon-library"></i>
-                <?= __("Libraries")?>
-            </a>
             <a href="/project/<?= $project->uuid?>/uicomponent" class="list-group-item list-group-item-action <?= $menu == 'uicomponent' ? "active" : ""?>">
                 <i class="iconfont icon-edit"></i>
                 <?= __("UI Component")?>
@@ -124,9 +116,17 @@ $packages = Env::package();
             </a>
             <?php }?>
             <div class="list-group-item p-1 bg-light"></div>
+            <a href="/project/<?= $project->uuid?>/lib" class="list-group-item list-group-item-action <?= $menu == 'lib' ? "active" : ""?>">
+                <i class="iconfont icon-library"></i>
+                <?= __("Libraries")?>
+            </a>
             <a href="/project/<?= $project->uuid?>/asset" class="list-group-item list-group-item-action <?= $menu == 'asset' ? "active" : ""?>">
                 <i class="iconfont icon-folder"></i>
                 <?= __("Asset")?>
+            </a>
+            <a href="/project/<?= $project->uuid?>/icon" class="list-group-item list-group-item-action <?= $menu == 'icon' ? "active" : ""?>">
+                <i class="iconfont icon-image"></i>
+                <?= __("Icon")?>
             </a>
             <div class="list-group-item p-1 bg-light"></div>
             <a href="/project/<?= $project->uuid?>/build" class="list-group-item list-group-item-action <?= $menu == 'build' ? "active" : ""?>">

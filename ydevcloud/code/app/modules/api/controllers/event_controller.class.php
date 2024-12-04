@@ -101,6 +101,7 @@ class Event_Controller extends YZE_Resource_Controller {
                 ->left_join(Page_Model::CLASS_NAME, 'p', 'p.id = e.page_id')
                 ->left_join(Action_Model::CLASS_NAME, 'a', "a.popupPageId = p.uuid")
                 ->where('e.is_deleted = 0 and a.page_id=:pid')
+                ->group_By('id', 'e')
                 ->select([':pid'=>$this->page->id], 'e');
         }
 
@@ -146,6 +147,10 @@ class Event_Controller extends YZE_Resource_Controller {
         $type = trim($request->get_from_post("type"));
         $event = trim($request->get_from_post("event"));
         $desc = trim($request->get_from_post("desc"));
+        $modifier = trim($request->get_from_post("modifier"));
+        $timeout = intval($request->get_from_post("timeout"));
+        $immediate = intval($request->get_from_post("immediate"));
+        $customKey = trim($request->get_from_post("customKey"));
         $custom_event_uuid = trim($request->get_from_post("custom_event_uuid"));
         $this->valid($page_uuid);
 
@@ -174,6 +179,10 @@ class Event_Controller extends YZE_Resource_Controller {
         $bind_event->set('page_id', $this->page->id)
             ->set('event', $uicomponent_event->name ?: $event)
             ->set('desc', $desc?:'')
+            ->set('modifier', $modifier?:'')
+            ->set('timeout', $timeout?:'')
+            ->set('immediate', $immediate?:'')
+            ->set('custom_key', $customKey?:'')
             ->set('uicomponent_event_id', $uicomponent_event->id?:NULL)
             ->save();
 

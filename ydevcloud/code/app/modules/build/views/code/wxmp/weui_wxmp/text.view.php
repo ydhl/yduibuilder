@@ -18,7 +18,7 @@ class Text_View extends Preview_Text_View {
     {
         $space =  $this->indent();
         echo "{$space}<view";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">";
         echo @$this->data['meta']['value'] ?: @$this->data['meta']['title'];
         echo "</view>\r\n";

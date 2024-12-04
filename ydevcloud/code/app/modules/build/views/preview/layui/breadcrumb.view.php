@@ -29,7 +29,7 @@ class Breadcrumb_View extends ValueList_View {
         $inputDataNameString = $isArr ? "alpinejs_get_value(\$el, '{$inputDataName}')" : $inputDataName;
 
         echo $this->indent(1) . '<a';
-        $this->build_event_listen();
+        $this->output_event_listen_props();
         echo $this->wrap_output('data-root', $myid);
         echo $this->wrap_output('href', 'javascript:void(0)');
         if ($outputData) {
@@ -67,7 +67,7 @@ class Breadcrumb_View extends ValueList_View {
         $space =  $this->indent();
 
         echo "{$space}<span";
-        echo $this->build_main_attrs(false);
+        echo $this->output_main_attrs(false);
         echo ">".PHP_EOL;
     }
     protected function build_ui_end(){

@@ -1,78 +1,44 @@
 <?php
 namespace app\modules\build\views\code\web\bootstrap_vue;
 use app\modules\build\views\code\Base_Code_Fragment;
-use app\modules\build\views\preview\bootstrap\Textarea_View as Preview_Textarea_View;
+use app\modules\build\views\code\web\Vue;
 
-class Textarea_View extends Preview_Textarea_View {
-    use Vue;
+class Textarea_View extends Input_View {
+    use Vue {
+        Vue::build_code as vueBuildCode;
+        Vue::get_base_data_attrs as vueBaseAttrs;
+    }
     public function build_code():Base_Code_Fragment
     {
-        parent::build_code();
-        $myid = $this->myId();
-        $defaultValue = @$this->data['meta']['value'];
-        $this->get_code_fragment()->add_import('vue', ['ref']);
-        $this->get_code_fragment()->add_import('bootstrap');
-        $this->get_code_fragment()->add_ref($myid, '', true);
-        $this->get_code_fragment()->add_ref("{$myid}Value", $defaultValue, true);
-
-        if (@$this->data['meta']['custom']['wordCountVisible']){
-            $this->get_code_fragment()->add_ref("{$myid}WordCount", 0, true);
-            ob_start();
-?>
-() => {
-  <?= $this->myId()?>WordCount.value = <?= $this->myId()?>Value.value.length
-}
-<?php
-            $this->get_code_fragment()->add_function("{$myid}Keyup", ob_get_clean(), true);
-        }
-        if (@$this->data['meta']['custom']['clearButtonVisible']){
-?>
-() => {
-  <?= $this->myId()?>WordCount.value = 0
-  <?= $this->myId()?>Value.value = ''
-}
-<?php
-            $this->get_code_fragment()->add_function("{$myid}Clean", ob_get_clean(), true);
-        }
-        return $this->get_code_fragment();
+        $this->vueBuildCode();
+        $fragment = $this->get_code_fragment();
+        $fragment->add_import('@/components/TextareaComponent.vue', [], 'TextareaComponent');
+        return $fragment;
     }
     public function build_ui()
     {
-        $myid = $this->myId();
-        $space =  $this->indent(2);
-        echo "{$space}<div";
-        echo $this->wrap_output('class', $this->body_css());
-        echo $this->wrap_output('style', $this->body_style());
-        echo ">\r\n";
-        echo $this->indent(3);
-        echo '<textarea class="w-100 border-0"';
-        if (@$this->data['meta']['custom']['autoRow']){
-            echo ' style="resize: none" ';
-        }
-        echo $this->build_form_attrs();
-        if (@$this->data['meta']['custom']['wordCountVisible']){
-            echo " @keyup='{$myid}Keyup'";
-        }
-        if (@$this->data['meta']['custom']['maxLength']){
-            echo ' maxlength='.$this->data['meta']['custom']['maxLength'];
-        }
-        echo ' v-model="'.$myid.'Value" rows="'.@$this->data['meta']['custom']['row'].'">';
-        echo "</textarea>\r\n";
+        $space =  $this->indent();
+        $outputDatas = $this->get_output_datas($outputDataName);
+        $iteratorDataName = $this->get_iterator_data_name();
 
-        if (@$this->data['meta']['custom']['wordCountVisible']){
-            echo $this->indent(3);
-            echo "<div class='word-count ml-3'>{{{$myid}WordCount}}";
-            if (@$this->data['meta']['custom']['maxLength']){
-                echo "/".$this->data['meta']['custom']['maxLength'];
-            }
-            echo "</div>\r\n";
+        echo "{$space}<TextareaComponent";
+        $this->output_component_props();
+        echo $this->wrap_output("color", $this->data['meta']['style']['color']);
+        echo $this->wrap_output("foregroundCss", $this->data['meta']['css']['foregroundTheme']);
+        echo $this->wrap_output(":wordCountVisible", $this->data['meta']['custom']['wordCountVisible'] ? 'true' : 'false');
+        echo $this->wrap_output(":clearButtonVisible", $this->data['meta']['custom']['clearButtonVisible'] ? 'true' : 'false');
+        echo $this->wrap_output(":maxLength", $this->data['meta']['custom']['maxLength']);
+        echo PHP_EOL."{$space}";
+
+        if ($outputDataName['VALUE']){
+            echo $this->wrap_output(':defaultValue', $iteratorDataName ?: $outputDataName['VALUE']);
         }
 
-        if (@$this->data['meta']['custom']['clearButtonVisible']){
-            echo $this->indent(3);
-            echo "<div class='cursor ml-3' @click='{$myid}Clean'>×</div>\r\n";
-        }
+        $this->output_v_model();
+        echo "></TextareaComponent>".PHP_EOL;
+    }
 
-        echo "{$space}</div>\r\n";
+    protected function get_base_data_attrs(){
+        return parent::get_base_data_attrs();// 调用input->get_base_data_attrs的方法，避免调用vue->get_base_data_attrs的方法
     }
 }

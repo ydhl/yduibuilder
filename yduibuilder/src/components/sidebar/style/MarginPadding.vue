@@ -5,81 +5,99 @@
     <i class="iconfont icon-point text-success" v-if="hasInherit"></i>
   </div>
   <div class="style-body d-none">
-    <template v-if="hasMargin">
-      <div class="text-muted text-center">{{t("style.margin")}}</div>
-      <!--[margin-->
-      <table class="_margin">
-      <tr>
-        <td></td>
-        <td :class="{'_margin-top': true, '_hover': hoverOnSide=='margin-top'}" @click="openSetting('margin-top')" @mouseover="hoverOnSide='margin-top'" @mouseleave="hoverOnSide=''">MT</td>
-        <td></td>
-        </tr>
-        <tr>
-          <td :class="{'_margin-left': true, '_hover': hoverOnSide=='margin-left'}" @click="openSetting('margin-left')" @mouseover="hoverOnSide='margin-left'" @mouseleave="hoverOnSide=''">ML</td>
-          <td :class="{'_content w-100 text-start': true, '_hover': hoverOnSide=='margin'}" @click="openSetting('margin')" @mouseover="hoverOnSide='margin'" @mouseleave="hoverOnSide=''"> <small v-html="marginAttrs"></small></td>
-          <td :class="{'_margin-right': true, '_hover': hoverOnSide=='margin-right'}" @click="openSetting('margin-right')" @mouseover="hoverOnSide='margin-right'" @mouseleave="hoverOnSide=''">MR</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td :class="{'_margin-bottom': true, '_hover': hoverOnSide=='margin-bottom'}" @click="openSetting('margin-bottom')" @mouseover="hoverOnSide='margin-bottom'" @mouseleave="hoverOnSide=''">MB</td>
-          <td></td>
-        </tr>
-      </table>
-    </template>
-
-    <div class="text-center text-muted mt-2">{{t("style.padding")}}</div>
-    <table class="_padding">
-      <tr>
-        <td></td>
-        <td :class="{'_padding-top': true, '_hover': hoverOnSide=='padding-top'}" @click="openSetting('padding-top')" @mouseover="hoverOnSide='padding-top'" @mouseleave="hoverOnSide=''">PT</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td :class="{'_padding-left': true, '_hover': hoverOnSide=='padding-left'}" @click="openSetting('padding-left')" @mouseover="hoverOnSide='padding-left'" @mouseleave="hoverOnSide=''">PL</td>
-        <td :class="{'_content w-100 text-start': true, '_hover': hoverOnSide=='padding'}" @click="openSetting('padding')" @mouseover="hoverOnSide='padding'" @mouseleave="hoverOnSide=''"> <small v-html="paddingAttrs"></small></td>
-        <td :class="{'_padding-right': true, '_hover': hoverOnSide=='padding-right'}" @click="openSetting('padding-right')" @mouseover="hoverOnSide='padding-right'" @mouseleave="hoverOnSide=''">PR</td>
-      </tr>
-      <tr>
-        <td></td>
-        <td :class="{'_padding-bottom': true, '_hover': hoverOnSide=='padding-bottom'}" @click="openSetting('padding-bottom')" @mouseover="hoverOnSide='padding-bottom'" @mouseleave="hoverOnSide=''">PB</td>
-        <td></td>
-      </tr>
-    </table>
-  </div>
-  <div v-if="isOpenSetting" style="z-index: 1041;position: absolute;top: 30%;left:0px;right: 0px">
-    <div class="card m-3 shadow-lg">
-        <div class="card-header d-flex justify-content-between align-items-center">{{t("style."+settingSide)}}
-          <button type="button" class="btn btn-light btn-sm" @click="closeSetting()" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="card-body">
-          <div class="form-group mb-3" v-if="cssMap[settingSide]">
-            <label>{{t("style.predefinedClass")}} <small class="text-muted">{{ui}} {{uiVersion}}</small></label>
-            <select class="form-select" v-model="sizeClass">
-              <option :value="css" :selected="sizeClass == css" :key="css" v-for="(name, css) in cssMap[settingSide]">{{ name }}</option>
-            </select>
-          </div>
-
-          <div class="form-group mb-3">
-            <label>{{t("style.value")}}</label>
-            <div class="input-group">
-              <input type="text" class="form-control w-75" placeholder="" v-model="size">
-            </div>
-          </div>
-        </div>
+    <div  class="fs-7" :style="`border: 1px dashed #444;background-color: ${hoverOnSide==''||hoverOnSide=='margin'?'#f7cba1':'#fff'}`"
+         @mouseover.stop="hoverOnSide='margin'" @mouseleave.stop="hoverOnSide=''">
+      <div class="d-flex p-1" v-if="hasMargin">
+        <div style="width: 40px" class="text-muted">margin</div>
+        <div class="flex-grow-1 d-flex align-items-center justify-content-center pointer" @click="openSetting('margin-top')"
+             v-html="attrs['margin-top'] || '-'"></div>
+        <div style="width: 40px" class="fs-7"></div>
       </div>
+      <div class="d-flex">
+        <div v-if="hasMargin" class="d-flex align-items-center justify-content-center p-2 flex-shrink-0 pointer" @click="openSetting('margin-left')"
+        v-html="attrs['margin-left'] || '-'"></div>
+        <div class="flex-grow-1" :style="`border: 1px solid #444;background-color: ${hoverOnSide==''||hoverOnSide=='border'?'#fcdb9f':'#fff'}`"
+             @mouseover.stop="hoverOnSide='border'" @mouseleave.stop="hoverOnSide=''">
+          <div class="d-flex p-1">
+            <div style="width: 40px" class="text-muted">border</div>
+            <div class="flex-grow-1 d-flex align-items-center justify-content-center pointer" @click="openSetting('border-top-width')"
+                 v-html="attrs['border-top-width'] || '-'"></div>
+            <div style="width: 40px"></div>
+          </div>
+          <div class="d-flex">
+            <div class="d-flex align-items-center justify-content-center p-2 flex-shrink-0 pointer" @click="openSetting('border-left-width')"
+              v-html="attrs['border-left-width'] || '-'"></div>
+            <div class="flex-grow-1" style="width: 20px">
+              <div class="flex-grow-1" :style="`border: 1px dashed #444;background-color: ${hoverOnSide==''||hoverOnSide=='padding'?'#c4ce8e':'#fff'}`"
+                   @mouseover.stop="hoverOnSide='padding'" @mouseleave.stop="hoverOnSide=''">
+                <div class="d-flex p-1">
+                  <div style="width: 40px" class="text-muted">padding</div>
+                  <div class="flex-grow-1 d-flex align-items-center justify-content-center pointer" @click="openSetting('padding-top')"
+                       v-html="attrs['padding-top'] || '-'"></div>
+                  <div style="width: 40px"></div>
+                </div>
+                <div class="d-flex p-1">
+                  <div class="d-flex align-items-center justify-content-center p-2 flex-shrink-0 pointer" @click="openSetting('padding-left')"
+                    v-html="attrs['padding-left'] || '-'"></div>
+                  <div class="flex-grow-1 d-flex align-items-center text-nowrap justify-content-center pointer"  @click="openSetting('sizing')"
+                       :style="`border: 1px solid #444;background-color:  ${hoverOnSide==''||hoverOnSide=='sizing'?'#8eb5c0':'#fff'}`"
+                       @mouseover.stop="hoverOnSide='sizing'" @mouseleave.stop="hoverOnSide=''"
+                  >{{currWidth || 'auto'}} <span class="text-muted">&nbsp;x&nbsp;</span> {{currHeight || 'auto'}}</div>
+                  <div class="d-flex align-items-center justify-content-center p-2 flex-shrink-0 pointer" @click="openSetting('padding-right')"
+                       v-html="attrs['padding-right'] || '-'"></div>
+                </div>
+                <div class="d-flex align-items-center justify-content-center p-1 pointer" @click="openSetting('padding-bottom')"
+                v-html="attrs['padding-bottom'] || '-'"></div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center justify-content-center p-2 flex-shrink-0 pointer" @click="openSetting('border-right-width')"
+            v-html="attrs['border-right-width'] || '-'"></div>
+          </div>
+          <div class="flex-grow-1 p-1 d-flex align-items-center justify-content-center pointer" @click="openSetting('border-bottom-width')"
+               v-html="attrs['border-bottom-width'] || '-'"></div>
+        </div>
+        <div v-if="hasMargin" class="d-flex align-items-center justify-content-center p-2 flex-shrink-0 pointer" @click="openSetting('margin-right')"
+        v-html="attrs['margin-right'] || '-'"></div>
+      </div>
+      <div v-if="hasMargin" class="flex-grow-1 p-1 d-flex align-items-center justify-content-center pointer" @click="openSetting('margin-bottom')"
+      v-html="attrs['margin-bottom'] || '-'"></div>
+    </div>
   </div>
-  <div class="right-backdrop" v-if="rightBackdropVisible"></div>
+  <lay-layer v-model="isOpenSetting" :title="t('style.'+settingSide)" :shade="true" :area="['500px', '300px']">
+    <div class="p-3">
+      <template v-if="settingSide=='sizing'">
+        <StyleSize :auto-open="true"></StyleSize>
+      </template>
+      <template v-else>
+        <div class="form-group mb-3" v-if="cssMap[settingSide]">
+          <label>{{t("style.predefinedClass")}} <small class="text-muted">{{ui}} {{uiVersion}}</small></label>
+          <select class="form-select" v-model="sizeClass">
+            <option :value="css" :selected="sizeClass == css" :key="css" v-for="(name, css) in cssMap[settingSide]">{{ name }}</option>
+          </select>
+        </div>
+        <div class="form-group mb-3">
+          <label>{{t("style.value")}}</label>
+          <div class="input-group">
+            <input type="text" class="form-control w-75" placeholder="" v-model="size">
+          </div>
+        </div>
+        <div class="form-group mb-3">
+          <label><input type="checkbox" v-model="syncOtherSide">{{t("style.syncOtherSide")}}</label>
+        </div>
+      </template>
+    </div>
+  </lay-layer>
 </template>
 
 <script lang="ts">
-import { computed, nextTick, ref, toRef, watch } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import initUI from '@/components/Common'
+import StyleSize from '@/components/sidebar/style/Size.vue'
 
 export default {
   name: 'StyleMarginPadding',
+  components: { StyleSize },
   props: {
     previewMode: Boolean
   },
@@ -90,24 +108,29 @@ export default {
     const hoverOnSide = ref('')
     const settingSide = ref('')
     const isOpenSetting = ref(false)
+    const syncOtherSide = ref(false)
     const previewMode = toRef(props, 'previewMode')
 
     const pickCssStyle = (meta: any, _css: any, _style: any) => {
       if (meta.css) {
         for (const name in meta.css) {
           if (name.match(/margin/)) {
-            _css.margin.push(meta.css[name])
+            _css.margin[name] = meta.css[name]
           } else if (name.match(/padding/)) {
-            _css.padding.push(meta.css[name])
+            _css.padding[name] = meta.css[name]
+          } else if (name.match(/border/)) {
+            _css.border[name] = meta.css[name]
           }
         }
       }
       if (meta.style) {
         for (const name in meta.style) {
           if (name.match(/margin/)) {
-            _style.margin.push(name + ':' + meta.style[name])
+            _style.margin[name] = meta.style[name]
           } else if (name.match(/padding/)) {
-            _style.padding.push(name + ':' + meta.style[name])
+            _style.padding[name] = meta.style[name]
+          } else if (name.match(/border/)) {
+            _style.border[name] = meta.style[name]
           }
         }
       }
@@ -115,49 +138,49 @@ export default {
 
     const attrs = computed(() => {
       if (!selectedUIItem.value) return
-      const _css: any = { margin: [], padding: [] }
-      const _style: any = { margin: [], padding: [] }
-      const _attr: any = { margin: '', padding: '' }
+      const _attr: any = {}
+      const _css: any = { margin: {}, padding: {}, border: {} }
+      const _style: any = { margin: {}, padding: {}, border: {} }
 
       const meta = selectedUIItem.value.meta
       const selector = selectedUIItem.value.meta.selector
       // console.log(meta)
       if (selector) pickCssStyle(selector, _css, _style)
       pickCssStyle(meta, _css, _style)
+      console.log(_attr)
+      for (const key in _css.margin) {
+        _attr[key] = _css.margin[key]
+      }
+      for (const key in _css.padding) {
+        _attr[key] = _css.padding[key]
+      }
+      for (const key in _css.border) {
+        _attr[key] = _css.border[key]
+      }
+      for (const key in _style.margin) {
+        _attr[key] = _attr[key] ? _attr[key] + '<br/>' + _style.margin[key] : _style.margin[key]
+      }
+      for (const key in _style.padding) {
+        _attr[key] = _attr[key] ? _attr[key] + '<br/>' + _style.padding[key] : _style.padding[key]
+      }
+      for (const key in _style.border) {
+        _attr[key] = _attr[key] ? _attr[key] + '<br/>' + _style.border[key] : _style.border[key]
+      }
 
-      if (_css.margin.length) {
-        _attr.margin = `css: ${_css.margin.join(' ')}`
-      }
-      if (_style.margin.length) {
-        _attr.margin += `<br/>style: ${_style.margin.join(';')}`
-      }
-      if (_css.padding.length) {
-        _attr.padding = `css: ${_css.padding.join(' ')}`
-      }
-      if (_style.padding.length) {
-        _attr.padding += `<br/>style: ${_style.padding.join(';')}`
-      }
       return _attr
     })
-
-    const marginAttrs = ref<string>('')
-    const paddingAttrs = ref<string>('')
-
-    watch(attrs, (attr) => {
-      if (!attr) {
-        marginAttrs.value = ''
-        paddingAttrs.value = ''
-        return
+    watch(syncOtherSide, (v) => {
+      if (v) {
+        sync(sizeClass.value, 'css')
+        sync(size.value, 'style')
       }
-      marginAttrs.value = attr.margin
-      paddingAttrs.value = attr.padding
-    }, { immediate: true })
+    })
     const sizeClass = computed<string>({
       get () {
         return info.getMeta(settingSide.value, 'css', previewMode)
       },
       set (v) {
-        info.setMeta(settingSide.value, v === 'inherit' ? undefined : v, 'css', false, previewMode)
+        sync(v, 'css')
       }
     })
     const size = computed<string>({
@@ -165,22 +188,41 @@ export default {
         return info.getMeta(settingSide.value, 'style', previewMode)
       },
       set (v) {
-        info.setMeta(settingSide.value, v || undefined, 'style', false, previewMode)
+        sync(v, 'style')
       }
     })
-
-    const rightBackdropVisible = ref(false)
+    function sync (v, type) {
+      if (syncOtherSide.value) {
+        if (settingSide.value.match(/^margin/)) {
+          info.setMeta('margin-top', v === 'inherit' ? undefined : v, type, false, previewMode)
+          info.setMeta('margin-right', v === 'inherit' ? undefined : v, type, false, previewMode)
+          info.setMeta('margin-bottom', v === 'inherit' ? undefined : v, type, false, previewMode)
+          info.setMeta('margin-left', v === 'inherit' ? undefined : v, type, false, previewMode)
+        } else if (settingSide.value.match(/^border/)) {
+          info.setMeta('border-top-width', v === 'inherit' ? undefined : v, type, false, previewMode)
+          info.setMeta('border-right-width', v === 'inherit' ? undefined : v, type, false, previewMode)
+          info.setMeta('border-bottom-width', v === 'inherit' ? undefined : v, type, false, previewMode)
+          info.setMeta('border-left-width', v === 'inherit' ? undefined : v, type, false, previewMode)
+        } else if (settingSide.value.match(/^padding/)) {
+          info.setMeta('padding-top', v === 'inherit' ? undefined : v, type, false, previewMode)
+          info.setMeta('padding-right', v === 'inherit' ? undefined : v, type, false, previewMode)
+          info.setMeta('padding-bottom', v === 'inherit' ? undefined : v, type, false, previewMode)
+          info.setMeta('padding-left', v === 'inherit' ? undefined : v, type, false, previewMode)
+        }
+      } else {
+        info.setMeta(settingSide.value, v || undefined, type, false, previewMode)
+      }
+    }
+    const currWidth = info.computedWrap('width', 'style', '', false, previewMode)
+    const currHeight = info.computedWrap('height', 'style', '', false, previewMode)
 
     const openSetting = (type: string) => {
       isOpenSetting.value = true
-      nextTick(() => {
-        rightBackdropVisible.value = true
-      })
+      syncOtherSide.value = false
       settingSide.value = type
     }
     const closeSetting = () => {
       isOpenSetting.value = false
-      rightBackdropVisible.value = false
       settingSide.value = ''
     }
     const hasInherit = computed(() => {
@@ -219,75 +261,13 @@ export default {
       settingSide,
       sizeClass,
       size,
-      marginAttrs,
-      paddingAttrs,
-      rightBackdropVisible,
       openSetting,
       closeSetting,
-      t
+      currWidth,
+      currHeight,
+      t,
+      syncOtherSide
     }
   }
 }
 </script>
-<style scoped lang="scss">
-@import '@/assets/bootstrap/bootstrap.scss';
-
-  ._margin{
-    cursor: pointer;
-    background-color: #f8cca1;
-    border: 1px solid #444;
-    td{
-      padding: 5px;
-      margin: 0px;
-      font-size: $font-size-sm !important;
-      text-align: center;
-    }
-    ._content{
-      background-color: #fae0c7;
-      border: 1px solid #4f676d;
-      padding: 20px;
-    }
-    ._hover{
-      background-color: #fdbd85;
-    }
-  }
-  ._border{
-    background-color: #fddc9f;
-    border: 1px solid #444;
-    cursor: pointer;
-    td{
-      padding: 5px;
-      margin: 0px;
-      font-size: $font-size-sm !important;
-      text-align: center;
-    }
-    ._content{
-      background-color: #fae4bc;
-      border: 1px solid #4f676d;
-      padding: 20px;
-    }
-
-    ._hover{
-      background-color: #ffc556;
-    }
-  }
-  ._padding{
-    background-color: #c5cf8e;
-    border: 1px solid #7e7e7e;
-    cursor: pointer;
-    td{
-      padding: 5px;
-      margin: 0px;
-      font-size: $font-size-sm !important;
-      text-align: center;
-    }
-    ._content{
-      background-color: #e8efc1;
-      border: 1px solid #4f676d;
-      padding: 20px;
-    }
-    ._hover{
-      background-color: #99a74e;
-    }
-  }
-</style>

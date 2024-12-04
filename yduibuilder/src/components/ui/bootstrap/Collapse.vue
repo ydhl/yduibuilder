@@ -3,8 +3,8 @@
        :class="[dragableCss, myCss]" :style="myStyleText" :id="myId" :data-type="uiconfig.type"
        :data-pageid="pageid">
     <template v-if="!uiconfig.items?.length">
-      <div class="card">
-        <div class="card-header" :id="uiconfig.meta.id+'heading0'">
+      <div class="accordion-item">
+        <div class="accordion-header" :id="uiconfig.meta.id+'heading0'">
           <h2 class="mb-0">
             <div class="btn btn-link btn-block text-left pointer-event-none" type="button" data-toggle="collapse"
                     :data-target="`#${uiconfig.meta.id}collapse0`" aria-expanded="true" :aria-controls="`${uiconfig.meta.id}collapse0`">
@@ -14,7 +14,7 @@
         </div>
 
         <div :id="`${uiconfig.meta.id}collapse0`" class="collapse show" :aria-labelledby="uiconfig.meta.id+'heading0'" :data-parent="'#'+uiconfig.meta.id">
-          <div class="card-body p-0">
+          <div class="accordion-body p-0">
             According body, you can add item from Info Panel
           </div>
         </div>
@@ -22,20 +22,18 @@
     </template>
     <template v-else>
       <template v-for="(subpage, index) in uiconfig.items" :key="index">
-        <div class="card">
-          <div class="card-header" :id="uiconfig.meta.id+'heading'+index">
-            <h2 class="mb-0">
-              <div class="btn btn-link btn-block text-left pointer-event-none" type="button" data-toggle="collapse"
+        <div class="accordion-item">
+          <div class="accordion-header" :id="uiconfig.meta.id+'heading'+index">
+            <button class="accordion-button pointer-event-none" type="button" data-toggle="collapse"
                       :data-target="`#${uiconfig.meta.id}collapse${index}`" aria-expanded="true" :aria-controls="`${uiconfig.meta.id}collapse${index}`">
                 {{subpage.meta.title}}
-              </div>
-            </h2>
+            </button>
           </div>
 
           <div :id="`${subpage.meta.id}collapse${index}`"
-               :class="{'collapse': true, 'show': (!uiconfig.meta.custom?.activeIndex && index ==0) || uiconfig.meta.custom?.activeIndex==index}" :aria-labelledby="subpage.meta.id+'heading'+index" :data-parent="'#'+subpage.meta.id">
-            <div class="card-body p-0">
-              <UIBase v-for="(item, index) in subpage.items" :key="index" :is-readonly="true" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
+               :class="{'accordion-collapse collapse ': true, 'show': (!uiconfig.meta.custom?.activeIndex && index ==0) || uiconfig.meta.custom?.activeIndex==index}" :aria-labelledby="subpage.meta.id+'heading'+index" :data-parent="'#'+subpage.meta.id">
+            <div class="accordion-body p-0">
+              <UIBase :is-readonly="true" :is-lock="myIsLock" :uiconfig="subpage" :pageid="pageid"></UIBase>
             </div>
           </div>
         </div>

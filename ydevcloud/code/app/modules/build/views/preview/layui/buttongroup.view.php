@@ -20,7 +20,7 @@ class Buttongroup_View extends Preview_View {
     {
         $space =  $this->indent();
         echo $space."<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">\r\n";
         foreach ((array)$this->childViews as $view){
             $view->output();

@@ -10,7 +10,7 @@ class Icon_View extends Preview_Icon_View {
     {
         $space =  $this->indent();
         echo "{$space}<view";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo "></view>\r\n";
     }
 }

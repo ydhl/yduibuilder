@@ -26,8 +26,9 @@ $icons = array_filter($icons, function($item) use ($queryIcon){
 });
 if (!$icons){
     ?>
-    <div class="m-5 p-5 d-flex justify-content-center align-content-center">
+    <div class="m-5 p-5 d-flex justify-content-center align-content-center align-items-center">
         <?= sprintf(__("The %s has no icons, you can upload iconfont from here"), $ui)?>
+        <button class="btn btn-primary btn-sm" onclick="window.history.back()"><?= __('back')?></button>
     </div>
     <?php
     return;

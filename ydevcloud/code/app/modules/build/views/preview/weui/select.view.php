@@ -31,7 +31,7 @@ class Select_View extends ValueList_View {
         $inputDataName = $this->get_input_data_name();
 
         echo "{$space}<div";
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         echo $this->wrap_output('@click', "open_{$myid}_menu");
         echo ">".PHP_EOL;
 

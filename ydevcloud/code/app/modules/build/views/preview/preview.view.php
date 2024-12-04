@@ -44,6 +44,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @var array Preview_View
      */
     protected $childViews = [];
+    protected $parentView;
     /**
      * 在具体某个事件中使用到到变量名称，格式[变量]
      * @var array
@@ -61,6 +62,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     private $_inputDataName;
     private $_boundData;
     private $_boundDataName;
+    private $_iteratorIndexNames = [];
     private $_iteratorIndexName;
     private $_iteratorDataName;
     private $_events = [];
@@ -95,7 +97,20 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         }
 
         $build->increase_indent(1);
-        return self::create_View($build);
+        $view = self::create_View($build);
+        $view->set_parent_view($this);
+        return $view;
+    }
+    protected function set_parent_view(Preview_View $view){
+        $this->parentView = $view;
+        return $this;
+    }
+
+    /**
+     * @return Preview_View
+     */
+    protected function get_parent_view(){
+        return $this->parentView;
     }
 
     /**
@@ -337,7 +352,8 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
 //            伪类暂时不支持预定义css样式
 //            $this->fetch_css($styles['css'], $cssInfo);
 //            print_r($cssInfo);
-            $this->styles[$key.$pseudoState->state_name] = join(' !important;'.PHP_EOL, $this->style_map($styles, $pseudoState->state_name)).' !important;';
+            $_ = $this->style_map($styles, $pseudoState->state_name);
+            if($_) $this->styles[$key.$pseudoState->state_name] = join(' !important;'.PHP_EOL, $_).' !important;';
         }
     }
 
@@ -403,7 +419,8 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             $styles = $this->build->get_uiid_bind_state_styles($this->myId(), $state->uuid);
             if (!$styles) continue;
 //            print_r($styles);
-            $this->styles[$key.'.'.$state_name] = join(' !important;'.PHP_EOL, array_values($this->style_map($styles, $state_name))).' !important;';
+            $_ = array_values($this->style_map($styles, $state_name));
+            if ($_) $this->styles[$key.'.'.$state_name] = join(' !important;'.PHP_EOL, $_).' !important;';
         }
     }
 
@@ -518,6 +535,10 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                 }else{
                     return "{}";
                 }
+            }
+            case 'file':
+            case 'blob':{
+                return "{}";
             }
             case 'map':{
                 if (!$this->build->need_mock() || !$data["mock"]){
@@ -670,12 +691,12 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      */
     public abstract function build_popup_ui(&$outputPopupIds=[]);
 
-    private function build_select_prepare_event_code(&$actionCodeLines){
+    protected function build_select_event_args_code(&$actionCodeLines){
         if ($this->data['meta']['custom']['multiple']) {
             if (in_array('boundData', $this->usedVariables)) $actionCodeLines[] = "const boundData = []";
             if (in_array('value', $this->usedVariables)) $actionCodeLines[] = "const value = []";
-
-            $actionCodeLines[] = "for(var opt of event.target.selectedOptions) {";
+            $actionCodeLines[] = "const selectEl = event.target.closest('[data-root=\"\"]').querySelector('select')";
+            $actionCodeLines[] = "for(var opt of selectEl.selectedOptions) {";
 //                $actionCodeLines[] = $this->indent(1, true)."console.log(opt,opt.innerText,opt.dataset?.bound)";
             if (in_array('boundData', $this->usedVariables)){
                 $actionCodeLines[] = $this->indent(1, true) . "const boundName = opt.dataset?.bound;";
@@ -684,7 +705,8 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             if (in_array('value', $this->usedVariables)) $actionCodeLines[] = $this->indent(1, true) . "value.push(opt.value);";
             $actionCodeLines[] = "}";
         } else {
-            $actionCodeLines[] = "const opt = event.target.selectedOptions?.[0]";
+            $actionCodeLines[] = "const selectEl = event.target.closest('[data-root=\"\"]').querySelector('select')";
+            $actionCodeLines[] = "const opt = selectEl.selectedOptions?.[0]";
             if (in_array('boundData', $this->usedVariables)){
                 $actionCodeLines[] = "const boundName = opt?.dataset?.bound;";
                 $actionCodeLines[] = "const boundData = boundName ? Alpine.evaluate(eventTarget, boundName) : null;";
@@ -692,24 +714,26 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             if (in_array('value', $this->usedVariables)) $actionCodeLines[] = "const value = opt ? opt?.value : null;";
         }
     }
-    private function build_other_prepare_event_code(&$actionCodeLines){
+    protected function build_other_event_args_code(&$actionCodeLines){
         $actionCodeLines[] = "const eventTarget = event.target.closest('[data-value]') || event.target.closest('[data-bound]');";
         if (in_array('boundData', $this->usedVariables)) $actionCodeLines[] = "const boundName = eventTarget?.dataset?.bound;";
         // x-for 的数据直接可以通过page.boundName访问
         if (strtolower($this->data['type']) == 'checkbox'){
-            $actionCodeLines[] = 'const checked = eventTarget.querySelector("[type=\'checkbox\']")?.checked';
             if (in_array('boundData', $this->usedVariables)){
+                $actionCodeLines[] = 'const checked = eventTarget.querySelector("[type=\'checkbox\']")?.checked';
                 $actionCodeLines[] = "const boundData = checked ? Alpine.evaluate(eventTarget, boundName) : undefined;";
             }
             if (in_array('value', $this->usedVariables)) {
-                $actionCodeLines[] = 'const value = checked ? eventTarget.dataset?.value : null';
+                $inputDataName = $this->get_input_data_name();
+                $actionCodeLines[] = 'const value = page.alpinejs_get_value(eventTarget, "'.$inputDataName.'")';
             }
         }else{
             if (in_array('boundData', $this->usedVariables)) $actionCodeLines[] = "const boundData = boundName ? Alpine.evaluate(eventTarget, boundName) : undefined;";
             if (in_array('value', $this->usedVariables)) $actionCodeLines[] = "const value = eventTarget?.dataset?.value;";
+            if (in_array('keyCode', $this->usedVariables)) $actionCodeLines[] = "const keyCode = event.code;";
         }
     }
-    private function build_input_prepare_event_code(&$actionCodeLines){
+    protected function build_input_event_args_code(&$actionCodeLines){
         $tagName = strtoupper($this->data['type']);
         $tagName = $tagName=='RANGEINPUT'?'INPUT':$tagName;
 
@@ -717,6 +741,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             $actionCodeLines[] = "const target = event.target.tagName=='{$tagName}' ? event.target : event.target.querySelector('.input') || undefined";
             $actionCodeLines[] = "const value = target?.value";
         }
+        if (in_array('keyCode', $this->usedVariables)) $actionCodeLines[] = "const keyCode = event.code;";
     }
 
     /**
@@ -727,8 +752,16 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @param $actionCodeLines
      * @return void
      */
-    private function build_prepare_event_code($eventModel, $html_event_name, &$eventCodes, &$actionCodeLines){
-        $eventCodes[$html_event_name]['args'] = $this->get_event_arg_names($html_event_name);
+    protected function build_event_args_code($eventModel, $html_event_name, &$eventCodes, &$actionCodeLines){
+        $eventCodes[$html_event_name]['args'] = ['event' => ["type" => 'any', "name" => 'event', "uuid" => 'event']];
+        if ($html_event_name=='change') { // change 通过alpinejs的watch直接传入对应的数据
+            $eventCodes[$html_event_name]['args'] = [
+                'value'=>["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                'oldValue'=>["type" => 'string', "name" => 'oldValue', "uuid" => 'oldValue'],
+                'boundData'=>["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+            ];
+            return;
+        }
         $codes = [];
         // 提取自定义事件的自定义参数
         if ($eventModel->uicomponent_event_id){
@@ -745,16 +778,15 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             array_unshift($actionCodeLines, ...$codes);
             return;
         }
-
-        if (!$this->usedVariables || !array_intersect(['value','boundData'], $this->usedVariables)) return;
+        if (!$this->usedVariables || !array_intersect(['value','boundData','keyCode'], $this->usedVariables)) return;
 
         // 数据值和绑定对数据
         if (strtolower($this->data['type']) == 'select'){
-            $this->build_select_prepare_event_code($codes);
+            $this->build_select_event_args_code($codes);
         }elseif (in_array(strtolower($this->data['type']), ['input', 'textarea', 'rangeinput'])){
-            $this->build_input_prepare_event_code($codes);
+            $this->build_input_event_args_code($codes);
         }else{
-            $this->build_other_prepare_event_code($codes);
+            $this->build_other_event_args_code($codes);
         }
         $codes[] = "";
         array_unshift($actionCodeLines, ...$codes);
@@ -776,14 +808,22 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * 获取弹窗的事件
      * @return array|null
      */
-    protected function get_popup_event_action_codes(){
-        $eventModels = @$this->build->get_popup_events();
+    protected function get_custom_event_action_codes(){
+        $eventModels = @$this->build->get_custom_events();
+        return $this->_get_event_action_codes($eventModels);
+    }
+    /**
+     * 获取生命周期的事件
+     * @return array|null
+     */
+    protected function get_lifecycle_event_action_codes(){
+        $eventModels = @$this->build->get_lifecycle_events();
         return $this->_get_event_action_codes($eventModels);
     }
     private function _get_event_action_codes($eventModels){
         $eventCodes = [];
 
-        if (!$eventModels) return;
+        if (!$eventModels) return [];
 
         foreach($eventModels as $eventModel) {
             $actionCodeLines = [];
@@ -793,15 +833,14 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             }else{
                 $html_event_name = $this->eventName($eventModel->event) ?: $eventModel->event;
             }
-            $html_event_name = strtolower($html_event_name);
 
             if (!$eventCodes[$html_event_name]) {
                 $eventCodes[$html_event_name] = ['code'=>[],'args'=>[],'comment'=>''];
             }
             if ($eventModel->desc){
-                $eventCodes[$html_event_name]['comment'] .= PHP_EOL.$eventModel->desc;
+                $eventCodes[$html_event_name]['comment'] .= PHP_EOL.html_entity_decode($eventModel->desc);
             }else if ($eventModel->get_uicomponent_event()) {
-                $eventCodes[$html_event_name]['comment'] .= PHP_EOL.$eventModel->get_uicomponent_event()->desc;
+                $eventCodes[$html_event_name]['comment'] .= PHP_EOL.html_entity_decode($eventModel->get_uicomponent_event()->desc);
             }
 
             // 先编译事件体代码，并记录使用了哪些基础变量
@@ -824,7 +863,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                 }
             }
             if ($actionCodeLines) {
-                $this->build_prepare_event_code($eventModel, $html_event_name, $eventCodes, $actionCodeLines);
+                $this->build_event_args_code($eventModel, $html_event_name, $eventCodes, $actionCodeLines);
                 $eventCodes[$html_event_name]['code'] = $actionCodeLines;
             }else{
                 $eventCodes[$html_event_name]['code'] = ["// NOT DEFINE ACTION;"];
@@ -865,7 +904,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             list('args'=>$args, 'code'=>$codeBlocks) = $eventInfo;
             if (!$codeBlocks) continue;
             $codeLines = [];
-            $codeLines[] = $this->myId(true)."_{$html_event_name}(".join(', ', $args).") {";
+            $codeLines[] = $this->myId(true)."_{$html_event_name}(".join(', ', array_keys($args)).") {";
             foreach ($codeBlocks as $codes){
                 $codeLines = array_merge($codeLines, $this->build->indent_code(1, $codes));
             }
@@ -1001,37 +1040,37 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @param $includeEvent boolean 是否包含事件输出绑定
      * @return void
      */
-    protected function build_main_attrs($includeEvent = true, $includeInputBind = true, $includeDataIndex=true) {
-        $this->build_css_attrs();
-        $myid = $this->myid();
+    protected function output_main_attrs($includeEvent = true, $includeInputBind = true, $includeDataIndex=true) {
+        $this->output_css_attrs();
         echo $this->wrap_output('data-uiid', $this->myid());
-        echo $this->wrap_output('x-id', "['{$myid}']");
         echo $this->wrap_output('data-type', strtolower($this->data['type']));
         if($includeDataIndex) echo $this->wrap_output(':data-index', $this->get_iterator_index_name());
         foreach ($this->_attrs as $name => $value){
             echo $this->wrap_output($name, $value);
         }
-        $this->build_data_output_bind();
-        if ($includeInputBind) $this->build_data_input_bind();
+        $this->output_data_output_bind();
+        if ($includeInputBind) $this->output_data_input_bind();
         if (!is_a($this, ValueList_View::class)){
-            $boundDataNames = [];
-            $boundDatas = $this->get_bound_datas($boundDataNames);
-            $outputDatas = $this->get_output_datas($outputDataNames);
+            $this->output_bound_value();
+        }
+        if($includeEvent) $this->output_event_listen_props();
+    }
+    protected function output_bound_value(){
+        $boundDataNames = [];
+        $boundDatas = $this->get_bound_datas($boundDataNames);
+//            $outputDatas = $this->get_output_datas($outputDataNames);
 //            var_dump($outputDatas);
-            $hasIterate = $this->need_iterate_data($iterateOutputAs, $dataName, $iterateDataName);
-            if($boundDatas){
-                foreach ($boundDataNames as $boundType => $boundDataName){
-                    if ($boundType === 'BOUND'){
-                        echo $this->wrap_output("data-bound", $hasIterate && $boundDataName==$dataName ? "itemOf{$iterateDataName}" : $boundDataName);
-                    }elseif ($boundType === 'VALUE'){
-                        echo $this->wrap_output(":data-value", $hasIterate && $boundDataName==$dataName  ? "itemOf{$iterateDataName}" : $boundDataName);
-                    }
+        $hasIterate = $this->need_iterate_data($iterateOutputAs, $dataName, $iterateDataName);
+        if($boundDatas){
+            foreach ($boundDataNames as $boundType => $boundDataName){
+                if ($boundType === 'BOUND'){
+                    echo $this->wrap_output("data-bound", $hasIterate && $boundDataName==$dataName ? "itemOf{$iterateDataName}" : $boundDataName);
+                }elseif ($boundType === 'VALUE'){
+                    echo $this->wrap_output(":data-value", $hasIterate && $boundDataName==$dataName  ? "itemOf{$iterateDataName}" : $boundDataName);
                 }
             }
         }
-        if($includeEvent) $this->build_event_listen();
     }
-
     /**
      * 获取绑定的输出数据项，该数据项可能是1级数据或者是数据下面的子数据，$dataName返回访问这个数据的访问路径。
      * 一个ui可以绑定多个输出类型，每个输出类型只能绑定一个数据项。
@@ -1085,7 +1124,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * 构建class输出，其中包含有条件的class和固定的class；构建hidden条件输出
      * @return void
      */
-    protected function build_css_attrs(){
+    protected function output_css_attrs(){
         $css = trim($this->get_css());
         $cssVariable = $this->css_of_state();
         $xShownExpression = $this->show_state_expression();
@@ -1099,53 +1138,25 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             echo $this->wrap_output('class', $css?:NULL);
         }
     }
-
+    protected abstract function get_input_data_name(&$inputIsArr=false, &$inputDataConfig = null);
     /**
      * 前端根据绑定数据类型及输出类型输出绑定
      * @return void
      */
-    protected abstract function build_data_output_bind();
+    protected abstract function output_data_output_bind();
     /**
      * 构建前端数据输入绑定
      * @return void
      */
-    protected abstract function build_data_input_bind();
+    protected abstract function output_data_input_bind();
     /**
      * 前端事件绑定
      * @return void
      */
-    protected abstract function build_event_listen();
+    protected abstract function output_event_listen_props();
 
-    protected function get_event_listen_props(){
-        $events = $this->build->get_events($this->myid());
-        $eventHandlers = [];
-        $myid = $this->myid();
-        foreach ($events as $event){
-            if(!$event->uicomponent_event_id && $this->isLifeCycleEvent($event->event)) continue;
-            $name = strtolower($event->uicomponent_event_id ? $event->event : $this->eventName($event->event));
-            if (!$name) continue;
-            if (!$this->is_custom_ui() && $name=='change') {
-                $inputDataName = $this->get_input_data_name();
-                $eventHandlers['x-init'] = "\$watch(alpinejs_get_input_data_name(\$el, '{$inputDataName}'), (value, oldValue) => {$myid}_change(value, oldValue))";
-            }else{
-                $eventHandlers['@'.$name] = $this->myid().'_'.$name;
-            }
-        }
-        return $eventHandlers;
-    }
-    /**
-     * 对于表单元素，输出表单特有的属性，比如name，disabled，readonly required placeholder等
-     *
-     * <strong style="color:red">注意这部分内容只能在具体的表单元素的上进行调用输出，比如input，textarea等</strong>
-     * @param false $notOutputId 默认输出表单元素id
-     */
-    protected function build_form_attrs ($includeName = true, $includeUuid=true) {
-        $myid = $this->myid();
-        if ($includeName) {
-            echo $this->wrap_output(':name', "\$id('{$myid}')");
-        }
+    protected function output_base_form_attrs ($includeUuid) {
         if($includeUuid) echo $this->wrap_output('data-uiid', $this->myId().$this->data['type']);
-
         if (@$this->data['meta']['form']['state']=='disabled'){
             echo ' disabled';
         }
@@ -1160,6 +1171,20 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         }
         echo $this->wrap_output('data-root', $this->myid());
     }
+    /**
+     * 对于表单元素，输出表单特有的属性，比如name，disabled，readonly required placeholder等
+     *
+     * <strong style="color:red">注意这部分内容只能在具体的表单元素的上进行调用输出，比如input，textarea等</strong>
+     * @param false $notOutputId 默认输出表单元素id
+     */
+    protected function output_form_attrs ($includeName = true, $includeUuid=true) {
+        $myid = $this->myid();
+        if ($includeName) {
+            echo $this->wrap_output('name', $myid);
+        }
+
+        $this->output_base_form_attrs($includeUuid);
+    }
 
     protected function wrap_icon($outputInner, $indent=null, $wrapTag='div', $iconTag='i') {
         $icon = $this->data['meta']['custom']['icon'];
@@ -1171,9 +1196,8 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         }
         echo PHP_EOL;
         echo $this->indent($indent ?: 1, true);
-        switch ($this->data['meta']['custom']['icon-position']) {
+        switch ($this->data['meta']['custom']['iconPosition']) {
             case 'top':{
-                echo $this->indent($indent ?: 1, true);
                 echo "<{$wrapTag}><{$iconTag} class='{$icon}'></{$iconTag}></{$wrapTag}>".PHP_EOL;
                 echo $this->indent($indent ?: 1, true);
                 $outputInner();
@@ -1205,7 +1229,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
         if (!$attr) return '';
         if ($justAttr) return " {$attr}";
         if (!isset($data)) return '';
-        $data = str_replace('"', '\"', $data);
+        $data = str_replace('"', "'", $data);
         return " {$attr}=\"{$data}\"";
     }
     public static function get_View_Class(array $uiconfig, Build_Model $build){
@@ -1581,15 +1605,28 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      */
     protected function set_iterator_index_name($indexName){
         $this->_iteratorIndexName = $indexName;
+        $idx = $this->get_parent_view()->get_iterator_index_names();
+        $idx[] = $indexName;
+        $this->_iteratorIndexNames = $idx;
         return $this;
     }
 
     /**
-     * 如果当前ui被迭代输出，该方法返回当前ui被迭代时的索引数据名，前端可以通过该数据名称获得动态的索引值
-     * @return mixed
+     * 如果当前ui被迭代输出，该方法返回当前ui被迭代时的索引数据名，前端可以通过该数据名称获得动态的索引值;
+     *
+     * @return array
      */
     protected function get_iterator_index_name(){
         return $this->_iteratorIndexName;
+    }
+
+    /**
+     * 返回上架及自己的迭代索引
+     * @return array
+     */
+    protected function get_iterator_index_names(){
+        if ($this->_iteratorIndexNames) return $this->_iteratorIndexNames;
+        return $this->parentView ? $this->parentView->get_iterator_index_names() : [];
     }
 
     /**
@@ -1599,13 +1636,13 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @return void
      */
     protected function add_used_variable($argName){
-        preg_match_all('/\b[a-zA-Z]+\b/', $argName, $matches);
+        preg_match_all('/\b[a-zA-Z\.]+\b/', $argName, $matches);
         foreach($matches[0] as $arg){
             $this->usedVariables[] = $arg;
         }
     }
-    protected function get_event_arg_names($event_name) {
-        $args = [
+    protected function get_base_event_args(){
+        return [
             'onchange' => [
                 'args' => [
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
@@ -1615,12 +1652,14 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             ],
             'oninput' => [
                 'args' => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', 'uuid' => 'boundData']
                 ]
             ],
             'onkeyup' => [
                 'args' => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'keyCode', "uuid" => 'keyCode'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
@@ -1628,6 +1667,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             ],
             'onkeydown' => [
                 'args' => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'keyCode', "uuid" => 'keyCode'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
@@ -1635,6 +1675,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             ],
             'onkeypress' => [
                 'args' => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'keyCode', "uuid" => 'keyCode'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
@@ -1642,54 +1683,77 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             ],
             'onclick' => [
                 "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
                 ]
             ],
             'ondblclick' => [
                 "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
                 ]
             ],
             'onmousedown' => [
                 "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
                 ]
             ],
             'onmouseup' => [
                 "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
                 ]
             ],
             'onmouseover' => [
                 "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
                 ]
             ],
             'onmouseout' => [
                 "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
                 ]
             ],
             'onmousemove' => [
                 "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
                 ]
             ],
             'onmouseenter' => [
                 "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
                 ]
             ],
             'onmouseleave' => [
                 "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onblur' => [
+                "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
+                    ["type" => 'string', "name" => 'value', "uuid" => 'value'],
+                    ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
+                ]
+            ],
+            'onfocus' => [
+                "args" => [
+                    ["type" => 'any', "name" => 'event', "uuid" => 'event'],
                     ["type" => 'string', "name" => 'value', "uuid" => 'value'],
                     ["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
                 ]
@@ -1697,33 +1761,135 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             'onfilechange' => [
                 "args" => [
                     ["type" => 'array', "name" => 'files', "uuid" => 'files', 'item' => ["type" => 'file']]
-
-                ]],
+                ]
+            ],
             'onuploadprogress' => [
                 "args" => [
                     ["type" => 'number', "name" => 'index', "uuid" => 'index'],
-                    ["type" => 'file', "name" => 'file', "uuid" => 'file'],
+                    ["type" => 'File', "name" => 'file', "uuid" => 'file'],
                     ["type" => 'number', "name" => 'progress', "uuid" => 'progress']
                 ]
             ],
             'onbeforeupload' => [
                 "args" => [
                     ["type" => 'number', "name" => 'index', "uuid" => 'index'],
-                    ["type" => 'file', "name" => 'file', "uuid" => 'file']
+                    ["type" => 'File', "name" => 'file', "uuid" => 'file']
                 ]
             ],
             'onfileuploaded' => [
                 "args" => [
                     ["type" => 'number', "name" => 'index', "uuid" => 'index'],
-                    ["type" => 'file', "name" => 'file', "uuid" => 'file'],
+                    ["type" => 'File', "name" => 'file', "uuid" => 'file'],
                     ["type" => 'any', "name" => 'rst', "uuid" => 'rst']
                 ]
             ]
         ];
-        $_ = ['event'];
-        foreach ($args[strtolower($event_name)]['args'] ?: [] as $item){
-            $_[] = $item['name'];
-        };
-        return $_;
+    }
+
+    /**
+     * 组件中输出的文案部分
+     * @return void
+     */
+    protected function body_text(){
+        return (strlen($this->data['meta']['value']) ? $this->data['meta']['value'] : @$this->data['meta']['title'])?:'';
+    }
+
+    /**
+     *
+     * 从代码表达式中找出所有变量名及其在代码中的位置
+     *
+     * 测试字符串：
+     *
+     * page.mutation=obj.sub.item2 + a[1] + '/' + page.mutation + \"obj.sub.item2 + '123'\"
+     *
+     *  page.obj.sub.item2.value
+     *
+     * page.mutation
+     *
+     * obj.a+123+abc[1]+obj.b[1].abc+'obj.a+123+abc[1]+obj.b[1].abc'
+     *
+     * function(abc){return obj.a+123+abc[1]+obj.b[1].abc+'obj.a+123+abc[1]+obj.b[1].abc'}
+     *
+     *
+     * @param $code
+     * @return array 每个数组项的第0个位置是变量名，第一个位置是所在第位置
+     */
+    public static function pick_data($code){
+        $dataNames = [];
+        preg_match_all("/(\w+|[^\w])/", $code, $matches, PREG_OFFSET_CAPTURE);
+        $isData = -1;
+        $dataName = '';
+        $endChar = '';
+        $position = -1;
+
+        if (!$matches[0]){
+            return $dataNames;
+        }
+        foreach($matches[0] as $index => $matche){
+            if ($isData===-1) { // 初始状态, 可能是第一次进来，也可能是匹配一个非变量名后重置
+                if (preg_match("/\w/", $matche[0])){ // 开始匹配变量名
+                    $isData = true;
+                    $dataName .= $matche[0];
+                    $position = $matche[1];
+                }else{
+                    // 不是变量名则看看是不是引号，是引号的话后面根据引号来判断结束
+                    $isData = false;
+                    if (substr($matche[0], -1)==='"'){
+                        $endChar='"';
+                    }else if(substr($matche[0], -1)==="'"){
+                        $endChar="'";
+                    }else if(substr($matche[0], -1)==="["){
+                        $endChar="]";
+                    }
+                }
+                continue;
+            }
+
+            if ($isData === true) { // 当前匹配的是变量名，则遇到非变量名时结束
+
+                if(preg_match("/([^\w\.\[\]])+/", $matche[0])){
+                    $dataNames[] = [$dataName,$position];
+                    $isData = -1;
+                    $dataName = '';
+                    $position = -1;
+                }else{// 继续拼接
+                    $dataName .= $matche[0];
+                }
+                continue;
+            }
+
+            // 当前匹配的不是变量名，则遇到另一个非变量名时结束回复到初始组状态
+            if(preg_match("/([^\w\.\[\]])+/", $matche[0])){
+                // 非变量，并且没有成对符合，或者有成对符合并且当前就是结束符号
+                if (!$endChar || ($endChar && substr($matche[0], -1) === $endChar)){
+                    $isData = false;
+                    $dataName = '';
+                    $position = -1;
+                    if (!$endChar){// 是否开启成对符号
+                        if (substr($matche[0], -1)==='"'){
+                            $endChar='"';
+                        }else if(substr($matche[0], -1)==="'"){
+                            $endChar="'";
+                        }else if(substr($matche[0], -1)==="["){
+                            $endChar="]";
+                        }
+                    }else{
+                        $endChar = '';
+                    }
+                }
+            }else{
+                // 匹配到了变量名，并且当前没有成对符号，表明开启了新变量名
+                if (!$endChar){
+                    $isData = true;
+                    $dataName .= $matche[0];
+                    $position = $matche[1];
+                }
+            }
+        }
+        // 收尾情况
+        if ($position!=-1 && $dataName){
+            $dataNames[] = [$dataName,$position];
+        }
+        return $dataNames;
     }
 }

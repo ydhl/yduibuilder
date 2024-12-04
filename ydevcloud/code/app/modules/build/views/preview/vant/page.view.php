@@ -25,7 +25,7 @@ class Page_View extends Preview_View {
     {
         $space =  $this->indent();
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">";
         echo "\r\n";
         foreach ($this->childViews as $view){

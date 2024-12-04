@@ -3,36 +3,6 @@ if (!this.YDECloud) {
     this.YDECloud = {};
 }
 ( function() {
-    if (typeof YDECloud.openPage !== 'function'){
-        /**
-         * 用layer封装 page的打开
-         *
-         * @param pageId 要打开的页面id
-         * @param url 要打开的地址
-         */
-        YDECloud.openPage = function ({pageId, url}){
-            var index = layer.open({
-                title: 'loading'
-                ,shade: 0
-                ,skin: 'layer-adapter'
-                ,shadeClose: false
-                ,area: ['80%','80%']
-                ,maxmin: true
-                ,resize: true
-                ,fixed: false
-                ,zIndex: layer.zIndex
-                ,type: 2
-                ,minStack: true
-                ,closeBtn: true
-                ,content: url
-                ,success: function (el){
-                    const title = el.find("iframe").get(0).contentDocument.title
-                    var index = layer.getFrameIndex(title)
-                    layer.title(title, index)
-                }
-            });
-        }
-    }
     if (typeof YDECloud.openModal !== 'function'){
         /**
          * 用layer封装bootstrap的modal

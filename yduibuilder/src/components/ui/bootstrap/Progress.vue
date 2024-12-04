@@ -39,6 +39,7 @@ export default {
     })
     const uiStyle = computed(() => {
       const style = progress.getUIStyle()
+      if (!style['min-width'])style['min-width'] = '100px'
       delete style.color
       return progress.appendImportant(style)
     })

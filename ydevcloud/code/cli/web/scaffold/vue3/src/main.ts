@@ -1,8 +1,17 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import './registerServiceWorker'
-import router from './router'
-import store from './store'
-import '@/assets/index.scss'
+import './assets/index.css'
 
-createApp(App).use(store).use(router).mount('#app')
+import { createApp, type Directive } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+import router from './router'
+import * as directives from "./directives";
+{{import}}
+const app = createApp(App)
+
+Object.keys(directives).forEach(key => {
+  app.directive(key, (directives as { [key: string]: Directive })[key]);
+});
+app.use(createPinia())
+app.use(router)
+
+app.mount('#app')

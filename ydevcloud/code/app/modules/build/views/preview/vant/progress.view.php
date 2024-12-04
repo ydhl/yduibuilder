@@ -21,7 +21,7 @@ class Progress_View extends Preview_View {
         $outputDatas = $this->get_output_datas($outputDataNames);
 
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         echo $this->indent(1).'<span';

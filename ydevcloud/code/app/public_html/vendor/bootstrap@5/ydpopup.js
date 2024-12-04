@@ -14,15 +14,17 @@ if (!this.YDECloud) {
             case 'no': backdrop = false;break;
         }
 
-        $(`#${id}`).on('hidden.bs.modal', event => {
+        document.getElementById(id).addEventListener('hidden.bs.modal', event => {
             $(`#${id}`).remove()
             // 弹窗加载的其他资源一并删除
             $(`[data-page-uuid=${id}]`).remove()
         })
-        $(`#${id}`).modal({
+
+        const model = new bootstrap.Modal(`#${id}`, {
             backdrop,
             keyboard
         })
+        model.show()
     }
     /**
      * 加载提示框
@@ -44,41 +46,6 @@ style="display: flex!important;justify-content: center;align-items: center; posi
     YDECloud.hideLoading = function (){
         $('#ydecloud-loading').remove()
     }
-    /**
-     * bootstrap 用model打开url指定的page
-     * page 通过iframe和当前页面做隔离
-     *
-     * @param currPageId 当前页面id
-     * @param pageId 要打开的页面id
-     * @param url 要打开的地址
-     */
-    YDECloud.openPage = function ({currPageId, pageId, url,  esc=true, backdrop= 'yes', events={}}){
-        const id = pageId
-        const listen = []
-        for (const eventName in events) {
-            listen.push(`${eventName}="${events[eventName]}"`)
-        }
-        $(`[data-uiid="${currPageId}"]`).append(`<div class="modal fade" id="${id}">
-    <div style="pointer-events: none;display: flex;width: 100vw;height: 100vh;align-items: center;justify-content: center">
-        <div class="modal-dialog" ${listen.join(' ')} style="max-width: none !important;">
-            <div class="modal-content" style="width: 80vw;height: 70vh">
-                <div class="modal-header">
-                    <h5 class="modal-title" x-text="$store.loadSubPages['${url}']||'Loading'"></h5>
-                    <button type="button" onclick="YDECloud.closeSelf(this)" class="close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body p-0" id="${id}Body">
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>`);
-        YDECloud.loadUrl(url, `#${id}Body`).then(() => {
-            showModal(id, backdrop, esc)
-        })
-    }
-
     /**
      * 打开bootstrap的modal
      *
@@ -112,14 +79,16 @@ style="display: flex!important;justify-content: center;align-items: center; posi
      * @param id
      */
     YDECloud.closeModal = function(id){
-        $('#'+id).modal('hide')
+        const model = bootstrap.Modal.getOrCreateInstance(document.getElementById(id))
+        model.hide()
     }
     /**
      * 弹窗内的元素关闭弹窗
      * @param self
      */
     YDECloud.closeSelf = function(self){
-        $(self).parents('.modal').modal('hide')
+        const model = bootstrap.Modal.getOrCreateInstance($(self).parents('.modal').get(0))
+        model.hide()
     }
 
 }())

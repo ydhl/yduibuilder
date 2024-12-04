@@ -16,6 +16,7 @@ class Build_Module extends YZE_Base_Module{
                 'preview/page/(?P<pageid>[^/]+)'	=> ['controller' => 'preview', 'action' => 'page'],
                 'preview/popup/(?P<pageid>[^/]+)'	=> ['controller' => 'preview', 'action' => 'popup'],
                 'preview/(?P<pid>[^/]+)'	=> [ 'controller' => 'preview' ],
+                'code/component/export'	=> [ 'controller' => 'code', 'action'=>'component_export' ],
                 'code/(?P<pid>[^/]+)'	=> [ 'controller' => 'code' ],
                 'code/(?P<pid>[^/]+)/common'	=> [ 'controller' => 'code', 'action'=>'common' ],
                 'code/page/(?P<pageid>[^/]+)'	=> ['controller' => 'code', 'action' => 'page'],

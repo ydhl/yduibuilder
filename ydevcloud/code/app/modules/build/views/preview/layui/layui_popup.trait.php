@@ -63,7 +63,7 @@ trait Layui_Popup {
      * @param $eventName
      * @return string
      */
-    protected function get_popup_page_url($page) {
+    protected function get_page_url($page) {
         return '/preview/page/'.$page->uuid;
     }
 

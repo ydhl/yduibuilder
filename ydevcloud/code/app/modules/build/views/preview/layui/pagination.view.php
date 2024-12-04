@@ -22,7 +22,7 @@ class Pagination_View extends Preview_View implements Valuable_View {
 
         $space =  $this->indent();
         echo "{$space}<div";
-        echo $this->build_main_attrs(true, false);
+        echo $this->output_main_attrs(true, false);
         echo "></div>".PHP_EOL;
     }
     protected function css_map()

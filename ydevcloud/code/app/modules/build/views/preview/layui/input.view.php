@@ -72,7 +72,7 @@ document.querySelector('#<?= $this->myId(true)?> .layui-reset').addEventListener
         $this->wrap_icon(function(){
             echo '<input';
             echo $this->wrap_output('type', @$this->data['meta']['custom']['inputType'] ?: 'text');
-            echo $this->build_form_attrs();
+            echo $this->output_form_attrs();
             echo $this->wrap_output('class', 'layui-input-custom');
             if (@$this->data['meta']['custom']['maxLength']){
                 echo $this->wrap_output('length', $this->data['meta']['custom']['maxLength']);

@@ -111,6 +111,17 @@ class Code_Controller extends YZE_Resource_Controller {
             throw new YZE_FatalException(sprintf(__('not found target %s'), $project_setting['frontend'].'/'.$frontendFramework.$majorFrontendFrameworkVersion ));
         }
     }
+    public function component_export(){
+        $request = $this->request;
+        $this->layout = '';
+        $framework = strtolower(trim($request->get_from_get("framework")));
+        $ui = strtolower(trim($request->get_from_get("ui")));
+        $component = trim($request->get_from_get("component"));
+        $frontend = strtolower(trim($request->get_from_get("frontend")));
+
+        echo file_get_contents($request->view_path()."/code/{$frontend}/{$ui}_{$framework}/component/{$component}.vue");
+        die;
+    }
     public function exception(\Exception $e){
         $request = $this->request;
         $this->layout = 'error';

@@ -32,15 +32,16 @@
              :title="t('action.validate')"  resize :shade="true" :area="['800px', '60vh']" :btn="buttons">
     <div class="p-2 d-flex gap-2">
       <div class="w-50">
+        <div class="text-muted">{{t('api.model.valid.pleaseChooseValidData')}}</div>
         <template v-if="queryDatas && queryDatas.length > 0">
           <template v-for="(queryData, index) in queryDatas" :key="index">
-            <DataPicker @checked="updateValidate" :checked-uuids="checkedUuids" path="page" :root-uuid="queryData.uuid"
+            <DataPicker @checked="updateValidate" :show-invalid-msg="true" :checked-uuids="checkedUuids" path="page" :root-uuid="queryData.uuid"
                          :index="0" :model="queryData" :intent="0"></DataPicker>
           </template>
         </template>
         <template v-if="pageDatas && pageDatas.length > 0">
           <template v-for="(pageData, index) in pageDatas" :key="index">
-            <DataPicker @checked="updateValidate" :checked-uuids="checkedUuids" path="page" :root-uuid="pageData.uuid"
+            <DataPicker @checked="updateValidate" :show-invalid-msg="true" :checked-uuids="checkedUuids" path="page" :root-uuid="pageData.uuid"
                          :index="0" :model="pageData" :intent="0"></DataPicker>
           </template>
         </template>

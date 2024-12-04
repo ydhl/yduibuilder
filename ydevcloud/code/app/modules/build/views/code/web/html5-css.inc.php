@@ -44,12 +44,14 @@ foreach ($pages as $page){
 }
 
 foreach ($commonStyles as $selector=>$style){
+    if (!trim($style)) continue;
     $build->output_code( $selector.' {',0);
     $build->output_code($style, 1);
     $build->output_code('}', 0);
 }
 
 foreach ($styles as $selector => $style){
+    if (!trim($style)) continue;
     $build->output_code($selector.' {', 0);
     $build->output_code($style, 1);
     $build->output_code('}', 0);

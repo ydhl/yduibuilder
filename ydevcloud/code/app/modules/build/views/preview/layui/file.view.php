@@ -46,7 +46,7 @@ class File_View extends Preview_View {
         echo $this->wrap_output('multiple', $this->data['meta']['custom']['multiple']);
         echo ">";
         echo $this->indent(3) . '<input class="layui-w-100" type="file"';
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
         echo ">\r\n";
         echo "{$space}</div>\r\n";
     }

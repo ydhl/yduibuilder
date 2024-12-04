@@ -49,7 +49,7 @@ trait Page_Bind_Data_Model_Method{
                 $path[] = $dataSource['name'];// 注意如果数组没有name也需要加上
                 return $rst;
             }
-        }else if ($dataSource['type'] == 'object') {
+        }else if (in_array($dataSource['type'], ['object','file','blob'])) {
             foreach ($dataSource['props'] as $prop) {
                 $rst = $this->find_data($data_id, $prop, $allParents, $path);
                 if ($rst) {

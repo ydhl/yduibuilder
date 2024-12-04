@@ -2,13 +2,11 @@
 namespace app\modules\build\views\preview\bootstrap;
 use app\modules\build\views\code\Base_Code_Fragment;
 
-use app\modules\build\views\code\Io_Data_Fetch;
 use app\modules\build\views\preview\Alpine;
 use app\modules\build\views\preview\Html_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Helper;
 use app\modules\build\views\preview\Preview_View;
 use app\modules\build\views\preview\Valuable_View;
-use yangzie\YZE_View_Component;
 
 /**
  * <pre>
@@ -36,40 +34,62 @@ class Input_View extends Preview_View implements Valuable_View {
 
         echo "{$space}<div";
         echo $this->wrap_output("style", "position: relative;");
+
+        $xShownExpression = $this->show_state_expression();
+        if ($xShownExpression){
+            echo $this->wrap_output('x-show', $xShownExpression);
+        }
+
+        echo $this->wrap_output("data-root", null, true);
         echo $this->wrap_output(":data-index", $this->get_iterator_index_name());
-        echo ">";
-        echo $this->indent(1);
-        $this->wrap_icon(function() use($iteratorDataName, $isArr, $outputDataName, $inputDataName, $eventHandlers){
-            echo '<input'.$this->wrap_output('type', @$this->data['meta']['custom']['inputType'] ?: 'text');
-            $this->build_main_attrs(true, true, false);
-            echo $this->wrap_output("autocomplete", $this->data['meta']['custom']['autocomplete']?:NULL);
-            echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength']?:NULL);
-            echo $this->build_form_attrs(true, false);
+        echo ">".PHP_EOL;
 
-            echo $this->wrap_output('@blur', $eventHandlers['@blur']);
-            echo $this->wrap_output('@focus', $eventHandlers['@focus']);
-
-            if ($this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
-                echo $this->wrap_output('@keyup', $this->myid().'_keyup');
+        $icon = $this->data['meta']['custom']['icon'];
+        switch ($this->data['meta']['custom']['iconPosition']) {
+            case 'top':
+            case 'left':{
+                echo $this->indent(1)."<div class='{$icon}' style='position:absolute;left:10px;top:0px;height:100%;align-items:center;display:flex;'></div>".PHP_EOL;
             }
-            if (!$outputDataName['VALUE']){
-                echo $this->wrap_output(':value', $inputDataName);
-            }else{
-                echo $this->wrap_output(':value', $isArr ? $iteratorDataName : $outputDataName['VALUE']);
-            }
-            echo ">".PHP_EOL;
-        },$this->get_build()->get_indent() + 1);
+        }
 
-        if (@$this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
+        echo $this->indent(1).'<input'.$this->wrap_output('type', @$this->data['meta']['custom']['inputType'] ?: 'text');
+        $this->output_main_attrs(false, true, false);
+        echo $this->wrap_output("autocomplete", $this->data['meta']['custom']['autocomplete']?:NULL);
+        echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength']?:NULL);
+        echo $this->output_form_attrs(true, false);
+
+        $this->output_event_listen_props();
+
+        if (($this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']) && !$eventHandlers['@keyup']){
+            echo $this->wrap_output('@keyup', $this->myid().'_keyup');
+        }
+        if (!$outputDataName['VALUE']){
+            echo $this->wrap_output(':value', $inputDataName);
+        }else{
+            echo $this->wrap_output(':value', $isArr ? $iteratorDataName : $outputDataName['VALUE']);
+        }
+        echo ">".PHP_EOL;
+
+        if ($icon || @$this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
             echo $this->indent(1) . '<div';
             echo $this->wrap_output('style', $this->get_action_style());
             echo $this->wrap_output('class', $this->get_action_class());
             echo '>'.PHP_EOL;
         }
+        if (@$icon){
+            switch ($this->data['meta']['custom']['iconPosition']) {
+                case 'bottom':
+                case 'right':{
+                    echo $this->indent(2);
+                    echo "<div class='{$icon}'></div>";
+                    echo PHP_EOL;
+                }
+            }
+        }
         if (@$this->data['meta']['custom']['wordCountVisible']){
             echo $this->indent(2) . "<span class='word-count' x-text='alpinejs_get_value(\$el, \"{$myid}_wordCount{$indexSuffix}\")'></span>";
             if (@$this->data['meta']['custom']['maxLength']){
-                echo "/".$this->data['meta']['custom']['maxLength'];
+                echo " / ".$this->data['meta']['custom']['maxLength'];
             }
             echo PHP_EOL;
         }
@@ -77,7 +97,7 @@ class Input_View extends Preview_View implements Valuable_View {
         if (@$this->data['meta']['custom']['clearButtonVisible']){
             echo $this->indent(2) . "<div @click='".$this->myid()."_clear' class='cursor' x-show='alpinejs_get_value(\$el, \"{$myid}_clearButtonVisible{$indexSuffix}\")'>×</div>".PHP_EOL;
         }
-        if (@$this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
+        if ($icon || @$this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
             echo $this->indent(1) . "</div>".PHP_EOL;
         }
 
@@ -86,7 +106,10 @@ class Input_View extends Preview_View implements Valuable_View {
     public function build_style($justSelf = true)
     {
         $style = parent::build_style($justSelf);
-        $style['[data-uiid='.$this->myid().'] .action'] = 'position: absolute; right: 10px; display: flex;column-gap: 10px;top: 0px;height: 100%;line-height: 2.4;';
+        $icon = $this->data['meta']['custom']['icon'];
+        if($icon) {
+            $style['[data-uiid='.$this->myid().']'] .= in_array($this->data['meta']['custom']['iconPosition'],['bottom','right']) ? 'padding-right: 60px' : 'padding-left: 30px';
+        }
         return $style;
     }
     public function build_code(): Base_Code_Fragment
@@ -118,13 +141,6 @@ class Input_View extends Preview_View implements Valuable_View {
             }
         }
 
-        // keyup事件
-        if ($wordCountVisible || $clearButtonVisible){
-            $codeLines[] = "{$myId}_keyup (event) {";
-            $codeLines[] = $this->indent(1, true)."alpinejs_input_keyup(this, event.target, '{$myId}', '{$inputDataName}')";
-            $codeLines[] = '},';
-        }
-
         // click事件
         if (@$clearButtonVisible){
             $codeLines[] = "{$myId}_clear (event) {";
@@ -133,6 +149,23 @@ class Input_View extends Preview_View implements Valuable_View {
         }
         $this->get_code_Fragment()->add_code(Html_Code_Fragment::SECTION_EVENT, $codeLines);
         return $this->get_code_fragment();
+    }
+    protected function get_event_action_codes(){
+        $codes = parent::get_event_action_codes();
+        $wordCountVisible = $this->data['meta']['custom']['wordCountVisible'];
+        $clearButtonVisible = $this->data['meta']['custom']['clearButtonVisible'];
+        $inputDataName = $this->get_input_data_name($inputIsArr);
+        $myId = $this->myid();
+        // keyup事件
+        if ($wordCountVisible || $clearButtonVisible){
+            if ($codes['keyup']){
+                $codes['keyup']['code'][] = "alpinejs_input_keyup(this, event.target, '{$myId}', '{$inputDataName}')";
+            }else{
+                $codes['keyup'] = ['code'=>[],'args'=>['event' => ["type" => 'any', "name" => 'event', "uuid" => 'event']],'comment'=>''];
+                $codes['keyup']['code'][] = "alpinejs_input_keyup(this, event.target, '{$myId}', '{$inputDataName}')";
+            }
+        }
+        return $codes;
     }
     protected function output_as_prop($outputAs, $outputData)
     {

@@ -365,12 +365,20 @@ class Bind_Controller extends YZE_Resource_Controller {
         $parentArrData = $bindDataModel->get_parent_of_data_id($data_id, ['array','map']);
         if (!$parentArrData) return;
         // 上级数据绑定的ui, 上级数据绑定了，才能绑定下级
-        $bindIO = Page_Bind_Io_Model::from()->where("page_id=:pid and data_id=:did and type='out'")
-            ->get_Single([':pid'=>$this->page->id, ':did'=>$parentArrData['uuid']]);
-        if (!$bindIO) throw new YZE_FatalException(__('Please bind the superior data output first'));
-        $parentBoundUI = $this->page->find_ui_item($bindIO->uiid);
-        if (!$parentBoundUI) throw new YZE_FatalException(__('Please bind the superior data output first'));
-        if (!$this->page->is_sub_ui($check_uiid, $parentBoundUI) && $check_uiid!=$parentBoundUI->meta->id) throw new YZE_FatalException(__('Must be bound to the subordinate UI of the UI bound to the superior array'));
+        $bindIOs = Page_Bind_Io_Model::from()->where("page_id=:pid and data_id=:did and type='out'")
+            ->select([':pid'=>$this->page->id, ':did'=>$parentArrData['uuid']]);
+        if (!$bindIOs) throw new YZE_FatalException(__('Please bind the superior data output first'));
+        $parentHasBound = false;
+        foreach ($bindIOs as $bindIO){
+            $parentBoundUI = $this->page->find_ui_item($bindIO->uiid);
+            if (!$parentBoundUI) continue;
+            if ($this->page->is_sub_ui($check_uiid, $parentBoundUI) || $check_uiid==$parentBoundUI->meta->id){
+                $parentHasBound = true;
+                break;
+            }
+        }
+        if (!$parentHasBound)
+            throw new YZE_FatalException(__('Must be bound to the subordinate UI of the UI bound to the superior array'));
     }
 
     private function check_bind_in($from_uuid, $data_id, $check_uiid){
@@ -396,7 +404,6 @@ class Bind_Controller extends YZE_Resource_Controller {
         $bound_as = trim($request->get_from_post("bound_as"))?:'none';
 
         // 同一个数据的输入和循环输出不能绑定在同一个ui上：出现了自己把自己改变了的情况
-
         $build = new Build_Model($this, $this->page, 0);
         $UIView = Preview_View::create_View($build);
 
@@ -458,9 +465,8 @@ class Bind_Controller extends YZE_Resource_Controller {
         $this->layout = '';
         $post_data = json_decode(trim(file_get_contents("php://input")), true);
         $this->valid($post_data['page_uuid']);
+
         $page = $this->page;
-
-
         $saveHelper = new Save_Model_Helper();
         $saveHelper->alias_classes = Page_Bind_Data_Model::CLASS_NAME;
         $saveHelper->fetch_modify_model = function($data) {
@@ -477,7 +483,7 @@ class Bind_Controller extends YZE_Resource_Controller {
             'name'=>function ($model, $value) {
                 $value = trim($value);
                 if (!$value) throw new YZE_FatalException(__('Please input name'));
-                if (in_array(strtolower($value), $this->words())) throw new YZE_FatalException(__('The data name cannot be a reserved keyword'));
+                if (in_array(strtolower($value), reserve_words())) throw new YZE_FatalException(__('The data name cannot be a reserved keyword'));
                 $bind_data = Page_Bind_Data_Model::from()
                     ->where('name=:name and is_deleted=0 and id!=:id and page_id=:pid')
                     ->get_Single([':name'=>$value,':id'=>intval($model->id),':pid'=>$this->page->id]);
@@ -493,61 +499,60 @@ class Bind_Controller extends YZE_Resource_Controller {
         }
         $post_data['enumValue'] = json_encode($post_data['enumValue'], JSON_UNESCAPED_UNICODE);
         $bind_data = $saveHelper->save($post_data);
+
+        $nameChanged = $post_data['nameChanged'];
+        if ($nameChanged['new'] && $nameChanged['old'] && $nameChanged['new'] !== $nameChanged['old']){
+            $this->changeDataName($page, $bind_data, $nameChanged['dataId'], $nameChanged['old']);
+        }
         return YZE_JSON_View::success($this, ['uuid'=>$bind_data->uuid]);
     }
-    private function words(){
-        return [
-            'break',
-            'case',
-            'catch',
-            'class',
-            'const',
-            'continue',
-            'debugger',
-            'default',
-            'delete',
-            'do',
-            'else',
-            'enum', // 保留字，但在ES中没有实际功能
-            'export',
-            'extends',
-            'finally',
-            'for',
-            'function',
-            'if',
-            'implements', // 保留字，但在ES中没有实际功能
-            'import',
-            'in',
-            'instanceof',
-            'interface', // 保留字，但在ES中没有实际功能
-            'let',
-            'new',
-            'package', // 保留字，但在ES中没有实际功能
-            'private', // 提案中的关键字，尚未在ES规范中正式定义
-            'protected', // 提案中的关键字，尚未在ES规范中正式定义
-            'public', // 提案中的关键字，尚未在ES规范中正式定义
-            'return',
-            'static',
-            'super',
-            'switch',
-            'this',
-            'throw',
-            'try',
-            'typeof',
-            'var',
-            'void',
-            'while',
-            'with',
-            'yield',
-            'async',
-            'await',
-            'true',
-            'false',
-            'null',
-            'undefined',
-            'NaN',
-            'Infinity'
-        ];
+    private function changeDataName(Page_Model $page, Page_Bind_Data_Model $bindData, $dataId, $old){
+        $dataModel = $bindData->get_data_model();
+        $path = [];
+        $dataConfig = $bindData->find_data($dataId, $dataModel, $allParents, $path);
+        $path = $oldPath = array_reverse($path);
+        $path[] = $dataConfig['name'];
+        $oldPath[] = $old;
+        $newDataName = join('.', $path);
+        $oldDataName = join('\.', $oldPath);
+        //页面中所有关联的表达式中的数据同步修改
+        $dba = YZE_DBAImpl::get_instance();
+        $sql = "select id, `expression`, code from page_bind_api_action where is_deleted=0 and page_id=".$page->id;
+        $rst = $dba->native_Query($sql);
+        while ($rst->next()){
+            $id = $rst->f('id');
+            $expression = html_entity_decode($rst->f('expression'));
+            $code = html_entity_decode($rst->f('code'));
+            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression) ?: $expression;
+            $code = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $code) ?: $code;
+            $dba->exec('update page_bind_api_action set expression='.$dba->quote($newExpression).', code='.$dba->quote($code).' where id='.$id);
+        }
+        $sql = "select id, from_expression from page_bind_variable where is_deleted=0 and from_page_id=".$page->id;
+        $rst = $dba->native_Query($sql);
+        while ($rst->next()){
+            $id = $rst->f('id');
+            $expression = html_entity_decode($rst->f('from_expression'));
+            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
+            if($newExpression) $dba->exec('update page_bind_variable set from_expression='.$dba->quote($newExpression).' where id='.$id);
+        }
+        $sql = "select id, `expression` from page_bind_state where is_deleted=0 and page_id=".$page->id;
+        $rst = $dba->native_Query($sql);
+        while ($rst->next()){
+            $id = $rst->f('id');
+            $expression = html_entity_decode($rst->f('expression'));
+            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
+            if($newExpression) $dba->exec('update page_bind_state set expression='.$dba->quote($newExpression).' where id='.$id);
+        }
+        $sql = "select m.id, m.expression from mutation as m 
+                left join `action` as a on a.id = m.action_id 
+                where m.is_deleted=0 and a.is_deleted=0 and a.page_id=".$page->id;
+        $rst = $dba->native_Query($sql);
+        while ($rst->next()){
+            $id = $rst->f('id');
+            $expression = html_entity_decode($rst->f('expression'));
+            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
+            if($newExpression) $dba->exec('update mutation set expression='.$dba->quote($newExpression).' where id='.$id);
+        }
     }
     // 页面删除绑定api
     /**

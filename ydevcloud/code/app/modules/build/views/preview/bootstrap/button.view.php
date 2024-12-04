@@ -12,6 +12,12 @@ class Button_View extends Preview_View {
         $space =  $this->indent();
         $meta = $this->data['meta'];
         $type = $meta['custom']['type'] ?: "button";
+
+        $outputDatas = $this->get_output_datas($dataName);
+        if ($outputDatas) {
+            $htmlDataName = $this->get_output_data_name('HTML', $outputDatas['HTML'], $dataName['HTML']);
+        }
+
         // 一般按钮
         echo $space;
         if (@$meta['custom']['type']=='link'){
@@ -20,11 +26,13 @@ class Button_View extends Preview_View {
             if (@$this->data['meta']['custom']['disabled']){
                 echo ' disabled ';
             }
-            $this->build_main_attrs();
+            $this->output_main_attrs();
             echo '>';
-            $this->wrap_icon(function(){
-                echo $this->data['meta']['title'] ?: '';
-            },$this->get_build()->get_indent() + 1);
+            if (!$htmlDataName){
+                $this->wrap_icon(function(){
+                    echo $this->body_text();
+                },$this->get_build()->get_indent() + 1);
+            }
             echo PHP_EOL;
             echo $space."</a>".PHP_EOL;
         }else{
@@ -34,11 +42,14 @@ class Button_View extends Preview_View {
             if (@$this->data['meta']['custom']['disabled']){
                 echo ' disabled ';
             }
-            $this->build_main_attrs();
+            $this->output_main_attrs();
             echo '>';
-            $this->wrap_icon(function(){
-                echo $this->data['meta']['title'] ?: '';
-            },$this->get_build()->get_indent() + 1);
+
+            if (!$htmlDataName) {
+                $this->wrap_icon(function () {
+                    echo $this->body_text();
+                }, $this->get_build()->get_indent() + 1);
+            }
             echo PHP_EOL;
             echo $space."</button>".PHP_EOL;
         }

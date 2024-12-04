@@ -171,7 +171,7 @@ trait Page_Bind_Api_Model_Method{
                     $info[] = $uiconfig->meta->title ? '「'.$uiconfig->meta->title.'」' :  '';
                     $info[] = $event->event;
                 }
-                return sprintf(__('The API is called when %s trigger event 「%s」 '), $info);
+                return vsprintf(__('The API is called when %s trigger event 「%s」 '), $info);
             case Page_Bind_API_Action_Model::CLASS_NAME:
                 $bind_action = Page_Bind_API_Action_Model::find_by_uuid($this->bind_uuid);
                 return $bind_action->get_condition_info();

@@ -80,7 +80,7 @@ if ($codes){?>
         <script type="module"><?php // 这里做在线预览，所以直接固定用petitevue的版本,并且明确知道用的是layer做弹窗?>
 
             import { createApp } from '<?= $build->get_root_Path()?>vendor/petitevue@0.4.0/petite-vue.es.js'
-            createApp(layerPageComponent({ pageId: '<?= $pageId?>', title: '<?= urlencode($page->name)?>', url: '<?= $this->get_popup_page_url($page)?>' })).mount("#<?= $pageId?>");
+            createApp(layerPageComponent({ pageId: '<?= $pageId?>', title: '<?= urlencode($page->name)?>', url: '<?= $this->get_page_url($page)?>' })).mount("#<?= $pageId?>");
         </script>
     </template>
 <?php
@@ -93,8 +93,8 @@ if ($codes){?>
      * @param $eventName
      * @return string
      */
-    protected function get_popup_page_url($page) {
-        return '/preview/page/'.$page->uuid;
+    protected function get_page_url($page) {
+        return '/preview/'.($page->page_type=='popup' ? 'popup' : 'page').'/'.$page->uuid;
     }
     /**
      * 预览时通过script 输出弹窗内容

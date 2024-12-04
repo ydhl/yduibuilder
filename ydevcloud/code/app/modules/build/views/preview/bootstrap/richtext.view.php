@@ -12,10 +12,13 @@ class Richtext_View extends Preview_View {
 
         $space =  $this->indent();
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">";
-        echo @$this->data['meta']['value'] ?: @$this->data['meta']['title'];
+        echo $this->default_value();
         echo "</div>".PHP_EOL;
+    }
+    protected function default_value() {
+        return @$this->data['meta']['value'] ?: @$this->data['meta']['title'];
     }
     protected function css_map()
     {

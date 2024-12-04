@@ -18,7 +18,7 @@
   <template v-else-if="myAction.popup_type=='alert'">
     <div class="d-inline-flex align-items-center justify-content-start">
       Alert(&nbsp;
-      <ExpressionDropdown :readonly="readonly" :has-mutation-operator="false" :variables="variables" @updateExpression="updateBoundAlert" :expression="alertExpression.expression"></ExpressionDropdown>
+      <ExpressionDropdown :readonly="readonly" :hide-arrow="true" :has-mutation-operator="false" :variables="variables" @updateExpression="updateBoundAlert" :expression="alertExpression.expression"></ExpressionDropdown>
       <ConfirmRemove icon="icon-remove" v-if="!readonly" @remove="removePopup"></ConfirmRemove>
       &nbsp;)
     </div>
@@ -50,7 +50,7 @@
   </lay-layer>
   <lay-layer v-model="pagePickDialogVisible" :title="t('common.page')" :shade="true" :area="['500px', '500px']" :btn="pagePickButtons">
     <div class="p-3">
-      <PagePicker :page-types="['page','popup']" :defualt-page-uuid="pickPageCache.popupPageId" @update="pickedPage"></PagePicker>
+      <PagePicker :page-types="['popup']" :defualt-page-uuid="pickPageCache.popupPageId" @update="pickedPage"></PagePicker>
     </div>
   </lay-layer>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div :class="[dragableCss, uiCss]"
+  <div :class="[dragableCss, uiCss, 'modal']"
        :draggable='draggable' :style="uiStyle" :id="myId" :data-type="uiconfig.type"
        :data-isContainer="true"
        :data-pageid="pageid">
@@ -10,7 +10,7 @@
             {{t('common.dragtohere')}}
           </template>
           <UIBase v-for="(item, index) in myItems.head" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
-          <button type="button" class="close" ><span>×</span></button>
+          <button type="button" class="btn-close"></button>
         </div>
         <div class="modal-body">
           <template v-if="!hasMainItems">
@@ -61,7 +61,7 @@ export default {
           delete style[styleKey]
         }
       }
-      return modal.appendImportant(style)
+      return modal.appendImportant(style) + 'width:auto !important;height: auto !important;display:inline !important;position:relative !important;'
     })
     const uiCss = computed(() => {
       const css = modal.getUICss()

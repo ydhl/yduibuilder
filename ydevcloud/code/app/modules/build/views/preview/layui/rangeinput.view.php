@@ -101,7 +101,7 @@ document.getElementById('<?= $this->myId(true)?>-range')?.addEventListener('chan
         echo $this->indent(3) . '<input type="range"';
         echo $this->wrap_output('id', $this->myId(true).'-range');
         echo $this->wrap_output('data-uiid', $this->myId().'-range');
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
         echo $this->wrap_output('min', $this->data['meta']['custom']['min']?:1);
         echo $this->wrap_output('max', $this->data['meta']['custom']['max']?:100);
         echo $this->wrap_output('step', $this->data['meta']['custom']['step']?:1);

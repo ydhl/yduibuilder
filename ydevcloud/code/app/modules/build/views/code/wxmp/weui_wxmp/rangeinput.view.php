@@ -18,7 +18,7 @@ class Rangeinput_View extends Preview_Rangeinput_View {
         echo "\r\n{$space}";
         echo "<slider ";
         echo 'class="w-100" show-value="true" ';
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
 
         $forceColor = '';
         if (@$this->data['meta']['custom']['theme'] && $this->data['meta']['custom']['theme'] != 'default'){

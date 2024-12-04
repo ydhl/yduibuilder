@@ -26,7 +26,7 @@ class Checkbox_View extends Preview_View {
             }
             echo " title='{$item['text']}'";
             echo ' id="'.$this->myId(true).$item['value'].'"';
-            echo $this->build_form_attrs();
+            echo $this->output_form_attrs();
             echo ' value="'.@$item['value'].'"';
             echo "'>\r\n";
             echo "{$space}</div>\r\n";

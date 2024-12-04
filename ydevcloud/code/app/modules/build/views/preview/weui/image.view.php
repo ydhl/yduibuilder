@@ -13,7 +13,7 @@ class Image_View extends Preview_View {
         $imgSrc = @$this->data['meta']['value']?:'/uibuilder.jpg';
         $imgSrc = $this->get_Img_Src($imgSrc);
         echo "{$space}<img";
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         echo $this->wrap_output("alt", $this->data['meta']['title']);
         echo $this->wrap_output("src", $imgSrc);
         echo "/>".PHP_EOL;

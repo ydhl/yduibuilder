@@ -15,13 +15,14 @@
         {{myModel.comment}}
     </span>
     <div class="pe-2 ps-2" @click.stop="check" >
+      <small class="text-muted pe-2" v-if="showInvalidMsg">{{myModel.invalidMsg}}</small>
       <input type="checkbox" :checked="checkedUuids.indexOf(myModel.uuid)!=-1">
     </div>
   </div>
 
   <template v-if="myModel.type=='object'  && isOpen">
     <DataPicker v-for="(item, index) in myModel.props" :bound-data="boundData" :variables="variables"
-                @checked="checked"
+                @checked="checked" :show-invalid-msg="showInvalidMsg"
                 :path="myPath" :rootUuid="rootUuid" :checked-uuids="checkedUuids"
                 :key="index" :intent="intent+1" :model="item" :index="index"></DataPicker>
   </template>
@@ -47,6 +48,7 @@ export default {
       type: Array
     }, // 选中的数据uuid
     index: Number,
+    showInvalidMsg: Boolean,
     intent: Number, // 缩进次数
     rootUuid: String, // model所在根节点记录的uuid
     path: String // 从根到自己到访问路径

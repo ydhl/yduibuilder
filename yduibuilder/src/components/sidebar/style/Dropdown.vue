@@ -8,6 +8,11 @@
       </div>
     </div>
     <DropdownValueList></DropdownValueList>
+    <div class="row">
+      <div class="col-sm-9 offset-3">
+        <label class=" form-check-label text-truncate d-block"><input type="checkbox" v-model="syncTitle" value="1"> {{ t('style.dropdown.syncTitle') }}</label>
+      </div>
+    </div>
     <div class="row" v-if="!isMobile">
       <div class="col-sm-9 offset-3">
         <label class=" form-check-label text-truncate d-block"><input type="checkbox" v-model="isSplitBtn" value="1"> {{ t('style.dropdown.splitBtn') }}</label>
@@ -74,54 +79,13 @@ export default {
     const { t } = useI18n()
     const store = useStore()
     const info = initUI()
-    const title = computed({
-      get: () => {
-        return info.getMeta('title') || ''
-      },
-      set: (v) => {
-        info.setMeta('title', v)
-      }
-    })
-    const menuAlign = computed({
-      get: () => {
-        return info.getMeta('menuAlign', 'custom') || 'left'
-      },
-      set: (v) => {
-        info.setMeta('menuAlign', v, 'custom')
-      }
-    })
-    const direction = computed({
-      get: () => {
-        return info.getMeta('direction', 'custom') || 'dropdown'
-      },
-      set: (v) => {
-        info.setMeta('direction', v, 'custom')
-      }
-    })
-    const size = computed({
-      get: () => {
-        return info.getMeta('dropdownSizing', 'css') || ''
-      },
-      set: (v) => {
-        info.setMeta('dropdownSizing', v, 'css')
-      }
-    })
-    const isOutline = computed({
-      get () {
-        return info.getMeta('isOutline', 'custom') || false
-      },
-      set (v) {
-        info.setMeta('isOutline', v, 'custom')
-      }
-    })
-    const isSplitBtn = computed({
-      get () {
-        return info.getMeta('isSplit', 'custom') || false
-      },
-      set (v) {
-        info.setMeta('isSplit', v, 'custom')
-      }
-    })
+    const title = info.computedWrap('title', '')
+    const menuAlign = info.computedWrap('menuAlign', 'custom', 'left')
+    const direction = info.computedWrap('direction', 'custom', 'dropdown')
+    const size = info.computedWrap('dropdownSizing', 'css', '')
+    const isOutline = info.computedWrap('isOutline', 'custom', false)
+    const isSplitBtn = info.computedWrap('isSplit', 'custom', false)
+    const syncTitle = info.computedWrap('syncTitle', 'custom', false)
     const parentIsNav = computed(() => {
       const { parentConfig } = store.getters.getUIItemInPage(info.selectedUIItemId.value, info.selectedPageId.value)
       return parentConfig.type.toLowerCase() === 'navbar' || parentConfig.type.toLowerCase() === 'nav'
@@ -138,7 +102,8 @@ export default {
       isOutline,
       parentIsNav,
       isMobile,
-      isSplitBtn
+      isSplitBtn,
+      syncTitle
     }
   }
 }

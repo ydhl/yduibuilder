@@ -14,7 +14,7 @@ class Progress_View extends Preview_View {
 
         $space =  $this->indent();
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         echo $this->indent(1).'<div';
@@ -95,7 +95,7 @@ class Progress_View extends Preview_View {
         return parent::output_as_prop($outputAs, $outputData);
     }
 
-    private function bar_css() {
+    protected function bar_css() {
         $css = ['progress-bar'];
         $styleMap = parent::style_map();
         if (@$this->data['meta']['css']['foregroundTheme'] && !$styleMap['color']){

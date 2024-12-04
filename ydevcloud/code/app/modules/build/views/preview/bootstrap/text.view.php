@@ -27,13 +27,11 @@ class Text_View extends Preview_View {
 
     public function build_ui()
     {
-        $type = strtolower(@$this->data['meta']['custom']['type'] ?: 'div');
+        $type = strtolower(@$this->data['meta']['custom']['type'] ?: 'span');
 
         $space =  $this->indent();
         echo "{$space}<{$type}";
-        echo $this->build_main_attrs();
-        echo ">";
-        echo htmlentities(strlen($this->data['meta']['value']) ? $this->data['meta']['value'] : @$this->data['meta']['title']);
-        echo "</{$type}>".PHP_EOL;
+        echo $this->output_main_attrs();
+        echo ">".$this->body_text()."</{$type}>".PHP_EOL;
     }
 }

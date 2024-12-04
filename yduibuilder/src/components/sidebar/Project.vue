@@ -195,7 +195,7 @@
   </div>
   <lay-layer v-model="movePageDlgVisible" :title="t('common.moveTo')" :shade="true" :area="['420px', '300px']" :btn="movePageButtons">
     <div class="p-2">
-      <FunctionPicker :data="modules" :single="true" :defualt-func-uuid="movePageFuncUuid" @update="(m,f)=>moveToFuncUuid = f.id" :defualt-module-uuid="movePageModuleUuid"></FunctionPicker>
+      <FunctionPicker :data="modules" :single="true" :defualt-func-uuid="movePageFuncUuid" @update="(m,f)=>{moveToFunc = f;moveToModule=m}" :defualt-module-uuid="movePageModuleUuid"></FunctionPicker>
     </div>
   </lay-layer>
 </template>
@@ -233,7 +233,8 @@ export default {
     const movePageFuncUuid = ref('')
     const movePageModuleUuid = ref('')
     let movePageUuid = ''
-    const moveToFuncUuid = ref('')
+    const moveToFunc = ref<any>({})
+    const moveToModule = ref<any>({})
     const { t } = useI18n()
     const pagePreviewPopup = ref()
     const hoverId = ref('')
@@ -268,6 +269,9 @@ export default {
       refresh(null)
     })
     watch(currPageId, () => {
+      refresh(null)
+    })
+    watch(currFunctionId, () => {
       refresh(null)
     })
     const gotoPage = (pid) => {
@@ -538,11 +542,12 @@ export default {
         text: t('common.moveTo'),
         callback: () => {
           movePageDlgVisible.value = false
-          ydhl.post('project/' + project.value.id + '/recovery', { page: movePageUuid, to: moveToFuncUuid.value }, [], (rst) => {
+          ydhl.post('project/' + project.value.id + '/recovery', { page: movePageUuid, to: moveToFunc.value.id }, [], (rst) => {
             if (!rst || !rst.success) {
               ydhl.alert(rst ? rst.msg : 'Oops, Please try again')
               return
             }
+            store.commit('movePage', { pageUuid: movePageUuid, module: moveToModule.value, func: moveToFunc.value })
             refresh(null)
           })
         }
@@ -581,7 +586,8 @@ export default {
       movePageButtons,
       movePageModuleUuid,
       movePageFuncUuid,
-      moveToFuncUuid,
+      moveToFunc,
+      moveToModule,
       timestamp: Date.parse((new Date()).toTimeString()),
       contextMenu,
       mouseleave,

@@ -54,10 +54,10 @@ export default {
     })
     const iconPosition = computed({
       get () {
-        return info.getMeta('icon-position', 'custom') || 'left'
+        return info.getMeta('iconPosition', 'custom') || 'left'
       },
       set (v) {
-        info.setMeta('icon-position', v, 'custom')
+        info.setMeta('iconPosition', v, 'custom')
       }
     })
     const openIconDialog = () => {

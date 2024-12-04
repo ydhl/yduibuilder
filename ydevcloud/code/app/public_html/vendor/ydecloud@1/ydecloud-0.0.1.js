@@ -86,24 +86,42 @@ if (!this.YDECloud) {
     }
     if (typeof YDECloud.loadUrl !== 'function'){
         YDECloud.loadUrl = function (url, appendToId) {
+            if (url.match(/\.(jpg|jpeg|png|gif|bmp|webp|svg)$/)){
+                console.log(appendToId)
+                return new Promise((resolve) => {
+                    $(appendToId).append(`<img style="width: 100%" src="${url}">`)
+                    resolve()
+                })
+            }
             return new Promise((resolve) => {
-                $.get(url, function (html) {
-                    const scripts = []
-                    const other = []
-                    for(let i=0; i< $(html).length; i++){
-                        const node = $(html).get(i);
-                        if (node.nodeName=='SCRIPT'){
-                            scripts.push(node)
-                        }else{
-                            other.push(node)
+                $.ajax({
+                    url,
+                    type: 'GET',
+                    success: function (html, status, xhr) {
+                        const contentType = xhr.getResponseHeader('Content-Type')
+                        if (contentType.startsWith('image/')){
+                            $(appendToId).append(`<img style="width: 100%" src="${url}">`)
+                            resolve()
+                            return
                         }
+
+                        const scripts = []
+                        const other = []
+                        for(let i=0; i< $(html).length; i++){
+                            const node = $(html).get(i);
+                            if (node.nodeName=='SCRIPT'){
+                                scripts.push(node)
+                            }else{
+                                other.push(node)
+                            }
+                        }
+                        $('body').append(scripts)
+                        // 把script单独提出来，先执行，延迟后在显示dom，避免其中绑定的x-text等数据提示不存在
+                        setTimeout(() => {
+                            $(appendToId).append(other)
+                            resolve()
+                        }, 300)
                     }
-                    $('body').append(scripts)
-                    // 把script单独提出来，先执行，延迟后在显示dom，避免其中绑定的x-text等数据提示不存在
-                    setTimeout(() => {
-                        $(appendToId).append(other)
-                        resolve()
-                    }, 300)
                 })
             })
         }

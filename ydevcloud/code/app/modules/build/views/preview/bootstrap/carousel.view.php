@@ -94,13 +94,13 @@ class Carousel_View extends ValueList_View {
 
         echo $this->indent(1).'<div class="carousel-inner"';
         echo $this->wrap_output(':id', "alpinejs_get_index(\$el, '{$myid}', '-inner')");
-        $this->build_event_listen();
         echo '>'.PHP_EOL;
         echo $this->indent(1)."</div>".PHP_EOL;
 
         echo $this->indent(1).'<template x-for="(itemOf'.$itemName.', idxOf'.$itemName.') in '
             .$iteratorName.'" :key="idxOf'.$itemName.'">'.PHP_EOL;
         echo $this->indent(1)."<div";
+        $this->output_event_listen_props();
         echo $this->wrap_output('class', 'carousel-item');
         echo $this->wrap_output(':data-value', $value);
         echo $this->wrap_output('data-bound', $boundData);
@@ -138,11 +138,15 @@ class Carousel_View extends ValueList_View {
         // 只处理标量数组
         $is_scale = $this->is_2d_scale_array($bindOutput) || $this->is_1d_scale_array($bindOutput);
 
-        $loadSubpages = '';
-        if ($is_scale) {
+        $loadSubpages = '';$append = '';
+        if (!$is_scale) {
+            if ($this->is_iteration($bindOutput)) {
+                $append = $this->appendChild();
+            }
+        }else{
+            $append = $this->appendChild();
             // 处理子页加载
             $loadSubpages = <<< SUB_PAGES
-
     const {$myid} = {}; 
     const {$myid}_subpages = document.querySelectorAll("[data-bs-target='{$myid}'].carousel-item");
     for( const subpage of {$myid}_subpages){
@@ -157,6 +161,7 @@ SUB_PAGES;
 
         $nextTick = <<< TICK
 this.\$nextTick(() => {
+    {$append}
     {$loadSubpages}
 })
 TICK;
@@ -181,7 +186,7 @@ TICK;
         $myid = $this->myid();
 
         echo "{$space}<div";
-        echo $this->build_main_attrs(false);
+        echo $this->output_main_attrs(false);
         echo $this->wrap_output('data-ride', 'carousel');
         echo $this->wrap_output(':id', "alpinejs_get_index(\$el, '{$myid}')");
         echo ">".PHP_EOL;
@@ -192,7 +197,7 @@ TICK;
         echo "</div>".PHP_EOL;
     }
 
-    private function placeholder_style()
+    protected function placeholder_style()
     {
         $map = ['background-color:#777'];
         if (!$this->data['meta']['style']['height'] && !$this->data['meta']['style']['min-height'] ){
@@ -220,7 +225,7 @@ TICK;
         foreach ($this->data['items'] as $index => $item){
             echo $this->indent(2);
             echo "<button";
-            echo $this->wrap_output("data-bs-target", "alpinejs_get_index(\$el, '{$myid}')");
+            echo $this->wrap_output(":data-bs-target", "alpinejs_get_index(\$el, '#{$myid}')");
             echo $this->wrap_output("data-bs-slide-to", $index);
             echo $this->wrap_output("type", 'button');
             echo $this->wrap_output("class", !isset($this->data['meta']['custom']['activeIndex']) && !$index || $this->data['meta']['custom']['activeIndex'] == $index ? 'active' : null);
@@ -233,11 +238,12 @@ TICK;
     private function build_static_slide(){
         echo $this->indent(1);
         echo '<div class="carousel-inner"';
-        $this->build_event_listen();
         echo '>'.PHP_EOL;
         if ( ! $this->data['items']) {
             echo $this->indent(2);
-            echo '<div class="carousel-item active">'.PHP_EOL;
+            echo '<div class="carousel-item active"';
+            $this->output_event_listen_props();
+            echo '>'.PHP_EOL;
             echo $this->indent(3);
             echo '<div class="d-block w-100 d-flex justify-content-center align-items-center"';
             echo $this->wrap_output('style', $this->placeholder_style());
@@ -256,6 +262,7 @@ TICK;
             echo $this->indent(2);
             echo "<div";
             echo $this->wrap_output('class', 'carousel-item '.(!isset($this->data['meta']['custom']['activeIndex']) && !$index || $this->data['meta']['custom']['activeIndex'] == $index ? 'active' : null));
+            $this->output_event_listen_props();
             echo $this->wrap_output('data-value', $index);
             echo ">".PHP_EOL;
             $view->increase_indent(2);
@@ -269,7 +276,7 @@ TICK;
         echo "</div>".PHP_EOL;
     }
     private function build_prev_next(){
-        if ( ! $this->data['meta']['custom']['showIndicator']) return;
+        if ( ! $this->data['meta']['custom']['showControl']) return;
         $myid = $this->myid();
 
         echo $this->indent(1).'<a class="carousel-control-prev" type="button"';

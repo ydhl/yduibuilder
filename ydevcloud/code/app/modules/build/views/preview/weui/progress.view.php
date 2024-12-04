@@ -23,7 +23,7 @@ class Progress_View extends Preview_View {
 
         $value = $this->data['meta']['value']?:50;
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         echo $this->indent(1).'<div';

@@ -13,7 +13,7 @@ class File_View extends Preview_View implements Valuable_View{
         $space =  $this->indent();
         echo "{$space}";
         echo "<div";
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         echo $this->indent(1).'<div class="van-uploader">'.PHP_EOL;
@@ -24,7 +24,7 @@ class File_View extends Preview_View implements Valuable_View{
         echo $this->wrap_output('accept', $this->data['meta']['custom']['accept']?:NULL);
         echo $this->wrap_output('class', 'van-uploader__input');
         echo $this->wrap_output('multiple', null, $this->data['meta']['custom']['multiple']?:null);
-        $this->build_form_attrs();
+        $this->output_form_attrs();
         echo ">".PHP_EOL;
         echo $this->indent(3).'</div>'.PHP_EOL;
         echo $this->indent(2).'</div>'.PHP_EOL;

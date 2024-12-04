@@ -39,7 +39,7 @@ class Modal_View extends Preview_View {
         $pageid = $pageUIConfig['meta']['id'];
 
         echo $this->indent().'<div onclick="YDECloud.layerTop(\''.$pageid.'\')"';
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">\r\n";
 
         if (!@$this->data['meta']['custom']['headless']){

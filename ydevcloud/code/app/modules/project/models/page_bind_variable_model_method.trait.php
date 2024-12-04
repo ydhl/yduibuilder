@@ -15,6 +15,7 @@ use yangzie\GraphqlSearchNode;
 trait Page_Bind_Variable_Model_Method{
 	private $expressionModel;
 	private $fromPageData;
+	private $toDataModel;
 	/**
 	 * 返回每个字段的描述文本
 	 * @param $column
@@ -104,7 +105,7 @@ trait Page_Bind_Variable_Model_Method{
 		}
 		return $this->fromPageData;
 	}
-    public function get_to_data() {
+    public function get_connect_to_data() {
 		return [
 			'expression'=>[
 				'type'=> 'connect',
@@ -157,7 +158,7 @@ trait Page_Bind_Variable_Model_Method{
 	 * 		]
 	 * ]
 	 *
-	 * 绑定信息有get_to_data()方法返回
+	 * 绑定信息有get_connect_to_data()方法返回
 	 *
 	 * @param $page
 	 * @param $bind_class
@@ -171,9 +172,8 @@ trait Page_Bind_Variable_Model_Method{
         foreach ($ios as $io){
 			$expression = $io->get_expression();
 			if (!$expression) continue;
-            $data[$io->from_uuid][$expression->data->id] = $io->get_to_data();
+            $data[$io->from_uuid][$expression->data->id] = $io->get_connect_to_data();
         }
         return $data;
     }
-
 }?>

@@ -97,6 +97,10 @@ abstract class ValueList_View extends Preview_View implements Valuable_View{
 
         echo $this->indent(1).'<template x-for="(itemOf'.$itemName.', idxOf'.$itemName.') in '
             .$iteratorName.'" :key="idxOf'.$itemName.'">'.PHP_EOL;
+
+        $this->set_iterator_index_name("idxOf{$itemName}");
+        $this->set_iterator_data_name("itemOf{$itemName}");
+
         $this->build_valuelist($is2D ? $outputData['item'] : $outputData, $itemName);
         echo $this->indent(1).'</template>'.PHP_EOL;
 

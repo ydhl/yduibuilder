@@ -88,15 +88,15 @@ class Dropdown_View extends ValueList_View {
         $myid = $this->myid();
         $isSplit = $this->data['meta']['custom']['isSplit'];
         echo "{$space}<div";
-        echo $this->build_main_attrs(false);
+        echo $this->output_main_attrs(false);
         echo ">".PHP_EOL;
 
         if ($isSplit){
             echo $this->indent(1) . '<button';
             echo $this->wrap_output('class', $this->btnCss());
-            echo $this->wrap_output('style', $this->btyStyle());
+            echo $this->wrap_output('style', $this->btnStyle());
             echo $this->wrap_output('type', 'button');
-            $this->build_event_listen();
+            $this->output_event_listen_props();
             echo '>';
             $this->wrap_icon(function(){
                 $text = ($this->data['meta']['title'] ?: $this->data['type']);
@@ -106,21 +106,23 @@ class Dropdown_View extends ValueList_View {
             echo $this->indent(1) . "</button>".PHP_EOL;
             echo $this->indent(1) . '<button role="button"';
             echo $this->wrap_output('class', $this->splitBtnCss());
-            echo $this->wrap_output('style', $this->btyStyle());
+            echo $this->wrap_output('style', $this->btnStyle());
             echo ' data-bs-toggle="dropdown" aria-expanded="false">';
             echo "</button>".PHP_EOL;
         }else{
             echo $this->indent(1) . '<button role="button" type="button" data-bs-toggle="dropdown" aria-expanded="false"';
             echo $this->wrap_output('class', 'dropdown-toggle '.$this->btnCss());
-            echo $this->wrap_output('style', $this->btyStyle());
+            echo $this->wrap_output('style', $this->btnStyle());
             echo '>';
             $this->wrap_icon(function() use($inputDataName, $iteratorName, $myid){
                 $text = ($this->data['meta']['title'] ?: $this->data['type']);
-                echo "<span";
-                if ($iteratorName) {
-                    echo $this->wrap_output('x-text', "alpinejs_checked_name(\$el, {$iteratorName}, '{$inputDataName}') || '{$text}'");
-                }else{
-                    echo $this->wrap_output('x-text', "alpinejs_checked_name(\$el, {$myid}_values(), '{$inputDataName}') || '{$text}'");
+                echo $this->indent(0) . "<span";
+                if($this->data['meta']['custom']['syncTitle']){
+                    if ($iteratorName) {
+                        echo $this->wrap_output('x-text', "alpinejs_checked_name(\$el, {$iteratorName}, '{$inputDataName}') || '{$text}'");
+                    }else{
+                        echo $this->wrap_output('x-text', "alpinejs_checked_name(\$el, {$myid}_values(), '{$inputDataName}') || '{$text}'");
+                    }
                 }
                 echo ">{$text}</span>";
             }, 2);
@@ -131,7 +133,7 @@ class Dropdown_View extends ValueList_View {
         echo $this->indent(1) . '<div class="dropdown-menu';
         echo @$this->data['meta']['custom']['menuAlign']=='right' ? ' dropdown-menu-right': '';
         echo '"';
-        $this->build_event_listen();
+        $this->output_event_listen_props();
         echo '>'.PHP_EOL;
 
     }
@@ -211,7 +213,7 @@ class Dropdown_View extends ValueList_View {
      * 分体式右侧箭头按钮
      * @return string
      */
-    private function splitBtnCss() {
+    protected function splitBtnCss() {
         $parentUI = $this->get_parent_UI();
         $parentIsNavbar = in_array(strtolower($parentUI['type']), ['nav']);
         if ($parentIsNavbar) return 'dropdown-toggle dropdown-toggle-split  nav-link';
@@ -235,7 +237,7 @@ class Dropdown_View extends ValueList_View {
      * 一体式按钮或者分体式左侧按钮
      * @return string
      */
-    private function btnCss() {
+    protected function btnCss() {
         $arr = [];
         $parentUI = $this->get_parent_UI();
         $cssMap = parent::css_map();
@@ -269,7 +271,7 @@ class Dropdown_View extends ValueList_View {
      * 整体按钮样式
      * @return string|null
      */
-    private function btyStyle () {
+    protected function btnStyle () {
         $styleArray = parent::style_map();
         // 如果自己有背景和前景则用自己的，否则用上层的
         $dropdownMeta = $this->dropdownMeta();

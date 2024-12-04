@@ -61,11 +61,6 @@ class Mutation_Model extends YZE_Model{
      * 
      * @var string
      */
-    const F_MUTATION_DATA_NAME = "mutation_data_name";
-    /**
-     * 
-     * @var string
-     */
     const F_MUTATION_DATA_TYPE = "mutation_data_type";
     /**
      * 
@@ -90,7 +85,6 @@ class Mutation_Model extends YZE_Model{
       'uuid'       => ['type' => 'string', 'null' => false,'length' => '45','default'	=> ''],
       'mutation_from_uuid' => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
       'mutation_data_id' => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
-      'mutation_data_name' => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
       'mutation_data_type' => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
       'action_id'  => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
       'expression' => ['type' => 'string', 'null' => false,'length' => '','default'	=> ''],

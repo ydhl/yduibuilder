@@ -9,7 +9,7 @@
          :max="uiconfig.meta.custom?.max!==undefined ? uiconfig.meta.custom?.max : 100"
          :step="uiconfig.meta.custom?.step!==undefined ? uiconfig.meta.custom?.step : 1"
          :required="uiconfig.meta?.form?.required"
-         :value="uiconfig.meta.value!==undefined ? uiconfig.meta.value : 50">
+         :value="uiconfig.meta.value!==undefined ? uiconfig.meta.value : 0">
 </template>
 
 <script lang="ts">
@@ -55,7 +55,7 @@ export default {
       if (background.length > 0) style['background-image'] = background.join(',')
 
       const minValue = uiconfig.meta.custom?.min === undefined ? 1 : uiconfig.meta.custom?.min
-      const defaultValue = uiconfig.meta.value === undefined ? 50 : parseFloat(uiconfig.meta.value)
+      const defaultValue = uiconfig.meta.value === undefined ? 0 : parseFloat(uiconfig.meta.value)
 
       const maxValue = uiconfig.meta.custom?.max === undefined ? 100 : uiconfig.meta.custom?.max
       backgroundSize[0] = (defaultValue === 0 || maxValue === minValue) ? '0%' : ((defaultValue - minValue) / (maxValue - minValue) * 100) + '%'
@@ -71,7 +71,7 @@ export default {
       css.range = 'form-control-range'
       css = getMyCss(props.uiconfig, css)
       if (previewItem) {
-        css = this.getMyCss(previewItem, css)
+        css = getMyCss(previewItem, css)
       }
 
       return Object.values(css).join(' ')

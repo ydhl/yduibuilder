@@ -9,7 +9,7 @@
       </template>
       <UIBase v-for="(item, index) in myItems.head" :key="index" :is-readonly="myIsReadonly" :is-lock="myIsLock" :uiconfig="item" :pageid="pageid"></UIBase>
     </div>
-    <div class="card-body">
+    <div class="card-body" v-if="!hasMainItems || mainItems.length>0">
       <template v-if="!hasMainItems">
         {{t('common.dragtohere')}}
       </template>

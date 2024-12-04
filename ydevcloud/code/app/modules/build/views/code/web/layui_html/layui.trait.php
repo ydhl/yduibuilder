@@ -16,7 +16,7 @@ trait Layui {
     protected function get_Img_Src($imgSrc){
         return rtrim($this->build->get_img_Asset_Path(), '/').'/'.basename(urldecode($imgSrc), PATHINFO_BASENAME);
     }
-    protected function get_popup_page_url($page) {
+    protected function get_page_url($page) {
         return $page->get_save_path('html');
     }
 }

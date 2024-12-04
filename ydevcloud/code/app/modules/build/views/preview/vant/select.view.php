@@ -23,7 +23,7 @@ class Select_View extends ValueList_View {
         $space =  $this->indent();
         echo $space.'<div';
         echo $this->wrap_output('@click', $this->myid().'_menu_switch($el, true)');
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         echo $this->indent(1);

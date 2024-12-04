@@ -47,7 +47,7 @@ this.setData({
     {
         echo "\r\n".$this->indent(4);
         echo '<textarea class="weui-textarea"';
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
         echo ' bindinput="'.$this->myId().'Input"';
         if (@$this->data['meta']['custom']['maxLength']){
             echo ' maxlength="'.$this->data['meta']['custom']['maxLength'].'"';

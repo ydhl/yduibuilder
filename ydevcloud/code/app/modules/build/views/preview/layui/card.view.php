@@ -51,7 +51,7 @@ class Card_View extends Preview_View {
         $myItems = $this->sub_items();
         $space =  $this->indent();
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">\r\n";
 
         if (!@$this->data['meta']['custom']['headless']){

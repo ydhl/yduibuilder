@@ -20,7 +20,7 @@ class Dropdown_View extends ValueList_View {
         $suffix = $isArr?'[-1]':'';
 
         echo "{$space}<div ";
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         echo $this->indent(1).'<span '.$this->wrap_output(':class', $this->menu_class()).'>'.PHP_EOL;

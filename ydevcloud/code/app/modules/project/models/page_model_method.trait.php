@@ -61,6 +61,12 @@ trait Page_Model_Method{
         Page_Bind_Variable_Model::from()->where('to_page_id=:pid')->delete([':pid'=>$this->id]);
         parent::remove();
     }
+    public function fetchPopupPageIds(&$popupPageIds=[]){
+        foreach (Action_Model::from()->where("page_id=:pid and type='popup' and is_deleted=0")->select([':pid'=>$this->id]) as $item){
+            if (!$item->popupPageId) continue;
+            if(!in_array($item->popupPageId, $popupPageIds))$popupPageIds[] = $item->popupPageId;
+        }
+    }
 
     public function fetchSubPageIds($config=null, &$subPageIds=[]){
         if (!$config){
@@ -298,11 +304,19 @@ trait Page_Model_Method{
             }
         }
         if (strtolower($target) == "vue"){
-            $module = $this->get_module();
-            $moduleName = $module->folder ?: 'module'.$module->id;
-            $folder = 'views/'.$moduleName;
-            $pageName = $this->file ?: ($this->get_export_file_name($target).".vue");
-            return $folder . '/' . $pageName;
+            if ($this->page_type == self::PAGE_TYPE_SUBPAGE){
+                $pageName = $this->file ?: ($this->get_export_file_name($target).".vue");
+                return 'views/subpage/' . $pageName;
+            }elseif($this->page_type == self::PAGE_TYPE_COMPONENT){
+                $pageName = $this->file ?: ($this->get_export_file_name($target).".vue");
+                return 'views/component/' . $pageName;
+            }else{
+                $module = $this->get_module();
+                $moduleName = $module->folder ?: 'module'.$module->id;
+                $folder = 'views/'.$moduleName;
+                $pageName = $this->file ?: ($this->get_export_file_name($target).".vue");
+                return $folder . '/' . $pageName;
+            }
         }
         if (strtolower($target) == "wxmp"){
             $module = $this->get_module();

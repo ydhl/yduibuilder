@@ -20,94 +20,77 @@
   </template>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref, watch } from 'vue'
 import ydhl from '@/lib/ydhl'
 import { useStore } from 'vuex'
 import DataStruct from '@/components/common/DataStruct.vue'
-export default {
-  name: 'PageData',
-  components: { DataStruct },
-  setup (pros: any, context: any) {
-    const { t } = useI18n()
-    const loading = ref(true)
-    const project = computed(() => store.state.design.project)
-    const store = useStore()
-    const selectedPage = computed(() => store.state.design.page)
-    const selectedPageId = computed(() => store.state.design.page?.meta?.id)
 
-    const pageDatas = ref<any>([])
-    const queryDatas = ref<any>([])
-    const pathDatas = ref<any>([])
+const { t } = useI18n()
+const loading = ref(true)
+const project = computed(() => store.state.design.project)
+const store = useStore()
+const selectedPage = computed(() => store.state.design.page)
+const selectedPageId = computed(() => store.state.design.page?.meta?.id)
 
-    const loadData = (showLoading = false) => {
-      if (showLoading) loading.value = true
-      ydhl.get('api/bind/data.json?page_uuid=' + selectedPageId.value, [], (rst) => {
-        if (showLoading) loading.value = false
-        if (!rst?.success) {
-          ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
-          return
-        }
-        pageDatas.value = rst.data.page
-        queryDatas.value = rst.data.query
-        pathDatas.value = rst.data.path
-      }, 'json')
+const pageDatas = ref<any>([])
+const queryDatas = ref<any>([])
+const pathDatas = ref<any>([])
+
+const loadData = (showLoading = false) => {
+  if (showLoading) loading.value = true
+  ydhl.get('api/bind/data.json?page_uuid=' + selectedPageId.value, [], (rst) => {
+    if (showLoading) loading.value = false
+    if (!rst?.success) {
+      ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
+      return
     }
-    const updatePageData = (data: any) => {
-      updateData('page', data)
-    }
-    const removePageData = (data) => {
-      removeData('page', data)
-    }
-    const updateQuery = (data: any) => {
-      updateData('query', data)
-    }
-    const removeQuery = (data) => {
-      removeData('query', data)
-    }
-    const updateData = (dataFrom, data: any) => {
-      data.page_uuid = selectedPageId.value
-      data.data_from = dataFrom
-      ydhl.loading(t('common.pleaseWait')).then((id) => {
-        ydhl.postJson('api/bind/data.json', data).then((rst: any) => {
-          if (!rst || !rst.success) {
-            ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
-          }
-          ydhl.closeLoading(id)
-          loadData()
-        }).catch((res: any) => {
-          ydhl.alert(res || t('common.operationFail'), t('common.ok'))
-        })
-      })
-    }
-    const removeData = (dataFrom, data) => {
-      ydhl.loading(t('common.pleaseWait')).then((id) => {
-        ydhl.post('api/bind/deletedata.json', { uuid: data.uuid }, [], (rst) => {
-          ydhl.closeLoading(id)
-          loadData()
-        }, 'json')
-      })
-    }
-    onMounted(() => {
-      loadData(true)
-    })
-    watch(selectedPageId, (n, v) => {
-      if (n !== v) loadData(false)
-    })
-    return {
-      t,
-      loading,
-      project,
-      pageDatas,
-      queryDatas,
-      pathDatas,
-      selectedPage,
-      updatePageData,
-      removePageData,
-      updateQuery,
-      removeQuery
-    }
-  }
+    pageDatas.value = rst.data.page
+    queryDatas.value = rst.data.query
+    pathDatas.value = rst.data.path
+  }, 'json')
 }
+const updatePageData = (data: any, index: number, nameChanged: Record<string, string>) => {
+  updateData('page', data, index, nameChanged)
+}
+const removePageData = (data) => {
+  removeData('page', data)
+}
+const updateQuery = (data: any, index: number, nameChanged: Record<string, string>) => {
+  updateData('query', data, index, nameChanged)
+}
+const removeQuery = (data) => {
+  removeData('query', data)
+}
+const updateData = (dataFrom, data: any, index: number, nameChanged: Record<string, string>) => {
+  data.page_uuid = selectedPageId.value
+  data.data_from = dataFrom
+  data.nameChanged = nameChanged
+  ydhl.loading(t('common.pleaseWait')).then((id) => {
+    ydhl.postJson('api/bind/data.json', data).then((rst: any) => {
+      if (!rst || !rst.success) {
+        ydhl.alert(rst.msg || t('common.operationFail'), t('common.ok'))
+      }
+      ydhl.closeLoading(id)
+      loadData()
+    }).catch((res: any) => {
+      ydhl.alert(res || t('common.operationFail'), t('common.ok'))
+    })
+  })
+}
+const removeData = (dataFrom, data) => {
+  ydhl.loading(t('common.pleaseWait')).then((id) => {
+    ydhl.post('api/bind/deletedata.json', { uuid: data.uuid }, [], (rst) => {
+      ydhl.closeLoading(id)
+      loadData()
+    }, 'json')
+  })
+}
+onMounted(() => {
+  loadData(true)
+})
+watch(selectedPageId, (n, v) => {
+  if (n !== v) loadData(false)
+})
 </script>

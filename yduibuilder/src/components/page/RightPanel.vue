@@ -2,7 +2,7 @@
   <div id="right-sidebar">
     <div class="header" ref="head" :style="headerStyle">
       <div class="left-tip" v-show="leftHasMore"></div>
-      <div class="header-scrollbar" ref="headScrollbar" @scroll="headScroll" @wheel="headWheel">
+      <div class="header-scrollbar" ref="headScrollbar" @scroll.passive="headScroll" @wheel.passive="headWheel">
         <ul class="nav nav-tabs">
           <li class="nav-item"><a class="nav-link disabled" disabled style="width: 10px !important"><i class="iconfont icon-placeholder"></i></a></li>
           <li class="nav-item">

@@ -36,7 +36,7 @@ class Input_View extends Preview_View implements Valuable_View {
         $meta = $this->data['meta'];
 
         echo "{$space}<label";
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         echo $this->wrap_output(':for', "\$id('{$myid}','-input')");
         echo ">".PHP_EOL;
         echo $this->indent(1).'<div class="weui-cell__hd"><span class="weui-label">'.$meta['title'].'</span></div>'.PHP_EOL;
@@ -48,7 +48,7 @@ class Input_View extends Preview_View implements Valuable_View {
             echo $this->wrap_output("autocomplete", $this->data['meta']['custom']['autocomplete']?:NULL);
             echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength']?:NULL);
             echo $this->wrap_output(':id', "\$id('{$myid}','-input')");
-            echo $this->build_form_attrs();
+            echo $this->output_form_attrs();
 
             if ($this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){
                 echo $this->wrap_output('@keyup', $this->myid().'_keyup');

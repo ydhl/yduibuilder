@@ -27,7 +27,7 @@ class Modal_View extends Preview_View {
         }
 
         echo $this->indent().'<div class="weui-mask"></div><div';
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">\r\n";
 
         if (!@$this->data['meta']['custom']['headless']){

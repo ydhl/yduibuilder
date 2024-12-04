@@ -12,7 +12,7 @@ class Nav_View extends ValueList_View {
     {
         $space =  $this->indent();
         echo "{$space}<div ";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         echo $this->indent(1).'<div class="van-tabs__wrap">'.PHP_EOL;

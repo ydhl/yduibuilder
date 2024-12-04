@@ -46,7 +46,7 @@ class Collapse_View extends ValueList_View {
             echo $this->indent(2).'<div class="accordion-header" id="'.$this->myid(true).'heading'.$index.'">'.PHP_EOL;
             echo $this->indent(3).'<button class="accordion-button" type="button" data-bs-toggle="collapse"';
             echo $this->wrap_output('data-value', $index);
-            $this->build_event_listen();
+            $this->output_event_listen_props();
             echo ' data-bs-target="#'.$this->myid(true).'collapse'.$index.'" aria-expanded="true" :aria-controls="'.$this->myid(true).'collapse'.$index.'">';
             echo $view->data['meta']['title'];
             echo "</button>".PHP_EOL;
@@ -54,7 +54,7 @@ class Collapse_View extends ValueList_View {
             echo $this->indent(2).'<div id="'.$this->myid(true).'collapse'.$index.'" class="accordion-collapse collapse';
             echo !isset($this->data['meta']['custom']['activeItem']) && !$index || $this->data['meta']['custom']['activeItem'] == $index ? 'show' : '';
             echo '" aria-labelledby="'.$this->myid(true).'heading'.$index.'" data-parent="#'.$this->myid(true).'">'.PHP_EOL;
-            echo $this->indent(3).'<div class="accordion-body">'.PHP_EOL;
+            echo $this->indent(3).'<div class="accordion-body p-0">'.PHP_EOL;
 
             $view->increase_indent(3);
             $view->output();
@@ -89,7 +89,7 @@ class Collapse_View extends ValueList_View {
         $space =  $this->indent();
         $myid = $this->myid();
         echo "{$space}<div";
-        echo $this->build_main_attrs(false);
+        echo $this->output_main_attrs(false);
         echo $this->wrap_output(':id', "alpinejs_get_index(\$el, '{$myid}')");
         echo ">".PHP_EOL;
     }
@@ -111,21 +111,21 @@ class Collapse_View extends ValueList_View {
 
         $indent = 0;
         // 只处理标量数组
-        $is_scale = $this->is_2d_scale_array($bindOutput) || $this->is_1d_scale_array($bindOutput);
 
-        if (!$is_scale) {
+        if (!$this->is_1d_object_array($bindOutput)) {
             return $fragment;
         }
 
         $nextTick = <<< TICK
 this.\$nextTick(() => {
     const {$myid} = {}; 
-    const {$myid}_subpages = document.querySelectorAll("[data-bs-target='{$myid}'].collapse");
+    const {$myid}_subpages = document.querySelectorAll("[data-bs-target='{$myid}'].accordion-body");
     for( const subpage of {$myid}_subpages){
         if (!subpage.dataset.value)continue;
         const id = subpage.id;
         {$myid}[id] = subpage.dataset.value;
     }
+    console.log({$myid})
     YDECloud.loadSubpages({$myid});
 })
 TICK;
@@ -142,21 +142,16 @@ TICK;
     }
     private function build_item($bindOutput, $iteratorName, $itemName, $indent){
         $myid = $this->myid();
-        // 只处理标量一维数组并把标量看作是要加载的子页url
+        if (!$this->is_1d_object_array($bindOutput)){
+            $this->build->output_code(__('can not bound to type '.$bindOutput['type']), $indent);
+            return;
+        }
+        // 只处理object数组，value看作是要加载的子页url，key看作标题
         list('name'=>$xTitle, 'value'=>$xValue, 'data'=>$boundData) = $this->get_bind_name_value($bindOutput, $itemName);
-        $needLoadSubpage =  $this->is_2d_scale_array($bindOutput) || $this->is_1d_scale_array($bindOutput);
-        if ($this->is_1d_scale_array($bindOutput)){
-            $activeExp = 'idxOf'.$itemName.' == 0';
-        }else{
-            $activeExp = "Object.keys({$iteratorName})?.[0]==idxOf{$itemName}";
-        }
+        $activeExp = 'idxOf'.$itemName.' == 0';
         ob_start();
-        $this->build_event_listen();
+        $this->output_event_listen_props();
         $eventListen = ob_get_clean();
-        $headerText = $needLoadSubpage ? "decodeURIComponent(\$store.loadSubPages[{$xValue}])" : $xTitle;
-        if (!$needLoadSubpage){
-            $bodyAttr = ' x-text="'.$xTitle.'"';
-        }
 
         $html = <<<HTML
 <div class="accordion-item">
@@ -164,19 +159,19 @@ TICK;
         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bound="{$boundData}"
             :data-value="{$xValue}"{$eventListen} :data-bs-target="alpinejs_get_index(\$el, '#{$myid}', idxOf{$itemName} + '-collapse')"
             aria-expanded="true" :aria-controls="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-collapse')"
-            x-text="{$headerText}">
+            x-text="{$xTitle}">
         </button>
     </div>
     <div :id="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-collapse')" :class="{'accordion-collapse collapse': true, 'show': {$activeExp}}"
         :aria-labelledby="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-header')" :data-value="{$xValue}" data-bs-target="{$myid}"
         :data-parent="alpinejs_get_index(\$el, '#{$myid}')">
-        <div {$bodyAttr} class="accordion-body"></div>
+        <div :id="alpinejs_get_index(\$el, '{$myid}', idxOf{$itemName} + '-body')" :data-value="{$xValue}" data-bs-target="{$myid}" class="accordion-body p-0"></div>
     </div>
 </div>
 HTML;
         $this->build->output_code($html, $indent);
     }
-    private function emptyContent(){
+    protected function emptyContent(){
         echo $this->indent(1);
         echo '<div class="accordion-item">'.PHP_EOL;
         echo $this->indent(2);

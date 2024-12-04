@@ -121,7 +121,7 @@
         </div>
       </div>
       <div class="row mb-3 p-2 text-muted">{{t('style.state.variableTip')}}</div>
-      <div class="p-3 d-flex align-items-start justify-content-start fs-1">
+      <div class="p-3 fs-1">
         <ExpressionDropdown :hide-arrow="true" :has-mutation-operator="false"
                             default-mutation-operator="check data:"
                             :hideMutationType="true" @updateExpression="updateExpression" :expression="editState.expression"></ExpressionDropdown>

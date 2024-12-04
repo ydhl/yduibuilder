@@ -130,6 +130,72 @@ export default {
             }
           ]
         })
+      } else if (props.language === 'jsAndJson') {
+        monaco.languages.register({ id: 'jsAndJson' })
+        monaco.languages.setMonarchTokensProvider('jsonAndJs', {
+          tokenizer: {
+            root: [
+              // 支持 JSON 语法
+              [/[^\\]["{}()]+/, 'keyword'],
+              [/[,:]/, 'delimiter'],
+              [/"([^"\\]|\\.)*"/, 'string'],
+              [/[0-9]+/, 'number'],
+              [/true|false/, 'boolean'],
+              [/null/, 'null'],
+
+              // 支持 JavaScript 语法
+              [/[a-zA-Z_$][a-zA-Z0-9_$]*/, 'identifier'],
+              [/[=+\-*/!%&<>^|~:]+/, 'operator'],
+              [/[();,.]+/, 'delimiter'],
+              [/\/\*/, '/*', '@comment'],
+              [/\/\/.*$/, 'comment'],
+              [/\\./, 'escape.invalid'],
+              [/"/, 'string', '@string'],
+              [/'/, 'string', '@singleQuote'],
+              [/\{/, 'delimiter', '@curly'],
+              [/\[/, 'delimiter', '@square'],
+              [/\(/, 'delimiter', '@parentheses'],
+              [/[0-9]+(?:\.[0-9]+)?(?:e[+-]?[0-9]+)?/, 'number']
+            ],
+
+            comment: [
+              [/[^/*]+/, 'comment'],
+              [/\*/, 'comment', '@push'],
+              [/[/*]/, 'comment']
+            ],
+
+            string: [
+              [/[^\\"]+/, 'string'],
+              [/@escapes/, 'string.escape'],
+              [/\\./, 'string.escape.invalid'],
+              [/"/, 'string', '@pop']
+            ],
+
+            singleQuote: [
+              [/[^\\']+/, 'string'],
+              [/@escapes/, 'string.escape'],
+              [/\\./, 'string.escape.invalid'],
+              [/'/, 'string', '@pop']
+            ],
+
+            curly: [
+              [/[^{}]+/, 'delimiter'],
+              [/[{}]/, 'delimiter'],
+              [/}/, 'delimiter', '@pop']
+            ],
+
+            square: [
+              [/[^\]]+/, 'delimiter'],
+              [/\]/, 'delimiter', '@pop']
+            ],
+
+            parentheses: [
+              [/[()]/, 'delimiter'],
+              [/[()]/, 'delimiter', '@pop']
+            ]
+          },
+          escapes: /\\(?:[btnfr"'\\/]|u[0-9a-fA-F]{4})/
+        })
       }
       if (!editorInstance) {
         editorInstance = monaco.editor.create(editor.value as HTMLElement, {
@@ -271,6 +337,7 @@ export default {
       if (editorInstance) editorInstance.layout()
     })
     const filterMarkers = (editorInstance) => {
+      if (!editorInstance) return
       if (props.language === 'json') {
         const model = editorInstance.getModel()
         const markers = monaco.editor.getModelMarkers({ owner: props.language })

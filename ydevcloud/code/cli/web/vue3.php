@@ -1,26 +1,9 @@
 <?php
 use function yangzie\__;
+use \app\project\Page_Model;
 include_once 'factory.php';
 
 class web_vue3 extends Base_Factory{
-    private $index = '<!DOCTYPE html>
-<html lang="">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-{{globalFiles}}
-  </head>
-  <body>
-    <noscript>
-      <strong>We\'re sorry but <%= htmlWebpackPlugin.options.title %> doesn\'t work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
-</html>';
     /**
      * @var array[] npm 包含的包，如果vendor支持npm安装，则通过install2xx函数返回对应的安装包和版本
      */
@@ -33,7 +16,12 @@ class web_vue3 extends Base_Factory{
     * @var array 在index.html 全局包含到文件，格式：包名=>[js=>[],'css'=>]
      */
     private $globalFiles = [];
-    private function _create_vendor() {
+    /**
+     * [import=>codes]
+     * @var array
+     */
+    private $maints = [];
+    private function create_vendor() {
         $this->zip->addEmptyDir("src/assets/vendor");
         $packages = $this->project->get_front_project_packages();
         $packages = array_merge($packages['system'], $packages['user']);
@@ -51,6 +39,7 @@ class web_vue3 extends Base_Factory{
             if ($install['dependencies']) $this->packageJson['dependencies'] += $install['dependencies'];
             if ($install['includeCSSFiles']) $this->includeCSSFiles[$package] = $install['includeCSSFiles'];
             if ($install['globalFiles']) $this->globalFiles[$package] = $install['globalFiles'];
+            if ($install['main.ts']) $this->maints[$package] = $install['main.ts'];
 
             // 未定义任何导出，那么就不导出该包
             if (!@$install['includeCSSFiles'] && !@$install['exportFiles'] && !@$install['globalFiles']) continue;
@@ -82,7 +71,7 @@ class web_vue3 extends Base_Factory{
             }
         }
 
-        $this->server->push(sprintf(__('generating %s'), 'src/assets/index.scss'));
+        $this->server->push(sprintf(__('generating %s'), 'src/assets/index.css'));
         $includeCSSFiles = [];
         foreach ($this->includeCSSFiles as $package => $files) {
             foreach ($files as $file => $isVendorFile){
@@ -93,9 +82,10 @@ class web_vue3 extends Base_Factory{
                 }
             }
         }
-        $this->zip->addFromString('src/assets/index.scss', join("\r\n", $includeCSSFiles));
+        $this->zip->addFromString('src/assets/index.css', join("\r\n", $includeCSSFiles));
 
-        $this->server->push(sprintf(__('generating %s'), 'public/index.html'));
+        $this->server->push(sprintf(__('generating %s'), 'index.html'));
+        $indexHtml = file_get_contents(dirname(__FILE__).'/scaffold/vue3/index.html');
         $globalFiles = [];
         foreach ($this->globalFiles as $package => $typeFiles) {
             foreach ($typeFiles as $type => $files){
@@ -111,8 +101,20 @@ class web_vue3 extends Base_Factory{
                 }
             }
         }
-        $indexHtml = preg_replace("/{{globalFiles}}/", "    ".join("\r\n    ", $globalFiles), $this->index);
-        $this->zip->addFromString('public/index.html', $indexHtml);
+        $indexHtml = preg_replace("/{{globalFiles}}/", "    ".join("\r\n    ", $globalFiles), $indexHtml);
+        $indexHtml = preg_replace("/{{projectName}}/", $this->project->name, $indexHtml);
+        $this->zip->addFromString('index.html', $indexHtml, ZipArchive::FL_OVERWRITE);
+
+        $this->server->push(sprintf(__('generating %s'), 'src/main.ts'));
+        $maintsContent = file_get_contents(dirname(__FILE__).'/scaffold/vue3/src/main.ts');
+        $imports = [];
+        foreach ($this->maints as $package => $maints) {
+            foreach ($maints as $type => $codes) {
+                $imports[] = $codes;
+            }
+
+        $maintsContent = preg_replace("/{{import}}/", join("\r\n", $imports), $maintsContent);}
+        $this->zip->addFromString('src/main.ts', $maintsContent, ZipArchive::FL_OVERWRITE);
 
     }
     private function exportIcon(){
@@ -129,15 +131,11 @@ class web_vue3 extends Base_Factory{
         foreach ($routers as $file=>$info){
             list('url'=>$url, 'name'=>$name) = $info;
             $basename = ucfirst(strtolower(pathinfo($file, PATHINFO_FILENAME)));
-            $imports[] = "import {$basename} from '../{$file}'";
             $routerMap[] = ['path'=>$url, 'name'=>$basename, 'component'=> $basename, 'import'=>"'../{$file}'"];
         }
         ob_start();
 ?>
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-<?php
-//echo  implode("\r\n", $imports);
-?>
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const routes: Array<RouteRecordRaw> = [
 <?php
@@ -154,7 +152,7 @@ const routes: Array<RouteRecordRaw> = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
 
@@ -162,7 +160,7 @@ export default router
 <?php
         return ob_get_clean();
     }
-    private function _create_views() {
+    private function create_views() {
         // 编译ui文件
         $this->zip->addEmptyDir("src/assets/img");
         $router = [];
@@ -175,10 +173,10 @@ export default router
 
                 $page_file = $page->get_save_path('vue');
                 $page_url = $page->id == $this->project->home_page_id ? '/' : ($page->url?:"/page{$page->id}");
-                $this->server->push("<strong>".sprintf(__('compile page %s to %s, url: %s'), $page->name, $page_file, $page_url)."</strong>");
+                $this->server->push($this->output(sprintf(__('compile page %s => %s(%s)'), $page->name, $page_file, $page_url),'success'));
 
-                // 弹窗页面不输出路由
-                if (strtolower($page->page_type)!='popup'){
+                // 弹窗页面、组件页面不输出路由
+                if (!in_array(strtolower($page->page_type), ['popup', 'component'])){
                     $router[$page_file] = ['url'=>$page_url, 'name'=>$page->name];
                 }
 
@@ -187,6 +185,17 @@ export default router
                 $this->zip->addFromString('src/'.$page_file, $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid)."\r\n");// 行未加个空行
                 $this->extractImage(json_decode(html_entity_decode($page->config), true), 'src/assets/img');
             }
+        }
+        foreach (Page_Model::from()->where('is_deleted = 0 and module_id is null and project_id=:pid')
+            ->select([':pid'=>$this->project->id]) as $page) {
+
+            $page_file = $page->get_save_path('vue');
+            $this->server->push($this->output(sprintf(__('compile component %s => %s'), $page->name, $page_file),'warning'));
+
+            $ydhttp = new YDHttp();
+            $ydhttp->request_header = ['token:' . $this->token];
+            $this->zip->addFromString('src/'.$page_file, $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid)."\r\n");// 行未加个空行
+            $this->extractImage(json_decode(html_entity_decode($page->config), true), 'src/assets/img');
         }
 
         if (!$hasIndexHtml){
@@ -198,7 +207,7 @@ export default router
         $this->server->push(__('generating router'));
         $this->zip->addFromString('src/router/index.ts', $this->_generater_routers($router));
 
-        $this->server->push(sprintf(__('compiled use : %s, you can <ol><li>npm install: install all need node modules</li><li>npm run serve: start the vue serve</li><li>npm run build: build the dist files</li></ol>'), 'Vue 3, babel, eslint, npm'));
+        $this->server->push(sprintf(__('compiled use : %s, you can <ol><li>npm install: install all need node modules</li><li>npm run dev: start the vue serve</li><li>npm run build: build the dist files</li></ol>'), 'Vue 3.5(Typescript, JSX, Vue Router, Pinia, ESLint, Prettier, Vue DevTools 7)'));
     }
     private function generateIndex($files) {
     $project_setting = $this->project->get_setting();
@@ -221,9 +230,9 @@ export default router
     public function compile(){
         $project_setting = $this->project->get_setting();
         $path = dirname(__FILE__).'/scaffold/vue3';
-        $this->addScaffoldFiles($path, '.', ['package.json']);
+        $this->addScaffoldFiles($path, '.', ['package.json','index.html','main.ts']);
         $this->zip->addEmptyDir("node_modules");
-        $this->_create_vendor();
+        $this->create_vendor();
 
         $this->server->push(__('generating package.json'));
         $package = json_decode(file_get_contents($path.'/package.json'), true);
@@ -233,6 +242,6 @@ export default router
         if ($this->packageJson['devDependencies']) $package['devDependencies'] += $this->packageJson['devDependencies'];
         $this->zip->addFromString('package.json', json_encode($package, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         $this->exportIcon();
-        $this->_create_views();
+        $this->create_views();
     }
 }

@@ -22,28 +22,25 @@ class File_View extends Preview_View implements Valuable_View {
         $space =  $this->indent(0);
         $myid = $this->myid();
         $accept = $this->data['meta']['custom']['accept'];
-        $needEvent = $this->data['meta']['custom']['isAutoUpload'] || $this->data['meta']['custom']['maxFileSize'] || $this->data['meta']['custom']['accept'];
         $inputDataName = $this->get_input_data_name();
 
         echo "{$space}";
         echo "<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
         echo $this->indent(1);
         echo '<input type="file" class="d-block"';
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
         echo $this->wrap_output('multiple', null, $this->data['meta']['custom']['multiple']?:null);
 
-        echo PHP_EOL.$this->indent(1);
         if ($accept){
             echo $this->wrap_output('accept', join(',',array_map(function($item){
                 return $this->get_mime_by_ext($item);
             }, explode(',', $accept))));
         }
 
-        if ($needEvent){
-            echo $this->wrap_output('x-init', "\$watch(alpinejs_get_input_data_name(\$el, '{$inputDataName}'), (value, oldValue) => {$myid}_handler(value))");
-        }
+        echo PHP_EOL.$this->indent(1);
+        echo $this->wrap_output('x-init', "\$watch(alpinejs_get_input_data_name(\$el, '{$inputDataName}'), (value, oldValue) => {$myid}_handler(value))");
         echo ">".PHP_EOL;
         echo "{$space}";
         echo "</div>".PHP_EOL;
@@ -56,7 +53,7 @@ class File_View extends Preview_View implements Valuable_View {
     protected function eventName($eventName)
     {
         $eventName = $this->alpineEventName($eventName);
-        if (in_array($eventName,['onFileChange','onBeforeUpload','onUploadProgress','onFileUploaded', 'onUploadComplete'])) return '';
+        if (in_array(strtolower($eventName),['onfilechange','onbeforeupload','onuploadprogress','onfileuploaded', 'onuploadcomplete'])) return '';
         return $eventName;
     }
 
@@ -95,8 +92,8 @@ class File_View extends Preview_View implements Valuable_View {
             $validate_ext = $this->build_ext_validate_code();
         }
 
-        $onFileChange = $this->has_event('onFileChange') ? "page.{$myid}_onfilechange(null, files)" : '';
-        $onUploadComplete = $this->has_event('onUploadComplete') ? "page.{$myid}_onuploadcomplete(null)" : '';
+        $onFileChange = $this->has_event('onFileChange') ? "page.{$myid}_onFileChange(files)" : '';
+        $onUploadComplete = $this->has_event('onUploadComplete') ? "page.{$myid}_onUploadComplete()" : '';
 
         $codes = [];
         $codes[] = "{$myid}_handler(files){";
@@ -136,11 +133,11 @@ class File_View extends Preview_View implements Valuable_View {
 
         $codeLines = ['promises.push(new Promise((resolve, reject) => {'];
         if ($this->has_event('onBeforeUpload')){
-            $codeLines[] = $this->indent(1, true)."page.{$myid}_onbeforeupload(null, index, file)";
+            $codeLines[] = $this->indent(1, true)."page.{$myid}_onBeforeUpload(index, file)";
         }
 
-        $onUploadProgress = $this->has_event('onUploadProgress') ? ["page.{$myid}_onuploadprogress(progressEvent, index, file, progress)"] : '';
-        $onFileUploaded = $this->has_event('onFileUploaded') ? ["page.{$myid}_onfileuploaded(null, index, file, rst)",'resolve(rst)'] : '';
+        $onUploadProgress = $this->has_event('onUploadProgress') ? ["page.{$myid}_onUploadProgress(index, file, progress)"] : '';
+        $onFileUploaded = $this->has_event('onFileUploaded') ? ["page.{$myid}_onFileUploaded(index, file, rst)",'resolve(rst)'] : '';
 
         $axios_codes = [];
         $this->build_axios_code($bind_api, $axios_codes, $onUploadProgress, $onFileUploaded);
@@ -172,7 +169,17 @@ class File_View extends Preview_View implements Valuable_View {
 
         return $size;
     }
-
+    protected function build_event_args_code($eventModel, $html_event_name, &$eventCodes, &$actionCodeLines){
+        $base_event_args = $this->get_base_event_args();
+        $eventCodes[$html_event_name]['args'] = [];
+        foreach ($base_event_args as $event_name => $arg){
+            if (preg_match("/{$html_event_name}|on{$html_event_name}/i", $event_name)) {
+                foreach ($arg['args'] as $item){
+                    $eventCodes[$html_event_name]['args'][$item['name']] = $item;
+                }
+            }
+        }
+    }
     private function build_filesize_validate_code(){
         $maxFileSize = $this->data['meta']['custom']['maxFileSize'];
         $size = $this->convertSizeToBytes($maxFileSize);

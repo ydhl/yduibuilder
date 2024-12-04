@@ -1,7 +1,7 @@
 <template>
   <div class="dropdown">
-    <button class="btn btn-primary d-flex align-items-center text-truncate justify-content-center"
-         data-bs-toggle="dropdown" ref="dropdownToggle" :style="style">{{!modelValue.id ? t('common.upload') : modelValue.name}}</button>
+    <button :class="['dropdown-toggle btn btn-primary d-flex align-items-center text-truncate justify-content-center', btnCss]"
+         data-bs-toggle="dropdown" ref="dropdownToggle" :style="style">{{ buttonTitle || (!modelValue.id ? t('common.upload') : modelValue.name)}}</button>
     <ul class="dropdown-menu dropdown-menu-end">
       <li><div class="dropdown-item" id="upload" ref="uploadBtn">{{t('common.upload')}}</div></li>
       <li><div class="dropdown-item" id="select" @click="openSelectFileDialog">{{t('common.selectFile')}}</div></li>
@@ -55,6 +55,12 @@ export default {
   props: {
     width: String,
     projectId: String,
+    btnCss: String,
+    buttonTitle: String,
+    showImage: {
+      type: Boolean,
+      default: true
+    },
     type: {
       type: String,
       default: 'image'
@@ -79,6 +85,7 @@ export default {
     const selectFile = ref(props.modelValue)
 
     const style = computed(() => {
+      if (!props.showImage) return ''
       let str = `width:${props.width};height:${props.height}`
       if (props.modelValue && props.type === 'image' && props.modelValue.url) {
         str += `;background-image:url(${props.modelValue.url});background-size: cover;background-repeat: no-repeat;background-position: center;`

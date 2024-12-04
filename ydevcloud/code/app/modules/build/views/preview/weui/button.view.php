@@ -17,7 +17,7 @@ class Button_View extends Preview_View {
         if (@$this->data['meta']['custom']['disabled']){
             echo ' disabled ';
         }
-        echo $this->build_main_attrs().'>';
+        echo $this->output_main_attrs().'>';
         $this->wrap_icon(function(){
             echo $this->data['meta']['title'] ?: '';
         });

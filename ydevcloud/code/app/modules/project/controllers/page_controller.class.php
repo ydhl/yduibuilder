@@ -76,7 +76,7 @@ class Page_Controller extends YZE_Resource_Controller {
         $query = Page_Model::from('p')
             ->left_join(Module_Model::CLASS_NAME, 'm', 'm.id = p.module_id and m.is_deleted=0 ')
             ->left_join(Function_Model::CLASS_NAME, 'f', 'f.id = p.function_id and f.is_deleted=0 ')
-            ->where($where)->order_By('modified_on','desc');
+            ->where($where)->order_By('modified_on','desc','p');
 
         $pages = $query->select($params, 'p');
 

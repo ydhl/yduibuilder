@@ -10,10 +10,12 @@
         <UIExport></UIExport>
       </div>
     </lay-layer>
-    <div class="context-menu" ref="contextMenuDom" :style="`left:${contextLeft}px;top:${contextTop}px`" v-if="showContextMenu">
-      <div class="item" @click.stop="exportUI()">{{t("common.createComponent")}}</div>
-      <div class="item" @click.stop="deleteUI()">{{t("common.remove")}}</div>
-      <div class="item" @click.stop="copyUI()">{{t("common.copy")}}</div>
+    <div class="context-menu-container" v-if="showContextMenu" @click="showContextMenu=false">
+      <div class="context-menu" ref="contextMenuDom" :style="`left:${contextLeft}px;top:${contextTop}px`">
+        <div class="item" @click.stop="exportUI()">{{t("common.createComponent")}}</div>
+        <div class="item" @click.stop="deleteUI()">{{t("common.remove")}}</div>
+        <div class="item" @click.stop="copyUI()">{{t("common.copy")}}</div>
+      </div>
     </div>
   </template>
 
@@ -25,7 +27,7 @@ import TopPanel from '@/components/page/TopPanelUI.vue'
 import RightPanel from '@/components/page/RightPanel.vue'
 import LeftPanel from '@/components/page/LeftPanelUI.vue'
 import WorkspacePanel from '@/components/page/WorkspacePanel.vue'
-import { computed, onMounted, getCurrentInstance, toRaw, ref, watch, nextTick } from 'vue'
+import { computed, onMounted, getCurrentInstance, toRaw, ref } from 'vue'
 import { useStore } from 'vuex'
 import ydhl from '@/lib/ydhl'
 import { useI18n } from 'vue-i18n'
@@ -77,7 +79,7 @@ export default {
       return store.state.design.backdropVisible
     })
     const { t } = useI18n()
-    const { selectedUIItemId, selectedPageId, selectedUIItem } = InitUI()
+    const { selectedPageId, selectedUIItem } = InitUI()
     const currPage = computed(() => store.state.design.page)
     const saved = computed(() => store.state.design.pageSaved[currPage.value.meta.id])
     const currFunction = computed(() => store.state.design.function)
@@ -240,11 +242,7 @@ export default {
         connectSocket()
       }, 5000)
     })
-    watch(selectedUIItemId, (o, v) => {
-      if (o !== v) {
-        showContextMenu.value = false
-      }
-    })
+
     const openExportUIDialog = () => {
       exportDialogVisible.value = true
     }
@@ -260,13 +258,8 @@ export default {
       openExportUIDialog()
     }
     const contextMenu = (data) => {
-      // 和上面watch selectedUIItemId有冲突，或导致右键点击两下才出现弹窗，因为右键
-      // 会把元素设置为选中，改变了selectuiitemid，这里执行后，watch又把showContextMenu设置为false（他们两个的顺序是未知的）
-      // 所以用nextTick
-      nextTick(() => {
-        showContextMenu.value = true
-        contextMenuPosition.value = data
-      })
+      showContextMenu.value = true
+      contextMenuPosition.value = data
     }
 
     return {
@@ -292,22 +285,3 @@ export default {
   name: 'UIBuilder'
 }
 </script>
-<style type="text/css">
-.context-menu{
-  position: absolute;
-  z-index: 999;
-  border: 1px solid #ccc;
-  box-shadow: 3px 5px 7px 0rem rgb(45 47 52 / 75%);
-}
-.context-menu .item{
-  padding: 5px 10px;
-  background-color: #efefef;
-  font-size: 14px;
-  word-break: keep-all;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.context-menu .item:hover{
-  background-color: #ffffff;
-}
-</style>

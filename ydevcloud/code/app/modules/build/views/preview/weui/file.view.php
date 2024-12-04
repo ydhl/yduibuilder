@@ -32,7 +32,7 @@ class File_View extends Preview_View implements Valuable_View{
         echo "<div class='weui-uploader__input-box'>".PHP_EOL;
         echo $this->indent(6);
         echo '<input type="file" class="weui-uploader__input"';
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
         if (@$this->data['meta']['custom']['accept']){
             echo ' accept="'.$this->data['meta']['custom']['accept'].'"';
         }

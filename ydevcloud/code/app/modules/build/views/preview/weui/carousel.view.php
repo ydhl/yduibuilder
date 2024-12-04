@@ -89,7 +89,7 @@ class Carousel_View extends ValueList_View {
 
         echo $this->indent(1).'<div class="carousel-inner"';
         echo $this->wrap_output(':id', "alpinejs_get_index(\$el, '{$myid}', '-inner')");
-        $this->build_event_listen();
+        $this->output_event_listen_props();
         echo '>'.PHP_EOL;
         echo $this->indent(1)."</div>".PHP_EOL;
 
@@ -183,7 +183,7 @@ TICK;
         $myid = $this->myid();
 
         echo "{$space}<div";
-        echo $this->build_main_attrs(false);
+        echo $this->output_main_attrs(false);
         echo $this->wrap_output('data-ride', 'carousel');
         echo $this->wrap_output(':id', "alpinejs_get_index(\$el, '{$myid}')");
         echo ">".PHP_EOL;
@@ -233,7 +233,7 @@ TICK;
     private function build_static_slide(){
         echo $this->indent(1);
         echo '<div class="carousel-inner"';
-        $this->build_event_listen();
+        $this->output_event_listen_props();
         echo '>'.PHP_EOL;
         if ( ! $this->data['items']) {
             echo $this->indent(2);

@@ -21,7 +21,7 @@ class Nav_View extends ValueList_View {
         echo ">".PHP_EOL;
 
         echo $this->indent(1) . "<ul";
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         echo $this->wrap_output('x-input', $inputDataName);
         echo ">".PHP_EOL;
     }

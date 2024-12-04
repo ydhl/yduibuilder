@@ -14,7 +14,7 @@ class Image_View extends Preview_View {
         $imgSrc = @$this->data['meta']['value']?:'/uibuilder.jpg';
         $imgSrc = $this->get_Img_Src($imgSrc);
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ' alt="'.(@$this->data['meta']['title']).'"';
         echo ' src="'.($imgSrc).'"';
         echo ">".PHP_EOL;

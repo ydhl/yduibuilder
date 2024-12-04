@@ -73,6 +73,26 @@ class Page_Bind_Event_Model extends YZE_Model{
      * @var string
      */
     const F_DESC = "desc";
+    /**
+     * 事件修饰符
+     * @var string
+     */
+    const F_MODIFIER = "modifier";
+    /**
+     * 防抖截流的周期
+     * @var integer
+     */
+    const F_TIMEOUT = "timeout";
+    /**
+     * 
+     * @var integer
+     */
+    const F_IMMEDIATE = "immediate";
+    /**
+     * 自定义按键key
+     * @var string
+     */
+    const F_CUSTOM_KEY = "custom_key";
     public static $columns = [
     'id'         => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
       'created_on' => ['type' => 'date', 'null' => false,'length' => '','default'	=> 'CURRENT_TIMESTAMP'],
@@ -84,6 +104,10 @@ class Page_Bind_Event_Model extends YZE_Model{
       'uiid'       => ['type' => 'string', 'null' => true,'length' => '445','default'	=> ''],
       'uicomponent_event_id' => ['type' => 'integer', 'null' => true,'length' => '','default'	=> ''],
       'desc'       => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
+      'modifier'   => ['type' => 'string', 'null' => true,'length' => '245','default'	=> ''],
+      'timeout'    => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '0'],
+      'immediate'  => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '0'],
+      'custom_key' => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
     ];
     /**
      * @see YZE_Model::$unique_key

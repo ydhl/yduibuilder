@@ -27,7 +27,7 @@ class Breadcrumb_View extends Preview_Breadcrumb_View {
     {
         $space =  $this->indent();
         echo "{$space}<view";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">\r\n";
 
         foreach ($this->values() as $item){

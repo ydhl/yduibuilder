@@ -88,19 +88,26 @@ trait Mutation_Model_Method{
 	 */
 	public function get_expression(){
 		if (!$this->expressionModel){
-			$exp = json_decode(html_entity_decode($this->expression), true);
-			if($exp) $this->expressionModel = new Expression($exp);
+			$exp = json_decode(html_entity_decode($this->expression), true) ?: [];
+			$this->expressionModel = new Expression($exp);
 		}
 		return $this->expressionModel;
 	}
 	public function get_muation_data(){
 		$expression = $this->get_expression();
+		$bindData = $this->get_from_data();
+		$dataModel = $bindData->get_data_model();
+		$path = [];
+		$dataConfig = $bindData->find_data($this->mutation_data_id, $dataModel, $allParents, $path);
+		$path = array_reverse($path);
+		$path[] = $dataConfig['name'];
+
 		return [
 			'expression' => $expression ? json_decode(html_entity_decode($this->expression)) : new \stdClass(),
 			'expression_code' => $expression ? $expression->get_expression_code() : $this->expression,
 			'from_uuid' => $this->mutation_from_uuid,
 			'data_id' => $this->mutation_data_id,
-			'data_name' => $this->mutation_data_name,
+			'data_name' => join('.', $path),
 			'mutation_operator' => $this->mutation_operator,
 			'data_type' => $this->mutation_data_type
 		];
@@ -113,7 +120,6 @@ trait Mutation_Model_Method{
 			$model = new Mutation_Model();
 			$model->set('mutation_from_uuid', $mutation['from_uuid'])
 				->set('mutation_data_id', $data_id)
-				->set('mutation_data_name', $mutation['data_name'])
 				->set('mutation_data_type', $mutation['data_type'])
 				->set('uuid', Mutation_Model::uuid())
 				->set('action_id', $action_id)

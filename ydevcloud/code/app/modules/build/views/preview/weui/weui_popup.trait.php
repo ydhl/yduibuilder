@@ -20,7 +20,7 @@ trait Weui_Popup {
      * @param $page
      * @return string
      */
-    protected function get_popup_page_url($page) {
+    protected function get_page_url($page) {
         if ($page->page_type=='popup'){
             // 弹窗加载时显示上完整的html结构
             return '/preview/popup/'.$page->uuid;

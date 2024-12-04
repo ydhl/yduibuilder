@@ -126,7 +126,7 @@ export default {
     }
 
     const updateChecked = ({ scope, path, data, rootDataId }) => {
-      if (myModel.value && data.type !== myModel.value.type && myModel.value.type !== 'any') {
+      if (data.type !== 'any' && myModel.value && data.type !== myModel.value.type && myModel.value.type !== 'any') {
         ydhl.alert(t('variable.boundTypeMismatch', [myModel.value.type]))
       }
       boundExpression.value = {
@@ -157,7 +157,7 @@ export default {
       context.emit('updateConnectData', fromRootUuid, fromPath, fromUuid, toData, remove, desc)
     }
     const updateExpression = (expression, desc) => {
-      updateConnectData(props.rootUuid, myPath.value, myModel.value.uuid, expression, !expression.type, desc)
+      updateConnectData(props.rootUuid, myPath.value, myModel.value.uuid, expression, !expression?.type, desc)
     }
     /**
      * 选择的数据

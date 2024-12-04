@@ -117,6 +117,11 @@ class Action_Model extends YZE_Model{
     const F_BIND_API_ID = "bind_api_id";
     /**
      * 
+     * @var string
+     */
+    const F_POPUP_TARGET = "popup_target";
+    /**
+     * 
      * @var enum
      */
     const F_POPUP_PAGE_TYPE = "popup_page_type";
@@ -185,6 +190,7 @@ class Action_Model extends YZE_Model{
       'input'      => ['type' => 'string', 'null' => true,'length' => '','default'	=> ''],
       'output'     => ['type' => 'string', 'null' => true,'length' => '','default'	=> ''],
       'bind_api_id' => ['type' => 'integer', 'null' => false,'length' => '','default'	=> '0'],
+      'popup_target' => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
       'popup_page_type' => ['type' => 'enum', 'null' => false,'length' => '','default'	=> 'unset'],
       'bind_class' => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
       'bind_uuid'  => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],

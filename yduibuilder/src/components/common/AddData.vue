@@ -116,212 +116,188 @@
   <CodeEditorDialog v-model="codeDialogVisible" :hide-variable="true" :schema="modelSchema" :code="code" @update="updateCode"></CodeEditorDialog>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref, watch } from 'vue'
 import ydhl from '@/lib/ydhl'
 import CodeEditorDialog from '@/components/common/CodeEditorDialog.vue'
 import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 
-export default {
-  name: 'AddData',
-  components: { AdvanceSelect, CodeEditorDialog },
-  props: {
-    modelValue: Object,
-    types: {
-      type: Array,
-      default: () => ['string', 'integer', 'number', 'boolean', 'object', 'array', 'map', 'null', 'any', 'blob', 'file']
-    },
-    isArrayItem: Boolean, // 数组结点标识, 数组结点则只能修改type和comment
-    hasDefaultValue: {
-      default: true,
-      type: Boolean
-    }
+const emit = defineEmits(['update:modelValue'])
+const { modelValue, types, isArrayItem, hasDefaultValue } = defineProps({
+  modelValue: Object,
+  types: {
+    type: Array,
+    default: () => ['string', 'integer', 'number', 'boolean', 'object', 'array', 'map', 'null', 'any', 'blob', 'file']
   },
-  emits: ['update:modelValue'],
-  setup (props: any, context: any) {
-    const { t } = useI18n()
-    const myModel = ref(props.modelValue)
-    const show = ref(false)
-    const codeDialogVisible = ref(false)
-    const valueType = ref('')
-    const code = ref('')
-    const mocks = {
-      '@string': t('mock.string'),
-      '@date': t('mock.date'),
-      '@time': t('mock.time'),
-      '@datetime': t('mock.datetime'),
-      '@color': t('mock.color'),
-      '@word': t('mock.word'),
-      '@cname': t('mock.cname'),
-      '@name': t('mock.name'),
-      '@paragraph': t('mock.paragraph'),
-      '@sentence': t('mock.sentence'),
-      '@cparagraph': t('mock.cparagraph'),
-      '@csentence': t('mock.csentence'),
-      '@url(http)': t('mock.URL')
-    }
-    const isScale = computed(() => ['string', 'integer', 'number', 'any'].indexOf(myModel.value.type) !== -1)
-    const validateRules = computed(() => {
-      const rules: any = [
-        {
-          header: t('common.general')
-        },
-        {
-          name: t('api.model.valid.notEmpty'),
-          value: 'notEmpty',
-          desc: t('api.model.valid.notEmptyDesc')
-        }
-      ]
-      if (isScale.value) {
-        rules.push(
-          {
-            header: t('common.custom')
-          },
-          {
-            name: t('common.custom'),
-            value: '',
-            input: true,
-            desc: t('api.model.valid.regular')
-          }
-        )
-      }
-      return rules
-    })
+  isArrayItem: Boolean, // 数组结点标识, 数组结点则只能修改type和comment
+  hasDefaultValue: {
+    default: true,
+    type: Boolean
+  }
+})
 
-    const enumValues = computed(() => {
-      const values: any = []
-      for (const name in props.modelValue.enumValue) {
-        values.push({ name, comment: props.modelValue.enumValue[name] })
-      }
-      if (values) {
-        values.push({ name: '', comment: '' })
-      }
-      return values
-    })
-    const modelSchema = computed(() => {
-      return ydhl.getModelJSONSchema(props.modelValue)
-    })
-    const validateRuleDesc = computed(() => {
-      if (myModel.value.validRegular) return myModel.value.validRegular
-      if (myModel.value.validRule) return t('api.model.valid.' + myModel.value.validRule)
-      return t('api.model.validate')
-    })
-    onMounted(() => {
-      if (!ydhl.isEmptyObject(props.modelValue.enumValue)) {
-        valueType.value = 'enum'
-      }
-    })
-    watch(myModel, (v) => {
-      context.emit('update:modelValue', v)
-    })
-    const changeType = (type) => {
-      show.value = false
-      myModel.value.type = type
-      delete myModel.value.validRegular
-      delete myModel.value.validRule
-      if (type === 'array' && !myModel.value.item) {
-        myModel.value.item = { type: 'string', uuid: ydhl.uuid() }
-        delete myModel.value.props
-      } else if (type === 'object' && !myModel.value.props) {
-        myModel.value.props = []
-        delete myModel.value.item
-      } else if (type === 'blob') {
-        myModel.value.props = [
-          {
-            uuid: 'blobSize',
-            type: 'number',
-            name: 'size',
-            readonly: true
-          },
-          {
-            uuid: 'blobType',
-            type: 'string',
-            name: 'type',
-            readonly: true
-          }
-        ]
-        delete myModel.value.item
-      } else if (type === 'file') {
-        myModel.value.props = [
-          {
-            uuid: 'fileSize',
-            type: 'number',
-            name: 'size',
-            readonly: true
-          },
-          {
-            uuid: 'fileType',
-            type: 'string',
-            name: 'type',
-            readonly: true
-          },
-          {
-            uuid: 'fileName',
-            type: 'string',
-            name: 'name',
-            readonly: true
-          },
-          {
-            uuid: 'fileLastModified',
-            type: 'string',
-            name: 'lastModified',
-            readonly: true
-          }
-        ]
-        delete myModel.value.item
-      } else if (type !== 'array' && type !== 'object') {
-        delete myModel.value.item
-        delete myModel.value.props
-      }
+const { t } = useI18n()
+const myModel = ref(modelValue)
+const show = ref(false)
+const codeDialogVisible = ref(false)
+const valueType = ref('')
+const code = ref('')
+const mocks = {
+  '@string': t('mock.string'),
+  '@date': t('mock.date'),
+  '@time': t('mock.time'),
+  '@datetime': t('mock.datetime'),
+  '@color': t('mock.color'),
+  '@word': t('mock.word'),
+  '@cname': t('mock.cname'),
+  '@name': t('mock.name'),
+  '@paragraph': t('mock.paragraph'),
+  '@sentence': t('mock.sentence'),
+  '@cparagraph': t('mock.cparagraph'),
+  '@csentence': t('mock.csentence'),
+  '@url(http)': t('mock.URL')
+}
+const isScale = computed(() => ['string', 'integer', 'number', 'any'].indexOf(myModel.value.type) !== -1)
+const validateRules = computed(() => {
+  const rules: any = [
+    {
+      header: t('common.general')
+    },
+    {
+      name: t('api.model.valid.notEmpty'),
+      value: 'notEmpty',
+      desc: t('api.model.valid.notEmptyDesc')
     }
-    const changeEnum = () => {
-      const length = enumValues.value.length
-      if (!length) return
-      if (enumValues.value[length - 1].name !== '') {
-        enumValues.value.push({ name: '', comment: '' })
+  ]
+  if (isScale.value) {
+    rules.push(
+      {
+        header: t('common.custom')
+      },
+      {
+        name: t('common.custom'),
+        value: '',
+        input: true,
+        desc: t('api.model.valid.regular')
       }
-      const values = {}
-      for (const value of enumValues.value) {
-        if (!value.name) continue
-        values[value.name] = value.comment
+    )
+  }
+  return rules
+})
+
+const enumValues = computed(() => {
+  const values: any = []
+  for (const name in modelValue.enumValue) {
+    values.push({ name, comment: modelValue.enumValue[name] })
+  }
+  if (values) {
+    values.push({ name: '', comment: '' })
+  }
+  return values
+})
+const modelSchema = computed(() => {
+  return ydhl.getModelJSONSchema(modelValue)
+})
+const validateRuleDesc = computed(() => {
+  if (myModel.value.validRegular) return myModel.value.validRegular
+  if (myModel.value.validRule) return t('api.model.valid.' + myModel.value.validRule)
+  return t('api.model.validate')
+})
+onMounted(() => {
+  if (!ydhl.isEmptyObject(modelValue.enumValue)) {
+    valueType.value = 'enum'
+  }
+})
+watch(myModel, (v) => {
+  emit('update:modelValue', v)
+})
+const changeType = (type) => {
+  show.value = false
+  myModel.value.type = type
+  delete myModel.value.validRegular
+  delete myModel.value.validRule
+  if (type === 'array' && !myModel.value.item) {
+    myModel.value.item = { type: 'string', uuid: ydhl.uuid() }
+    delete myModel.value.props
+  } else if (type === 'object' && !myModel.value.props) {
+    myModel.value.props = []
+    delete myModel.value.item
+  } else if (type === 'blob') {
+    myModel.value.props = [
+      {
+        uuid: myModel.value.uuid + '|size',
+        type: 'number',
+        name: 'size',
+        readonly: true
+      },
+      {
+        uuid: myModel.value.uuid + '|type',
+        type: 'string',
+        name: 'type',
+        readonly: true
       }
-      myModel.value.enumValue = values
-      context.emit('update:modelValue', JSON.parse(JSON.stringify(myModel.value)))
-    }
-    const updateCode = (newCode) => {
-      codeDialogVisible.value = false
-      myModel.value.defaultValue = newCode
-    }
-    const openCodeDialog = () => {
-      codeDialogVisible.value = true
-      code.value = myModel.value.defaultValue
-    }
-    const changeValueType = () => {
-      valueType.value = valueType.value === 'enum' ? '' : 'enum'
-      if (valueType.value === 'enum') {
-        myModel.value.enumValue = {}
+    ]
+    delete myModel.value.item
+  } else if (type === 'file') {
+    myModel.value.props = [
+      {
+        uuid: myModel.value.uuid + '|size',
+        type: 'number',
+        name: 'size',
+        readonly: true
+      },
+      {
+        uuid: myModel.value.uuid + '|type',
+        type: 'string',
+        name: 'type',
+        readonly: true
+      },
+      {
+        uuid: myModel.value.uuid + '|name',
+        type: 'string',
+        name: 'name',
+        readonly: true
+      },
+      {
+        uuid: myModel.value.uuid + '|lastModified',
+        type: 'string',
+        name: 'lastModified',
+        readonly: true
       }
-    }
-    return {
-      t,
-      myModel,
-      valueType,
-      isScale,
-      show,
-      code,
-      updateCode,
-      codeDialogVisible,
-      changeEnum,
-      changeValueType,
-      enumValues,
-      mocks,
-      changeType,
-      modelSchema,
-      validateRules,
-      validateRuleDesc,
-      openCodeDialog
-    }
+    ]
+    delete myModel.value.item
+  } else if (type !== 'array' && type !== 'object') {
+    delete myModel.value.item
+    delete myModel.value.props
+  }
+}
+const changeEnum = () => {
+  const length = enumValues.value.length
+  if (!length) return
+  if (enumValues.value[length - 1].name !== '') {
+    enumValues.value.push({ name: '', comment: '' })
+  }
+  const values = {}
+  for (const value of enumValues.value) {
+    if (!value.name) continue
+    values[value.name] = value.comment
+  }
+  myModel.value.enumValue = values
+  emit('update:modelValue', JSON.parse(JSON.stringify(myModel.value)))
+}
+const updateCode = (newCode) => {
+  codeDialogVisible.value = false
+  myModel.value.defaultValue = newCode
+}
+const openCodeDialog = () => {
+  codeDialogVisible.value = true
+  code.value = myModel.value.defaultValue
+}
+const changeValueType = () => {
+  valueType.value = valueType.value === 'enum' ? '' : 'enum'
+  if (valueType.value === 'enum') {
+    myModel.value.enumValue = {}
   }
 }
 </script>

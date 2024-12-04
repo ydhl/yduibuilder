@@ -27,14 +27,14 @@ class Textarea_View extends Input_View {
         $myid = $this->myid();
 
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
         echo $this->indent(1).'<div class="weui-cell__hd w-100"><label class="weui-label">'.$this->data['meta']['title'].'</label></div>'.PHP_EOL;
         echo $this->indent(1).'<div class="weui-cell__bd w-100">'.PHP_EOL;
         echo $this->indent(2).'<textarea class="weui-textarea input"';
         echo $this->wrap_output('style',$this->data['meta']['custom']['autoRow'] ? 'resize: none' : null);
         echo $this->wrap_output('maxlength', $this->data['meta']['custom']['maxLength']?:NULL);
-        $this->build_form_attrs();
+        $this->output_form_attrs();
         echo $this->wrap_output('@keyup', ($wordCountVisible || $clearButtonVisible) ? $this->myid().'_keyup' : null);
         echo $this->wrap_output('rows', @$this->data['meta']['custom']['row']);
 

@@ -10,7 +10,7 @@ class Container_View extends Preview_View {
     {
         echo $this->indent();
         echo "<view";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">\r\n";
 
         foreach ($this->childViews as $view){

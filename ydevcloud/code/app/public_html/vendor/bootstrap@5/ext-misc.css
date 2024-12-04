@@ -38,8 +38,8 @@ body {
 .iconfont {
     font-size: inherit !important;
 }
-/*ydecloud在输出pagination时第一个元素时template*/
-[data-uiid] .page-item:nth-child(2) .page-link {
+/*ydecloud在用alpinejs输出pagination时第一个元素时template*/
+[data-uiid] .remove-radius:nth-child(2) .page-link {
     border-top-left-radius: var(--bs-pagination-border-radius);
     border-bottom-left-radius: var(--bs-pagination-border-radius);
 }

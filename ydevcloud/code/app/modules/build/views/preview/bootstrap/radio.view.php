@@ -35,7 +35,11 @@ class Radio_View extends ValueList_View {
         echo $this->wrap_output('type', $this->type);
         echo $this->wrap_output('class', "form-check-input mt-0");
         echo $this->wrap_output(':id', "\$id('{$myid}-item')");
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
+        $eventHandlers = $this->get_event_listen_props();
+        if($eventHandlers['@blur']) echo $this->wrap_output("@blur", $eventHandlers['@blur']);
+        if($eventHandlers['@focus']) echo $this->wrap_output("@focus", $eventHandlers['@focus']);
+
         if ($value){
             echo $this->wrap_output(':value', $value);
             echo $this->wrap_output(':data-default', $checked ? "{$checked} ? {$value} : ''" : null);
@@ -62,7 +66,8 @@ class Radio_View extends ValueList_View {
     {
         $space =  $this->indent();
         echo "{$space}<div";
-        $this->build_main_attrs();
+        $this->output_main_attrs();
+        $this->output_init_input();
         echo ">".PHP_EOL;
     }
     protected function build_ui_end()

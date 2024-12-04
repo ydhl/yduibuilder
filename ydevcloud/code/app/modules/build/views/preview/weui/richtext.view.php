@@ -18,7 +18,7 @@ class Richtext_View extends Preview_View {
 
         $space =  $this->indent();
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">";
         echo @$this->data['meta']['value'] ?: @$this->data['meta']['title'];
         echo "</div>".PHP_EOL;

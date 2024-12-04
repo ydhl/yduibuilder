@@ -80,7 +80,8 @@ const store = {
     endKind: '',
     backdropVisible: false,
     selectedUIItemActiveState: { type: 'normal', state: 'normal' },
-    previewStyleItem: {} // 设置style selector时用于预览，也是uibase结构体, 但只用到其中到meta.style部分内容
+    previewStyleItem: {}, // 设置style selector时用于预览，也是uibase结构体, 但只用到其中到meta.style部分内容
+    themeColorPreview: {} // 用于在主题定制时预览主题颜色
   },
   mutations: {
     updateExtraInfo (state: any, props: Record<any, any>) {

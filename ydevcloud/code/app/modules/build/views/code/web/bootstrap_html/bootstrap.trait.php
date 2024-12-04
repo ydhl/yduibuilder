@@ -24,7 +24,7 @@ trait Bootstrap {
      * @param $page
      * @return string
      */
-    protected function get_popup_page_url($page) {
+    protected function get_page_url($page) {
         return '../'.$page->get_save_path('html');
     }
 }

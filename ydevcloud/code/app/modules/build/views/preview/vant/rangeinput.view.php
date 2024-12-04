@@ -19,7 +19,7 @@ class Rangeinput_View extends Preview_View implements Valuable_View {
         $space =  $this->indent();
         echo "{$space}";
         echo "<div";
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         echo $this->indent(1).'<div class="van-field__control van-field__control--custom">'.PHP_EOL;

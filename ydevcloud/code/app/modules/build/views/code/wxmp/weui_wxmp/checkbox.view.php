@@ -27,7 +27,7 @@ class Checkbox_View extends Preview_Checkbox_View {
                 echo ' checked';
             }
             echo ' class="weui-check" id="'.$this->myId().$index.'"';
-            echo $this->build_form_attrs();
+            echo $this->output_form_attrs();
             echo ' value="'.@$item['value'].'"';
             echo "/>\r\n";
             echo $this->indent(7);

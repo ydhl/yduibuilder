@@ -11,7 +11,7 @@ class Hr_View extends Preview_View {
     {
         $space =  $this->indent();
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
         if ($this->data['meta']['value']){
             echo $this->indent(1);

@@ -92,6 +92,7 @@ class Load_Controller extends YZE_Resource_Controller {
         $project_setting['framework'] = $project_setting['frontend_framework'] ? $package[$project_setting['frontend_framework']]['name'] : '';
         $project_setting['name'] = $project->name;
         $project_setting['endKind'] = $project->end_kind;
+        $project_setting["rewrite"] = $package[$project_setting['frontend_framework']]['rewrite']; // 框架是否支持路径重载
         $assets = ['style'=>[],'javascript'=>[]];
         if (file_exists(YZE_UPLOAD_PATH."/project/{$project->uuid}/iconfont/iconfont.css")){
             $assets['style'] = UPLOAD_SITE_URI."/project/{$project->uuid}/iconfont/iconfont.css";
@@ -106,7 +107,6 @@ class Load_Controller extends YZE_Resource_Controller {
             "canEdit"=> $member->can_edit(),
             'userRole'=>$member->role,
             "endKind"=> $project->end_kind,
-            "rewrite"=> $package[$project_setting['frontend_framework']]['rewrite'], // 框架是否支持路径重载
             "codeTypes"=> $codeTypes?:null,
             "simulateModel"=>$project->end_kind === "mobile" ? "portrait" : "pc",
             "page" => []

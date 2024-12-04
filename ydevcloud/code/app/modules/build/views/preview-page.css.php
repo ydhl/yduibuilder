@@ -27,6 +27,7 @@ foreach ($pages as $page){
     $styles = array_merge($styles, $pageView->build_style(false));
 }
 foreach ($commonStyles as $selector => $style){
+    if (!trim($style)) continue;
     $build->output_code($selector.' {', 0);
     $build->output_code($style, 1);
     $build->output_code('}', 0);
@@ -44,6 +45,7 @@ if ($globalCssVariable){
 
 // 当前页面及子页的元素样式
 foreach ($styles as $selector => $style){
+    if (!trim($style)) continue;
     $build->output_code($selector.' {', 0);
     $build->output_code($style, 1);
     $build->output_code('}', 0);

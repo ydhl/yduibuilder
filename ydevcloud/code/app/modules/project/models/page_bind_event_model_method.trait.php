@@ -49,30 +49,40 @@ trait Page_Bind_Event_Model_Method{
      * @return void
      */
     public static function remove_gone_uiid(Page_Model $page) {
-        $events = Page_Bind_Event_Model::from()->where('page_id=:pid and uicomponent_event_id is null')->select([':pid'=>$page->id]);
+        $events = Page_Bind_Event_Model::from('be')
+            ->left_join(Uicomponent_Event_Model::CLASS_NAME, 'ue', 'ue.id = be.uicomponent_event_id')
+            ->left_join(Page_Model::CLASS_NAME, 'p', 'p.id = ue.page_id')
+            ->where('be.page_id=:pid')->select([':pid'=>$page->id]);
         foreach ($events as $event){
-            $uiids = array_filter(explode(",", $event->uiid));
-            $filter_uiids = [];
-            foreach ($uiids as $uiid){
-                if($page->find_ui_item($uiid)){
-                    $filter_uiids[] = $uiid;
+            if ($event['be']->uiid && !$event['ue']){
+                $uiids = array_filter(explode(",", $event['be']->uiid));
+                $filter_uiids = [];
+                foreach ($uiids as $uiid){
+                    if($page->find_ui_item($uiid)){
+                        $filter_uiids[] = $uiid;
+                    }
                 }
-            }
-            if ($filter_uiids){
-                $event->set('uiid', join(",", $filter_uiids))->save();
-            }else{
-                $event->remove();
+                $event['be']->set('uiid', join(",", $filter_uiids))->save();
+            }else if ($event['ue']) {// 组件事件
+                $subPageIds = [];
+                $page->fetchSubPageIds(null, $subPageIds);
+                $page->fetchPopupPageIds($subPageIds);
+                if (!in_array($event['p']->uuid, $subPageIds)){
+                    $event['be']->remove();
+                }
             }
         }
     }
     public function get_event_data(){
         $record = $this->get_records();
-        unset($record['id']);
+        unset($record['id'],$record['custom_key']);
         $actionData = [];
         foreach ($this->get_actions() as $action){
             $actionData[] = $action->get_action_data();
         }
         $record['actions'] = $actionData;
+        $record['modifier'] = $record['modifier'] ? explode(',', $record['modifier']) : [];
+        $record['customKey'] = $this->custom_key;
         $record['uiid'] = array_filter(explode(',', $record['uiid']));
         return $record;
     }

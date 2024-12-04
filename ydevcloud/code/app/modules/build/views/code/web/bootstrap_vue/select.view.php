@@ -1,7 +1,87 @@
 <?php
 namespace app\modules\build\views\code\web\bootstrap_vue;
+use app\modules\build\views\code\Base_Code_Fragment;
 use app\modules\build\views\preview\bootstrap\Select_View as Preview_Select_View;
+use app\modules\build\views\code\web\Vue;
 
 class Select_View extends Preview_Select_View {
-    use Vue;
+    use Vue {
+        Vue::build_code as vueBuildCode;
+    }
+
+    public function build_ui()
+    {
+        $space =  $this->indent();
+        echo "{$space}<SelectComponent";
+        $this->output_component_props();
+        echo $this->wrap_output(":formAttrs", $this->get_form_attrs());
+        echo $this->wrap_output(":items", $this->items());
+        echo $this->wrap_output("selectCss", $this->select_css());
+        if (@$this->data['meta']['custom']['multiple']){
+            echo $this->wrap_output(":multiple", 'true');
+        }
+        echo PHP_EOL."{$space}";
+        $this->output_v_model();
+        echo "></SelectComponent>".PHP_EOL;
+    }
+
+    protected function output_v_model(){
+        $needIterate = $this->get_iterator_index_names();
+        $inputDataName = $this->get_input_data_name($inputIsArr, $inputDataConfig);
+        $modifies = "";
+        if ($this->data['meta']['custom']['multiple']){
+            $modifies = ".select";
+        }
+        echo $needIterate && $inputIsArr ? $this->wrap_output('v-input'.$modifies, $inputDataName) : $this->wrap_output('v-model', $inputDataName);
+    }
+    public function build_code():Base_Code_Fragment
+    {
+        $this->vueBuildCode();
+        $fragment = $this->get_code_fragment();
+        $fragment->add_import('@/components/SelectComponent.vue', [], 'SelectComponent');
+        return $fragment;
+    }
+
+    protected function items(){
+        $bindOutputs = $this->get_output_datas($outDataName);
+        if (!$bindOutputs){
+            return $this->formatVue3JSON($this->data['meta']['values'] ?: $this->demo_values());
+        }
+        if ($this->need_iterate_ui('VALUELIST', $bindOutputs['VALUELIST'])){
+            // 二维数组，第二维迭代
+            $valueListDataName = $bindOutputs['VALUELIST']['name'];
+            return 'itemOf'.$valueListDataName;
+        }else if($bindOutputs['VALUELIST']){
+            // 一维数组迭代
+            return $outDataName['VALUELIST'];
+        }else{
+            return $this->formatVue3JSON($this->data['meta']['values'] ?: $this->demo_values());
+        }
+    }
+    protected function get_form_attrs(){
+        $attrs = ['{'];
+        $attrs[] = "'data-uiid':'" . $this->myId().$this->data['type'] . "',";
+
+        if (@$this->data['meta']['custom']['size']){
+            $attrs[] = "'size':'" . $this->data['meta']['custom']['size'] . "',";
+        }
+
+        if (@$this->data['meta']['form']['state']=='disabled'){
+            $attrs[] = 'disabled: true,';
+        }
+        if (@$this->data['meta']['form']['state']=='readonly'){
+            $attrs[] = 'readonly: true,';
+        }
+        if (@$this->data['meta']['form']['required']){
+            $attrs[] = 'required: true,';
+        }
+        if (@$this->data['meta']['form']['placeholder']) {
+            $attrs[] = "'placeholder':" . addslashes($this->data['meta']['form']['placeholder']).',';
+        }
+        $attrs[] = "'data-root':'".$this->myid()."'";
+
+        $attrs[] = '}';
+
+        return join('', $attrs);
+    }
 }

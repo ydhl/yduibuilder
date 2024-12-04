@@ -2,56 +2,48 @@
 namespace app\modules\build\views\code\web\bootstrap_vue;
 use app\modules\build\views\code\Base_Code_Fragment;
 use app\modules\build\views\preview\bootstrap\Rangeinput_View as Preview_Rangeinput_View;
+use app\modules\build\views\code\web\Vue;
 
 class Rangeinput_View extends Preview_Rangeinput_View {
-    use Vue;
+    use Vue {
+        Vue::build_code as vueBuildCode;
+        Vue::get_base_data_attrs as vueBaseAttrs;
+    }
+
     public function build_ui()
     {
-        $space =  $this->indent(2);
-        $myid = $this->myId();
-        echo "{$space}";
-        echo "<div";
-        echo $this->wrap_output('class', $this->body_css());
-        echo ">\r\n";
-        echo $this->indent(3)."<input type='range' ref='{$myid}'";
-        echo $this->build_form_attrs();
-        echo ' v-model="'.$myid.'Value" :style="'.$myid.'Style"';
-        echo ' min="'.@$this->data['meta']['custom']['min']?:1;
-        echo '" max="'.@$this->data['meta']['custom']['max']?:100;
-        echo '" step="'.@$this->data['meta']['custom']['step']?:1;
+        $space =  $this->indent();
+        $outputDatas = $this->get_output_datas($outputDataName);
 
-        echo '"';
-        echo $this->wrap_output('class', $this->rangeCss());
-        echo ">\r\n";
-        echo "{$space}";
-        echo "</div>\r\n";
+        $iteratorDataName = $this->get_iterator_data_name();
+        echo "{$space}<RangeInputComponent";
+        $this->output_component_props();
+        echo $this->wrap_output("min", $this->data['meta']['custom']['min']);
+        echo $this->wrap_output("max", $this->data['meta']['custom']['max']);
+        echo $this->wrap_output("step", $this->data['meta']['custom']['step']);
+        echo PHP_EOL."{$space}";
+        if ($outputDataName['VALUE']){
+            echo $this->wrap_output(':defaultValue', $iteratorDataName ?: $outputDataName['VALUE']);
+        }
+
+        $this->output_v_model();
+        echo "></RangeInputComponent>".PHP_EOL;
     }
-    public function build_code():Base_Code_Fragment
+    public function build_code(): Base_Code_Fragment
     {
-        parent::build_code();
-        $myid = $this->myId();
-        $defaultValue = floatval(@$this->data['meta']['value']);
-        $this->get_code_fragment()->add_import('vue', ['ref','computed']);
-        $this->get_code_fragment()->add_import('bootstrap');
-        $this->get_code_fragment()->add_ref($myid, '', true);
-        $this->get_code_fragment()->add_ref("{$myid}Value", $defaultValue, true);
+        $this->vueBuildCode();
+        $fragment = $this->get_code_fragment();
+        $fragment->add_import('@/components/RangeInputComponent.vue', [], 'RangeInputComponent');
+        return $fragment;
+    }
 
-        ob_start();
-?>
-() => {
-  const minValue = <?= $myid?>.value?.min || 1
-  const value = <?= $myid?>Value.value
-  const maxValue = <?= $myid?>.value?.max || 100
-  const percent = ((value - minValue) / (maxValue - minValue)) * 100 + '%'
-  const style = <?= $this->formatVue3JSON($this->rangeStyle())?>
+    protected function get_base_data_attrs(){
+        $attrs = $this->vueBaseAttrs();
 
-  style['background-size'] = `${percent} 100%`
-  return YDECloud.styleFromJson(style)
-}
-<?php
+        if (@$this->data['meta']['form']['state']=='disabled') $attrs[] = 'disabled:true';
+        if (@$this->data['meta']['form']['state']=='readonly') $attrs[] = 'readonly:true';
+        if (@$this->data['meta']['form']['required']) $attrs[] = 'required:true';
 
-        $this->get_code_fragment()->add_import("@/lib/ydecloud", [], 'YDECloud');
-        $this->get_code_fragment()->add_computed("{$myid}Style", ob_get_clean(), true);
-        return $this->get_code_fragment();
+        return $attrs;
     }
 }

@@ -52,7 +52,7 @@ function buildProject($server, $loginUser, $data) {
         return;
     }
 
-    $server->push(sprintf(__('compile finished please: <a href="%s">download</a>'), getOssLink($url)));
+    $server->push(vsprintf(__('compile finished please: <a href="%s" target="_blank">download</a>'), [getOssLink($url)]));
     $server->push("done");
 }
 

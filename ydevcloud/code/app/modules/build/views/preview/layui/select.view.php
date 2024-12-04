@@ -26,7 +26,7 @@ class Select_View extends Preview_View {
         if ($this->data['meta']['custom']['searchable']) {
             echo ' lay-search';
         }
-        echo $this->build_form_attrs();
+        echo $this->output_form_attrs();
         echo ">\r\n";
 
         foreach ((array)$values as $item){

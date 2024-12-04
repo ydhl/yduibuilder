@@ -20,8 +20,8 @@ trait Bootstrap_Popup {
      * @param $page
      * @return string
      */
-    protected function get_popup_page_url($page) {
-        return '/preview/popup/'.$page->uuid;
+    protected function get_page_url($page) {
+        return '/preview/'.($page->page_type=='popup' ? 'popup' : 'page').'/'.$page->uuid;
     }
 
 }

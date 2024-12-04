@@ -214,7 +214,6 @@ const baseUIDefines: Record<UIType, UIDefine> = {
     name: 'ui.table',
     isContainer: true,
     isIterable: true,
-    isValuable: true,
     outputAs: ['VALUELIST', 'STYLE', 'CSS', 'KEYVALUE', 'NONE']
   },
   Text: {

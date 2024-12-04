@@ -21,7 +21,7 @@ class Dropdown_View extends ValueList_View {
         $suffix = $isArr?'[-1]':'';
 
         echo "{$space}<div ";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">".PHP_EOL;
 
         echo $this->indent(1).'<div'.$this->wrap_output(':class', $this->bar_class()).$this->wrap_output('style', $this->bar_style()).'>'.PHP_EOL;

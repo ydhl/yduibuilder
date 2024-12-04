@@ -229,7 +229,7 @@ trait Page_Bind_Api_Action_Model_Method{
         return  [
             'uuid'=>$this->uuid,
             'mode'=>$this->mode,
-            'code'=>$this->code,
+            'code'=>html_entity_decode($this->code),
             'expression'=>json_decode(html_entity_decode($this->expression), true),
             'expression_desc'=>$expression ? $expression->get_expression_code() : '',
             'output_data_id'=>$this->output_data_id,

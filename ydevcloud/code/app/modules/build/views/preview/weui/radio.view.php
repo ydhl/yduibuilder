@@ -27,7 +27,7 @@ class Radio_View extends ValueList_View {
     {
         $space =  $this->indent();
         echo "{$space}<div";
-        $this->build_main_attrs();
+        $this->output_main_attrs();
         echo ">".PHP_EOL;
     }
 
@@ -61,7 +61,7 @@ class Radio_View extends ValueList_View {
 
         echo $this->indent(2)."<div class='weui-cell__ft'>".PHP_EOL;
         echo $this->indent(3)."<input type='{$this->type}'";
-        $this->build_form_attrs();
+        $this->output_form_attrs();
         if ($value){
             echo $this->wrap_output(':value', $value);
             echo $this->wrap_output('data-bound', $boundData);

@@ -272,6 +272,7 @@ function undo (state) {
   state.page = JSON.parse(stack)
 }
 function addStack (state) {
+  if (!state.page) return
   const pageUuid = state.page.meta?.id
   const index = state.pageStackIndex[pageUuid] !== undefined ? state.pageStackIndex[pageUuid] : -1
   if (!state.pageStacks[pageUuid]) state.pageStacks[pageUuid] = []
@@ -343,7 +344,8 @@ export default {
     previewStyleItem: {}, // 设置style selector时用于预览，也是uibase结构体, 但只用到其中到meta.style部分内容
     declaredEvents: [], // 缓存当前组件页面的自定义事件
     pageStacks: {}, //  当前打开的页面及其config数组，用于redo/undo，格式{pageid:[]}
-    pageStackIndex: {} //  当前打开的页面stack的当前位置，用于redo/undo，格式{pageid:integer}
+    pageStackIndex: {}, //  当前打开的页面stack的当前位置，用于redo/undo，格式{pageid:integer}
+    themeColorPreview: {} // 用于在主题定制时预览主题颜色
   },
   mutations: {
     updateProjectState (state: any, { name, value, save = true }) {
@@ -376,6 +378,21 @@ export default {
         state.module = design.module
         state.function = design.function
         state.page = null
+      }
+    },
+    /**
+     * 移动页面后更新pageModule，pageFunction结构
+     * @param state
+     * @param pageUuid
+     * @param moduleUuid
+     * @param funcUuid
+     */
+    movePage (state: any, { pageUuid, module, func }) {
+      state.pageModule[pageUuid] = module
+      state.pageFunction[pageUuid] = func
+      if (state.page.meta.id === pageUuid) {
+        state.module = module
+        state.function = func
       }
     },
     /**

@@ -29,7 +29,7 @@ class Input_View extends Preview_View implements Valuable_View {
         $myid = $this->myid();
 
         echo "{$space}<div";
-        echo $this->build_main_attrs();
+        echo $this->output_main_attrs();
         echo ">";
         $this->wrap_icon(function() use($outputDataName, $inputDataName, $isArr, $iteratorDataName){
             echo '<input';
@@ -48,7 +48,7 @@ class Input_View extends Preview_View implements Valuable_View {
                 echo $this->wrap_output('@keyup', $this->myid().'_keyup');
             }
 
-            echo $this->build_form_attrs();
+            echo $this->output_form_attrs();
             echo ">".PHP_EOL;
         },1);
 

@@ -6,6 +6,9 @@ abstract class Base_Factory{
      */
     protected $zip;
     protected $server;
+    /**
+     * @var \app\project\Project_Model
+     */
     protected $project;
     protected $token;
     public function __construct ($server, $project, $token) {
@@ -48,7 +51,7 @@ abstract class Base_Factory{
             $this->server->push(sprintf(__('Add %s'),$entry));
             if (is_dir($file)){
                 $this->zip->addEmptyDir($entry);
-                $this->addScaffoldFiles($file, $relativePath.basename($file)."/");
+                $this->addScaffoldFiles($file, $relativePath.basename($file)."/", $exclude_files);
             }else{
                 if (in_array(basename($file), $exclude_files)) continue;
                 $this->zip->addFile($file, $entry);
@@ -67,7 +70,7 @@ abstract class Base_Factory{
             if ($src){
                 $name = pathinfo(urldecode($src), PATHINFO_BASENAME);
                 $dist_image = rtrim($imageFolder, '/')."/".$name;
-                $this->server->push(sprintf(__('%sdownload image: %s => %s%s'), "<div class='text-info'>",$src, $dist_image,'</div>'));
+                $this->server->push($this->output(sprintf(__('download image: %s => %s'), $src, $dist_image), 'info'));
                 $this->zip->addFromString($dist_image, file_get_contents($src));
             }
         }
@@ -78,7 +81,7 @@ abstract class Base_Factory{
             $name = pathinfo(urldecode($img['url']), PATHINFO_BASENAME);
             $dist_image = rtrim($imageFolder, '/')."/".$name;
 
-            $this->server->push(sprintf(__('%sdownload image: %s => %s%s'), "<div class='text-info'>",$img['url'], $dist_image,'</div>'));
+            $this->server->push($this->output(sprintf(__('download image: %s => %s'), $img['url'], $dist_image), 'info'));
             $this->zip->addFromString($dist_image, file_get_contents($img['url']));
         }
         foreach ((array)@$uiconfig['items'] as $item){
@@ -94,7 +97,7 @@ abstract class Base_Factory{
         $zipFileName = $this->project->id . "-" . $this->project->name . ".zip";
         $this->zip = new \ZipArchive();
         $fullpath = dirname(__FILE__) . '/' . $zipFileName;
-        if ($this->zip->open($fullpath, \ZipArchive::CREATE) !== TRUE) {
+        if ($this->zip->open($fullpath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== TRUE) {
             $this->server->push(__('can not create zip file'));
             return;
         }
@@ -106,6 +109,11 @@ abstract class Base_Factory{
     }
     public abstract function compile();
 
+    /**
+     * @param $string
+     * @param $type error|info|success|secondary|warning
+     * @return void
+     */
     protected function output($string, $type='normal'){
         $wrap = $string;
         switch ($type){
@@ -117,6 +125,12 @@ abstract class Base_Factory{
                 break;
             case 'success':
                 $wrap = "<div class='text-success'>{$string}</div>";
+                break;
+            case 'secondary':
+                $wrap = "<div class='text-secondary'>{$string}</div>";
+                break;
+            case 'warn':
+                $wrap = "<div class='text-warning'>{$string}</div>";
                 break;
         }
         $this->server->push($wrap);

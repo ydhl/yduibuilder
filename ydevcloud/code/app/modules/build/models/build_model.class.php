@@ -72,7 +72,8 @@ class Build_Model{
 	 */
 	private $cssFactory;
 	private $events=[];
-	private $popupEvents=[];
+	private $customEvents=[];
+	private $lifecycleEvents=[];
 	private $ioBinds=[];
 	private $dataBinds=[];
 	private $uiid2BindData=[];
@@ -208,6 +209,7 @@ class Build_Model{
 		if (!$this->page) return; // 直接编译style（单独自定义公用的style selector）、或者编译一个项目的公用代码时候没page
 		$this->apiBinds = [];
 		$this->events = [];
+		$this->lifecycleEvents = [];
 		$this->ioBinds = [];
 		$this->variableBinds = [];
 		$this->dataBinds = [];
@@ -236,8 +238,13 @@ class Build_Model{
 		}
 
 		foreach ($events as $event){
+			// 弹窗及组件的自定义事件
 			if($event->get_uicomponent_event() && !$event->uiid) {
-				$this->popupEvents[$event->id] = $event;
+				$this->customEvents[$event->id] = $event;
+				continue;
+			}
+			if ($this->isLifeCycleEvent($event->event)){
+				$this->lifecycleEvents[] = $event;
 				continue;
 			}
 			foreach (explode(',', $event->uiid) as $uiid){
@@ -297,7 +304,19 @@ class Build_Model{
 		$this->variableBinds = Page_Bind_Variable_Model::from()->where('(from_page_id=:pid or to_page_id=:pid) and is_deleted=0')
 			->select([':pid'=>$this->page->id]);
 	}
-
+	private function isLifeCycleEvent($eventName){
+		return in_array(strtolower($eventName), [
+			'onload',
+			'onready',
+			'onshow',
+			'onhide',
+			'onbeforeunload',
+			'onunload',
+			'onpulldown',
+			'onreachbottom',
+			'onresize',
+		]);
+	}
 	/**
 	 * 查找数据绑定关系
 	 * @param $type string from｜to
@@ -393,8 +412,11 @@ class Build_Model{
 	public function get_events($uiid){
 		return $this->events[$uiid]?:[];
 	}
-	public function get_popup_events(){
-		return $this->popupEvents;
+	public function get_custom_events(){
+		return $this->customEvents;
+	}
+	public function get_lifecycle_events(){
+		return $this->lifecycleEvents;
 	}
 	public function get_ui(){
 		return $this->project->get_setting_value('ui');
@@ -480,6 +502,13 @@ class Build_Model{
 		$lines = $this->indent_code(isset($indent) ? $indent: $this->get_indent(), $codes);
 		echo join(PHP_EOL, $lines).PHP_EOL;// 每行代码后面加个换行
 	}
+	public function space($indent){
+		if ($this->is_indent_with_tab()){
+			return str_repeat("\t", $indent * $this->indentSpaceSize);
+		}else{
+			return str_repeat(' ', $indent * $this->indentSpaceSize);
+		}
+	}
 
 	/**
 	 * 对给定对codes里面对代码进行缩进，并返回代码数组，每项一句代码
@@ -489,13 +518,9 @@ class Build_Model{
 	 */
 	public function indent_code($indent, $codes){
 		if (!$codes) return [];
-		if ($this->is_indent_with_tab()){
-			$indent =  str_repeat("\t", $indent * $this->indentSpaceSize);
-		}else{
-			$indent =  str_repeat(' ', $indent * $this->indentSpaceSize);
-		}
+		$indent = $this->space($indent);
 		$lines = array_map(function ($code) use($indent){
-			$lines = explode(PHP_EOL, $code);
+			$lines = is_array($code) ? $code : explode(PHP_EOL, $code);
 			return join(PHP_EOL,array_map(function ($line) use($indent){
 				if (!trim($line)) return;
 				return $indent.$line;
