@@ -190,7 +190,7 @@ export default {
     const headScroll = (event: any) => {
       if (leftHasMore.value || rightHasMore.value) {
         event.stopPropagation()
-        event.preventDefault()
+        // event.preventDefault()
         event.cancelBubble = true
       }
       changeHeadMoreState()
@@ -198,7 +198,7 @@ export default {
     const headWheel = (event: any) => {
       if (leftHasMore.value || rightHasMore.value) {
         event.stopPropagation()
-        event.preventDefault()
+        // event.preventDefault()
         event.cancelBubble = true
       }
       const _headScrollbar = $(headScrollbar.value as any)

@@ -375,7 +375,7 @@ const headScroll = (event: any, type) => {
   const right = type === 'head' ? rightHasMore.value : pageRightHasMore.value
   if (left || right) {
     event.stopPropagation()
-    event.preventDefault()
+    // event.preventDefault()
     event.cancelBubble = true
   }
   changeHeadMoreState(type)
@@ -386,7 +386,7 @@ const headWheel = (event: any, type) => {
   const _headScrollbar = type === 'head' ? $(headScrollbar.value as any) : $(pageTabScrollbar.value as any)
   if (left || right) {
     event.stopPropagation()
-    event.preventDefault()
+    // event.preventDefault()
     event.cancelBubble = true
   }
   // console.log(event);

@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, toRef } from 'vue'
+import { ref, computed } from 'vue'
 import ydhl from '@/lib/ydhl'
 import { useI18n } from 'vue-i18n'
 import DataMutation from '@/components/common/DataMutation.vue'
@@ -44,7 +44,7 @@ import { useStore } from 'vuex'
 import DataInfo from '@/components/common/DataInfo.vue'
 
 const emit = defineEmits(['update:modelValue'])
-const props = defineProps({
+const { readonly, variables, autosave, modelValue } = defineProps({
   readonly: Boolean,
   modelValue: Object,
   variables: Object,
@@ -54,17 +54,11 @@ const props = defineProps({
     type: Boolean
   } // 是否自动提交接口保存
 })
-const {
-  readonly,
-  variables,
-  eventName,
-  autosave
-} = props
 const dialogVisible = ref(false)
 const detailDlgVisible = ref(false)
 const variableModel = ref({})
 const pageDatas = ref<any>([])
-const myAction = toRef(props, 'modelValue')
+const myAction = computed(() => modelValue)
 const mutationDefault = ref(JSON.parse(JSON.stringify(myAction.value.mutations || {})))
 const hasMutation = computed(() => myAction.value.mutations && Object.keys(myAction.value.mutations).length > 0)
 const { t } = useI18n()

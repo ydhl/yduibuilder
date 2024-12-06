@@ -27,8 +27,8 @@ trait Vue_Build_Code {
         foreach ($bindVariables as $bindVariable){
             $expression = $bindVariable->get_expression();
             if (!$expression) continue;
-            $expression_code = $expression->get_expression_code();
-            $codeLines[] = $bindVariable->to_data_path . ' = ' . $expression_code;
+            $expression_code = $this->append_vue_value($expression->get_expression_code());
+            $codeLines[] = $this->append_vue_value($bindVariable->to_data_path) . ' = ' . $expression_code;
             $this->add_used_variable($expression_code);
         }
     }
@@ -91,7 +91,7 @@ trait Vue_Build_Code {
         $index = 0;
         foreach ($bindActions as $bindAction){
             if ($bindAction->mode == 'code') {
-                $codeLines[] = "const promise{$index} = new Promise((resolve) => {";
+                $codeLines[] = "const promise{$index} = new Promise((resolve, reject) => {";
                 $expression_code = $this->append_vue_value(html_entity_decode($bindAction->code));
                 $codeLines = array_merge($codeLines, $this->build->indent_code(1, $expression_code));
                 $codeLines[] = "})";
@@ -188,7 +188,7 @@ trait Vue_Build_Code {
                     if (!$bindVariable) continue;
                     $expression = $bindVariable->get_expression();
                     if (!$expression) continue;
-                    $exp = $expression->get_expression_code();
+                    $exp = $this->append_vue_value($expression->get_expression_code());
                     if ($dataConfig['type'] == 'array'){
                         $codeLines[] = "if({$exp} !== undefined){";
                         $codeLines[] = $this->indent(1, true)."for(const item of {$exp}) {";
@@ -208,7 +208,7 @@ trait Vue_Build_Code {
                     if (!$bindVariable) continue;
                     $expression = $bindVariable->get_expression();
                     if (!$expression) continue;
-                    $expression_code = $expression->get_expression_code();
+                    $expression_code = $this->append_vue_value($expression->get_expression_code());
                     $this->add_used_variable($expression_code);
 
                     $codeLines[] = 'if('.$expression_code.' !== undefined){';
@@ -239,7 +239,7 @@ trait Vue_Build_Code {
             if (!$bindVariable) continue;
             $expression = $bindVariable->get_expression();
             if (!$expression) continue;
-            $expression_code = $expression->get_expression_code();
+            $expression_code = $this->append_vue_value($expression->get_expression_code());
             $this->add_used_variable($expression_code);
 
             if ($dataConfig['type'] == 'array'){
@@ -269,7 +269,7 @@ trait Vue_Build_Code {
             if (!$bindVariable) continue;
             $expression = $bindVariable->get_expression();
             if (!$expression) continue;
-            $expression_code = $expression->get_expression_code();
+            $expression_code = $this->append_vue_value($expression->get_expression_code());
 
             $codeLines[] = "if({$expression_code} !== undefined){";
             $codeLines[] = $this->indent(1, true)."_{$dataName}[{$dataConfig['name']}] = {$expression_code}";
@@ -296,7 +296,7 @@ trait Vue_Build_Code {
             foreach ($bindDatas as $data){
                 $expression = $inputArgs[$data->uuid];
                 if (!$expression) continue;
-                $expression_code = $expression->get_expression_code();
+                $expression_code = $this->append_vue_value($expression->get_expression_code());
                 $args[] = $data->name.'=${'.$expression_code.'}';
                 $this->add_used_variable($expression_code);
             }
@@ -402,12 +402,12 @@ INTERVAL;
         $codeLines[] = $this->indent(1, true)."withCredentials: true,";
         if ($inputPath){
             $params = $this->get_param_variable($formatVariables, $inputPath);
-            $url = $this->replace_param($this->build->get_api_base().$bind_api->path, $params);
+            $url = $this->replace_param($bind_api->path, $params);
             $codeLines[] = $params ?
-                $this->indent(1, true).'url: `'.$url.'`,' :
-                $this->indent(1, true).'url: "'.$url.'"';
+                $this->indent(1, true).'url: `${ydecloud.apiBase}'.$url.'`,' :
+                $this->indent(1, true).'url: ydecloud.apiBase+"'.$url.'"';
         }else{
-            $codeLines[] = $this->indent(1, true).'url: "'.$this->build->get_api_base().$bind_api->path.'"';
+            $codeLines[] = $this->indent(1, true).'url: ydecloud.apiBase+"'.$bind_api->path.'"';
         }
 
         $codeLines[] = " }).then((response: any) => {";
@@ -418,6 +418,7 @@ INTERVAL;
         $codeLines[] = " }).catch((err: any) =>{";
         $codeLines[] = $this->indent(1, true)."alert(err)";
         $codeLines[] = " })";
+        $this->get_code_fragment()->add_import('@/lib/ydecloud',[], 'ydecloud');
     }
     protected function build_webapi_code(Action_Model $action, &$codeLines){
         $bind_api = $action->get_bind_api();
@@ -447,7 +448,7 @@ INTERVAL;
         }elseif ($expression->type == 'connect'){
             $dataName = $this->is_scale_type($expression->data->type) ? "{$expression->data->path}" : "JSON.stringify({$expression->data->path})";
         }else{
-            $dataName = $expression->get_expression_code();
+            $dataName = $this->append_vue_value($expression->get_expression_code());
             $this->add_used_variable($dataName);
         }
         $dataName = $this->append_vue_value($dataName, $expression->type == 'connect');
@@ -474,7 +475,7 @@ INTERVAL;
                 }elseif ($inputExpression->type=='connect'){ //数据赋值
                     $queryArgs[] = $bindData->name.': '. $this->append_vue_value($inputExpression->data->path, true);
                 }else { //表达式赋值
-                    $expression_code = $inputExpression->get_expression_code();
+                    $expression_code = $this->append_vue_value($inputExpression->get_expression_code());
                     $this->add_used_variable($expression_code);
                     $queryArgs[] = $bindData->name . ': ' . $this->append_vue_value($expression_code);
                 }
@@ -596,7 +597,7 @@ INTERVAL;
         foreach ($matches[1] as $name){
             $expression = $inputArgs[$name];
             if (!$expression) continue;
-            $string = preg_replace("/{{$name}}/i", '\\${'.$expression->get_expression_code().'}', $string);
+            $string = preg_replace("/{{$name}}/i", '\\${'.$this->append_vue_value($expression->get_expression_code()).'}', $string);
         }
         return $string;
     }

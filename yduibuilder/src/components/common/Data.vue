@@ -106,7 +106,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, watch, toRef } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { layer } from '@layui/layer-vue'
 import ConfirmRemove from '@/components/common/ConfirmRemove.vue'
@@ -122,7 +122,7 @@ import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 // 数据模型展示，可绑定ui
 const emit = defineEmits(['remove', 'update'])
 
-const props = defineProps({
+const { index, path, canInput, canOutput, fromId, fromType, isArrayItem, canMutation, intent, model } = defineProps({
   model: Object,
   index: Number,
   path: {
@@ -138,9 +138,8 @@ const props = defineProps({
   canMutation: Boolean, // 是否能编辑和删除
   intent: Number // 缩进次数
 })
-const { index, path, canInput, canOutput, fromId, fromType, isArrayItem, canMutation, intent } = props
 const editModel = ref()
-const myModel = toRef<any>(props, 'model')
+const myModel = computed(() => model)
 const { t } = useI18n()
 const editDlgVisible = ref(false)
 const tip = ref('')
@@ -159,7 +158,7 @@ const drawFromEl = ref()
 const currBindOutUI = ref()
 const isAddProps = ref(false)
 const codeType = ref<string>('view') // view || import
-const isOpen = toRef(props, 'open')
+const isOpen = ref(open)
 const showBoundType = ref('')
 const code = ref('')
 let nameChanged: any = {}
@@ -264,6 +263,9 @@ watch(() => editModel.value?.name, (v, oldValue) => {
   }
   nameChanged = { dataId: editModel.value.uuid, new: v, old: oldValue }
 })
+watch(open, (n) => {
+  isOpen.value = n
+})
 const rebuildInOutUuid = (data: any) => {
   if (!data) return
   data.uuid = ydhl.uuid()
@@ -320,7 +322,7 @@ watch(XYInIframe, (v) => {
 })
 // 在某个ui上松开后结束画线,并设置绑定关系
 watch(mouseupInFrame, (v) => {
-  if (!canvas.isDrawline() || canvas.getDrawFromId() !== myModel.value.uuid) return
+  if (!hoverUIItem.value || !canvas.isDrawline() || canvas.getDrawFromId() !== myModel.value.uuid) return
   canvas.stopDrawline()
   currBindOutUI.value = hoverUIItem.value
   if (currBindType.value === 'in') {

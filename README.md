@@ -56,7 +56,7 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 
 ## 项目组成
 
-1. 下载的代码包含四个项目目录：ydevcloud，yduibuilder，snapshot，ydapibuilder
+1. 下载的代码包含四个项目目录：ydevcloud，yduibuilder，snapshot，ydapibuilder，yangzie
 2. ydevcloud： 管理后端：
    1. 项目管理
    2. 编译生成UI代码
@@ -64,6 +64,7 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 4. snapshot： 页面截屏工具 （可选）
 5. ydevcloud/code/cli：socket服务，用于编译打包生成代码 （可选）
 6. ydapibuilder：API管理工具，管理接口信息
+7. yangzie: 模拟api接口
 
 ## 安装
 
@@ -77,9 +78,9 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
    pull 镜像: docker pull gzydhl/ydecloud
 2. 运行镜像：
 
-   **_docker run -it -p 8080:8080 -p 9999:9999 -p 9998:9998 -p 8888:8888 -v 你本地的目录:/var/www/html gzydhl/ydecloud /bin/bash_**
+   **_docker run -it -p 8080:8080 -p 9999:9999 -p 9998:9998 -p 8888:8888 -p 8181:8181 -v 你本地的目录:/var/www/html gzydhl/ydecloud /bin/bash_**
 
-   1. 这里会把后台项目端口8080，yduibuilder项目端口9999，apibox项目端口9998，socket服务端口8888在主机和docker内部服务之间做个映射。
+   1. 这里会把后台项目端口8080，yduibuilder项目端口9999，apibox项目端口9998，yangzie项目端口8181，socket服务端口8888在主机和docker内部服务之间做个映射。
    2. `你本地的目录`就是主机上下载的代码的根目录（包含ydevcloud，yduibuilder的目录）
 3. 启动apache2  service apache2 start
 4. 启动mariadb  service mariadb start
@@ -111,7 +112,7 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 
 #### 准备
 
-1. 本地需要安装php 7.4+环境并安装swoole、openssl、zip、xml、gd2，json，iconv扩展，
+1. 本地需要安装php 7.4+环境并安装swoole、openssl、zip、xml、gd2，json、iconv、curl扩展，
 2. 安装mysql或者mariadb数据库
 3. windows上php需要配置系统环境，以便在命令行能访问php.exe
 4. 安装rabbitmq（可选，如果要生成页面截屏则安装）

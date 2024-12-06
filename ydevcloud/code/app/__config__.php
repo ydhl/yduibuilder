@@ -96,6 +96,9 @@ class App_Module extends \yangzie\YZE_Base_Module{
 		if(! extension_loaded('gd')){
 			throw new YZE_FatalException("未安装gd2模块");
 		}
+		if(! extension_loaded('curl')){
+			throw new YZE_FatalException("未安装curl模块");
+		}
 	}
 
 	protected function config()

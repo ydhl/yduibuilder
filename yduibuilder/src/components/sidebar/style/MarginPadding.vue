@@ -63,7 +63,7 @@
       v-html="attrs['margin-bottom'] || '-'"></div>
     </div>
   </div>
-  <lay-layer v-model="isOpenSetting" :title="t('style.'+settingSide)" :shade="true" :area="['500px', '300px']">
+  <lay-layer v-model="isOpenSetting" :title="settingSide ? t('style.'+settingSide) : ''" :shade="true" :area="['500px', '300px']">
     <div class="p-3">
       <template v-if="settingSide=='sizing'">
         <StyleSize :auto-open="true"></StyleSize>
@@ -147,7 +147,7 @@ export default {
       // console.log(meta)
       if (selector) pickCssStyle(selector, _css, _style)
       pickCssStyle(meta, _css, _style)
-      console.log(_attr)
+      // console.log(_attr)
       for (const key in _css.margin) {
         _attr[key] = _css.margin[key]
       }
@@ -191,23 +191,37 @@ export default {
         sync(v, 'style')
       }
     })
+    function getCss (type, index) {
+      const css = Object.keys(info.cssMap.value?.[type]) || []
+      return css[index] || 'inherit'
+    }
     function sync (v, type) {
       if (syncOtherSide.value) {
         if (settingSide.value.match(/^margin/)) {
-          info.setMeta('margin-top', v === 'inherit' ? undefined : v, type, false, previewMode)
-          info.setMeta('margin-right', v === 'inherit' ? undefined : v, type, false, previewMode)
-          info.setMeta('margin-bottom', v === 'inherit' ? undefined : v, type, false, previewMode)
-          info.setMeta('margin-left', v === 'inherit' ? undefined : v, type, false, previewMode)
+          const index = type === 'css' ? Object.keys(info.cssMap?.value?.[settingSide.value])?.indexOf(v) : -1
+          const t = type === 'css' ? getCss('margin-top', index) : v
+          const r = type === 'css' ? getCss('margin-right', index) : v
+          const b = type === 'css' ? getCss('margin-bottom', index) : v
+          const l = type === 'css' ? getCss('margin-left', index) : v
+          info.setMeta('margin-top', t === 'inherit' ? undefined : t, type, false, previewMode)
+          info.setMeta('margin-right', r === 'inherit' ? undefined : r, type, false, previewMode)
+          info.setMeta('margin-bottom', b === 'inherit' ? undefined : b, type, false, previewMode)
+          info.setMeta('margin-left', l === 'inherit' ? undefined : l, type, false, previewMode)
         } else if (settingSide.value.match(/^border/)) {
           info.setMeta('border-top-width', v === 'inherit' ? undefined : v, type, false, previewMode)
           info.setMeta('border-right-width', v === 'inherit' ? undefined : v, type, false, previewMode)
           info.setMeta('border-bottom-width', v === 'inherit' ? undefined : v, type, false, previewMode)
           info.setMeta('border-left-width', v === 'inherit' ? undefined : v, type, false, previewMode)
         } else if (settingSide.value.match(/^padding/)) {
-          info.setMeta('padding-top', v === 'inherit' ? undefined : v, type, false, previewMode)
-          info.setMeta('padding-right', v === 'inherit' ? undefined : v, type, false, previewMode)
-          info.setMeta('padding-bottom', v === 'inherit' ? undefined : v, type, false, previewMode)
-          info.setMeta('padding-left', v === 'inherit' ? undefined : v, type, false, previewMode)
+          const index = type === 'css' ? Object.keys(info.cssMap?.value?.[settingSide.value])?.indexOf(v) : -1
+          const t = type === 'css' ? getCss('padding-top', index) : v
+          const r = type === 'css' ? getCss('padding-right', index) : v
+          const b = type === 'css' ? getCss('padding-bottom', index) : v
+          const l = type === 'css' ? getCss('padding-left', index) : v
+          info.setMeta('padding-top', t === 'inherit' ? undefined : t, type, false, previewMode)
+          info.setMeta('padding-right', r === 'inherit' ? undefined : r, type, false, previewMode)
+          info.setMeta('padding-bottom', b === 'inherit' ? undefined : b, type, false, previewMode)
+          info.setMeta('padding-left', l === 'inherit' ? undefined : l, type, false, previewMode)
         }
       } else {
         info.setMeta(settingSide.value, v || undefined, type, false, previewMode)

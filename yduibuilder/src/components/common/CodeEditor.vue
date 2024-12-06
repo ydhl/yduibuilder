@@ -83,7 +83,7 @@ export default {
     const store = useStore()
     const currPage = computed(() => store.state.design.page)
     const scope = ref('local')
-    const pageVariables = ref([])
+    const pageVariables = ref<any>([])
     const globalVariables = ref([])
     const suggestions: any = []
     let editorInstance
@@ -327,6 +327,7 @@ export default {
         globalVariables.value = rst.data?.global || []
 
         suggestions.push(...ydhl.getVariableSuggestions(pageVariables.value, 'page.'))
+        if (rst.data?.error) pageVariables.value.push(rst.data?.error)
         suggestions.push(...ydhl.getVariableSuggestions(globalVariables.value, 'global.'))
       })
     }
