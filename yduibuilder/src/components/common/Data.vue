@@ -122,7 +122,7 @@ import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
 // 数据模型展示，可绑定ui
 const emit = defineEmits(['remove', 'update'])
 
-const { index, path, canInput, canOutput, fromId, fromType, isArrayItem, canMutation, intent, model } = defineProps({
+const { index, path, canInput, canOutput, fromId, fromType, isArrayItem, canMutation, intent, model, open } = defineProps({
   model: Object,
   index: Number,
   path: {
@@ -263,7 +263,7 @@ watch(() => editModel.value?.name, (v, oldValue) => {
   }
   nameChanged = { dataId: editModel.value.uuid, new: v, old: oldValue }
 })
-watch(open, (n) => {
+watch(() => open, (n) => {
   isOpen.value = n
 })
 const rebuildInOutUuid = (data: any) => {
