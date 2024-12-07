@@ -68,6 +68,10 @@ UI框架定义人机交互等界面，比如Bootstrap，Vant。
 
 ## 安装
 
+### 在线演示环境
+
+[http://ydecloud2.yidianhulian.com](http://ydecloud2.yidianhulian.com)
+
 ### docker 安装（建议）
 
 所有服务运行在docker容器内（基于ubuntu系统），但代码在你主机上。
