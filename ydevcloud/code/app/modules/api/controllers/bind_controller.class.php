@@ -523,7 +523,7 @@ class Bind_Controller extends YZE_Resource_Controller {
             $id = $rst->f('id');
             $expression = html_entity_decode($rst->f('expression'));
             $code = html_entity_decode($rst->f('code'));
-            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression) ?: $expression;
+            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|error\.|global\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression) ?: $expression;
             $code = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $code) ?: $code;
             $dba->exec('update page_bind_api_action set expression='.$dba->quote($newExpression).', code='.$dba->quote($code).' where id='.$id);
         }
@@ -532,7 +532,7 @@ class Bind_Controller extends YZE_Resource_Controller {
         while ($rst->next()){
             $id = $rst->f('id');
             $expression = html_entity_decode($rst->f('from_expression'));
-            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
+            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|error\.|global\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
             if($newExpression) $dba->exec('update page_bind_variable set from_expression='.$dba->quote($newExpression).' where id='.$id);
         }
         $sql = "select id, `expression` from page_bind_state where is_deleted=0 and page_id=".$page->id;
@@ -540,7 +540,7 @@ class Bind_Controller extends YZE_Resource_Controller {
         while ($rst->next()){
             $id = $rst->f('id');
             $expression = html_entity_decode($rst->f('expression'));
-            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
+            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|error\.|global\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
             if($newExpression) $dba->exec('update page_bind_state set expression='.$dba->quote($newExpression).' where id='.$id);
         }
         $sql = "select m.id, m.expression from mutation as m 
@@ -550,7 +550,7 @@ class Bind_Controller extends YZE_Resource_Controller {
         while ($rst->next()){
             $id = $rst->f('id');
             $expression = html_entity_decode($rst->f('expression'));
-            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
+            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|error\.|global\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
             if($newExpression) $dba->exec('update mutation set expression='.$dba->quote($newExpression).' where id='.$id);
         }
     }

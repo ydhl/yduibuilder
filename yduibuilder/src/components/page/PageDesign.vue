@@ -13,41 +13,38 @@
                @keyup.enter="isInEditPageTitle=false"
                @blur="isInEditPageTitle=false" :title="t('page.editPage')">
       </div>
-      <div class="bg-light text-truncate active ps-1 pe-1 text-muted rounded user-select-none" data-bs-toggle="tooltip" :title="t('page.boxModelTip')"><i class="iconfont icon-boxmodel"></i> <small>{{t('page.boxModel')}}</small></div>
-      <div :class="{'item': true,'disabled':!canUndo}" data-bs-toggle="tooltip" :title="t('common.undo')" @click="canUndo ? undo() : ''"><i class="iconfont icon-undo"></i></div>
-      <div :class="{'item': true,'disabled':!canRedo}" data-bs-toggle="tooltip" :title="t('common.redo')" @click="canRedo ? redo() : ''"><i class="iconfont icon-redo"></i></div>
-      <div class="item" data-bs-toggle="tooltip" :title="t('page.copyPage')" @click="copyPage"><i class="iconfont icon-copy"></i></div>
-      <div class="item" data-bs-toggle="tooltip" :title="t('page.deletePage')" @click="deletePage"><i class="iconfont icon-remove"></i></div>
-      <div class="item" data-bs-toggle="tooltip" :title="t('page.code')" @click="openExportCodeDialog"><i class="iconfont icon-code"></i></div>
+      <div class="text-truncate active ps-1 pe-1 text-muted rounded user-select-none" data-bs-toggle="tooltip" :title="t('page.boxModelTip')"><i class="iconfont icon-boxmodel"></i> <small>{{t('page.boxModel')}}</small></div>
+      <div class="item text-muted"><div style="height: 10px;width: 1px;background-color: #cccccc"></div></div>
+      <div :class="{'item': true,'disabled':!canUndo || iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('common.undo')" @click="canUndo ? undo() : ''"><i class="iconfont icon-undo"></i></div>
+      <div :class="{'item': true,'disabled':!canRedo || iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('common.redo')" @click="canRedo ? redo() : ''"><i class="iconfont icon-redo"></i></div>
+
+      <div class="item text-muted"><div style="height: 10px;width: 1px;background-color: #cccccc"></div></div>
+      <div class="item btn-group" v-if="apiEnvs && iframeMode!='preview'">
+        <i class="iconfont icon-run" :title="t('common.preview')" data-bs-toggle="dropdown" aria-expanded="true"></i>
+        <ul class="dropdown-menu">
+          <li v-for="(envUrl, envName) in apiEnvs" :key="envName"><a :class="{'dropdown-item': true, 'active': apiEnv===envName && iframeMode=='preview'}" href="javascript:void(0)" @click="apiEnv=envName;switchIframe('preview');">{{envName}}</a></li>
+        </ul>
+      </div>
+      <div v-else-if="iframeMode!='preview'" class="item" data-bs-toggle="tooltip" :title="t('common.preview')" @click="switchIframe('preview')"><i class="iconfont icon-run"></i></div>
+      <div class="item btn-group" v-if="iframeMode!='code'">
+        <i class="iconfont icon-code" :title="t('page.code')" data-bs-toggle="dropdown" aria-expanded="true"></i>
+        <ul class="dropdown-menu">
+          <li v-for="(type, index) in codeTypes" :key="index"><a class="dropdown-item" href="javascript:void(0)" @click="codeType=index;switchIframe('code');">{{ type }}</a></li>
+        </ul>
+      </div>
+      <div v-if="iframeMode!='design'" class="item" data-bs-toggle="tooltip" :title="t('common.edit')" @click="iframeMode = 'design'"><i class="iconfont icon-edit"></i></div>
+      <div class="item text-muted"><div style="height: 10px;width: 1px;background-color: #cccccc"></div></div>
+      <div :class="{'item': true,'disabled':iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('page.copyPage')" @click="copyPage"><i class="iconfont icon-copy"></i></div>
+      <div :class="{'item': true,'disabled':iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('page.deletePage')" @click="deletePage"><i class="iconfont icon-remove"></i></div>
     </div>
     <!--控制页面的缩放-->
     <div :style="wrapperStyle + wrapperHeight" :id="'wrapper' + uiconfig.meta.id">
-      <div :class="{'page shadow-sm': true, 'simulate-border': simulateModel!='pc'}" ref="page" :style="pageStyle">
-        <iframe :height="contentHeight" style="user-select: none;display: block" :title="uiconfig.meta.title" :id="uiconfig.meta.id" width="100%" :src="pageUrl"/>
+      <div :class="{'page shadow-sm': iframeMode=='design','page border-0': iframeMode!='design', 'simulate-border': simulateModel!='pc'}" ref="page" :style="pageStyle">
+        <iframe :height="contentHeight" :style="`user-select: none;display: ${iframeMode=='design'?'block':'none'}`" :title="uiconfig.meta.title" :id="uiconfig.meta.id" width="100%" :src="pageUrl"/>
+        <iframe v-if="iframeMode!='design'" style="height:100vh;user-select: none;display: block" width="100%" :src="previewUrl"/>
       </div>
     </div>
   </div>
-  <!-- Dialog -->
-  <template v-if="exportDialogVisible" >
-    <teleport to="body">
-      <div style="z-index: 1040;position: absolute;top:0;left:0px;right: 0px">
-        <div class="card m-3 shadow-lg user-select-none">
-          <div class="card-header d-flex justify-content-between">
-            <ul class="nav nav-tabs card-header-tabs" v-if="codeTypes">
-              <li class="nav-item" v-for="(language,type) in codeTypes" :key="type">
-                <a :class="['nav-link', {'active': currCodeType==type}]" href="javascript:;" @click="loadCode(type, language)">{{type}}</a>
-              </li>
-            </ul>
-            <span v-if="!codeTypes">{{t('page.code')}}</span>
-            <button type="button" class="btn btn-light btn-sm" @click="exportDialogVisible = false" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div id="exportedCodeEditor" style="height: 500px"></div>
-        </div>
-      </div>
-    </teleport>
-  </template>
 </template>
 
 <script lang="ts">
@@ -55,7 +52,6 @@ import UIInit from '@/components/Common'
 import { ref, watch, computed, nextTick, Ref, onUpdated, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
-import * as monaco from 'monaco-editor'
 import ydhl from '@/lib/ydhl'
 import { YDJSStatic } from '@/lib/ydjs'
 import { useRoute } from 'vue-router'
@@ -74,18 +70,20 @@ export default {
     const route = useRoute()
     const store = useStore()
     const isReady = ref(false)
-    const exportDialogVisible = ref(false)
+    const iframeMode = ref('design') // design preview code
+    const apiEnv = ref('') // design preview code
     const { t } = useI18n()
-    watch(exportDialogVisible, function (v) {
-      store.commit('updateState', { backdropVisible: v })
-      if (!v) editorInstance = null
-    })
-    let editorInstance
 
+    const projectId = computed(() => store.state.design.project.id)
     const simulateWidth = computed(() => store.state.design.simulateWidth)
     const pageScale = computed(() => store.state.design.scale)
     const versionId = computed(() => store.state.design.pageVersionId[props.uiconfig.meta.id])
     const codeTypes = computed(() => store.state.design.codeTypes)
+    const needSave = computed(() => {
+      const pageSaved = store.state.design.pageSaved || {}
+      return pageSaved?.[props.uiconfig.meta.id] === 0
+    })
+    const codeType = ref('')
     const stackIndex = computed(() => {
       const index = store.state.design.pageStackIndex[props.uiconfig.meta.id]
       return index !== undefined ? index : -1
@@ -100,14 +98,10 @@ export default {
       if (!stacks) return false
       return stackIndex.value > 0
     })
-    const currCodeType = ref('')
-    watch(codeTypes, (v) => {
-      if (codeTypes.value) {
-        currCodeType.value = Object.keys(codeTypes.value)[0]
-      }
-    }, { immediate: true })
 
     const currFunctionId = computed(() => store.state.design.function.id)
+    const currModuleId = computed(() => store.state.design.module.id)
+    const apiEnvs = computed(() => store.state.design.project.api_env || undefined)
     const simulateModel = computed(() => store.state.design.simulateModel || 'pc')
     const minHeight = computed(() => {
       if (simulateModel.value === 'tablet') {
@@ -206,46 +200,30 @@ export default {
     })
 
     const copyPage = () => {
+      if (iframeMode.value !== 'design') return
       // console.log(props)
       ydhl.confirm(t('common.copyPageConfirm'), t('common.copy'), t('common.cancel')).then((dialogid) => {
         ydhl.closeLoading(dialogid)
         store.commit('copyPage', { pageid: props.uiconfig.meta.id })
+      }).catch(() => {
       })
     }
-
-    const loadCode = (type, language) => {
-      const loadingId = YDJS.loading(t('common.pleaseWait'))
-      currCodeType.value = type
-      ydhl.get('code/page/' + props.uiconfig.meta.id + '?code_type=' + currCodeType.value, {}, (code) => {
-        exportDialogVisible.value = true
-        // console.log(code)
-        YDJS.hide_dialog(loadingId)
-        nextTick(() => {
-          // editor.getAction('editor.action.formatDocument').run()
-          if (!editorInstance) {
-            editorInstance = monaco.editor.create(document.getElementById('exportedCodeEditor') as HTMLElement, {
-              roundedSelection: true,
-              scrollBeyondLastLine: false,
-              readOnly: true,
-              language: language || 'html'
-            })
-          }
-          editorInstance.setValue(code)
-          monaco.editor.setModelLanguage(editorInstance.getModel(), language || 'html')
-        })
-      }, 'html')
-    }
-    const openExportCodeDialog = function () {
+    const switchIframe = function (mode: string) {
+      if (!needSave.value) {
+        iframeMode.value = mode
+        return
+      }
       const loadingId = YDJS.loading(t('common.pleaseWait'))
       ydhl.savePage(currFunctionId.value, props.uiconfig, versionId.value, (rst) => {
         if (rst?.success) {
           store.commit('updateSavedState', { pageUuid: props.uiconfig.meta.id, saved: 1, versionId: rst.data.versionId })
         }
+        iframeMode.value = mode
         YDJS.hide_dialog(loadingId)
-        loadCode(currCodeType.value, null)
       })
     }
     const deletePage = function () {
+      if (iframeMode.value !== 'design') return
       YDJS.confirm(t('page.deletePageConfirm'), '', (dialogid) => {
         YDJS.hide_dialog(dialogid)
         store.commit('deletePage', { pageid: props.uiconfig.meta.id })
@@ -261,10 +239,21 @@ export default {
       }
       return url
     })
+    const previewUrl = computed(() => {
+      if (iframeMode.value === 'code') {
+        return ydhl.api + `code/${projectId.value}?hidemaster=1&module=${currModuleId.value}&page=${props.uiconfig.meta.id}&code_type=${codeType.value}&token=${ydhl.getJwt()}`
+      }
+      if (iframeMode.value === 'preview') {
+        return ydhl.api + `preview/page/${props.uiconfig.meta.id}?hidemaster=1&device=${simulateModel.value}&apiEnv=${apiEnv.value}&token=${ydhl.getJwt()}`
+      }
+      return '#'
+    })
     const undo = () => {
+      if (iframeMode.value !== 'design') return
       store.commit('undo', { pageId: props.uiconfig.meta.id })
     }
     const redo = () => {
+      if (iframeMode.value !== 'design') return
       store.commit('redo', { pageId: props.uiconfig.meta.id })
     }
     return {
@@ -272,6 +261,8 @@ export default {
       title,
       isInEditPageTitle,
       t,
+      codeTypes,
+      codeType,
       actionStyle,
       wrapperStyle,
       wrapperHeight,
@@ -282,21 +273,21 @@ export default {
       pageStyle,
       isReady,
       contentHeight,
-      exportDialogVisible,
       simulateModel,
       isHomePage,
       isPopup,
       pageUrl,
+      previewUrl,
       canRedo,
       canUndo,
+      iframeMode,
+      apiEnvs,
+      apiEnv,
       copyPage,
       undo,
       redo,
-      openExportCodeDialog,
-      loadCode,
-      deletePage,
-      currCodeType,
-      codeTypes
+      switchIframe,
+      deletePage
     }
   }
 }

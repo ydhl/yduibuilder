@@ -2,6 +2,7 @@
 namespace app\build;
 use app\modules\build\views\preview\Preview_View;
 use app\vendor\Env;
+use function yangzie\yze_merge_query_string;
 use function yangzie\yze_module_css_bundle;
 
 /**
@@ -31,7 +32,7 @@ $view = Preview_View::create_View($build);
     <link rel="stylesheet" type="text/css" href="/upload/project/<?=$project->uuid?>/iconfont/iconfont.css" />
     <?php }?>
     <title><?= $page->name?></title>
-    <link rel="stylesheet" type="text/css" href="/preview/page/<?= $page->uuid?>.css" />
+    <link rel="stylesheet" type="text/css" href="<?= yze_merge_query_string("/preview/page/{$page->uuid}.css", $_GET)?>" />
 </head>
 <body>
     <div id="ydecloud-app">
@@ -55,7 +56,7 @@ if ($page->page_type == 'popup'){
         }
         ?>
 
-        import ydecloudRun from "<?='/preview/page/'.$page->uuid.'.js?api_env='.$_GET['api_env'].'&mock='.$_GET['mock']?>";
+        import ydecloudRun from "<?= yze_merge_query_string('/preview/page/'.$page->uuid.'.js', $_GET)?>";
         alpinejs_init_directive(Alpine);
         if(document.readyState === "complete" ||(document.readyState !== "loading" && !document.documentElement.doScroll)) {
             ydecloudRun()

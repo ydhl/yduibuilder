@@ -33,7 +33,7 @@ class Input_View extends Preview_View implements Valuable_View {
         $eventHandlers = $this->get_event_listen_props();
 
         echo "{$space}<div";
-        echo $this->wrap_output("style", "position: relative;");
+        echo $this->wrap_output("style", $this->wrap_style());
 
         $xShownExpression = $this->show_state_expression();
         if ($xShownExpression){
@@ -102,6 +102,10 @@ class Input_View extends Preview_View implements Valuable_View {
         }
 
         echo "{$space}</div>".PHP_EOL;
+    }
+    private function wrap_style(){
+        $style = ["position: relative;width:100%"];
+        return join(';', $style);
     }
     public function build_style($justSelf = true)
     {

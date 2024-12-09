@@ -137,7 +137,24 @@ $project_structure[] = [
             <?php
         }
     }
-
+    if ($pages && $curr_module){
+    ?>
+    <div class="card me-3 mb-3" style="width: 15rem">
+        <div class="card-body p-0 d-flex align-items-center justify-content-center">
+            <?php if ($curr_module && !$curr_function){?>
+                <a href="javascript:void(0)" data-url="/module/<?= $curr_module->uuid?>/addfunction"
+                   data-title="<?= __('Add Function')?>" class="text-muted text-decoration-none yd-dialog"><i class="iconfont icon-function"></i> <?= __('Add Function')?></a>
+            <?php }?>
+            <br/>
+            <?php if ($curr_function){?>
+            <a href="javascript:;" data-url="<?= Project_Model::get_ui_builder_url()?>"
+           data-functionid="<?= $curr_function->uuid?>"
+           class="run-ui-builder text-muted text-decoration-none"><i class="iconfont icon-uibuilder"></i> <?= __('Add New Page')?></a>
+            <?php }?>
+        </div>
+    </div>
+    <?php
+    }
     foreach ($pages as $page){ ?>
         <div class="card me-3 mb-3" style="width: 15rem">
             <div class="card-header d-flex justify-content-between align-items-center">

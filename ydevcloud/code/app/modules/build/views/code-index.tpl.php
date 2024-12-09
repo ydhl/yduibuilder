@@ -12,7 +12,9 @@ use function yangzie\yze_merge_query_string;
 $this->set_data('type', 'code');
 $module = $this->get_data('module');
 $project = $this->get_data('project');
-$this->master_view = 'master/preview';
+if (!$_GET['hidemaster']){
+    $this->master_view = 'master/preview';
+}
 $pages = $module ? $module->get_pages() : [];
 $curr_page = $this->get_data('curr_page');
 $curr_page = $curr_page ?: reset($pages);
@@ -36,7 +38,7 @@ $offset = "0px";
 <ul class="nav nav-tabs mt-3">
 <?php foreach (array_keys($codeTypes) as $type){?>
     <li class="nav-item">
-        <a class="nav-link <?= $codeType==$type ? 'active' :''?>" href="<?= yze_merge_query_string('',['code_type'=>$type])?>"><?=$type?></a>
+        <a class="nav-link <?= $codeType==$type ? 'active' :''?>" href="<?= yze_merge_query_string('',array_merge($_GET,['code_type'=>$type]))?>"><?=$type?></a>
     </li>
 <?php }?>
 </ul>
@@ -52,7 +54,7 @@ $offset = "0px";
             readOnly: true,
             language: '<?= $codeTypes? $codeTypes[$codeType] :'html'?>'
         })
-        $.get("/code/page/<?= $curr_page->uuid?>?code_type=<?=$codeType?>&api_env=<?= $_GET['api_env']?>",{},function (code) {
+        $.get("<?= yze_merge_query_string('/code/page/'.$curr_page->uuid, array_merge($_GET,['code_type'=>$codeType]))?>",{},function (code) {
             editor.setValue(code);
         });
 

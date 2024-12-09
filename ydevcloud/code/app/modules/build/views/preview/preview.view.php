@@ -778,6 +778,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             array_unshift($actionCodeLines, ...$codes);
             return;
         }
+
         if (!$this->usedVariables || !array_intersect(['value','boundData','keyCode'], $this->usedVariables)) return;
 
         // 数据值和绑定对数据
@@ -1810,12 +1811,16 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      *
      * function(abc){return obj.a+123+abc[1]+obj.b[1].abc+'obj.a+123+abc[1]+obj.b[1].abc'}
      *
+     * age.match(/\d+/)
+     *
      *
      * @param $code
      * @return array 每个数组项的第0个位置是变量名，第一个位置是所在第位置
      */
     public static function pick_data($code){
         $dataNames = [];
+        // 先过滤掉转义的部分
+        $code = preg_replace("/\\\\.{1}/", '-',$code);
         preg_match_all("/(\w+|[^\w])/", $code, $matches, PREG_OFFSET_CAPTURE);
         $isData = -1;
         $dataName = '';

@@ -267,6 +267,7 @@ CLOSE;
             }
             $funcName = "function ".$this->get_event_function_name($html_event_name)."(".join(',', $funcArgs).") {";
             $lines[] = $funcName;
+            $lines[] = $this->indent(1, true)."let hasError;";
             foreach ($codeBlocks as $codes){
                 $lines = array_merge($lines, $this->build->indent_code(1, $codes));
             }

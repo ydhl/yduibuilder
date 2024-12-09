@@ -97,7 +97,6 @@ class Io_Data_Fetch{
         if (!$inputInfo) return [];
 
         $bind_data_model = $this->build->get_bound_datas($inputInfo['from_uuid']);
-
         if (!$bind_data_model) return [];
         $path = [];
         $bind_data_model->get_parent_of_data_id($inputInfo['data_id'], null, $path, $data);

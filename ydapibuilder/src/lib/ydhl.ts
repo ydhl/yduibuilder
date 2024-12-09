@@ -12,6 +12,10 @@ export default {
   apiBuilder: 'http://localhost:9998',
   modelDesign: 'http://localhost:9997',
   socket: 'ws://localhost:8888',
+  // api: 'http://ydecloud2.yidianhulian.com/',
+  // apiBuilder: 'http://ydapibuilder2.yidianhulian.com',
+  // modelDesign: 'http://ydmodel.yidianhulian.com',
+  // socket: 'ws://ydecloud2.yidianhulian.com:8888',
 
   /**
    * 保存所有API

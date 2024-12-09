@@ -83,14 +83,14 @@ $env = Env::package();
     $ui = $project->get_setting_value(Env::UI).'@'.$project->get_setting_value(Env::UI_VERSION);
     $logo = $project->get_setting_value('logo');
     ?>
-    <div class="card flex-grow-1 bg-light">
+    <div class="card bg-light" style="flex: 1; min-width: 300px">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
                     <?php if ($logo){?>
                         <img src="<?= SITE_URI."image?file=".urlencode($logo)?>" class="rounded-circle" style="width: 30px;height: 30px;object-fit: cover"/>
                     <?php }?>
-                    <a class="text-decoration-none" href="/project/<?= $project->uuid?>"><?= $project->name?></a>
+                    <a class="text-decoration-none ms-2" href="/project/<?= $project->uuid?>"><?= $project->name?></a>
                 </div>
                 <?php if (!$project_member->is_creater){?>
                     <button class="btn btn-sm btn-outline-primary yd-confirm-post" data-redirect="reload"
@@ -132,5 +132,11 @@ $env = Env::package();
             </div>
         </div>
     </div>
-<?php }?>
+<?php }
+if (count($members) % 2){
+?>
+    <div style="flex: 1;min-width: 300px"></div>
+<?php
+}
+?>
 </div>

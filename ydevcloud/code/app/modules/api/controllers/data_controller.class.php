@@ -56,11 +56,13 @@ class Data_Controller extends YZE_Resource_Controller {
             ->order_By('name','asc', 'e')
             ->order_By('id','asc','e')->select([':pid'=>$this->page->id]);
         $datas = [];
+        $error = ['type'=>'object','props'=>[], 'name'=>'error'];
         foreach ($items as $item){
             $datas[] = $item->get_data_model();
+            $error['props'][] = ['type'=>'string','name'=>$item->name];
         }
 
-        return YZE_JSON_View::success($this, ['page'=>$datas, 'global'=>[]]);
+        return YZE_JSON_View::success($this, ['page'=>$datas, 'global'=>[], 'error'=>$error]);
     }
 
     public function exception(\Exception $e){

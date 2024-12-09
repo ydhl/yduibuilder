@@ -549,7 +549,6 @@ INTERVAL;
     protected function build_validate_code(Action_Model $action, &$codeLines){
         $validates = $action->get_validate_datas();
         $subActions = $action->get_sub_condition_action();
-        if ($subActions)  $codeLines[] = 'let hasError = false;';
         foreach ($validates as $validate) {
             $data = $validate->get_validate_data();
             $fullName = $data['fullName'];
@@ -583,7 +582,7 @@ INTERVAL;
         $codeLines[] = $this->indent(1, true)."delete error.value?.['{$errorKey}']";
         $codeLines[] = "} else{";
         if ($subActions) $codeLines[] = $this->indent(1, true)."hasError = true";
-        $codeLines[] = $this->indent(1, true)."error.value['{$errorKey}'] =  '{$msg}'";
+        $codeLines[] = $this->indent(1, true)."error.value['{$errorKey}'] = ".($msg ? "'{$msg}'" : 'true');
         $codeLines[] = "}";
     }
 

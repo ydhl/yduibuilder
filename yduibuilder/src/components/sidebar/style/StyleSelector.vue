@@ -51,6 +51,7 @@ export default {
     // 用来鉴别是否需要加载selector： ui改变后或者ui没变，但state变了
     const needReloadSelector = computed(() => props.stateUuid + info.selectedUIItemId.value)
     watch(needReloadSelector, () => {
+      if (!selectorDom.value) return
       const control: any = $(selectorDom.value)
       control.select2('close')
       selectors.value = []

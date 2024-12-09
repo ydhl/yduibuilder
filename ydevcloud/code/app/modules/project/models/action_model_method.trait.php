@@ -95,7 +95,9 @@ trait Action_Model_Method{
             $validates = Validate_Data_Model::from()->where('is_deleted=0 and action_id=:id')->select([':id'=>$this->id]);
             $validateData = [];
             foreach ($validates as $validate){
-                $validateData[] = $validate->get_validate_data();
+                $data = $validate->get_validate_data();
+                if (!$data) continue;
+                $validateData[] = $data;
             }
             $action_records['validate']['datas'] = $validateData?:[];
 

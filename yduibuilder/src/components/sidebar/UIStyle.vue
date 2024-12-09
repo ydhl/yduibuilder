@@ -150,6 +150,7 @@ import { Expression } from '@/store/model'
 export default {
   name: 'UIStyle',
   components: { ExpressionDropdown, StyleSize, StyleLyout, StyleSelector, StyleUtilities, MarginPadding, StyleBorder, Typography, StyleBackground },
+  emits: ['contextMenu'],
   setup (props: any, context: any) {
     const info = initUI()
     const { t } = useI18n()
@@ -157,7 +158,7 @@ export default {
     const addStyleStateVisible = ref<any>(false)
     const variableDialogVisible = ref<any>(false)
     const previewMode = ref<any>(false)
-    const activeStyleState = computed<{ type: string, state: string }>({
+    const activeStyleState = computed<{ type: string, state: string }, { type: string, state: string }>({
       get () {
         return store.state.design.selectedUIItemActiveState || { type: 'normal', state: 'normal' }
       },
@@ -180,7 +181,7 @@ export default {
     // 该变量记录当前加载的style state是从那个页面加载下来的，主要解决页面改变后导致当前选中的ui被清空时，保存该ui的style state用，因为这是store中的page已经改变了
     const loadStyleFromPageUiid = ref<any>('')
     const editState = ref<any>({})
-    const previewStyleItem = computed<Record<any, any>>({
+    const previewStyleItem = computed<Record<any, any>, Record<any, any>>({
       get () {
         return store.state.design.previewStyleItem
       },
@@ -341,7 +342,13 @@ export default {
       ydhl.get('api/state.json', { page_uuid: currPage.value?.meta.id, uiid: uiID.value }, (rst) => {
         if (!rst.success) return
         styleStates.value = rst.data || {}
-        switchStyleState(activeStyleState.value.type, activeStyleState.value.state)
+        if (ydhl.isEmptyObject(rst.data) || !rst.data[activeStyleState.value.state]) { // 没有自定义状态，则恢复normal
+          activeStyleState.value = { type: 'normal', state: 'normal' }
+          previewMode.value = false
+          previewStyleItem.value = {}
+        } else {
+          switchStyleState(activeStyleState.value.type, activeStyleState.value.state)
+        }
       })
     }
     const removeStyleState = (styleState) => {

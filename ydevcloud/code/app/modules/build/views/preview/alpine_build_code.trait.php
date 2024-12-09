@@ -96,7 +96,7 @@ trait Alpine_Build_Code {
         $index = 0;
         foreach ($bindActions as $bindAction){
             if ($bindAction->mode == 'code') {
-                $codeLines[] = "const promise{$index} = new Promise((resolve) => {";
+                $codeLines[] = "const promise{$index} = new Promise((resolve, reject) => {";
                 $codeLines = array_merge($codeLines, $this->build->indent_code(1, html_entity_decode($bindAction->code)));
                 $codeLines[] = "})";
                 $codeLines[] = "promise{$index}.then(() => {";
@@ -538,7 +538,10 @@ INTERVAL;
     protected function build_validate_code(Action_Model $action, &$codeLines){
         $validates = $action->get_validate_datas();
         $subActions = $action->get_sub_condition_action();
-        if ($subActions)  $codeLines[] = 'let hasError = false;';
+        if ($subActions)  {
+            $this->add_used_variable('hasError');
+            $codeLines[] = 'hasError = false;';
+        }
         foreach ($validates as $validate) {
             $data = $validate->get_validate_data();
             $fullName = $data['fullName'];
@@ -571,7 +574,7 @@ INTERVAL;
         $codeLines[] = $this->indent(1, true)."delete page.error['{$errorKey}']";
         $codeLines[] = "} else{";
         if ($subActions) $codeLines[] = $this->indent(1, true)."hasError = true";
-        $codeLines[] = $this->indent(1, true)."page.error['{$errorKey}'] =  '{$msg}'";
+        $codeLines[] = $this->indent(1, true)."page.error['{$errorKey}'] =  ".($msg ? "'{$msg}'" : 'true');
         $codeLines[] = "}";
     }
 

@@ -114,6 +114,7 @@ INPITCONFIG;
             }
             $lines[] = $this->get_event_function_name($html_event_name)."(".join(', ', array_keys($args)).") {";
             $lines[] = $this->indent(1, true)."const page = this";
+            $lines[] = $this->indent(1, true)."let hasError;";
             foreach ($codeBlocks as $codes){
                 $lines = array_merge($lines, $this->build->indent_code(1, $codes));
             }
