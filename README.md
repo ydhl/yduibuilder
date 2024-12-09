@@ -212,3 +212,9 @@ socket服务是用swoole写的，请先确保安装了对应的swoole扩展；�
 8. [Jquery](https://jquery.com/)
 9. [Wangeditor](https://www.wangeditor.com/)
 10. [Popperjs](https://popper.js.org/)
+
+##  联系我们
+
+1. [官网](https://yidianhulian.com/)
+2. QQ群：577891075
+3. [在线演示](http://ydecloud2.yidianhulian.com)
