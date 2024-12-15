@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex align-items-center justify-content-center">
+  <div class="d-inline-flex align-items-center justify-content-start" :style="style">
     <template v-if="hasMutationOperator">
       <AdvanceSelect :options="mutationOperators" btn-size="btn-xs" :default-text="myDefaultMutationOperator || t('expression.operator')" @change="(option) => updateMutationOperator(option.value)">
         <template #input>
@@ -9,26 +9,26 @@
     </template>
     <template v-if="myExpression?.type == 'literal'">
       <template v-if="!hideArrow">←</template>
-      <div v-if="readonly" class="text-success w-75 text-truncate">{{myExpression.literal}}</div>
+      <div v-if="readonly" class="text-success text-truncate">{{myExpression.literal}}</div>
       <template v-else>
         <template v-if="leftValue?.enumValue">
           <AdvanceSelect :options="formatEnumValue" :default-text="myExpression.literal || t('common.choose')" @change="(option)=>changeEnumValue(option.value)"></AdvanceSelect>
         </template>
         <template v-else>
-          <div @click="openCodeEditor('literal')" class="text-success me-1 fs-7 w-75 text-truncate pointer">{{myExpression?.literal || t('action.notSet')}}</div>
+          <div @click="openCodeEditor('literal')" class="text-success me-1 fs-7 text-truncate pointer">{{myExpression?.literal || t('action.notSet')}}</div>
         </template>
       </template>
     </template>
     <template v-else-if="myExpression?.type == 'code'">
       <template v-if="!hideArrow">←</template>
-      <div class="text-success w-75 text-truncate fs-7" v-if="readonly">{{myExpression.code}}</div>
+      <div class="text-success text-truncate fs-7" v-if="readonly">{{myExpression.code}}</div>
       <template v-else>
-        <div @click="openCodeEditor('code')" class="me-1 fs-7 w-75 text-truncate pointer">{{myExpression?.code || t('action.notSet')}}</div>
+        <div @click="openCodeEditor('code')" class="me-1 fs-7 text-truncate pointer">{{myExpression?.code || t('action.notSet')}}</div>
       </template>
     </template>
-    <div v-else-if="myExpression?.type == 'connect'" :title="myExpression.data?.path ? myExpression.data?.path : ''" @click="!readonly ? connectDataDialogVisible=true : ''" class="pointer text-danger w-50 text-truncate">
+    <div v-else-if="myExpression?.type == 'connect'" :title="myExpression.data?.path ? myExpressionName : ''" @click="!readonly ? connectDataDialogVisible=true : ''" class="pointer text-danger text-truncate">
       <template v-if="myExpression.data?.name">
-        <template v-if="!hideArrow">←</template> {{myExpression.data.name}}
+        <template v-if="!hideArrow">←</template> {{myExpressionName}}
       </template>
       <span v-else class="fs-7">
         <i class="iconfont icon-connect hover-primary"></i>{{t('action.notSet')}}
@@ -40,7 +40,7 @@
     </template>
     <span class="fs-7" v-if="endBracket">{{endBracket}}</span>
     <template v-if="!hideMutationType">
-    <div v-if="!readonly && (!hasMutationOperator || (hasMutationOperator && defaultMutationOperator))" class="flex-shrink-0 d-flex align-items-center text-muted">&nbsp;{
+    <div v-if="!readonly && (!hasMutationOperator || (hasMutationOperator && defaultMutationOperator))" class="flex-shrink-0 d-inline-flex align-items-center text-muted">&nbsp;{
       <AdvanceSelect :options="mutationTypes"  btn-size="btn-xs" :default-text="myExpression?.type ? t('expression.'+myExpression?.type)  : t('variable.rightValue')" @change="(option) => changeMutationType(option.value)"></AdvanceSelect>
       }&nbsp;
     </div>
@@ -80,6 +80,7 @@ export default {
     leftValuePath: String, // 左值访问路径
     hideArrow: Boolean,
     hideMutationType: Boolean,
+    style: String,
     hasMutationOperator: {
       default: true,
       type: Boolean
@@ -143,6 +144,13 @@ export default {
     const myExpressionDesc = computed(() => {
       return ydhl.getExpressionDesc(myExpression.value)
     })
+    const myExpressionName = computed(() => {
+      if (myExpression.value.data?.isExpression) {
+        const path = myExpression.value.data.path
+        return path ? path.replace(/page\.(\w+)/, 'page.$1()') : ''
+      }
+      return myExpression.value.data?.path
+    })
     const myDefaultMutationOperator = computed(() => {
       const operator = props.defaultMutationOperator?.trim()
       if (!operator) return ''
@@ -197,6 +205,7 @@ export default {
         id: data.uuid,
         type: data.type,
         path: path,
+        isExpression: data.isExpression,
         name: data.name
       }
       context.emit('updateExpression', myExpression.value, myExpressionDesc.value)
@@ -261,6 +270,7 @@ export default {
       selectedPageId,
       formatEnumValue,
       code,
+      myExpressionName,
       myExpressionDesc,
       updateExpression,
       updateCode,

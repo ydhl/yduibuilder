@@ -5,19 +5,19 @@
       <label class="col-sm-3 col-form-label text-end text-truncate">{{ t('style.container.subset') }}</label>
       <div class="col-sm-9">
         <div class="list-group">
-          <template v-if="subsetNames && subsetNames.length>0">
-            <div class="list-group-item p-1 d-flex justify-content-between align-items-center" v-for="(item, index) in subsetNames" :key="index">
+          <template v-if="subset">
+            <div class="list-group-item p-1 d-flex justify-content-between align-items-center" v-for="(item, subsetName) in subset" :key="subsetName">
               <label class="flex-grow-1 ms-1 m-0 text-truncate d-flex align-items-center">
-                <input type="radio" :checked="subsetActive == item" @click="updateActiveSubset(item)" class="me-1" :name="selectedUIItemId+'subSetName'">
-                {{item}}</label>
+                <input type="radio" :checked="subsetActive == subsetName" @click="updateActiveSubset(subsetName)" class="me-1" :name="selectedUIItemId+'subSetName'">
+                {{subsetName}}</label>
               <div class="d-flex align-items-center">
-                <button type="button" @click="openSetting(index)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-edit"></i></button>
-                <ConfirmRemove @remove="remove(index)" icon="icon-remove"></ConfirmRemove>
+                <button type="button" @click="openSetting(subsetName)" class="btn border-0 btn-outline-light btn-sm p-0 ps-1 pe-1 text-muted"><i class="iconfont icon-edit"></i></button>
+                <ConfirmRemove @remove="remove(subsetName)" icon="icon-remove"></ConfirmRemove>
               </div>
             </div>
           </template>
         </div>
-        <button type="button" @click="openSetting(-1)" class="btn btn-outline-primary btn-block btn-sm mt-1 mb-2">
+        <button type="button" @click="openSetting('')" class="btn btn-outline-primary btn-block btn-sm mt-1 mb-2">
           {{t('style.form.addValue')}}
         </button>
         <slot></slot>
@@ -27,9 +27,9 @@
 
   <lay-layer v-model="isOpenSetting" :title="t('style.container.subsetName')" :shade="true" :area="['300px', '200px']">
     <div class="p-3">
-      <input type="text" :placeholder="t('style.container.subsetName')" v-model.trim="newItem" class="form-control form-control-sm">
+      <input type="text" :placeholder="t('style.container.subsetName')" v-model.trim="newSubsetName" class="form-control form-control-sm">
       <div class="mt-3">
-        <button type="button" class="btn btn-primary btn-block" @click="updateValue">{{t('common.ok')}}</button>
+        <button type="button" class="btn btn-primary btn-block" @click="updateSubsetName">{{t('common.ok')}}</button>
       </div>
     </div>
   </lay-layer>
@@ -38,7 +38,7 @@
 <script lang="ts">
 import { useI18n } from 'vue-i18n'
 import UIInit from '@/components/Common'
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import ConfirmRemove from '@/components/common/ConfirmRemove.vue'
 import ydhl from '@/lib/ydhl'
 import { useStore } from 'vuex'
@@ -50,30 +50,19 @@ export default {
   setup (props: any, context: any) {
     const { t } = useI18n()
     const initInfo = UIInit()
-    const editValueIndex = ref(-1)
     const store = useStore()
-    const newItem = ref('')
-    const subsetNames = ref<Array<string>>([])
+    const newSubsetName = ref('')
     const isOpenSetting = ref(false)
     const rightBackdropVisible = ref(false)
+    let oldSubsetName = ''
     const subsetActive = initInfo.computedWrap('subsetActive', 'custom', '')
     const subset = initInfo.computedWrap('subset', 'custom', {})
 
-    const updateSubset = () => {
-      const value = {}
-      for (const index in subsetNames.value) {
-        const subsetName = subsetNames.value[index]
-        let sub = subset.value[subsetName]
-        if (!sub) sub = Object.values(subset.value)?.[index] || [] // 改名了
-        value[subsetName] = sub
-      }
-      subset.value = value
+    const remove = (subsetName) => {
+      const old = JSON.parse(JSON.stringify(subset.value))
+      delete old[subsetName]
+      subset.value = old
     }
-    const remove = (index) => {
-      subsetNames.value.splice(index, 1)
-      updateSubset()
-    }
-
     const updateActiveSubset = (newActive) => {
       //  交互容器的items和subset，把当前状态的保持更新进到subset；把要切换的目标状态的从subset中取出来
       subset.value[subsetActive.value] = initInfo.selectedUIItem.value?.items || []
@@ -86,14 +75,9 @@ export default {
       })
       subsetActive.value = newActive
     }
-
-    const openSetting = (editItemIndex) => {
-      editValueIndex.value = editItemIndex
-      if (editItemIndex > -1) {
-        newItem.value = subsetNames.value[editItemIndex]
-      } else {
-        newItem.value = ''
-      }
+    const openSetting = (subsetName: string) => {
+      oldSubsetName = subsetName
+      newSubsetName.value = subsetName || ''
       isOpenSetting.value = true
       nextTick(() => {
         rightBackdropVisible.value = true
@@ -101,38 +85,39 @@ export default {
     }
     const closeSetting = () => {
       isOpenSetting.value = false
+      oldSubsetName = ''
       rightBackdropVisible.value = false
-      editValueIndex.value = -1
     }
-
-    const updateValue = () => {
-      if (subsetNames.value.filter((item) => newItem.value === item).length > 0) {
+    const updateSubsetName = () => {
+      const subsetNames = Object.keys(subset.value)
+      if (subsetNames.filter((item) => newSubsetName.value === item).length > 0) {
         ydhl.alert(t('style.container.subsetNameExist'))
         return
       }
-      if (editValueIndex.value > -1) { // 修改
-        subsetNames.value[editValueIndex.value] = newItem.value
+      if (oldSubsetName) { // 修改
+        const old = JSON.parse(JSON.stringify(subset.value))
+        delete old[oldSubsetName]
+        old[newSubsetName.value] = subset.value[oldSubsetName]
+        subset.value = old
+        if (subsetActive.value === oldSubsetName) subsetActive.value = newSubsetName.value
       } else { // 新增
-        if (subsetNames.value.length === 0) subsetActive.value = newItem.value
-        subsetNames.value.push(newItem.value)
+        if (ydhl.isEmptyObject(subset.value)) subsetActive.value = newSubsetName.value
+        const old = JSON.parse(JSON.stringify(subset.value)) || {}
+        old[newSubsetName.value] = []
+        subset.value = old
       }
-      updateSubset()
       closeSetting()
     }
-    onMounted(() => {
-      subsetNames.value = Object.keys(subset.value) || []
-    })
 
     return {
       t,
       rightBackdropVisible,
       isOpenSetting,
-      editValueIndex,
       openSetting,
       closeSetting,
-      updateValue,
-      subsetNames,
-      newItem,
+      updateSubsetName,
+      subset,
+      newSubsetName,
       remove,
       updateActiveSubset,
       subsetActive,

@@ -53,13 +53,12 @@ class Container_View extends Preview_View {
 
     public function build_code(): Base_Code_Fragment
     {
-        $this->alpineBuildCode();
-        $fragment = $this->get_code_Fragment();
+        $fragment = $this->alpineBuildCode();
         $subset = $this->get_subset();
         $subsetActive = @$this->data['meta']['custom']['subsetActive'];
 
         foreach ($subset as $subsetName => $views){
-            // 对于当前处于激活的subset，meta items中的可能是最新的, parent::build_style 已处理
+            // 处于激活的 alpineBuildCode 已处理
             if ($subsetActive != $subsetName){
                 foreach ($views as $view){
                     $view->build_code();

@@ -1,7 +1,7 @@
 <template>
   <div class="p-3" ref="editorContainer">
       <div class="text-danger p-1 m-1 fs-7" v-if="tip">{{tip}}</div>
-      <div class="d-flex align-items-stretch">
+      <div class="d-flex align-items-stretch border-bottom border-light">
         <div ref="editor" class="flex-grow-1" :style="editStyle"></div>
         <div v-if="!hideVariable" style="width: 300px;border-left:1px solid #dcdcdb" class="flex-shrink-0 d-flex">
           <div class="vertical-tab">
@@ -9,19 +9,19 @@
             <a :class="{'vertical-tab-item': true, 'active': scope=='page'}" @click="scope='page'" href="javascript:void(0)">{{t('variable.pageScope')}}</a>
             <a :class="{'vertical-tab-item': true, 'active': scope=='global'}" @click="scope='global'" href="javascript:void(0)">{{t('variable.globalScope')}}</a>
           </div>
-          <div v-if="scope=='local'" class="flex-grow-1">
+          <div v-if="scope=='local'" :style="`height:${height}`" class="flex-grow-1 overflow-auto">
             <template v-for="(variable, index) in variables" :key="index">
               <DataSimple :model="variable" path="" :index="index" :intent="0" :root-uuid="variable.id"></DataSimple>
             </template>
             <div v-if="!variables || variables.length ==0" class="d-flex align-items-center text-muted h-100 justify-content-center">{{t('common.empty')}}</div>
           </div>
-          <div v-if="scope=='page'" class="flex-grow-1">
+          <div v-if="scope=='page'" :style="`height:${height}`" class="flex-grow-1 overflow-auto">
             <template v-for="(variable, index) in pageVariables" :key="index">
               <DataSimple :model="variable" path="" :index="index" :intent="0" :root-uuid="variable.id"></DataSimple>
             </template>
             <div v-if="!pageVariables || pageVariables.length ==0" class="d-flex align-items-center text-muted h-100 justify-content-center">{{t('common.empty')}}</div>
           </div>
-          <div v-if="scope=='global'" class="flex-grow-1">
+          <div v-if="scope=='global'" :style="`height:${height}`" class="flex-grow-1 overflow-auto">
             <template v-for="(variable, index) in globalVariables" :key="index">
               <DataSimple :model="variable" path="" :index="index" :intent="0" :root-uuid="variable.id"></DataSimple>
             </template>
@@ -53,6 +53,7 @@ export default {
     leftValuePath: String, // 左值路径
     surroundCode: String, // 操作符或前后代码，@表示编辑器中的代码嵌入的位置
     editStyle: String,
+    height: String,
     title: String,
     hideVariable: {
       default: false,
@@ -84,7 +85,7 @@ export default {
     const currPage = computed(() => store.state.design.page)
     const scope = ref('local')
     const pageVariables = ref<any>([])
-    const globalVariables = ref([])
+    const globalVariables = ref<any>([])
     const suggestions: any = []
     let editorInstance
     let completionItemProvider
@@ -323,12 +324,25 @@ export default {
     })
     const loadVariables = () => {
       ydhl.get('api/data.json', { page_uuid: currPage.value.meta.id }, (rst) => {
-        pageVariables.value = rst.data?.page || []
-        globalVariables.value = rst.data?.global || []
+        if (rst.data?.page) {
+          pageVariables.value = [{
+            type: 'object',
+            name: 'page',
+            title: t('variable.pageScope'),
+            props: rst.data.page
+          }]
+        }
+        if (rst.data?.global) {
+          globalVariables.value = [{
+            type: 'object',
+            name: 'global',
+            props: rst.data.global
+          }]
+        }
 
-        suggestions.push(...ydhl.getVariableSuggestions(pageVariables.value, 'page.'))
+        suggestions.push(...ydhl.getVariableSuggestions(pageVariables.value))
         if (rst.data?.error) pageVariables.value.push(rst.data?.error)
-        suggestions.push(...ydhl.getVariableSuggestions(globalVariables.value, 'global.'))
+        suggestions.push(...ydhl.getVariableSuggestions(globalVariables.value))
       })
     }
     const escapeRegExp = (string) => {

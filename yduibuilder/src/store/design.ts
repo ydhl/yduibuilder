@@ -54,20 +54,43 @@ function findUIItemInfo (state: Record<any, any>, uiid: string) {
       findStruct.uiConfig = parent
       return findStruct
     }
-    if (!parent.items) return findStruct
+    if (!parent.items && !parent.meta?.custom?.subset) return findStruct
 
-    for (let i = 0; i < parent.items.length; i++) {
-      if (parent.items[i].meta.id === uiid) {
-        findStruct.index = i
-        findStruct.uiConfig = parent.items[i]
-        findStruct.parentConfig = parent
-        return findStruct
+    if (parent.items) {
+      for (let i = 0; i < parent.items.length; i++) {
+        if (!parent.items || !parent.items[i]) continue
+        if (parent.items[i].meta.id === uiid) {
+          findStruct.index = i
+          findStruct.uiConfig = parent.items[i]
+          findStruct.parentConfig = parent
+          return findStruct
+        }
+        const subItems: any = parent.items[i].items || null
+        if (subItems && subItems.length > 0) {
+          const findInfo: any = _find(uiid, parent.items[i])
+          if (findInfo.index !== -1) {
+            return findInfo
+          }
+        }
       }
-      const subItems: any = parent.items[i].items || null
-      if (subItems && subItems.length > 0) {
-        const findInfo: any = _find(uiid, parent.items[i])
-        if (findInfo.index !== -1) {
-          return findInfo
+    }
+    if (parent.meta?.custom?.subset) {
+      for (const subsetName in parent.meta?.custom?.subset) {
+        const subsets = parent.meta?.custom?.subset[subsetName]
+        for (let i = 0; i < subsets.length; i++) {
+          if (subsets[i].meta.id === uiid) {
+            findStruct.index = i
+            findStruct.uiConfig = subsets[i]
+            findStruct.parentConfig = parent
+            return findStruct
+          }
+          const subItems: any = subsets[i].items || null
+          if (subItems && subItems.length > 0) {
+            const findInfo: any = _find(uiid, subsets[i])
+            if (findInfo.index !== -1) {
+              return findInfo
+            }
+          }
         }
       }
     }

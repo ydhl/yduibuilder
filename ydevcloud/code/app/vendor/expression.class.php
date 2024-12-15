@@ -73,24 +73,30 @@ class Expression extends YZE_Object {
 
     /**
      * 表达式代码
-     * @param $dataConfig array
-     * @param $hidePrefix boolean
+     *
+     * @param $translate_expression_call boolean 是否把代码中的表达式调用加上调用符号()
      * @return string|null
      */
-    public function get_expression_code($hidePrefix=false){
+    public function get_expression_code($translate_expression_call=true){
         switch (strtolower($this->type)){
             case 'literal': return $this->literal;
             case 'code': return $this->code;
-            case 'connect':return $this->remove_prefix($this->data->path, $hidePrefix);
+            case 'connect':{
+                $dataPath = $this->data->path;
+                if ($this->data->isExpression && $translate_expression_call){
+                    $dataPath = preg_replace("/page\.(\w+)/", 'page.\\1()', $dataPath);
+                }
+                return $dataPath;
+            }
             case 'operator':return $this->operator;
-            case 'expression':return $this->get_condition_expression_code($hidePrefix);
+            case 'expression':return $this->get_condition_expression_code();
             case 'expression_group':{
                 $code = [];
                 if ($this->modifier) $code[] = preg_replace("/@/", '', $this->modifier);
                 if ($this->subexpression) $code[] = '(';
 
                 foreach ($this->subexpression as $sub){
-                    $code[] = $sub->get_expression_code($hidePrefix);
+                    $code[] = $sub->get_expression_code($translate_expression_call);
                 }
 
                 if ($this->subexpression) $code[] = ')';
@@ -99,43 +105,38 @@ class Expression extends YZE_Object {
             case 'ternary':
             {
                 $code = [];
-                $code[] = $this->expression ? $this->expression->get_expression_code($hidePrefix) : $this->get_condition_expression_code($hidePrefix);
+                $code[] = $this->expression ? $this->expression->get_expression_code($translate_expression_call) : $this->get_condition_expression_code($translate_expression_call);
                 $code[] = '?';
-                $code[] = $this->trueExpression->get_expression_code($hidePrefix);
+                $code[] = $this->trueExpression->get_expression_code($translate_expression_call);
                 $code[] = ':';
-                $code[] = $this->falseExpression->get_expression_code($hidePrefix);
+                $code[] = $this->falseExpression->get_expression_code($translate_expression_call);
                 return join(' ', $code);
             }
         }
         return null;
     }
-    private function remove_prefix($data, $hidePrefix, $modifier=''){
-        $rst = '';
-        if (!$hidePrefix) {
-            $rst = $data;
-        }else{
-            $rst = preg_replace('/^page\./','', $data);
-        }
+    private function replace_modifer($data, $modifier=''){
+        $rst = $data;
         if ($modifier && preg_match("/@/", $modifier)){
             return preg_replace("/@/", $rst, $modifier);
         }else{
             return $rst;
         }
     }
-    private function get_condition_expression_code($hidePrefix) {
+    private function get_condition_expression_code($translate_expression_call=false) {
         $code = [];
         if ($this->expression) {
-            $code[] = $this->expression->get_expression_code();
+            $code[] = $this->expression->get_expression_code($translate_expression_call);
         }else if ($this->data){
-            $code[] = $this->remove_prefix($this->data->path, $hidePrefix, $this->data->modifier) ?: $this->data->literal;
+            $code[] = $this->replace_modifer($this->data->path, $this->data->modifier) ?: $this->data->literal;
         }
 
         if ($this->operator)$code[] = $this->operator;
 
         if ($this->rightExpression) {
-            $code[] = $this->rightExpression->get_expression_code();
+            $code[] = $this->rightExpression->get_expression_code($translate_expression_call);
         }else if ($this->rightData){
-            $code[] = $this->remove_prefix($this->rightData->path, $hidePrefix, $this->rightData->modifier) ?: $this->rightData->literal;
+            $code[] = $this->replace_modifer($this->rightData->path, $this->rightData->modifier) ?: $this->rightData->literal;
         }
 
         return join(' ', $code);

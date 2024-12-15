@@ -33,8 +33,8 @@ trait Alpine_Build_Code {
             $expression = $bindVariable->get_expression();
             if (!$expression) continue;
             $expression_code = $expression->get_expression_code();
+            $this->add_local_scope_variable($expression_code);
             $codeLines[] = $bindVariable->to_data_path . ' = ' . $expression_code;
-            $this->add_used_variable($expression_code);
         }
     }
 
@@ -109,7 +109,7 @@ trait Alpine_Build_Code {
                 if ($expression) {
                     $expression_code = $expression->get_expression_code();
                     $codeLines[] = "if ({$expression_code}){";
-                    $this->add_used_variable($expression_code);
+                    $this->add_local_scope_variable($expression_code);
                 }
                 $this->get_post_processor_body($expression ? 1 : 0, $bindAction, $io_data_fetch, $bind_api, $codeLines);
                 if ($expression) $codeLines[] = "}";
@@ -121,10 +121,10 @@ trait Alpine_Build_Code {
     protected function build_page_data_code($indent) {
         $fragment = $this->get_code_Fragment();
         $build = $this->build;
-        $index = 0;
         // 对于弹窗访问，参数在加载js的地址中
         $queryString = $this->build->is_subpage() ? ',import.meta.url' : '';
         foreach ($build->get_bound_datas() as $bound_data){
+            if ($bound_data->isExpression) continue;
             $dataConfig = $bound_data->get_data_model();
             if ($dataConfig['comment'] || $dataConfig['title'] || $dataConfig['deprecated']){
                 $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, "/**");
@@ -144,13 +144,42 @@ trait Alpine_Build_Code {
                 $defaultValue = 'Mock.mock('.$defaultValue.')';
             }
             $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, $bound_data->name.': '.$defaultValue.',');
-
-            $index++;
         }
         $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, 'error: {},');
         $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, "");
         $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, "\$title: \"{$this->data['meta']['title']}\",");
         $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, "\$pageId: \"{$this->myid()}\",");
+
+        // 表达式
+        foreach ($build->get_bound_datas() as $bound_data) {
+            if (!$bound_data->isExpression) continue;
+
+            $expressionFunc = [];
+            $dataConfig = $bound_data->get_data_model();
+            if ($dataConfig['comment'] || $dataConfig['title'] || $dataConfig['deprecated']){
+                $expressionFunc[] = "/**";
+                if($dataConfig['title']) $expressionFunc[] = " * ".$dataConfig['title'];
+                if($dataConfig['comment']) $expressionFunc[] = " * ".$dataConfig['comment'];
+                if($dataConfig['deprecated']) $expressionFunc[] = " * ".($dataConfig['deprecated'] ? 'Deprecated' : '');
+                $expressionFunc[] = " */";
+            }
+            $defaultValue = $dataConfig['defaultValue'];
+            $multiple = preg_match("/\n/", $defaultValue);
+            $expressionFunc[] = "{$bound_data->name}() {";
+            $this->add_local_scope_variable($defaultValue);
+            if (in_array('page', (array)$this->localScopeVariables)) {
+                $expressionFunc[] = $this->get_build()->indent_code(1, "const page = this;");
+            }
+            if ($multiple){
+                $expressionFunc[] = $this->get_build()->indent_code(1, explode(PHP_EOL, $defaultValue));
+            }else{
+                $expressionFunc[] = $this->get_build()->indent_code(1, "return ".preg_replace("/^\s*return\s*/", '',$defaultValue));
+            }
+
+            $expressionFunc[] = "},";
+            $fragment->add_code(Html_Code_Fragment::SECTION_EVENT, $expressionFunc);
+
+        }
     }
     protected function build_api_body_data(Page_Bind_Api_Model $bind_api, $formatVariables, $inputBody, &$codeLines) {
         if(!$inputBody) return [];
@@ -174,7 +203,7 @@ trait Alpine_Build_Code {
                     }else{
                         $codeLines[] = 'formData.push(`'.$dataConfig['name'].'=${'.$exp.'}`);';
                     }
-                    $this->add_used_variable($exp);
+                    $this->add_local_scope_variable($exp);
                 }
                 return [$this->indent(1, true)."data: formData.join('&'),"];
             case 'form-data':
@@ -185,7 +214,7 @@ trait Alpine_Build_Code {
                     $expression = $bindVariable->get_expression();
                     if (!$expression) continue;
                     $expression_code = $expression->get_expression_code();
-                    $this->add_used_variable($expression_code);
+                    $this->add_local_scope_variable($expression_code);
 
                     $codeLines[] = 'if('.$expression_code.' !== undefined){';
                     if ($dataConfig['type'] == 'array'){
@@ -216,7 +245,7 @@ trait Alpine_Build_Code {
             $expression = $bindVariable->get_expression();
             if (!$expression) continue;
             $expression_code = $expression->get_expression_code();
-            $this->add_used_variable($expression_code);
+            $this->add_local_scope_variable($expression_code);
 
             if ($dataConfig['type'] == 'array'){
                 $myCodes[] = "if({$expression_code} !== undefined){";
@@ -250,7 +279,7 @@ trait Alpine_Build_Code {
             $codeLines[] = "if({$expression_code} !== undefined){";
             $codeLines[] = $this->indent(1, true)."_{$dataName}[{$dataConfig['name']}] = {$expression_code}";
             $codeLines[] = '}';
-            $this->add_used_variable($expression_code);
+            $this->add_local_scope_variable($expression_code);
         }
 
         return "_{$dataName}";
@@ -274,7 +303,7 @@ trait Alpine_Build_Code {
                 if (!$expression) continue;
                 $expression_code = $expression->get_expression_code();
                 $args[] = $data->name.'=${'.$expression_code.'}';
-                $this->add_used_variable($expression_code);
+                $this->add_local_scope_variable($expression_code);
             }
             $redirect = '/preview/page/'.$popupPage->uuid.'?'.join('&', $args);
             $codeLines[] = $action->popup_target == '_self' ? 'document.location.href=`'.$redirect.'`' : 'window.open(`'.$redirect.'`)';
@@ -421,7 +450,7 @@ INTERVAL;
             $dataName = $this->is_scale_type($expression->data->type) ? "{$expression->data->path}" : "JSON.stringify({$expression->data->path})";
         }else{
             $dataName = $expression->get_expression_code();
-            $this->add_used_variable($dataName);
+            $this->add_local_scope_variable($dataName);
         }
         $codeLines[] = "alert({$dataName})";
     }
@@ -450,7 +479,7 @@ INTERVAL;
                     $queryArgs[] = $bindData->name.': '. $inputExpression->data->path;
                 }else { //表达式赋值
                     $expression_code = $inputExpression->get_expression_code();
-                    $this->add_used_variable($expression_code);
+                    $this->add_local_scope_variable($expression_code);
                     $queryArgs[] = $bindData->name . ': ' . $expression_code;
                 }
             }else{
@@ -494,7 +523,7 @@ INTERVAL;
         foreach ($argConfigs as $argConfig){
             $inputExpression = $inputExpressions[$argConfig['uuid']];
             $expression_code = $inputExpression->get_expression_code();
-            $this->add_used_variable($expression_code);
+            $this->add_local_scope_variable($expression_code);
             $args[] = $argConfig['name'].": ".$expression_code;
         }
         //// html渲染时会把属性xxYYY变成xxxyyy,为了和代码中保持同步，这里统一把事件名转换成小写
@@ -520,8 +549,10 @@ INTERVAL;
             $rightValue = $expression->get_expression_code();
             $operatior = $mutation->mutation_operator ?: ' = ';
             $operatior = preg_replace("/@/", $rightValue, $operatior);
-            $codes = [join('.', $path), $operatior];
-            $this->add_used_variable($rightValue);
+            $left = join('.', $path);
+            $codes = [$left, $operatior];
+            $this->add_local_scope_variable($left);
+            $this->add_local_scope_variable($rightValue);
             $codeLines[] = join('', $codes);
         }
     }
@@ -539,7 +570,7 @@ INTERVAL;
         $validates = $action->get_validate_datas();
         $subActions = $action->get_sub_condition_action();
         if ($subActions)  {
-            $this->add_used_variable('hasError');
+            $this->add_local_scope_variable('hasError');
             $codeLines[] = 'hasError = false;';
         }
         foreach ($validates as $validate) {
@@ -570,6 +601,7 @@ INTERVAL;
         }
     }
     private function _build_validate_code(&$codeLines, $check, $errorKey, $msg, $subActions){
+        $this->add_local_scope_variable('page');
         $codeLines[] = "if({$check}){";
         $codeLines[] = $this->indent(1, true)."delete page.error['{$errorKey}']";
         $codeLines[] = "} else{";

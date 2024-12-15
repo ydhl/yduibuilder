@@ -24,6 +24,7 @@
         <template v-else>
           <span class="text-decoration-line-through text-muted" v-if="myModel.deprecated">{{myModel.name}}</span>
           <template v-else>{{myModel.name}}</template>
+          <template v-if="myModel.isRoot && myModel.isExpression">()</template>
         </template>
       </div>
       <span class="ps-1 text-truncate fs-7">
@@ -36,7 +37,7 @@
         </span>
         <span class="text-muted" :title="myModel.mock=='1' ? 'Has Mock' : ('Mock: '+ myModel.mock)" v-if="myModel.mock">&nbsp;M</span>
         <template v-if="myModel.defaultValue">
-          <span v-if="['object','array','map','any'].indexOf(myModel.type)==-1">&nbsp;{{myModel.defaultValue}}</span>
+          <span v-if="['object','array','map','any'].indexOf(myModel.type)==-1 && !isExpression">&nbsp;{{myModel.defaultValue}}</span>
           <span v-else @click.stop="openCodeEditor(myModel.defaultValue, 'view')">&nbsp;{{t('common.view')}}</span>
         </template>
       </span>
@@ -45,7 +46,7 @@
       </span>
     </div>
     <div class="model-action" v-if="myCanMutation">
-      <i class="iconfont icon-import pointer text-muted hover-primary" @click.stop="openCodeEditor('', 'import')" v-if="myModel.type=='object' || myModel.type=='array'"></i>
+      <i class="iconfont icon-import pointer text-muted hover-primary" @click.stop="openCodeEditor('', 'import')" v-if="(myModel.type=='object' || myModel.type=='array')"></i>
       <i v-else style="width: 16px;height: 24px;">&nbsp;</i>
       <i class="iconfont icon-plus pointer text-muted hover-primary" @click.stop="add" v-if="myModel.type=='object'"></i>
       <i v-else style="width: 16px;height: 24px;">&nbsp;</i>
@@ -70,8 +71,8 @@
       <div class="text-truncate flex-shrink-0">
         <i :class="`iconfont text-primary icon-${item.type.toLowerCase()}`"></i>&nbsp;{{ item.meta.title || item.type }}
       </div>
-      <div class="text-muted" v-if="!hasOutputAs(item.type) && showBoundType==='in'"> as data input</div>
-      <div class="text-muted" v-if="!hasOutputAs(item.type) && showBoundType==='out'"> as data output</div>
+      <div class="text-muted ms-2 me-2" v-if="!hasOutputAs(item.type) && showBoundType==='in'">{{t('common.asDataInput')}}</div>
+      <div class="text-muted ms-2 me-2" v-if="!hasOutputAs(item.type) && showBoundType==='out'">{{t('common.asDataOutput')}}</div>
       <div class="input-group flex-grow-1 flex-nowrap input-group-sm ms-2 me-2" v-if="hasOutputAs(item.type)">
         <div class="input-group-text border-0 fs-7 p-0 bg-white">{{t('api.outputAS')}}&nbsp;</div>
         <AdvanceSelect :options="outputAsItems(item)" @change="(option) => changeOutputAs(item, option.value, showBoundType)" :default-text="myModel.out[item.meta.id] || ''"></AdvanceSelect>
@@ -86,18 +87,21 @@
   <template v-if="myModel.type=='array' && isOpen">
     <Data :model="myModel.item" :from-type="fromType" :from-id="fromId" :open="open" :path="[...path, myModel.name]"
                :index="0" @update="updateItem" :can-mutation="canMutation" :intent="intent+1"
+               :is-expression="isExpression"
                :can-input="false" :can-output="canOutput" :is-array-item="true"></Data>
   </template>
   <template v-else-if="['object', 'file', 'blob'].indexOf(myModel.type) !== -1 && isOpen">
     <div class="text-muted text-center" v-if="!myModel.props || myModel.props.length==0">{{t('api.model.noSubField')}}</div>
     <template v-else>
       <Data v-for="(item, index) in myModel.props" :from-type="fromType" :from-id="fromId" :open="open" :path="[...path, myModel.name]"
+                 :is-expression="isExpression"
                  @remove="removeItem" @update="updateItem" :can-input="['file', 'blob'].indexOf(myModel.type) !== -1 ? false : canInput" :can-output="canOutput"
                  :can-mutation="canMutation" :key="index" :intent="intent+1" :model="item" :index="index"></Data>
     </template>
   </template>
   <lay-layer v-model="editDlgVisible" :title="isAddProps ? t('api.addData') : t('api.editData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
-    <AddData v-model="editModel" :is-array-item="!isAddProps && isArrayItem"/>
+    <AddData v-if="!isExpression" v-model="editModel" :is-array-item="!isAddProps && isArrayItem"/>
+    <AddExpression v-else v-model="editModel" :can-add-expression="!isAddProps && !isArrayItem" :is-array-item="isArrayItem"/>
   </lay-layer>
   <CodeEditorDialog :read-only="codeType=='view'" :title="codeType=='view'?t('api.model.defaultValue'):t('api.model.import')"
                     :hide-variable="true" :ignore-code-error="true"
@@ -119,10 +123,11 @@ import baseUIDefines from '@/components/ui/define'
 import DataInfo from '@/components/common/DataInfo.vue'
 import CodeEditorDialog from '@/components/common/CodeEditorDialog.vue'
 import AdvanceSelect from '@/components/common/AdvanceSelect.vue'
+import AddExpression from '@/components/common/AddExpression.vue'
 // 数据模型展示，可绑定ui
 const emit = defineEmits(['remove', 'update'])
 
-const { index, path, canInput, canOutput, fromId, fromType, isArrayItem, canMutation, intent, model, open } = defineProps({
+const { index, path, canInput, canOutput, fromId, fromType, isArrayItem, canMutation, intent, model, open, isExpression } = defineProps({
   model: Object,
   index: Number,
   path: {
@@ -135,6 +140,7 @@ const { index, path, canInput, canOutput, fromId, fromType, isArrayItem, canMuta
   fromId: String, // 该数据来源于哪里
   fromType: String, // 数据来源那个表
   isArrayItem: Boolean, // 数组结点标识,用于标识数组的第一个结点
+  isExpression: Boolean, // 当前数据是不是表达式内的数据
   canMutation: Boolean, // 是否能编辑和删除
   intent: Number // 缩进次数
 })
@@ -480,7 +486,7 @@ const edit = () => {
 }
 const add = () => {
   isAddProps.value = true
-  editModel.value = { type: 'string', uuid: ydhl.uuid() }
+  editModel.value = { type: 'string', uuid: ydhl.uuid(), isExpression: isExpression }
   nameChanged = {}
   editDlgVisible.value = true
 }
@@ -490,7 +496,24 @@ const showComment = () => {
 
 // 删除根级数据
 const remove = () => {
-  emit('remove', index)
+  // 先把绑定删除
+  const inItems: any = []
+  let outItems: any = []
+  if (myModel.value.in) inItems.push(myModel.value.in)
+  if (myModel.value.out) outItems = Object.keys(myModel.value.out)
+
+  const promises = []
+  for (const itemid of inItems) {
+    const { uiConfig } = store.getters.getUIItem(itemid)
+    promises.push(slinceRemoveBind(uiConfig, 'in'))
+  }
+  for (const itemid of outItems) {
+    const { uiConfig } = store.getters.getUIItem(itemid)
+    promises.push(slinceRemoveBind(uiConfig, 'out'))
+  }
+  Promise.all(promises).then(() => {
+    emit('remove', index)
+  })
 }
 // 删除数据中的数据
 const removeItem = (index: number) => {
@@ -610,6 +633,32 @@ const saveBound = (uiItem, type, outputAs, uiType, boundAs = '') => {
     , 'json')
   })
 }
+const slinceRemoveBind = (uiItem: any, type: string) => {
+  const uiid = uiItem.meta.id
+  const outputAs = myModel.value.out?.[uiid]
+
+  return new Promise((resolve) => {
+    ydhl.post('api/bind/remove.json', { ui_id: uiid, type, data_id: myModel.value.uuid, page_uuid: selectedPageId.value }, [], (rst) => {
+      resolve(true)
+      if (!rst.success) {
+        return
+      }
+      const metaProps: any = {}
+      if (type === 'out') {
+        delete uiItem.dataOut?.[outputAs]
+        metaProps.dataOut = uiItem.dataOut ? JSON.parse(JSON.stringify(uiItem.dataOut)) : {}
+      } else {
+        uiItem.dataIn = null
+        metaProps.dataIn = null
+      }
+      store.commit('updateUIInfo', {
+        itemid: uiid,
+        pageId: selectedPageId.value,
+        props: metaProps
+      })
+    })
+  })
+}
 const removeBind = (uiItem: any, type: string) => {
   const uiid = uiItem.meta.id
   const outputAs = myModel.value.out?.[uiid]
@@ -677,6 +726,7 @@ const importData = (newCode) => {
   codeEditorVisible.value = false
   const oldUuid = editModel.value.uuid
   editModel.value = ydhl.parseJsonData(myModel.value.name, myModel.value.isRoot, json)
+  editModel.value.isExpression = isExpression
   editModel.value.uuid = oldUuid
   save(index)
 }

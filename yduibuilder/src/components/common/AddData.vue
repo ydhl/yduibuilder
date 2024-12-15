@@ -42,7 +42,7 @@
       </div>
       <template v-if="isScale">
         <div class="row">
-          <label class="col-sm-3 col-form-label text-end" @click="changeValueType()">
+          <label class="col-sm-3 col-form-label text-end" for="enum" @click="changeValueType()">
             <input class="form-check-input" type="checkbox" role="switch" id="enum" :checked="valueType == 'enum'">
             {{t("api.model.isEnumValue")}}
           </label>

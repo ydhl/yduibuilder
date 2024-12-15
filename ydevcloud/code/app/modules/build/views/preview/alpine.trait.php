@@ -19,6 +19,7 @@ trait Alpine {
         $isTopPage = !$this->find_parent($this->myid());
         // 顶级元素构建alpine代码结构主体
         if ($isTopPage){
+            $this->init_page_scope_variable();
             $this->build_page_data_code(1);
             $this->build_custom_event_code();
             $this->build_lifecycle_event_code();
@@ -39,7 +40,7 @@ trait Alpine {
                     foreach ($variables as $variable){
                         $expression = $variable->get_expression();
                         if ($variable->to_page_id == $subPage->id && $expression){
-                            $inputData[$variable->to_data_path] = $expression->get_expression_code(true);
+                            $inputData[$variable->to_data_path] = $this->remove_page_scope_data_prefix($expression->get_expression_code());
                         }
                     }
                     $fragment->add_subpage_module($subPageId, $jsPath, $inputData);
@@ -71,7 +72,6 @@ STORE;
         }else{
             $this->build_initialize_code();
         }
-
         return $fragment;
     }
     private function build_component_input($indent) {
@@ -113,8 +113,6 @@ INPITCONFIG;
                 $lines[] = " */";
             }
             $lines[] = $this->get_event_function_name($html_event_name)."(".join(', ', array_keys($args)).") {";
-            $lines[] = $this->indent(1, true)."const page = this";
-            $lines[] = $this->indent(1, true)."let hasError;";
             foreach ($codeBlocks as $codes){
                 $lines = array_merge($lines, $this->build->indent_code(1, $codes));
             }
@@ -176,7 +174,42 @@ INPITCONFIG;
             echo $this->wrap_output($this->output_as_prop($outputAS, $outputData), $outputDataName);
         }
     }
+    protected function need_iterate_data(&$iterateOutputAs=null, &$dataName=null, &$iterateDataName=null){
+        $outputDatas = $this->get_output_datas($dataNames);
+        foreach ($outputDatas as $outputAS => $outputData){
+            if ($this->need_iterate_ui($outputAS, $outputData)){
+                $iterateOutputAs = $outputAS;
+                $dataName = $dataNames[$outputAS];
+                $iterateDataName = $outputData['name'] ?: $dataName;
+                // alipnejs expression 作为方法调用
+                $dataName = $this->append_expression_call($outputData['isExpression'], $dataName);
+                return true;
+            }
+        }
+        return false;
+    }
+    private function append_expression_call($isExpression, $dataName){
+        if (!$isExpression) return $dataName;
+        return preg_replace("/^([^.]+)?/", '\\1()', $dataName);
+    }
 
+    /**
+     * expresion 数据作为方法调用，加上(), 同时页面数据page.xxx的替换成xxx
+     * @param $outputAs
+     * @param $outputData
+     * @param $outputDataName
+     * @return string|null
+     */
+    protected function get_output_data_name($outputAs, $outputData, $outputDataName){
+        // alipnejs expression 作为方法调用
+        $outputDataName = $this->remove_page_scope_data_prefix($outputDataName);
+        if ($outputDataName && $outputData['isExpression']){
+            $outputDataName = $this->append_expression_call($outputData['isExpression'], $outputDataName);
+        }
+        $outputDataName = parent::get_output_data_name($outputAs, $outputData, $outputDataName);
+
+        return $outputDataName;
+    }
     protected function output_data_input_bind(){
         // 表单组件绑定x-model
         if (!$this->is_input_ui()) return;
@@ -228,6 +261,7 @@ INPITCONFIG;
             $this->set_iterator_data_name("itemOf{$iterateDataName}");
         }
 
+        $this->init_page_scope_variable();
         $this->build_ui();
 
         if ($hasIteral){
@@ -285,7 +319,7 @@ INPITCONFIG;
         $this->output_base_form_attrs($includeUuid);
     }
     /**
-     * 对表单组件或者值列表组件构建输入数据对初始化代码
+     * 对表单组件或者值列表组件构建输入数据的初始化代码
      *
      * - 如果是表单ui并且没有绑定输入数据，则生成一个ID_value的数据进行绑定
      * - 如果是值列表ui并且没有绑定输入数据，则生成一个ID_value的数据进行绑定；

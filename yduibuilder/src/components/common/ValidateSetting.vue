@@ -9,7 +9,7 @@
         <template v-if="myValidate?.trueActions?.length > 0">
           <div class="fs-7 mt-1">{{t('api.model.valid.whenPass')}}:</div>
           <div v-for="(action, actionIndex) in myValidate.trueActions" :key="actionIndex"
-               class="p-1 pe-0 ps-3 d-flex align-items-center">
+               class="p-1 pe-0 ps-3 d-flex align-items-center w-100">
             <i :class="'iconfont text-danger me-1 icon-' + action.type"></i>
             <EventAction :action="action" :readonly="true"></EventAction>
           </div>
@@ -18,7 +18,7 @@
         <template v-if="myValidate?.falseActions?.length > 0">
           <div class="fs-7 mt-1">{{t('api.model.valid.whenFail')}}:</div>
           <div v-for="(action, actionIndex) in myValidate.falseActions" :key="actionIndex"
-               class="p-1 pe-0 ps-3 d-flex align-items-center">
+               class="p-1 pe-0 ps-3 d-flex align-items-center w-100">
             <i :class="'iconfont text-danger me-1 icon-' + action.type"></i>
             <EventAction :action="action" :readonly="true"></EventAction>
           </div>

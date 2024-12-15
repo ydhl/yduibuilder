@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'flex-grow-1': true,'text-truncate':['popup','redirect','emit'].indexOf(myAction.type)==-1}">
+  <div :class="{'flex-grow-1': true,'text-truncate':['popup','redirect','emit'].indexOf(myAction.type)==-1}" style="width: calc(100% - 60px)">
     <template v-if="myAction.type==='popup'">
       <PopupSetting :readonly="readonly" :variables="variables" @beforeSave="beforeSave" :autosave="autosave"
                     :page-data-inline="popupPageDataInline" v-model="myAction"></PopupSetting>

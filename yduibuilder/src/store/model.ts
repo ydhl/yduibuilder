@@ -201,6 +201,10 @@ export interface DataStruct{
    * 绑定该数据的ui uuid及绑定类型
    */
   bound?: Record<string, BoundAsType>;
+  /**
+   * 是否是表达式数据
+   */
+  isExpression?: boolean;
 }
 export interface DataStructString extends DataStruct{
   min?: number;
@@ -383,6 +387,7 @@ export interface Expression{
     name?: string,
     modifier?: string,
     literal?: string,
+    isExpression?: boolean,
     type?: string
   }
   literal?: string,
@@ -395,6 +400,7 @@ export interface Expression{
     name?: string,
     modifier?: string,
     literal?: string,
+    isExpression?: boolean,
     type?: string
   }
   rightExpression?: Expression,

@@ -163,6 +163,11 @@ class Page_Bind_Data_Model extends YZE_Model{
      * @var string
      */
     const F_INVALIDMSG = "invalidMsg";
+    /**
+     * 
+     * @var integer
+     */
+    const F_ISEXPRESSION = "isExpression";
     public static $columns = [
     'id'         => ['type' => 'integer', 'null' => false,'length' => '','default'	=> ''],
       'created_on' => ['type' => 'date', 'null' => false,'length' => '','default'	=> 'CURRENT_TIMESTAMP'],
@@ -191,6 +196,7 @@ class Page_Bind_Data_Model extends YZE_Model{
       'validRegular' => ['type' => 'string', 'null' => true,'length' => '145','default'	=> ''],
       'validRule'  => ['type' => 'string', 'null' => true,'length' => '45','default'	=> ''],
       'invalidMsg' => ['type' => 'string', 'null' => true,'length' => '145','default'	=> ''],
+      'isExpression' => ['type' => 'integer', 'null' => false,'length' => '1','default'	=> '0'],
     ];
     /**
      * @see YZE_Model::$unique_key

@@ -3,7 +3,7 @@
     <div class="model-field flex-shrink-0 text-truncate" @click="toggle" :style="'padding-left: ' + (intent * 16) + 'px'">
       <i v-if="myModel.type=='object' && !hasBound" :class="{'iconfont':true, 'icon-tree-close': !isOpen, 'icon-tree-open': isOpen}"></i>
       <i v-if="myModel.type!='object' || hasBound" style="width: 16px;height: 24px;">&nbsp;</i>
-      <div class="pointer hover-text-primary" @click.stop="viewDetail">{{myModel.name || 'ROOT'}}</div>
+      <div class="pointer hover-text-primary" @click.stop="viewDetail">{{myModel.name || 'ROOT'}}<template v-if="myModel.isRoot && myModel.isExpression">()</template></div>
       <span :class="'ps-1 fs-7 param-' + myModel.type">
         {{myModel.type}}
       </span>
@@ -89,7 +89,12 @@ export default {
     const connectDataDialogVisible = ref(false)
     const store = useStore()
     const currPage = computed(() => store.state.design.page)
-    const myPath = computed(() => (props.path ? props.path + '.' : '') + (myModel.value.name || ''))
+    const myPath = computed(() => {
+      const path: Array<string> = []
+      if (props.path) path.push(props.path + '.')
+      if (myModel.value.name) path.push(myModel.value.name)
+      return path.join('')
+    })
 
     const hasBound = computed(() => {
       return props.boundData?.[myModel.value.uuid]

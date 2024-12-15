@@ -24,6 +24,8 @@ function split (target: string, splitCallback: Function | undefined = undefined,
   _direction = direction
   const move = _.throttle((event: MouseMoveEvent) => {
     if (!isSpliting) return
+    event.preventDefault()
+    event.stopPropagation()
     if (splitingCallback) {
       isSpliting = splitingCallback(event[clientXY] - downOrig + startOrig)
       // console.log(isSpliting)
@@ -31,6 +33,8 @@ function split (target: string, splitCallback: Function | undefined = undefined,
   }, 100)
 
   const up = (event: MouseUpEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
     if (isSpliting) {
       if (splitedCallback) splitedCallback()
       isSpliting = false
@@ -40,6 +44,8 @@ function split (target: string, splitCallback: Function | undefined = undefined,
     JQuery('body').off('mousemove', move)
   }
   const down = (event: MouseDownEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
     downOrig = event[clientXY]
     const frmae = new Frame(event.target.style.cssText)
     startOrig = parseFloat(frmae.get('transform', `translate${_direction}`)) || 0

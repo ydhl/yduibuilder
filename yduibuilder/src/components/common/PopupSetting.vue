@@ -1,6 +1,6 @@
 <template>
   <template v-if="myAction.popupPageId">
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center" style="width: 100%">
       <div @click="!readonly ? viewPopup() : ''" class="d-flex align-items-center pointer hover-text">
         {{myAction.popupPageTitle}}
         <ConfirmRemove v-if="!readonly" icon="icon-remove" @remove="removePopup"></ConfirmRemove>
@@ -16,9 +16,9 @@
     </div>
   </template>
   <template v-else-if="myAction.popup_type=='alert'">
-    <div class="d-inline-flex align-items-center justify-content-start">
+    <div class="d-inline-flex align-items-center justify-content-start" style="width: 100%">
       Alert(&nbsp;
-      <ExpressionDropdown :readonly="readonly" :hide-arrow="true" :has-mutation-operator="false" :variables="variables" @updateExpression="updateBoundAlert" :expression="alertExpression.expression"></ExpressionDropdown>
+      <ExpressionDropdown style="max-width: calc(100% - 70px)" :readonly="readonly" :hide-arrow="true" :has-mutation-operator="false" :variables="variables" @updateExpression="updateBoundAlert" :expression="alertExpression.expression"></ExpressionDropdown>
       <ConfirmRemove icon="icon-remove" v-if="!readonly" @remove="removePopup"></ConfirmRemove>
       &nbsp;)
     </div>

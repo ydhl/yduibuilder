@@ -17,6 +17,9 @@
 
     <DataStruct :can-mutation="true" :can-input="true" :can-output="true" :data-title="t('variable.pageScope')"
             :datas="pageDatas" @remove="removePageData" @update="updatePageData"></DataStruct>
+
+    <DataStruct :can-mutation="true" :can-input="false" :is-expression="true" :can-output="true" :data-title="t('expression.expression')"
+                :datas="pageExpressions" @remove="removePageData" @update="updatePageData"></DataStruct>
   </template>
 </template>
 
@@ -27,6 +30,7 @@ import ydhl from '@/lib/ydhl'
 import { useStore } from 'vuex'
 import DataStruct from '@/components/common/DataStruct.vue'
 
+defineEmits(['contextMenu'])
 const { t } = useI18n()
 const loading = ref(true)
 const project = computed(() => store.state.design.project)
@@ -35,6 +39,7 @@ const selectedPage = computed(() => store.state.design.page)
 const selectedPageId = computed(() => store.state.design.page?.meta?.id)
 
 const pageDatas = ref<any>([])
+const pageExpressions = ref<any>([])
 const queryDatas = ref<any>([])
 const pathDatas = ref<any>([])
 
@@ -47,6 +52,7 @@ const loadData = (showLoading = false) => {
       return
     }
     pageDatas.value = rst.data.page
+    pageExpressions.value = rst.data.expression
     queryDatas.value = rst.data.query
     pathDatas.value = rst.data.path
   }, 'json')

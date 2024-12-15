@@ -1,7 +1,7 @@
 <template>
   <lay-layer v-model="myDetailDlgVisible" :title="t('api.dataInfo')" :shade="true" :area="['800px', '500px']">
     <div class="p-3 d-flex align-items-start">
-      <table class="table table-striped table-hover table-responsive table-sm">
+      <table class="table table-striped table-hover table-responsive table-sm" v-if="!data.isExpression">
         <tbody>
         <template v-for="(value, name, index) in data" :key="index">
           <tr v-if="['props','item','uuid', 'out' ,'bound', 'in'].indexOf(name) == -1">
@@ -9,6 +9,15 @@
             <td>{{value}}</td>
           </tr>
         </template>
+        </tbody>
+      </table>
+      <table class="table table-striped table-hover table-responsive table-sm" v-else>
+        <tbody>
+          <tr><td>type</td><td>{{data.type}}</td></tr>
+          <tr><td>name</td><td>{{data.name}}</td></tr>
+          <tr><td>title</td><td>{{data.title}}</td></tr>
+          <tr><td>comment</td><td>{{data.comment}}</td></tr>
+          <tr><td>expression</td><td><pre>{{data.defaultValue}}</pre></td></tr>
         </tbody>
       </table>
       <div>

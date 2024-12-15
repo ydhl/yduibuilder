@@ -13,7 +13,7 @@
                @keyup.enter="isInEditPageTitle=false"
                @blur="isInEditPageTitle=false" :title="t('page.editPage')">
       </div>
-      <div class="text-truncate active ps-1 pe-1 text-muted rounded user-select-none" data-bs-toggle="tooltip" :title="t('page.boxModelTip')"><i class="iconfont icon-boxmodel"></i> <small>{{t('page.boxModel')}}</small></div>
+      <div :class="{'item': true,'disabled': iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('page.boxModelTip')"><i class="iconfont icon-boxmodel"></i> <small>{{t('page.boxModel')}}</small></div>
       <div class="item text-muted"><div style="height: 10px;width: 1px;background-color: #cccccc"></div></div>
       <div :class="{'item': true,'disabled':!canUndo || iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('common.undo')" @click="canUndo ? undo() : ''"><i class="iconfont icon-undo"></i></div>
       <div :class="{'item': true,'disabled':!canRedo || iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('common.redo')" @click="canRedo ? redo() : ''"><i class="iconfont icon-redo"></i></div>
@@ -22,16 +22,20 @@
       <div class="item btn-group" v-if="apiEnvs && iframeMode!='preview'">
         <i class="iconfont icon-run" :title="t('common.preview')" data-bs-toggle="dropdown" aria-expanded="true"></i>
         <ul class="dropdown-menu">
-          <li v-for="(envUrl, envName) in apiEnvs" :key="envName"><a :class="{'dropdown-item': true, 'active': apiEnv===envName && iframeMode=='preview'}" href="javascript:void(0)" @click="apiEnv=envName;switchIframe('preview');">{{envName}}</a></li>
+          <li v-for="(envUrl, envName) in apiEnvs" :key="envName">
+            <a :class="{'dropdown-item': true, 'active': apiEnv===envName && iframeMode=='preview'}"
+               href="javascript:void(0)" @click="apiEnv=envName;switchIframe('preview');">{{envName}}</a>
+          </li>
         </ul>
       </div>
       <div v-else-if="iframeMode!='preview'" class="item" data-bs-toggle="tooltip" :title="t('common.preview')" @click="switchIframe('preview')"><i class="iconfont icon-run"></i></div>
-      <div class="item btn-group" v-if="iframeMode!='code'">
+      <div class="item btn-group" v-if="codeTypes && iframeMode!='code'">
         <i class="iconfont icon-code" :title="t('page.code')" data-bs-toggle="dropdown" aria-expanded="true"></i>
         <ul class="dropdown-menu">
           <li v-for="(type, index) in codeTypes" :key="index"><a class="dropdown-item" href="javascript:void(0)" @click="codeType=index;switchIframe('code');">{{ type }}</a></li>
         </ul>
       </div>
+      <div v-else-if="iframeMode!='code'" class="item" data-bs-toggle="tooltip" :title="t('page.code')" @click="codeType='';switchIframe('code')"><i class="iconfont icon-code"></i></div>
       <div v-if="iframeMode!='design'" class="item" data-bs-toggle="tooltip" :title="t('common.edit')" @click="iframeMode = 'design'"><i class="iconfont icon-edit"></i></div>
       <div class="item text-muted"><div style="height: 10px;width: 1px;background-color: #cccccc"></div></div>
       <div :class="{'item': true,'disabled':iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('page.copyPage')" @click="copyPage"><i class="iconfont icon-copy"></i></div>
@@ -244,7 +248,7 @@ export default {
         return ydhl.api + `code/${projectId.value}?hidemaster=1&module=${currModuleId.value}&page=${props.uiconfig.meta.id}&code_type=${codeType.value}&token=${ydhl.getJwt()}`
       }
       if (iframeMode.value === 'preview') {
-        return ydhl.api + `preview/page/${props.uiconfig.meta.id}?hidemaster=1&device=${simulateModel.value}&apiEnv=${apiEnv.value}&token=${ydhl.getJwt()}`
+        return ydhl.api + `preview/page/${props.uiconfig.meta.id}?hidemaster=1&device=${simulateModel.value}&api_env=${apiEnv.value}&token=${ydhl.getJwt()}`
       }
       return '#'
     })

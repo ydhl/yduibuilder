@@ -72,7 +72,7 @@ const backdropVisible = computed(() => {
 const { t } = useI18n()
 const { selectedPageId } = InitUI()
 const currPage = computed(() => store.state.design.page)
-const saved = computed(() => store.state.design.pageSaved[currPage.value.meta.id])
+const saved = computed(() => store.state.design.pageSaved[currPage.value?.meta.id])
 const currFunction = computed(() => store.state.design.function)
 const openedPages = computed(() => store.state.design.openedPages)
 const loadContent = (pageId, functionId, projectId, cb) => {

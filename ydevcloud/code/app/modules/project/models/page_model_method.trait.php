@@ -240,6 +240,13 @@ trait Page_Model_Method{
         foreach ((array)$config->items as &$subconfig){
             $this->merge_data_bind($subconfig, $dataBind);
         }
+        if ($config->meta->custom->subset){
+            foreach ($config->meta->custom->subset as &$subconfigs){
+                foreach ($subconfigs as &$subconfig){
+                    $this->merge_data_bind($subconfig, $dataBind);
+                }
+            }
+        }
     }
     private function merge_selector(&$config, $styles){
         if ($styles[$config->meta->id]){
@@ -331,6 +338,14 @@ trait Page_Model_Method{
         foreach ($config->items as $item){
             $finded = self::findUiItem($item, $uiid);
             if ($finded) return $finded;
+        }
+        if ($config->meta->custom->subset){
+            foreach ($config->meta->custom->subset as $subsetName => $subsets){
+                foreach ($subsets as $subset){
+                    $finded = self::findUiItem($subset, $uiid);
+                    if ($finded) return $finded;
+                }
+            }
         }
         return null;
     }
@@ -776,6 +791,14 @@ trait Page_Model_Method{
         unset($uiconfig->dataIn, $uiconfig->dataOut, $uiconfig->dataBound, $uiconfig->events);
         foreach ((array)$uiconfig->items as &$subconfig){
             self::remove_node($subconfig);
+        }
+
+        if ($uiconfig->meta->custom->subset) {
+            foreach ($uiconfig->meta->custom->subset as &$subconfigs) {
+                foreach ($subconfigs as &$subconfig){
+                    self::remove_node($subconfig);
+                }
+            }
         }
         return $uiconfig;
     }

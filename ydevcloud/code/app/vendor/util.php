@@ -490,6 +490,7 @@ function reserve_words(){
         'default',
         'delete',
         'do',
+        'error',
         'else',
         'enum', // 保留字，但在ES中没有实际功能
         'export',
@@ -497,6 +498,7 @@ function reserve_words(){
         'finally',
         'for',
         'function',
+        'global',
         'if',
         'implements', // 保留字，但在ES中没有实际功能
         'import',
@@ -505,6 +507,7 @@ function reserve_words(){
         'interface', // 保留字，但在ES中没有实际功能
         'let',
         'new',
+        'page',
         'package', // 保留字，但在ES中没有实际功能
         'private', // 提案中的关键字，尚未在ES规范中正式定义
         'protected', // 提案中的关键字，尚未在ES规范中正式定义

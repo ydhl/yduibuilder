@@ -3,6 +3,7 @@ namespace app\modules\build\views\code\web;
 use app\build\Build_Model;
 use app\modules\build\views\code\Base_Code_Fragment;
 use app\modules\build\views\preview\Html_Code_Fragment;
+use app\modules\build\views\preview\Preview_View;
 use app\modules\build\views\preview\ValueList_View;
 use app\modules\build\views\preview\Vue_Build_Code;
 use app\project\Action_Model;
@@ -158,6 +159,7 @@ trait Vue {
         $isTopPage = !$this->find_parent($this->myid());
         // 顶级元素构建vue代码结构主体
         if ($isTopPage){
+            $this->init_page_scope_variable();
             $this->build_page_data_code(1);
             $this->build_custom_event_code();
 
@@ -245,6 +247,13 @@ CLOSE;
     }
 
 
+    protected function need_iterate_data(&$iterateOutputAs=null, &$dataName=null, &$iterateDataName=null){
+        return Preview_View::need_iterate_data($iterateOutputAs, $dataName, $iterateDataName);
+    }
+
+    protected function get_output_data_name($outputAs, $outputData, $outputDataName){
+        return Preview_View::get_output_data_name($outputAs, $outputData, $outputDataName);
+    }
     protected function build_custom_event_code() {
         $eventCodes = array_merge($this->get_custom_event_action_codes(), $this->get_lifecycle_event_action_codes());
         if (!$eventCodes) return;
@@ -267,7 +276,6 @@ CLOSE;
             }
             $funcName = "function ".$this->get_event_function_name($html_event_name)."(".join(',', $funcArgs).") {";
             $lines[] = $funcName;
-            $lines[] = $this->indent(1, true)."let hasError;";
             foreach ($codeBlocks as $codes){
                 $lines = array_merge($lines, $this->build->indent_code(1, $codes));
             }
@@ -325,9 +333,8 @@ CLOSE;
         foreach ($bindVariables as $bindVariable){
             $expression = $bindVariable->get_expression();
             if (!$expression) continue;
-            $expression_code = $expression->get_expression_code();
-            $codeLines[] = $this->append_vue_value($bindVariable->to_data_path, true) . ' = ' . $expression_code;
-            $this->add_used_variable($expression_code);
+            $expression_code = $expression->get_expression_code(false);
+            $codeLines[] = $this->append_vue_value($bindVariable->to_data_path) . ' = ' . $expression_code;
         }
     }
 
@@ -344,30 +351,27 @@ CLOSE;
      *
      *
      * @param $code string
-     * @param boolean $isPageData dataName是否是页面数据，通常情况下页面数据应该有前缀page.xxx,但某些情况下并没有；在vue中页面数据都是ref，都需要通过.value访问
      * @return string
      */
-    private function append_vue_value($code, $isPageData = false){
+    private function append_vue_value($code){
         $code =  trim($code);
         $dataNames = self::pick_data($code);
         if (!$dataNames) return $code;
         $fix = 0;// 替换后导致原来位置有偏移，改变量记录应该偏移多少
+
         foreach ($dataNames as $item){
             list($dataName, $position) = $item;
-            if (in_array(strtolower($dataName), reserve_words())) continue;
+            if (!$this->is_page_scope_variable($dataName)) continue;
 
-            preg_match("/^(?P<v>(page\.)?\w+[^rst])(\.|$)/", $dataName,$matches); //rst 为api返回的数据
+            preg_match("/^(?P<v>(page\.)?\w+(?<!rst))(\.|$)/", $dataName,$matches); //rst 为api返回的数据
 
             if (!$matches['v']) { // xxx的情况
-                if ($isPageData) {
-                    $code = substr_replace($code, "{$dataName}.value", $position + $fix, strlen($dataName));
-                    $fix += strlen("{$dataName}.value") - strlen($dataName);
-                }
                 continue;
             }
             $v = $matches['v'];
             $name = preg_replace("/page\./", '', $v).".value";
             $newDataName = preg_replace("/^{$v}/", $name, $dataName);
+//            var_dump("-",$dataName,$name,$newDataName);
 //            echo $code.' at '.($position + $fix).'('.$position.', fix '.$fix.') to '.$newDataName.PHP_EOL;
             $code = substr_replace($code, $newDataName, $position + $fix, strlen($dataName));
             $fix += strlen($newDataName) - strlen($dataName);
@@ -397,6 +401,7 @@ CLOSE;
             $this->set_iterator_data_name("itemOf{$iterateDataName}");
         }
 
+        $this->init_page_scope_variable();
         $this->build_ui();
 
         if ($hasIteral){

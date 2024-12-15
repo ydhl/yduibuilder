@@ -32,6 +32,7 @@ import { getUIDefines } from '@/components/ui/define'
 
 export default {
   name: 'UI',
+  emits: ['contextMenu'],
   setup () {
     const store = useStore()
     const openState = ref(true)

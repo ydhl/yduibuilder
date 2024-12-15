@@ -33,6 +33,7 @@ import { useI18n } from 'vue-i18n'
 export default {
   name: 'UIInfo',
   components: { StyleForm },
+  emits: ['contextMenu'],
   setup (props: any, context: any) {
     const info = initUI()
     const { t } = useI18n()

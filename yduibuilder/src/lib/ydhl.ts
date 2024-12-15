@@ -698,7 +698,7 @@ export default {
         )
         if (needValidate) {
           const errorKey = name.replace(/page\./, '')
-          const errorName = 'error.' + (errorKey.match(/\./) ? `['${errorKey}']` : errorKey)
+          const errorName = 'error' + (errorKey.match(/\./) ? `['${errorKey}']` : `.${errorKey}`)
           suggestions.push(
             {
               label: errorName,

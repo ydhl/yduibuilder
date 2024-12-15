@@ -46,10 +46,15 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     protected $childViews = [];
     protected $parentView;
     /**
-     * 在具体某个事件中使用到到变量名称，格式[变量]
+     * 在具体某个事件中使用到的变量名称，格式[变量1,  变量2] 整个页面编译链共用
      * @var array
      */
-    protected $usedVariables = [];
+    protected static $pageScopeVariables = [];
+    /**
+     * 编译某个函数、事件时用到的临时变量
+     * @var array
+     */
+    protected $localScopeVariables = [];
     /**
      * 元素上的属性数组 [属性名=>属性值1]
      * @var array
@@ -373,7 +378,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             $state_name = $state->state_type == 'custom' ? $state->state_name : $state->state_type;
             $styles = $this->build->get_uiid_bind_state_styles($this->myId(), $state->uuid);
             if (!$styles) continue;
-            $expression = $state->get_expression() ? $state->get_expression()->get_expression_code(true) : null;
+            $expression = $state->get_expression() ? $this->remove_page_scope_data_prefix($state->get_expression()->get_expression_code()) : null;
             if (!$expression) continue;
 
             $css = [];
@@ -399,7 +404,10 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                 break;
             }
         }
-        return $hiddenState && $hiddenState->get_expression() ? $hiddenState->get_expression()->get_expression_code(true) : null;
+        if (!$hiddenState) return null;
+        $expression = $hiddenState->get_expression();
+        if (!$expression) return null;
+        return $this->remove_page_scope_data_prefix($expression->get_expression_code());
     }
 
     /**
@@ -693,55 +701,55 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
 
     protected function build_select_event_args_code(&$actionCodeLines){
         if ($this->data['meta']['custom']['multiple']) {
-            if (in_array('boundData', $this->usedVariables)) $actionCodeLines[] = "const boundData = []";
-            if (in_array('value', $this->usedVariables)) $actionCodeLines[] = "const value = []";
+            if (in_array('boundData', $this->localScopeVariables)) $actionCodeLines[] = "const boundData = []";
+            if (in_array('value', $this->localScopeVariables)) $actionCodeLines[] = "const value = []";
             $actionCodeLines[] = "const selectEl = event.target.closest('[data-root=\"\"]').querySelector('select')";
             $actionCodeLines[] = "for(var opt of selectEl.selectedOptions) {";
 //                $actionCodeLines[] = $this->indent(1, true)."console.log(opt,opt.innerText,opt.dataset?.bound)";
-            if (in_array('boundData', $this->usedVariables)){
+            if (in_array('boundData', $this->localScopeVariables)){
                 $actionCodeLines[] = $this->indent(1, true) . "const boundName = opt.dataset?.bound;";
                 $actionCodeLines[] = $this->indent(1, true) . "if(boundName) boundData.push(Alpine.evaluate(eventTarget, boundName));";
             }
-            if (in_array('value', $this->usedVariables)) $actionCodeLines[] = $this->indent(1, true) . "value.push(opt.value);";
+            if (in_array('value', $this->localScopeVariables)) $actionCodeLines[] = $this->indent(1, true) . "value.push(opt.value);";
             $actionCodeLines[] = "}";
         } else {
             $actionCodeLines[] = "const selectEl = event.target.closest('[data-root=\"\"]').querySelector('select')";
             $actionCodeLines[] = "const opt = selectEl.selectedOptions?.[0]";
-            if (in_array('boundData', $this->usedVariables)){
+            if (in_array('boundData', $this->localScopeVariables)){
                 $actionCodeLines[] = "const boundName = opt?.dataset?.bound;";
                 $actionCodeLines[] = "const boundData = boundName ? Alpine.evaluate(eventTarget, boundName) : null;";
             }
-            if (in_array('value', $this->usedVariables)) $actionCodeLines[] = "const value = opt ? opt?.value : null;";
+            if (in_array('value', $this->localScopeVariables)) $actionCodeLines[] = "const value = opt ? opt?.value : null;";
         }
     }
     protected function build_other_event_args_code(&$actionCodeLines){
-        $actionCodeLines[] = "const eventTarget = event.target.closest('[data-value]') || event.target.closest('[data-bound]');";
-        if (in_array('boundData', $this->usedVariables)) $actionCodeLines[] = "const boundName = eventTarget?.dataset?.bound;";
+        if (in_array('value', $this->localScopeVariables)) $actionCodeLines[] = "const eventTarget = event.target.closest('[data-value]') || event.target.closest('[data-bound]');";
+        if (in_array('boundData', $this->localScopeVariables)) $actionCodeLines[] = "const boundName = eventTarget?.dataset?.bound;";
         // x-for 的数据直接可以通过page.boundName访问
         if (strtolower($this->data['type']) == 'checkbox'){
-            if (in_array('boundData', $this->usedVariables)){
+            if (in_array('boundData', $this->localScopeVariables)){
                 $actionCodeLines[] = 'const checked = eventTarget.querySelector("[type=\'checkbox\']")?.checked';
                 $actionCodeLines[] = "const boundData = checked ? Alpine.evaluate(eventTarget, boundName) : undefined;";
             }
-            if (in_array('value', $this->usedVariables)) {
+            if (in_array('value', $this->localScopeVariables)) {
                 $inputDataName = $this->get_input_data_name();
                 $actionCodeLines[] = 'const value = page.alpinejs_get_value(eventTarget, "'.$inputDataName.'")';
             }
         }else{
-            if (in_array('boundData', $this->usedVariables)) $actionCodeLines[] = "const boundData = boundName ? Alpine.evaluate(eventTarget, boundName) : undefined;";
-            if (in_array('value', $this->usedVariables)) $actionCodeLines[] = "const value = eventTarget?.dataset?.value;";
-            if (in_array('keyCode', $this->usedVariables)) $actionCodeLines[] = "const keyCode = event.code;";
+            if (in_array('boundData', $this->localScopeVariables)) $actionCodeLines[] = "const boundData = boundName ? Alpine.evaluate(eventTarget, boundName) : undefined;";
+            if (in_array('value', $this->localScopeVariables)) $actionCodeLines[] = "const value = eventTarget?.dataset?.value;";
+            if (in_array('keyCode', $this->localScopeVariables)) $actionCodeLines[] = "const keyCode = event.code;";
         }
     }
     protected function build_input_event_args_code(&$actionCodeLines){
         $tagName = strtoupper($this->data['type']);
         $tagName = $tagName=='RANGEINPUT'?'INPUT':$tagName;
 
-        if (in_array('value', $this->usedVariables)) {
+        if (in_array('value', $this->localScopeVariables)) {
             $actionCodeLines[] = "const target = event.target.tagName=='{$tagName}' ? event.target : event.target.querySelector('.input') || undefined";
             $actionCodeLines[] = "const value = target?.value";
         }
-        if (in_array('keyCode', $this->usedVariables)) $actionCodeLines[] = "const keyCode = event.code;";
+        if (in_array('keyCode', $this->localScopeVariables)) $actionCodeLines[] = "const keyCode = event.code;";
     }
 
     /**
@@ -753,6 +761,10 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
      * @return void
      */
     protected function build_event_args_code($eventModel, $html_event_name, &$eventCodes, &$actionCodeLines){
+        if (in_array('page', (array)$this->localScopeVariables)) {
+            array_unshift($actionCodeLines, "const page = this;");
+        }
+
         $eventCodes[$html_event_name]['args'] = ['event' => ["type" => 'any', "name" => 'event', "uuid" => 'event']];
         if ($html_event_name=='change') { // change 通过alpinejs的watch直接传入对应的数据
             $eventCodes[$html_event_name]['args'] = [
@@ -760,6 +772,9 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                 'oldValue'=>["type" => 'string', "name" => 'oldValue', "uuid" => 'oldValue'],
                 'boundData'=>["type" => 'any', "name" => 'boundData', "uuid" => 'boundData']
             ];
+            $this->add_local_scope_variable('value');
+            $this->add_local_scope_variable('oldValue');
+            $this->add_local_scope_variable('boundData');
             return;
         }
         $codes = [];
@@ -769,18 +784,20 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             $args = json_decode(html_entity_decode($customEvent->args), true);
             $argNames = [];
             foreach ($args as $arg){
-                if (!$this->usedVariables || !in_array($arg['name'], $this->usedVariables)){
+                if (!$this->localScopeVariables || !in_array($arg['name'], $this->localScopeVariables)){
                     continue;
                 }
                 $argNames[] = $arg['name'];
+
+                $this->add_local_scope_variable($arg['name']);
             }
             if ($argNames) $codes[] = "const { ".join(', ', $argNames)." } = event.detail";
             array_unshift($actionCodeLines, ...$codes);
             return;
         }
 
-        if (!$this->usedVariables || !array_intersect(['value','boundData','keyCode'], $this->usedVariables)) return;
-
+        if (!$this->localScopeVariables || !array_intersect(['value','boundData','keyCode', 'hasError'], $this->localScopeVariables)) return;
+        if (in_array('hasError', $this->localScopeVariables)) $codes[] = "let hasError;";
         // 数据值和绑定对数据
         if (strtolower($this->data['type']) == 'select'){
             $this->build_select_event_args_code($codes);
@@ -828,7 +845,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
 
         foreach($eventModels as $eventModel) {
             $actionCodeLines = [];
-            $this->usedVariables = [];
+            $this->localScopeVariables = [];
             if ($eventModel->uicomponent_event_id){
                 $html_event_name = $eventModel->event;
             }else{
@@ -974,6 +991,20 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             $finded = $this->find_parent($uiid, $index, $item);
             if ($finded) {
                 return $finded;
+            }
+        }
+        if ($parent['meta']['custom']['subset']){
+            foreach ((array)$parent['meta']['custom']['subset'] as $i => $items){
+                foreach ($items as $item){
+                    if ($item['meta']['id'] == $uiid) {
+                        $index = $i;
+                        return $parent;
+                    }
+                    $finded = $this->find_parent($uiid, $index, $item);
+                    if ($finded) {
+                        return $finded;
+                    }
+                }
             }
         }
         $index = -1;
@@ -1631,15 +1662,65 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
     }
 
     /**
-     * 在具体的某个事件中使用的变量
+     * 在整个页面范围内的变量
+     *
+     * @param $code
+     * @return void
+     */
+    protected function add_page_scope_variable($argName){
+        if (!in_array($argName, self::$pageScopeVariables)) self::$pageScopeVariables[] = $argName;
+    }
+    protected function is_page_scope_variable($argName){
+        foreach (self::$pageScopeVariables as $variable){
+            if (preg_match("/^(page\.)?{$variable}/", $argName)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * 移除代码中数据的page.前缀
+     * @param $code string
+     * @return string
+     */
+    protected function remove_page_scope_data_prefix($code) {
+        $code =  trim($code);
+        $dataNames = self::pick_data($code);
+        if (!$dataNames) return $code;
+        $fix = 0;// 替换后导致原来位置有偏移，改变量记录应该偏移多少
+
+        foreach ($dataNames as $item){
+            list($dataName, $position) = $item;
+            if (!$this->is_page_scope_variable($dataName)) continue;
+            preg_match("/^(?P<v>page\.\w+)/", $dataName,$matches);
+            if (!$matches['v']) {
+                continue;
+            }
+            $v = $matches['v'];
+            $name = preg_replace("/page\./", '', $v);
+            $newDataName = preg_replace("/^{$v}/", $name, $dataName);
+            $code = substr_replace($code, $newDataName, $position + $fix, strlen($dataName));
+            $fix += strlen($newDataName) - strlen($dataName);
+        }
+
+        return $code;
+    }
+
+    /**
+     * 在具体的某个事件中使用的变量, 没有page. global. error. rst.的都认为是局部变量
      *
      * @param $argName
      * @return void
      */
-    protected function add_used_variable($argName){
-        preg_match_all('/\b[a-zA-Z\.]+\b/', $argName, $matches);
-        foreach($matches[0] as $arg){
-            $this->usedVariables[] = $arg;
+    protected function add_local_scope_variable($code){
+        $datas = $this->pick_data($code);
+        foreach ($datas as $data){
+            preg_match_all('/(?<!page.|global.|error.|rst.)\b\w+/u', $data[0], $matches);
+
+            foreach($matches[0] as $arg){
+                if (preg_match("/^\d+$/", $arg)) continue;
+                if (in_array($arg, ['global','error','rst'])) continue;
+                if (!in_array($arg, $this->localScopeVariables)) $this->localScopeVariables[] = $arg;
+            }
         }
     }
     protected function get_base_event_args(){
@@ -1896,5 +1977,19 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
             $dataNames[] = [$dataName,$position];
         }
         return $dataNames;
+    }
+
+    /**
+     * 把页面的数据放入used_variable 数组，便于后续编译代码时使用
+     * @return void
+     */
+    protected function init_page_scope_variable(){
+        $build = $this->build;
+        $this->add_page_scope_variable('error');
+        foreach ($build->get_bound_datas() as $bound_data) {
+            $dataConfig = $bound_data->get_data_model();
+            $this->add_page_scope_variable($dataConfig['name']);
+            $this->add_page_scope_variable("page.".$dataConfig['name']);// 页面变量存在page.xxx的写法
+        }
     }
 }

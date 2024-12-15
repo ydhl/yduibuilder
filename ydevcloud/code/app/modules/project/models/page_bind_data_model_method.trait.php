@@ -24,6 +24,7 @@ trait Page_Bind_Data_Model_Method{
         }
         $record['defaultValue'] = html_entity_decode($this->defaultValue);
         $record['isRoot'] = true;
+        $record['isExpression'] = $this->isExpression ? 1 : 0;
         $record['enumValue'] = json_decode(html_entity_decode($this->enumValue), true)?:null;
         return $record;
     }
@@ -119,5 +120,12 @@ trait Page_Bind_Data_Model_Method{
         $path = array_reverse($path);
         $path[] = $data['name'];
         return $data;
+    }
+    public function remove(){
+        $mutations = Mutation_Model::from()->where('mutation_from_uuid=:uuid and is_deleted=0')->select([':uuid'=>$this->uuid]);
+        foreach ($mutations as $mutation){
+            $mutation->remove();
+        }
+        parent::remove();
     }
 }?>

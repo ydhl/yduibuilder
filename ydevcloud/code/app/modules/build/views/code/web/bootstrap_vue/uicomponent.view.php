@@ -91,7 +91,7 @@ class UIComponent_View extends Preview_UIComponent_View {
         foreach ($variables as $variable){
             $expression = $variable->get_expression();
             if ($variable->to_page_id == $componentPage->id && $expression){
-                $queryArgs[] = $variable->to_data_path.': '. $expression->get_expression_code(true);
+                $queryArgs[] = $variable->to_data_path.': '. $this->remove_page_scope_data_prefix($expression->get_expression_code(false));
             }
         }
         if(!$queryArgs) return;

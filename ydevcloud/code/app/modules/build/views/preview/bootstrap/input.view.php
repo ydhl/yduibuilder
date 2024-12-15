@@ -118,10 +118,9 @@ class Input_View extends Preview_View implements Valuable_View {
     }
     public function build_code(): Base_Code_Fragment
     {
-        $this->alpineBuildCode();
+        $codeFragment = $this->alpineBuildCode();
         $hasIterate = $this->need_iterate_data($iterateOutputAs, $outputDataName, $iterateDataName);
         $codeLines = [];
-        $codeFragment = $this->get_code_Fragment();
         $inputDataName = $this->get_input_data_name($inputIsArr);
         $wordCountVisible = $this->data['meta']['custom']['wordCountVisible'];
         $clearButtonVisible = $this->data['meta']['custom']['clearButtonVisible'];

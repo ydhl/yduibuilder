@@ -21,6 +21,7 @@ class Expression_Data extends YZE_Object {
     public $name;
     public $modifier;
     public $literal;
+    public $isExpression;
     public $type;
 
     public function __construct(array $datas) {

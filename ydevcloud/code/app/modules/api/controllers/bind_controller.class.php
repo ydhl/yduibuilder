@@ -169,12 +169,16 @@ class Bind_Controller extends YZE_Resource_Controller {
         $data_from = $request->get_from_get("data_from");
 
         $bindDatas = Page_Bind_Data_Model::get_page_bind_data($this->page->id, $data_from);
-        $datas = ['page'=>[],'path'=>[],'query'=>[]];
+        $datas = ['page'=>[],'path'=>[],'query'=>[],'expression'=>[]];
         foreach ($bindDatas as $data){
-            $datas[$data->data_from][] = $data->get_data_model();
+            if ($data->data_from === 'page'){
+                $datas[$data->isExpression ? 'expression' : 'page'][] = $data->get_data_model();
+            }else{
+                $datas[$data->data_from][] = $data->get_data_model();
+            }
         }
         $in_out = Page_Bind_Io_Model::get_io($this->page, Page_Bind_Data_Model::CLASS_NAME);
-        $rst = ['page'=>[],'path'=>[],'query'=>[]];
+        $rst = ['page'=>[],'path'=>[],'query'=>[],'expression'=>[]];
         foreach ($datas as $date_from => $items){
             foreach ($items as $index => $data){
                 $rst[$date_from][$index] = Page_Bind_Io_Model::get_bind_io($in_out, $data);
@@ -498,6 +502,7 @@ class Bind_Controller extends YZE_Resource_Controller {
             $post_data['content'] = json_encode($post_data['props'], JSON_UNESCAPED_UNICODE);
         }
         $post_data['enumValue'] = json_encode($post_data['enumValue'], JSON_UNESCAPED_UNICODE);
+        $post_data['isExpression'] = $post_data['isExpression'] ? 1 : 0;
         $bind_data = $saveHelper->save($post_data);
 
         $nameChanged = $post_data['nameChanged'];
@@ -517,6 +522,16 @@ class Bind_Controller extends YZE_Resource_Controller {
         $oldDataName = join('\.', $oldPath);
         //页面中所有关联的表达式中的数据同步修改
         $dba = YZE_DBAImpl::get_instance();
+
+        $sql = "select id, `input` from action where is_deleted=0 and page_id=".$page->id;
+        $rst = $dba->native_Query($sql);
+        while ($rst->next()){
+            $id = $rst->f('id');
+            $expression = html_entity_decode($rst->f('input'));
+            $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|error\.|global\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression) ?: $expression;
+            if($newExpression) $dba->exec('update action set `input`='.$dba->quote($newExpression).' where id='.$id);
+        }
+
         $sql = "select id, `expression`, code from page_bind_api_action where is_deleted=0 and page_id=".$page->id;
         $rst = $dba->native_Query($sql);
         while ($rst->next()){
@@ -527,6 +542,7 @@ class Bind_Controller extends YZE_Resource_Controller {
             $code = preg_replace('/([^a-zA-Z.]+|page\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $code) ?: $code;
             $dba->exec('update page_bind_api_action set expression='.$dba->quote($newExpression).', code='.$dba->quote($code).' where id='.$id);
         }
+
         $sql = "select id, from_expression from page_bind_variable where is_deleted=0 and from_page_id=".$page->id;
         $rst = $dba->native_Query($sql);
         while ($rst->next()){
@@ -535,6 +551,7 @@ class Bind_Controller extends YZE_Resource_Controller {
             $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|error\.|global\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
             if($newExpression) $dba->exec('update page_bind_variable set from_expression='.$dba->quote($newExpression).' where id='.$id);
         }
+
         $sql = "select id, `expression` from page_bind_state where is_deleted=0 and page_id=".$page->id;
         $rst = $dba->native_Query($sql);
         while ($rst->next()){
@@ -543,6 +560,7 @@ class Bind_Controller extends YZE_Resource_Controller {
             $newExpression = preg_replace('/([^a-zA-Z.]+|page\.|error\.|global\.|^)\b'.$oldDataName.'\b/', '\1'.$newDataName, $expression);
             if($newExpression) $dba->exec('update page_bind_state set expression='.$dba->quote($newExpression).' where id='.$id);
         }
+
         $sql = "select m.id, m.expression from mutation as m 
                 left join `action` as a on a.id = m.action_id 
                 where m.is_deleted=0 and a.is_deleted=0 and a.page_id=".$page->id;

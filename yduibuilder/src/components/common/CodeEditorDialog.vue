@@ -2,7 +2,8 @@
   <lay-layer resize layer-classes="layui-layer-content-overflow" :resizeEnd="recomputed" v-model="myDlgVisible"
              :title="`${title || t('common.customCode')} - ${language}`"
              :shade="true" :area="['800px', '400px']" :btn="buttons">
-    <CodeEditor v-if="myDlgVisible" :hide-variable="hideVariable" ref="codeEditor" :editStyle="editStyle" :code="code" :schema="schema" :left-data="leftData" :left-value-path="leftValuePath"
+    <CodeEditor v-if="myDlgVisible" :hide-variable="hideVariable" ref="codeEditor" :editStyle="editStyle" :code="code"
+                :schema="schema" :left-data="leftData" :left-value-path="leftValuePath" :height="editHeight"
     :surround-code="leftOperator" :tip="tip" :variables="variables" :read-only="readOnly" :language="language"
     ></CodeEditor>
   </lay-layer>
@@ -52,7 +53,8 @@ export default {
   emits: ['update:modelValue', 'update'],
   setup (props: any, context: any) {
     const { t } = useI18n()
-    const editStyle = ref('height: 200px')
+    const editStyle = ref('height: 250px')
+    const editHeight = ref('250px')
     const codeEditor = ref()
 
     const myDlgVisible = computed({
@@ -104,12 +106,14 @@ export default {
       const container = document.getElementById(id)
       if (!container) return
       const { width, height } = container.getBoundingClientRect()
-      editStyle.value = `height:${height - 200}px;width:${width - 340}px`
+      editStyle.value = `height:${height - 150}px;width:${width - 340}px`
+      editHeight.value = `${height - 150}px`
     }
     return {
       buttons,
       t,
       recomputed,
+      editHeight,
       codeEditor,
       editStyle,
       myDlgVisible

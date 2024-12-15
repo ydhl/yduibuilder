@@ -5,17 +5,16 @@
   </component>
   <div v-if="showRect" :class="{'ui-rect':true, 'ui-hover': hoverUIItemId===uiconfig.meta.id, 'ui-selected': selectedUIItemId===uiconfig.meta.id, 'ui-highlight': highlightUIItemIds ? highlightUIItemIds.indexOf(uiconfig.meta.id)!=-1 : false}" :style="rectStyle">&nbsp;</div>
   <div v-if="showAction" class="ui-action" :style="actionStyle">
-    <span><i :class="['iconfont', 'icon-' + uiconfig.type.toLowerCase()]"></i>{{uiconfig.type}}</span>
+    <span class="text-danger"><i :class="['iconfont', 'icon-' + uiconfig.type.toLowerCase()]"></i>&nbsp;{{uiconfig.type}}</span>
     <span class="text-muted">{{width}} ✕ {{height}}</span>
     <template v-if="uiconfig.dataIn?.path">
       <span class="text-primary"><i class="iconfont icon-data-input"></i>{{uiconfig.dataIn?.path}}</span>
     </template>
     <template v-if="uiconfig.dataOut">
       <span v-for="(path, outputAs, index) in uiconfig.dataOut" :key="index">
-        <i class="iconfont icon-data-output"></i>{{path}}
-        <span class="text-success" v-if="outputAs">&nbsp;{{outputAs}}&nbsp;</span>
-        <span class="text-primary" v-if="uiconfig.dataBound?.VALUE == path">&nbsp;Value&nbsp;</span>
-        <span class="text-primary" v-if="uiconfig.dataBound?.BOUND == path">&nbsp;Bound&nbsp;</span>
+        <i class="iconfont icon-data-output"></i>{{path}}<span class="text-success" v-if="outputAs">:{{outputAs}}</span>
+        <span class="text-primary" v-if="uiconfig.dataBound?.VALUE == path"> as Value&nbsp;</span>
+        <span class="text-primary" v-if="uiconfig.dataBound?.BOUND == path"> as Bound&nbsp;</span>
       </span>
     </template>
     <span v-if="uiconfig.events && uiconfig.events.length >0"><i class="iconfont icon-event"></i>{{uiconfig.events.length}} {{t('common.event')}}</span>

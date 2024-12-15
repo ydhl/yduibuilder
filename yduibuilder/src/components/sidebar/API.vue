@@ -87,6 +87,7 @@ import WebAPIBasicInfo from '@/components/common/WebAPIBasicInfo.vue'
 export default {
   name: 'API',
   components: { WebAPIBasicInfo, DataConnect, BindAPIPostProcessors },
+  emits: ['contextMenu'],
   setup (pros: any, context: any) {
     const { t } = useI18n()
     const apis = ref<any>([])

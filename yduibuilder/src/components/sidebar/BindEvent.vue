@@ -324,6 +324,7 @@ import Util from '@/components/Util'
  */
 export default {
   name: 'BindEvent',
+  emits: ['contextMenu'],
   components: {
     AdvanceSelect,
     EventAction,
