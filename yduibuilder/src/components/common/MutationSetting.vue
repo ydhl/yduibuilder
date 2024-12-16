@@ -16,7 +16,7 @@
   <lay-layer v-model="dialogVisible" :title="t('variable.mutation')" layer-classes="layui-layer-content-overflow" resize
              :resizing="resizeDialog"
              :shade="true" :area="['600px', layerHeight + 'px']" :btn="buttons">
-    <div class="p-2 d-flex flex-column" :style="`height: ${layerHeight-110}px`">
+    <div class="p-2 d-flex flex-column overflow-auto" :style="`height: ${layerHeight-160}px`">
       <div v-if="variables && variables.length > 0">
         <div class="text-muted">{{t('variable.localScopeInEvent', [eventName])}}</div>
         <div class="d-flex align-items-center gap-2 bg-light p-1">

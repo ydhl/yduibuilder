@@ -13,7 +13,7 @@
                @keyup.enter="isInEditPageTitle=false"
                @blur="isInEditPageTitle=false" :title="t('page.editPage')">
       </div>
-      <div :class="{'item': true,'disabled': iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('page.boxModelTip')"><i class="iconfont icon-boxmodel"></i> <small>{{t('page.boxModel')}}</small></div>
+      <div :class="{'item': true,'disabled': iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('page.boxModelTip')"><i class="iconfont icon-boxmodel"></i> <small class="text-truncate">{{t('page.boxModel')}}</small></div>
       <div class="item text-muted"><div style="height: 10px;width: 1px;background-color: #cccccc"></div></div>
       <div :class="{'item': true,'disabled':!canUndo || iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('common.undo')" @click="canUndo ? undo() : ''"><i class="iconfont icon-undo"></i></div>
       <div :class="{'item': true,'disabled':!canRedo || iframeMode!='design'}" data-bs-toggle="tooltip" :title="t('common.redo')" @click="canRedo ? redo() : ''"><i class="iconfont icon-redo"></i></div>
