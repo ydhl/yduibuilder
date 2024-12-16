@@ -185,6 +185,7 @@ export default {
     pageData: 'Page Data',
     pageHasBeenDeletedByOtherUser: 'Page has been deleted by user {0}',
     pageHasBeenModifiedByOtherUser: 'Page has been modified by user {0}, page will be reload',
+    pleaseCheckRequired: 'Please check the required fields',
     pleaseSelectUIItem: 'Select an element on the canvas to activate this panel',
     pleaseWait: 'Please wait',
     position: 'Position',

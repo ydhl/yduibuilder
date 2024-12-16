@@ -74,7 +74,7 @@ function alpinejs_find_index(el){
  *
  * @param el
  * @param valueName
- * @param ignoreSelf boolean false 则表示获取上层ui绑定的数据名
+ * @param ignoreSelf boolean true 则表示获取上层ui绑定的数据名
  * @return {*}
  */
 function alpinejs_get_input_data_name(el, valueName, ignoreSelf){

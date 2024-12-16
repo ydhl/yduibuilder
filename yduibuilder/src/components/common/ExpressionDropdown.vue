@@ -54,7 +54,7 @@
                  :checked-uuid="myExpression.data?.id" :page-uuid="selectedPageId"/>
     </div>
   </lay-layer>
-  <CodeEditorDialog v-model="codeDlgVisible" :left-operator="defaultMutationOperator" :language="codeType === 'literal' ? 'json' : 'jsAndJson'"
+  <CodeEditorDialog v-model="codeDlgVisible" :left-operator="defaultMutationOperator" :language="codeType === 'literal' ? 'json' : 'javascript'"
               :left-value-path="leftValuePath" :left-data="leftValue" :variables="variables"
               :schema="leftValueSchema" :code="code" @update="updateCode"></CodeEditorDialog>
 </template>
@@ -80,7 +80,9 @@ export default {
     leftValuePath: String, // 左值访问路径
     hideArrow: Boolean,
     hideMutationType: Boolean,
-    style: String,
+    style: {
+      type: [String, Object]
+    },
     hasMutationOperator: {
       default: true,
       type: Boolean

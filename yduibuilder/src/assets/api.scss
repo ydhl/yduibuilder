@@ -101,11 +101,11 @@
   background-color: #efefef;
 }
 .bind-icon.bound{
-  background-color: var(--bs-primary);
+  background-color: rgba(var(--bs-danger-rgb), 0.85);
   color: #fff;
 }
 .bind-icon.bound-out{
-  background-color: var(--bs-success);
+  background-color: rgba(var(--bs-primary-rgb), 0.85);
   color: #fff;
 }
 .bind-icon{

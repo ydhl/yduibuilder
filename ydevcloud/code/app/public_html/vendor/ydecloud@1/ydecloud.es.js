@@ -31,7 +31,7 @@ export default function (Alpine) {
          *
          * @param el
          * @param valueName
-         * @param ignoreSelf  boolean false 则表示获取上层ui绑定的数据
+         * @param ignoreSelf  boolean true 则表示获取上层ui绑定的数据
          * @return {*|undefined}
          */
         alpinejs_get_value(el, valueName, ignoreSelf=false)
@@ -83,9 +83,11 @@ export default function (Alpine) {
             Alpine.evaluate(el, `${name} = value`, { scope: { value: typeof value === 'object' ? JSON.parse(JSON.stringify(value)) : value } });
             // Alpine.evaluate(el, `${name} = ${typeof value=="string" ? '"'+value+'"' : value}`)
         },
-        alpinejs_set_value_from_list(el, valueName, items, isArray){
+        alpinejs_init_input_from_output_data(el, valueName, items, isArray){
             const value = []
             if (!items) return
+            const init = this.alpinejs_get_value(el, valueName)
+            if(!this.alpinejs_is_empty(init)) return;
 
             let name = valueName;
             if (valueName.match(/\[-1\]/)) {

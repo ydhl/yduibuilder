@@ -99,7 +99,7 @@
                  :can-mutation="canMutation" :key="index" :intent="intent+1" :model="item" :index="index"></Data>
     </template>
   </template>
-  <lay-layer v-model="editDlgVisible" :title="isAddProps ? t('api.addData') : t('api.editData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
+  <lay-layer v-model="editDlgVisible" resize :title="isAddProps ? t('api.addData') : t('api.editData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
     <AddData v-if="!isExpression" v-model="editModel" :is-array-item="!isAddProps && isArrayItem"/>
     <AddExpression v-else v-model="editModel" :can-add-expression="!isAddProps && !isArrayItem" :is-array-item="isArrayItem"/>
   </lay-layer>

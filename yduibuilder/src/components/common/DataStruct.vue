@@ -19,7 +19,7 @@
                  :index="index" :model="data" :intent="0" :key="index"></DataComp>
     </div>
   </div>
-  <lay-layer v-model="dialogVisible" :title="t('api.addData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
+  <lay-layer v-model="dialogVisible" resize :title="t('api.addData')" :shade="true" :area="['520px', '500px']" :btn="buttons">
     <AddData :types="types" v-model="currData" v-if="!isExpression"/>
     <AddExpression :types="types" :can-add-expression="true" v-model="currData" v-else/>
   </lay-layer>

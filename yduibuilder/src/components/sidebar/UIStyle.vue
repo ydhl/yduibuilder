@@ -109,8 +109,9 @@
     </div>
   </div>
 
-  <lay-layer v-model="addStyleStateVisible" layer-classes="layui-layer-content-overflow" :title="t('style.state.addState')" :shade="true" :area="['320px', '300px']" :btn="buttons">
-    <div class="p-2" style="width: 300px">
+  <lay-layer v-model="addStyleStateVisible" layer-classes="layui-layer-content-overflow"
+             :title="t('style.state.addState')" :shade="true" :area="['320px', '300px']" :btn="buttons">
+    <div class="p-3" style="width: 300px">
       <div class="row">
         <label class="col-sm-3 col-form-label text-truncate">{{t("style.state.stateName")}}</label>
         <div class="col-sm-9 d-flex align-items-center">
@@ -120,8 +121,8 @@
           <div v-else class="form-control-plaintext">{{editState.type}}</div>
         </div>
       </div>
-      <div class="row mb-3 p-2 text-muted">{{t('style.state.variableTip')}}</div>
-      <div class="p-3 fs-1">
+      <div class="row mb-1 fs-7 p-2 text-muted">{{t('style.state.variableTip')}}</div>
+      <div class="text-success">
         <ExpressionDropdown :hide-arrow="true" :has-mutation-operator="false"
                             default-mutation-operator="check data:"
                             :hideMutationType="true" @updateExpression="updateExpression" :expression="editState.expression"></ExpressionDropdown>

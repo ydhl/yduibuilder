@@ -1,5 +1,5 @@
 <template>
-  <div class="p-2" style="width: 500px">
+  <div class="p-2" style="width: calc(100% - 20px)">
     <div class="row">
       <label class="col-sm-3 col-form-label text-end">{{ t('api.model.type') }}</label>
       <div class="col-sm-9">
@@ -55,7 +55,9 @@
       </div>
     </div>
   </div>
-  <CodeEditorDialog v-model="codeDialogVisible" :left-operator="leftOperator" language="javascript" :code="code" @update="updateCode"></CodeEditorDialog>
+  <CodeEditorDialog v-model="codeDialogVisible" :left-operator="leftOperator" language="javascript"
+                    :title="`${myModel.name||''} ${myModel.title||''}`"
+                    :code="code" @update="updateCode"></CodeEditorDialog>
 </template>
 
 <script lang="ts" setup>

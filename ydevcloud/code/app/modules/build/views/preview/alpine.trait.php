@@ -387,16 +387,16 @@ INPITCONFIG;
     }
 
     /**
-     * 如果输出有数据，把输出赋值给输入，已输出为主
+     * 如果输出有数据，同时输入没有数据，这时把输出赋值给输入
      * @return void
      */
-    protected function output_init_input(){
+    protected function init_input_from_output(){
         $inputDataName = $this->get_input_data_name($inputIsArr, $inputData);
         $outputDatas = $this->get_output_datas($outputDataName);
 
         if ($inputData){
             if ($outputDataName['VALUELIST']){
-                echo $this->wrap_output('x-init', "alpinejs_set_value_from_list(\$el, '{$inputDataName}',"
+                echo $this->wrap_output('x-init', "alpinejs_init_input_from_output_data(\$el, '{$inputDataName}',"
                     .$outputDataName['VALUELIST'].",".($inputData['type']=='array' ? 'true' : 'false').")");
             }else{
                 $values = $this->data['meta']['values'] ?: $this->demo_values();

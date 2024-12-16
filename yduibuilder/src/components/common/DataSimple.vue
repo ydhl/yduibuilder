@@ -7,9 +7,10 @@
         <template v-if="isArrayItem">
           <span class="text-success">ITEM</span>
         </template>
-        <template v-else>
+        <span v-else :class="{'fst-italic': myModel.isRoot && myModel.isExpression}">
           {{myModel.name}}
-        </template>
+          <template v-if="myModel.isRoot && myModel.isExpression">()</template>
+        </span>
       </div>
       <span :class="'ps-1 fs-7 param-' + myModel.type">
         {{myModel.type}}

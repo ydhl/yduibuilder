@@ -185,6 +185,7 @@ export default {
     pageData: '页面数据',
     pageHasBeenDeletedByOtherUser: '该页面已被{0}删除了',
     pageHasBeenModifiedByOtherUser: '该页面已被{0}修改了，当前不是最新版本，确定后将重新加载页面',
+    pleaseCheckRequired: '请检查必填项',
     pleaseSelectUIItem: '请先选择画板中的UI元素激活该面板',
     pleaseWait: '请稍后',
     position: '位置',

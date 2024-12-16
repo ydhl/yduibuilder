@@ -13,7 +13,7 @@
     </div>
     <!--title-->
     <div class="model-title d-flex flex-nowrap justify-content-end flex-grow-1 w-50">
-      <ExpressionDropdown :variables="variables" :hide-arrow="true" :expression="expression" :has-mutation-operator="true"
+      <ExpressionDropdown style="width: 100%" :variables="variables" :hide-arrow="true" :expression="expression" :has-mutation-operator="true"
                           :default-mutation-operator="mutationOperator" @updateMutationOperator="updateMutationOperator"
                           @updateExpression="updateExpression" :leftValue="myModel" :leftValuePath="path"></ExpressionDropdown>
     </div>

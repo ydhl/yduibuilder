@@ -1,5 +1,5 @@
 <template>
-  <div class="p-2" style="width: 500px">
+  <div class="p-2" style="width: calc(100% - 20px)">
     <div class="row">
       <label class="col-sm-3 col-form-label text-end">{{ t('api.model.type') }}</label>
       <div class="col-sm-9">
@@ -15,7 +15,7 @@
       <div class="row">
         <label class="col-sm-3 col-form-label text-end">{{ t('api.model.name') }} <span class="text-danger">*</span></label>
         <div class="col-sm-9">
-          <input type="text" class="form-control form-control-sm" v-model="myModel.name">
+          <input type="text" class="form-control form-control-sm" v-model.trim="myModel.name">
         </div>
       </div>
       <div class="row mb-1">
@@ -34,10 +34,10 @@
                          @change="(option) => { myModel.validRule = option.value; myModel.validRegular='' }"
                          :default-text="validateRuleDesc">
             <template #input>
-              <input type="text" placeholder="such as /\d+/" class="form-control form-control-sm" v-model="myModel.validRegular"/>
+              <input type="text" placeholder="such as /\d+/" class="form-control form-control-sm" v-model.trim="myModel.validRegular"/>
             </template>
           </AdvanceSelect>
-          <input type="text" class="form-control mt-1 form-control-sm" placeholder="error message" maxlength="145" v-model="myModel.invalidMsg">
+          <input type="text" class="form-control mt-1 form-control-sm" placeholder="error message" maxlength="145" v-model.trim="myModel.invalidMsg">
         </div>
       </div>
       <template v-if="isScale">
@@ -65,7 +65,7 @@
       <div class="row">
         <label class="col-sm-3 col-form-label text-end">{{ t('api.model.initLength') }}</label>
         <div class="col-sm-9">
-          <input type="number" maxlength="255" minlength="1" class="form-control form-control-sm" v-model="myModel.initLength">
+          <input type="number" maxlength="255" minlength="1" class="form-control form-control-sm" v-model.trim="myModel.initLength">
         </div>
       </div>
     </template>
@@ -81,7 +81,7 @@
     <div class="row" v-else-if="myModel.type=='any'">
       <label class="col-sm-3 col-form-label text-end">{{ t('api.model.mock') }}</label>
       <div class="col-sm-9">
-        <input type="text" class="form-control form-control-sm" placeholder="mock template string" v-model="myModel.mock">
+        <input type="text" class="form-control form-control-sm" placeholder="mock template string" v-model.trim="myModel.mock">
       </div>
     </div>
     <div class="row" v-else-if="['blob', 'file'].indexOf(myModel.type) === -1">
@@ -96,24 +96,26 @@
     <div class="row" v-if="hasDefaultValue && ['blob', 'file'].indexOf(myModel.type) === -1">
       <label class="col-sm-3 col-form-label text-end">{{ t('api.model.defaultValue') }}</label>
       <div class="col-sm-9">
-        <input type="text" v-if="['object','array','map','any'].indexOf(myModel.type) == -1" class="form-control form-control-sm" v-model="myModel.defaultValue">
+        <input type="text" v-if="['object','array','map','any'].indexOf(myModel.type) == -1" class="form-control form-control-sm" v-model.trim="myModel.defaultValue">
         <button type="button" v-else @click="openCodeDialog" class="btn btn-xs btn-light">{{myModel.defaultValue?t('common.view'):t('action.notSet')}}</button>
       </div>
     </div>
     <div class="row">
       <label class="col-sm-3 col-form-label text-end">{{ t('api.model.title') }}</label>
       <div class="col-sm-9">
-        <input type="text" class="form-control form-control-sm" maxlength="45" v-model="myModel.title">
+        <input type="text" class="form-control form-control-sm" maxlength="45" v-model.trim="myModel.title">
       </div>
     </div>
     <div class="row">
       <label class="col-sm-3 col-form-label text-end">{{ t('api.model.comment') }}</label>
       <div class="col-sm-9">
-        <textarea class="form-control form-control-sm" v-model="myModel.comment"></textarea>
+        <textarea class="form-control form-control-sm" v-model.trim="myModel.comment"></textarea>
       </div>
     </div>
   </div>
-  <CodeEditorDialog v-model="codeDialogVisible" :hide-variable="true" :schema="modelSchema" :code="code" @update="updateCode"></CodeEditorDialog>
+  <CodeEditorDialog v-model="codeDialogVisible" :hide-variable="true"
+                    :title="`${myModel.name||''} ${myModel.title||''}`"
+                    :schema="modelSchema" :code="code" @update="updateCode"></CodeEditorDialog>
 </template>
 
 <script lang="ts" setup>
@@ -210,6 +212,10 @@ onMounted(() => {
   }
 })
 watch(myModel, (v) => {
+  if (!v.name) {
+    ydhl.alert(t('common.pleaseCheckRequired'))
+    return
+  }
   emit('update:modelValue', v)
 })
 const changeType = (type) => {
