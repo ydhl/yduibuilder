@@ -15,8 +15,18 @@ trait Function_Model_Method{
      * 获取页面（不包含popup，master）
      * @return array
      */
-    public function get_pages() {
-        return Page_Model::from()->where('function_id=:id and is_deleted=0 and page_type="page"')->select([':id'=>$this->id]);
+    public function get_pages($type='page') {
+        $where = 'function_id=:id and is_deleted=0';
+        $param = [':id'=>$this->id];
+        if ($type){
+            $where .= ' and page_type=:page';
+            $param[':page'] = $type;
+        }
+        $pages = Page_Model::from()->where($where)->select($param);
+        foreach ($pages as $page) {
+            $page->set_function($this);
+        }
+        return $pages;
     }
     /**
      * 获取页面（不包含popup，master）

@@ -536,7 +536,7 @@ abstract class Preview_View extends \yangzie\YZE_View_Component{
                 $propDefault = [];
                 foreach ($data['props'] as $prop){
                     $default = $this->data_default($prop);
-                    if ($default) $propDefault[] = '"'.$prop['name'].'": '.$default;
+                    $propDefault[] = '"'.$prop['name'].'": '.$default;
                 }
                 if ($propDefault){
                     return "{".join(",", $propDefault)."}";

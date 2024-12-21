@@ -5,9 +5,7 @@ use app\modules\build\views\preview\bootstrap\Container_View as Preview_Containe
 use app\modules\build\views\code\web\Vue;
 
 class Container_View extends Preview_Container_View {
-    use Vue {
-        Vue::build_code as vueBuildCode;
-    }
+    use Vue;
 
     public function build_ui()
     {
@@ -48,8 +46,27 @@ class Container_View extends Preview_Container_View {
         }
     }
     public function build_code(): Base_Code_Fragment{
-        $fragment = $this->vueBuildCode();
+        $fragment = $this->get_code_fragment();
         $fragment->add_import('@/components/ContainerComponent.vue', [], 'ContainerComponent');
+        $this->build_event_code();
+        $this->build_initialize_code();
+
+        $subset = $this->get_subset();
+        $this->get_output_datas($dataNames);
+        if (!$dataNames['VALUE'] || !$this->subset){ // 没有子集
+            foreach ((array)@$this->childViews as $view){
+                $view->build_code();
+                $fragment->merge($view->get_code_fragment());
+            }
+        }else if ($dataNames['VALUE'] && $this->subset){ // 有子集
+            foreach ($subset as $views){
+                foreach ($views as $view){
+                    $view->build_code();
+                    $fragment->merge($view->get_code_fragment());
+                }
+            }
+        }
+
         return $fragment;
     }
 }

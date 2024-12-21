@@ -11,11 +11,18 @@ use \yangzie\YZE_DBAImpl;
  * @package project
  */
 trait Module_Model_Method{
+    private $functions = [];
     public function function_count(){
         return Function_Model::from()->where('module_id=:id and is_deleted=0')->count('id', [':id'=>$this->id]);
     }
     public function get_functions() {
-        return Function_Model::from()->where('module_id=:id and is_deleted=0')->select( [':id'=>$this->id]);
+        if (!$this->functions){
+            $this->functions = Function_Model::from()->where('module_id=:id and is_deleted=0')->select( [':id'=>$this->id]);
+            foreach ($this->functions as $function) {
+                $function->set_module($this);
+            }
+        }
+        return $this->functions;
     }
 
     /**

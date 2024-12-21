@@ -134,11 +134,6 @@ trait Alpine_Build_Code {
                 $fragment->add_code(Html_Code_Fragment::SECTION_DATA_DEFINE, " */");
             }
             $defaultValue = $this->data_default($dataConfig);
-            if ($bound_data->data_from==Page_Bind_Data_Model::DATA_FROM_PATH){
-                $defaultValue = 'YDECloud.getPathArgValue("'.$bound_data->name.'") || '.$defaultValue;
-            }else if ($bound_data->data_from==Page_Bind_Data_Model::DATA_FROM_QUERY){
-                $defaultValue = 'YDECloud.getQueryValue("'.$bound_data->name.'"'.$queryString.') || '.$defaultValue;
-            }
 
             if ($defaultValue && $build->need_mock() && $dataConfig['mock']) {
                 $defaultValue = 'Mock.mock('.$defaultValue.')';
@@ -448,6 +443,7 @@ INTERVAL;
             $dataName = $expression->literal;
         }elseif ($expression->type == 'connect'){
             $dataName = $this->is_scale_type($expression->data->type) ? "{$expression->data->path}" : "JSON.stringify({$expression->data->path})";
+            $this->add_local_scope_variable($dataName);
         }else{
             $dataName = $expression->get_expression_code();
             $this->add_local_scope_variable($dataName);
@@ -476,6 +472,7 @@ INTERVAL;
                 if ($inputExpression->type == 'literal'){// 字面量
                     $queryArgs[] = $bindData->name.': '.$inputExpression->literal;
                 }elseif ($inputExpression->type=='connect'){ //数据赋值
+                    $this->add_local_scope_variable($inputExpression->data->path);
                     $queryArgs[] = $bindData->name.': '. $inputExpression->data->path;
                 }else { //表达式赋值
                     $expression_code = $inputExpression->get_expression_code();

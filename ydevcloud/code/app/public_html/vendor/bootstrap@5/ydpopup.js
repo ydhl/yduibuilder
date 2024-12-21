@@ -36,7 +36,6 @@ style="display: flex!important;justify-content: center;align-items: center; posi
     <div class="card shadow-sm">
         <div class="card-body bg-secondary">
             <div class="spinner-border text-white" role="status">
-              <span class="sr-only">Loading...</span>
             </div>
         </div>
     </div>
@@ -67,6 +66,15 @@ style="display: flex!important;justify-content: center;align-items: center; posi
         }, 1000)
 
         $(`[data-uiid="${currPageId}"]`).append(`<div ${listen.join(' ')} id="${id}Body"></div>`);
+
+        const urlObject = new URL(document.location.origin+url);
+        const params = new URLSearchParams(urlObject.search);
+        const input = {}
+        for(const [key, value] of params.entries()){
+            input[key] = {value}
+        }
+
+        window[`_inputConfig_${pageId}`] = input
         YDECloud.loadUrl(url, `#${id}Body`).then(() => {
             clearTimeout(timer)
             YDECloud.hideLoading()

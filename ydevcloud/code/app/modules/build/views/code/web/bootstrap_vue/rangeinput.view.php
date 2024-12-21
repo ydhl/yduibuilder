@@ -18,9 +18,9 @@ class Rangeinput_View extends Preview_Rangeinput_View {
         $iteratorDataName = $this->get_iterator_data_name();
         echo "{$space}<RangeInputComponent";
         $this->output_component_props();
-        echo $this->wrap_output("min", $this->data['meta']['custom']['min']);
-        echo $this->wrap_output("max", $this->data['meta']['custom']['max']);
-        echo $this->wrap_output("step", $this->data['meta']['custom']['step']);
+        echo $this->wrap_output(":min", $this->data['meta']['custom']['min']);
+        echo $this->wrap_output(":max", $this->data['meta']['custom']['max']);
+        echo $this->wrap_output(":step", $this->data['meta']['custom']['step']);
         echo PHP_EOL."{$space}";
         if ($outputDataName['VALUE']){
             echo $this->wrap_output(':defaultValue', $iteratorDataName ?: $outputDataName['VALUE']);

@@ -69,15 +69,15 @@ class Nav_View extends  Preview_Nav_View{
 
     private function checkedItemCss() {
 
-        $css = ["nav-link"];
+        $css = [];
         $theme = $this->data['meta']['css']['foregroundTheme'];
         if ($theme && $theme !== 'default' && !$this->data['meta']['style']['color']){
             $checkedCss = $this->cssTranslate['backgroundTheme'][$theme].' text-white';
         }
 
-        $css[] = "{$checkedCss} active";
+        $css[] = "{$checkedCss} disabled";
 
-        return join(', ', $css)?:null;
+        return join(' ', $css)?:null;
     }
 
     private function itemCss() {

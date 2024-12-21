@@ -215,6 +215,7 @@ declare const $
 export default {
   name: 'Project',
   components: { FunctionPicker },
+  emits: ['contextMenu'],
   setup (props: any, context: any) {
     const store = useStore()
     const currFunctionId = computed(() => store.state.design.function.id)

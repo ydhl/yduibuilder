@@ -146,7 +146,6 @@ const canEdit = computed(() => store.state.design.canEdit)
 const oldDesign = computed(() => store.state.design)
 const oldUser = computed(() => store.state.user)
 onBeforeRouteUpdate((to, from) => {
-  console.log(to, from)
   if (to?.fullPath === from?.fullPath) return // 点击右边边栏会触发onBeforeRouteUpdate，原因未知
   // 地址发生变化，跳转到其他页面，加载目标页面内容
   loadContent(to.query.uuid, to.query.functionId, to.query.projectId, null)

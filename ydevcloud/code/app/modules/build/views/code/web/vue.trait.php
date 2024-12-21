@@ -350,6 +350,8 @@ CLOSE;
      * 把xxx.yyy 调整为 xxx.value.yyy
      *
      *
+     * 如果代码中有xxx()调用，而xxx是表达式数据，则移除(), 因为在vue中表达式是computed
+     *
      * @param $code string
      * @return string
      */
@@ -373,8 +375,17 @@ CLOSE;
             $newDataName = preg_replace("/^{$v}/", $name, $dataName);
 //            var_dump("-",$dataName,$name,$newDataName);
 //            echo $code.' at '.($position + $fix).'('.$position.', fix '.$fix.') to '.$newDataName.PHP_EOL;
-            $code = substr_replace($code, $newDataName, $position + $fix, strlen($dataName));
+            $currPosition = $position + $fix;
+            $code = substr_replace($code, $newDataName, $currPosition, strlen($dataName));
             $fix += strlen($newDataName) - strlen($dataName);
+
+            // 删除自定义代码中表达式数据的()
+            $hasBracket = preg_match("/(?P<w>{$newDataName}\s*\(\s*\))/", $code, $bracketMatches);
+            if ($hasBracket){ // 删除表达式数据的括号
+                $word = $bracketMatches['w'];
+                $code = substr_replace($code, $newDataName, $currPosition, strlen($word));
+                $fix += strlen($newDataName) - strlen($word);
+            }
         }
 
         return $code;

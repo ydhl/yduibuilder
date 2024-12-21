@@ -43,9 +43,9 @@ $view->output();
 echo "\n";
 ?>
 <script type="module" data-page-uuid="<?=$page->uuid?>">
-    import ydecloudRun from "<?= $relativePath.'assets/js/'.$page->get_export_file_name('html').'.js?'.http_build_query($_GET) ?>";
+    import ydecloudRun from "<?= $relativePath.'assets/js/'.$page->get_export_file_name('html').'.js' ?>";
     if(document.readyState === "complete" ||(document.readyState !== "loading" && !document.documentElement.doScroll)) {
-        ydecloudRun()
+        ydecloudRun(window['_inputConfig_<?= $page->uuid?>'])
     } else {
         document.addEventListener("DOMContentLoaded", ydecloudRun)
     }
@@ -81,7 +81,7 @@ echo PHP_EOL;
 
     alpinejs_init_directive(Alpine);
     if(document.readyState === "complete" ||(document.readyState !== "loading" && !document.documentElement.doScroll)) {
-        ydecloudRun()
+        ydecloudRun(window['_inputConfig_<?= $page->uuid?>'])
     } else {
         document.addEventListener("DOMContentLoaded", ydecloudRun)
     }

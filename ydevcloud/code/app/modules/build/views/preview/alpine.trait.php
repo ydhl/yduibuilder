@@ -40,7 +40,9 @@ trait Alpine {
                     foreach ($variables as $variable){
                         $expression = $variable->get_expression();
                         if ($variable->to_page_id == $subPage->id && $expression){
-                            $inputData[$variable->to_data_path] = $this->remove_page_scope_data_prefix($expression->get_expression_code());
+                            $inputData[$variable->to_data_path] = [
+                                'from'=>$this->remove_page_scope_data_prefix($expression->get_expression_code())
+                            ];
                         }
                     }
                     $fragment->add_subpage_module($subPageId, $jsPath, $inputData);
@@ -75,14 +77,19 @@ STORE;
         return $fragment;
     }
     private function build_component_input($indent) {
-        if (!$this->build->is_subpage()) return;
         $inputCode = <<<INPITCONFIG
 if(inputConfig){
     for(const myData in inputConfig){
-        this[myData] = this.alpinejs_get_value(this.\$el, inputConfig[myData])
-        this.\$watch(inputConfig[myData], (value, oldValue)=>{
-            this[myData] = value
-        })
+        if(!(myData in this)) continue;
+        const config = inputConfig[myData]
+        if (config.from){
+            this[myData] = this.alpinejs_get_value(this.\$el, config.from)
+            this.\$watch(config.from, (value, oldValue)=>{
+                this[myData] = value
+            })
+        }else{
+            this[myData] = config.value
+        }
     }
 }
 INPITCONFIG;

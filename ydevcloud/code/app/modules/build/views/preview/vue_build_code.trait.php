@@ -552,7 +552,6 @@ INTERVAL;
             $dataConfig = $bindData->find_data($mutation->mutation_data_id, $dataModel, $allParents, $path);
             $path = array_reverse($path);
             $path[] = $dataConfig['name'];
-//            print_r(self::$pageScopeVariables);
             $rightValue = $this->append_vue_value($expression->get_expression_code(false));
 //            $rightValue = $expression->get_expression_code(false);
             $operatior = $mutation->mutation_operator ?: ' = ';
