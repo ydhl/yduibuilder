@@ -56,7 +56,7 @@ if ($page->page_type == 'popup'){
         }
         ?>
 
-        import ydecloudRun from "<?= '/preview/page/'.$page->uuid.'.js'?>";
+        import ydecloudRun from "<?= yze_merge_query_string('/preview/page/'.$page->uuid.'.js', $_GET)?>";
         alpinejs_init_directive(Alpine);
         if(document.readyState === "complete" ||(document.readyState !== "loading" && !document.documentElement.doScroll)) {
             ydecloudRun(window['_inputConfig_<?= $page->uuid?>'])

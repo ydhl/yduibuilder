@@ -18,7 +18,7 @@ $view = Preview_View::create_View($build);
 <?php $view->output(); ?>
 
 <script type="module" data-page-uuid="<?=$page->uuid?>">
-    import ydecloudRun from "<?='/preview/page/'.$page->uuid.'.js'?>";
+    import ydecloudRun from "<?='/preview/page/'.$page->uuid.'.js?'.http_build_query($_GET)?>";
     if(document.readyState === "complete" ||(document.readyState !== "loading" && !document.documentElement.doScroll)) {
         ydecloudRun(window['_inputConfig_<?= $page->uuid?>'])
     } else {
