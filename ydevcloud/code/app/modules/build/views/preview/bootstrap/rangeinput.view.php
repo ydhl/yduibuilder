@@ -14,11 +14,12 @@ class Rangeinput_View extends Preview_View implements Valuable_View {
 
     public function build_ui()
     {
-        $min = @$this->data['meta']['custom']['min']??1;
-        $max = @$this->data['meta']['custom']['max']??100;
-        $step = @$this->data['meta']['custom']['step']??1;
+        $min = @$this->data['meta']['custom']['min']?:0;
+        $max = @$this->data['meta']['custom']['max']?:100;
+        $step = @$this->data['meta']['custom']['step']?:1;
         $inputDataName = $this->get_input_data_name($inputIsArr, $inputData);
         $outputDatas = $this->get_output_datas($outputDataName);
+        $iteratorDataName = $this->get_iterator_data_name();
 
         $space =  $this->indent();
         echo $space."<input type='range'";
@@ -30,21 +31,7 @@ class Rangeinput_View extends Preview_View implements Valuable_View {
         echo $this->wrap_output('step', $step);
         echo PHP_EOL.$space;
 
-
-        if ($inputData){
-            echo $this->wrap_output(':value', "alpinejs_get_value(\$el, '{$inputDataName}')");
-        }elseif ($outputDataName['VALUE']){
-            $valueDataName = $this->get_output_data_name('VALUE', $outputDatas['VALUE'], $outputDataName['VALUE']);
-            echo $this->wrap_output(':value', $valueDataName);
-        }else{
-            echo $this->wrap_output('value', @$this->data['meta']['value']?:0);
-        }
-
-        if ($outputDataName['VALUE'] && $inputDataName){
-            echo $this->wrap_output('x-init', "alpinejs_set_value(\$el, '{$inputDataName}',"
-                .($outputDatas['VALUE']['type']=='array' ? $outputDataName['VALUE'] : '['.$outputDataName['VALUE'].']').", true)");
-        }
-
+        echo $this->wrap_output(':value', $this->get_default_bind_value($inputIsArr, $inputDataName, $iteratorDataName, $outputDataName));
         echo $this->wrap_output(':style', "`background-size: \${(alpinejs_get_value(\$el, '{$inputDataName}') - $min) / ($max - $min) * 100 || 0}%`");
         echo ">".PHP_EOL;
     }

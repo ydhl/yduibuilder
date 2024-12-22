@@ -76,7 +76,7 @@ export default {
         arr.push('nav-link')
         return arr.join(' ')
       }
-      arr.push('btn btn-block')
+      arr.push('btn d-block')
 
       const isOutline = dropdownMeta.value.custom?.isOutline ? 'outline-' : ''
 

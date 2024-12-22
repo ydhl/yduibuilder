@@ -61,7 +61,6 @@ class Select_View extends ValueList_View {
         if($eventHandlers['@blur']) echo $this->wrap_output("@blur", $eventHandlers['@blur']);
         if($eventHandlers['@focus']) echo $this->wrap_output("@focus", $eventHandlers['@focus']);
         echo $this->wrap_output('class', $this->select_css());
-        $this->init_input_from_output();
         echo ">".PHP_EOL;
     }
     public function build_ui_end(){

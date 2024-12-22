@@ -49,13 +49,7 @@ class Textarea_View extends Input_View {
         echo $this->wrap_output('@blur', $eventHandlers['@blur']);
         echo $this->wrap_output('@focus', $eventHandlers['@focus']);
 
-        if ($inputDataName && !$outputDataName['VALUE']){
-            echo $this->wrap_output(':value', $inputDataName);
-        }elseif ($outputDataName['VALUE']){
-            echo $this->wrap_output(':value', $isArr ? $iteratorDataName : $outputDataName['VALUE']);
-        }else{
-            echo $this->wrap_output('value', @$this->data['meta']['value']);
-        }
+        echo $this->wrap_output(':value', $this->get_default_bind_value($isArr, $inputDataName, $iteratorDataName, $outputDataName));
 
         echo '>';
         echo "</textarea>".PHP_EOL;

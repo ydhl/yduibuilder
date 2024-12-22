@@ -63,11 +63,8 @@ class Input_View extends Preview_View implements Valuable_View {
         if (($this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']) && !$eventHandlers['@keyup']){
             echo $this->wrap_output('@keyup', $this->myid().'_keyup');
         }
-        if (!$outputDataName['VALUE']){
-            echo $this->wrap_output(':value', $inputDataName);
-        }else{
-            echo $this->wrap_output(':value', $isArr ? $iteratorDataName : $outputDataName['VALUE']);
-        }
+        echo $this->wrap_output(':value', $this->get_default_bind_value($isArr, $inputDataName, $iteratorDataName, $outputDataName));
+
         echo ">".PHP_EOL;
 
         if ($icon || @$this->data['meta']['custom']['wordCountVisible'] || $this->data['meta']['custom']['clearButtonVisible']){

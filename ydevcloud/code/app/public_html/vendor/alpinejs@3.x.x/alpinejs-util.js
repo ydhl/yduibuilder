@@ -299,7 +299,9 @@ function alpinejs_init_directive(Alpine){
                 }
                 evaluate(`${exp} = values`, { scope: { values } });
             }})
-        }else if (['input', 'textarea', 'rangeinput'].indexOf(uiType) !== -1){
+            return
+        }
+        if (['input', 'textarea', 'rangeinput'].indexOf(uiType) !== -1){
             const inputEl = el.querySelector('.input') || el
             const subtype = inputEl.getAttribute('type')?.toLowerCase()
             if (['color', 'date', 'range'].indexOf(subtype) !== -1){
@@ -313,7 +315,9 @@ function alpinejs_init_directive(Alpine){
                     execExp(exp, event.target.value)
                 }})
             }
-        }else if ('select' === uiType){
+            return
+        }
+        if ('select' === uiType){
             Alpine.bind(el.querySelector('.input'), { '@change'(event) {
                 const exp = alpinejs_init_iterator_value(event.target, expression, evaluate)
                 if (!exp) return
@@ -325,7 +329,9 @@ function alpinejs_init_directive(Alpine){
                     evaluate(`${exp} = "${selectedValues?.[0]}" ? "${selectedValues?.[0]}" : undefined`);
                 }
             }})
-        }else if ('file' === uiType){
+            return
+        }
+        if ('file' === uiType){
             Alpine.bind(el, { '@change'(event) {
                 const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, isArrayData);
                 const files = []
@@ -338,16 +344,17 @@ function alpinejs_init_directive(Alpine){
                     evaluate(`${exp} = checkedFile`, { scope: { checkedFile: files?.[0] }});
                 }
             }})
-        }else{
-            // 其他迭代类元素
-            Alpine.bind(el, { '@click'(event) {
-                const eventTarget = event.target.closest('[data-value]');
-                if (!eventTarget) return;
-
-                const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, isArrayData)
-                execExp(exp, eventTarget.dataset?.value)
-            }})
+            return
         }
+
+        // 其他迭代类元素
+        Alpine.bind(el, { '@click'(event) {
+            const eventTarget = event.target.closest('[data-value]');
+            if (!eventTarget) return;
+
+            const exp = alpinejs_init_iterator_value(event.target, expression, evaluate, isArrayData)
+            execExp(exp, eventTarget.dataset?.value)
+        }})
     });
 }
 function alpinejs_input_keyup(page, el, uiid, inputName){

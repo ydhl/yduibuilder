@@ -82,33 +82,6 @@ export default function (Alpine) {
             }
             Alpine.evaluate(el, `${name} = value`, { scope: { value: typeof value === 'object' ? JSON.parse(JSON.stringify(value)) : value } });
             // Alpine.evaluate(el, `${name} = ${typeof value=="string" ? '"'+value+'"' : value}`)
-        },
-        alpinejs_init_input_from_output_data(el, valueName, items, isArray){
-            const value = []
-            if (!items) return
-            const init = this.alpinejs_get_value(el, valueName)
-            if(!this.alpinejs_is_empty(init)) return;
-
-            let name = valueName;
-            if (valueName.match(/\[-1\]/)) {
-                const index = alpinejs_find_index(el)
-                name = valueName.replace(/\[-1\]$/, '')
-                if (index.length > 0) {
-                    for (const idx of index) {
-                        name += '[' + idx + ']';
-                        Alpine.evaluate(el, `if (${name} == undefined) ${name} = []`);
-                    }
-                }
-            }
-            for (let i=0; i<items.length; i++){
-                const item = items[i]
-                if (typeof item !== 'object') {
-                    continue;
-                }
-                if (item.checked) value.push(item.value || item.name || i)
-            }
-
-            Alpine.evaluate(el, `${name} = value`, { scope: { value: isArray ? value : value?.[0] } });
         }
     }
 }

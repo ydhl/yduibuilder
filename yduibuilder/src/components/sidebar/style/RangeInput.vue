@@ -36,7 +36,7 @@ export default {
     })
     const max = computed({
       get () {
-        return initInfo.getMeta('max', 'custom') || 0
+        return initInfo.getMeta('max', 'custom') || 100
       },
       set (v) {
         initInfo.setMeta('max', v, 'custom')
@@ -44,7 +44,7 @@ export default {
     })
     const step = computed({
       get () {
-        return initInfo.getMeta('step', 'custom') || 0
+        return initInfo.getMeta('step', 'custom') || 1
       },
       set (v) {
         initInfo.setMeta('step', v, 'custom')

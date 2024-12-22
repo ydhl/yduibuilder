@@ -691,6 +691,7 @@ const switchPage = (data) => {
   })
 }
 const closePage = (pageUuid) => {
+  if (!pageUuid) return
   if (pageSaved.value[pageUuid] === 0) {
     ydhl.confirm(t('common.notSaveInfo'), t('common.close'), t('common.cancel')).then((dialogId) => {
       ydhl.closeLoading(dialogId)
@@ -799,7 +800,7 @@ function rightClickCloseLeft () {
   const endIndex = openedPages.value.findIndex((item) => item.meta.id === rightClickOnPage.value.meta.id)
   if (endIndex === -1) return
   for (let i = 0; i < endIndex; i++) {
-    closePage(openedPages.value[i].meta.id)
+    closePage(openedPages.value[i]?.meta?.id)
   }
 }
 function rightClickCloseRight () {

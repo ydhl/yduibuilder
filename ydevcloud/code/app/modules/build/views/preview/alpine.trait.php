@@ -393,30 +393,27 @@ INPITCONFIG;
         return "{$myid}_value";
     }
 
-    /**
-     * 如果输出有数据，同时输入没有数据，这时把输出赋值给输入
-     * @return void
-     */
-    protected function init_input_from_output(){
-        $inputDataName = $this->get_input_data_name($inputIsArr, $inputData);
-        $outputDatas = $this->get_output_datas($outputDataName);
 
-        if ($inputData){
-            if ($outputDataName['VALUELIST']){
-                echo $this->wrap_output('x-init', "alpinejs_init_input_from_output_data(\$el, '{$inputDataName}',"
-                    .$outputDataName['VALUELIST'].",".($inputData['type']=='array' ? 'true' : 'false').")");
-            }else{
-                $values = $this->data['meta']['values'] ?: $this->demo_values();
-                $checked = [];
-                foreach ($values as $value){
-                    if (!$value['checked']) continue;
-                    $checked[] = strlen($value['value']) ? $value['value'] : $value['name'];
-                }
-                if ($checked){
-                    echo $this->wrap_output('x-init', "alpinejs_set_value(\$el, '{$inputDataName}',"
-                        .($inputData['type']=='array' ? json_encode($checked) : "'".array_pop($checked)."'").")");
-                }
-            }
+    /**
+     * 根据输入和输出绑定的情况返回组件的默认值：
+     *
+     * 如果输入有值，用输入的
+     *
+     * 否则如果迭代输出了，用当前的迭代值
+     *
+     * 最后如果绑定有输出值，用之
+     *
+     * @param $isArr
+     * @param $inputDataName
+     * @param $iteratorDataName
+     * @param $outputDataName
+     * @return mixed|string
+     */
+    protected function get_default_bind_value($isArr, $inputDataName, $iteratorDataName, $outputDataName){
+        $value = $isArr ? "alpinejs_get_value(\$el, '{$inputDataName}')" : $inputDataName;
+        if ($isArr || $outputDataName['VALUE']){
+            $value .= " || ".($isArr ? $iteratorDataName : $outputDataName['VALUE']);
         }
+        return $value;
     }
 }

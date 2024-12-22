@@ -110,7 +110,7 @@ class Dropdown_View extends ValueList_View {
             echo ' data-bs-toggle="dropdown" aria-expanded="false">';
             echo "</button>".PHP_EOL;
         }else{
-            echo $this->indent(1) . '<button role="button" type="button" data-bs-toggle="dropdown" aria-expanded="false"';
+            echo $this->indent(1) . '<a role="button" type="button" data-bs-toggle="dropdown" aria-expanded="false"';
             echo $this->wrap_output('class', 'dropdown-toggle '.$this->btnCss());
             echo $this->wrap_output('style', $this->btnStyle());
             echo '>';
@@ -127,7 +127,7 @@ class Dropdown_View extends ValueList_View {
                 echo ">{$text}</span>";
             }, 2);
             echo PHP_EOL;
-            echo $this->indent(1)."</button>".PHP_EOL;
+            echo $this->indent(1)."</a>".PHP_EOL;
         }
 
         echo $this->indent(1) . '<div class="dropdown-menu';
@@ -252,7 +252,7 @@ class Dropdown_View extends ValueList_View {
         }
 
         $buttonMeta = $this->data['meta'];
-        $arr = ['btn btn-block'];
+        $arr = ['btn d-block'];
         unset($cssMap['backgroundTheme'], $cssMap['foregroundTheme']);
 
         $isOutline = @$buttonMeta['custom']['isOutline'] ? 'outline-' :'';
