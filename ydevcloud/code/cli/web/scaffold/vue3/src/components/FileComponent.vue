@@ -14,7 +14,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
+import {computed, onMounted, ref,defineExpose} from 'vue'
 import axios, {type AxiosProgressEvent} from 'axios'
 import y from '@/lib/ydecloud'
 const { iterateIndex, attrs, formAttrs, css, multiple, accept, uploadUrl, isAutoUpload, maxFileSize, style } = defineProps({
@@ -35,11 +35,16 @@ css: {
 style: String
 })
 const model = defineModel()
-const emit = defineEmits(['click','dblclick','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave','onFileChange', 'onBeforeUpload', 'onUploadProgress', 'onFileUploaded','onUploadComplete'])
+const emit = defineEmits(['onFileChange', 'onBeforeUpload', 'onUploadProgress', 'onFileUploaded','onUploadComplete'])
 const exts = computed<Array<string>>(() => accept && accept.split(',') || [])
 let modelIsArray = false
 const changedTime = ref('')// 仅仅用了却不触发v-input自定义指令
 
+defineExpose({initModelFromXInput})
+// 由x-input指令调用
+function initModelFromXInput(n: any){
+  model.value = n
+}
 function convertSizeToBytes(sizeStr: string) {
   let size = parseInt(sizeStr) || 0
   const suffix = sizeStr.slice(-2).toLowerCase()

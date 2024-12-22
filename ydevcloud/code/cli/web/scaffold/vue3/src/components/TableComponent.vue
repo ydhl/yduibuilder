@@ -87,7 +87,6 @@ datas:{
     type:Array<Array<Record<string, any>|string>>
 }
 })
-const emit = defineEmits(['click','dblclick','scroll','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
 const header = computed(() => {
   if(headless) return []
   return datas.slice(0, headerRow)

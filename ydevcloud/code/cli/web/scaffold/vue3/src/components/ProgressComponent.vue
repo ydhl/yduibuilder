@@ -41,5 +41,4 @@ style: {
   type: [Object , String, Array]
 }
 })
-const emit = defineEmits(['click','dblclick','scroll','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
 </script>

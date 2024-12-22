@@ -1,5 +1,5 @@
 <template>
-  <input type='range' v-attr="attrs" :class="css" data-root :data-index="iterateIndex" :data-realindex="myValue?iterateIndex:null" v-model.number="myValue"
+  <input type='range' v-attr="attrs" :class="css" data-root :data-index="iterateIndex" v-model.number="myValue"
          :min="min" :max="max" :step="step"
          @click="y.emit($el, 'y-click', $event, myValue, boundData)"
         @dblclick="y.emit($el, 'y-dblclick', $event, myValue, boundData)"
@@ -17,7 +17,7 @@
 </template>
 <script lang="ts" setup>
 import y from '@/lib/ydecloud'
-import {onMounted, ref, watch} from 'vue'
+import { onMounted, ref, watch, nextTick, defineExpose } from 'vue'
 const { iterateIndex, attrs, css, style, min, max, step, defaultValue, boundData } = defineProps({
 // 该组件被迭代时的索引
 iterateIndex: Number,
@@ -47,18 +47,31 @@ style: String
 })
 const myValue = ref(0)
 const model = defineModel<number|string>()
-const emit = defineEmits(['blur','change','click','dblclick','focus','input','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
+const emit = defineEmits(['change'])
+let needSyncModel = true
 
+defineExpose({initModelFromXInput})
+// 由x-input指令调用
+function initModelFromXInput(n: any){
+  model.value = n
+}
 watch(myValue, (n, old) => {
   emit('change', n, old)
-  model.value = n
+  if (needSyncModel){
+    model.value = n
+  }
 })
 
+// 外面改变了model
 watch(model, (n) => {
+  needSyncModel = false
   myValue.value = Number(n)
+  nextTick(() => {
+    needSyncModel = true
+  })
 })
 
 onMounted(() => {
-  myValue.value = parseInt(String(defaultValue || model.value ||  0))
+  myValue.value = parseInt(String(model.value ||  defaultValue || min))
 })
 </script>

@@ -14,13 +14,14 @@
         @click="y.emit($el, 'y-click', $event, myValues, item);"
         @blur="y.emit($el, 'y-blur', $event, myValues, item)"
         @focus="y.emit($el, 'y-focus', $event, myValues, item)"
-        :value="getItemValue(index, item)">{{ getItemTitle(item) }}</option>
+        :value="valueList.getItemValue(index, item)">{{ valueList.getItemTitle(item) }}</option>
       </select>
     </div>
 </template>
 <script lang="ts" setup>
 import y from '@/lib/ydecloud'
-import {ref, onMounted, watch} from 'vue'
+import ValueList from './ValueList'
+import {ref, onMounted, watch, defineExpose} from 'vue'
 const { iterateIndex, attrs, formAttrs, css, selectCss, multiple, style, items } = defineProps({
 // 该组件被迭代时的索引
 iterateIndex: Number,
@@ -41,11 +42,18 @@ items:{
     type:[Array<string|number>, Array<{ [key: string]: string | number | boolean | undefined }>]
 },
 })
-const model = defineModel()
-const myValues = ref<Array<string>|string>()
+const model = defineModel<any>()
+const myValues = ref<any>()
 let modelIsArray = false
-const emit = defineEmits(['blur','change','click','dblclick','focus','input','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
+const emit = defineEmits(['change'])
+const valueList = new ValueList(items)
+let needEmitChange = true
 
+defineExpose({initModelFromXInput})
+// 由x-input指令调用
+function initModelFromXInput(n: any){
+  model.value = n
+}
 watch(myValues, (newValues, old) => {
   if (multiple && Array.isArray(newValues)){// 多值
     model.value = modelIsArray ? newValues : newValues?.[0]
@@ -53,38 +61,29 @@ watch(myValues, (newValues, old) => {
     model.value = modelIsArray ? [newValues] : newValues
   }
 
+  if (!needEmitChange) {
+    needEmitChange = true
+    return
+  }
   emit('change', newValues, old)
 })
 
-function getItemTitle(item: string|number|{ [key: string]: string | number | boolean | undefined }) {
-  return String(typeof item === 'object' ? (item.name || item.value) : item)
-}
-
-function getItemValue(index: number, item: string|number|{ [key: string]: string | number | boolean | undefined }) {
-  return String(typeof item === 'object' ? (item.value || item.name || index) : item)
-}
 onMounted(() => {
-  modelIsArray = model.value==undefined || Array.isArray(model.value)
-  if(multiple){
-    myValues.value = []
+  needEmitChange = model.value === undefined
+  modelIsArray = model.value !== undefined || Array.isArray(model.value)
+  // 绑定的输入有值，优先用输入值
+  if (!valueList.isEmpty(model.value)){
+    if (multiple) {
+      myValues.value = modelIsArray ? model.value : [model.value]
+    }else{
+      myValues.value = modelIsArray ? model.value?.[0] : model.value
+    }
+    return
+  }
+  if (multiple) {
+    myValues.value = valueList.getDefaultValues()
   }else{
-    myValues.value = ''
-  }
-  for(let index=0; index<items.length; index++){
-    const item = items[index]
-    if (typeof item !== 'object' || !item.checked) continue
-    if(multiple){
-      (myValues.value as Array<string>).push(getItemValue(index, item))
-    }else{
-      myValues.value = getItemValue(index, item)
-    }
-  }
-  if (myValues.value){
-    if (modelIsArray){
-      model.value = multiple ? myValues.value : [myValues.value]
-    }else{
-      model.value = multiple ? myValues.value?.[0] : myValues.value
-    }
+    myValues.value = valueList.getDefaultValue()
   }
 })
 </script>

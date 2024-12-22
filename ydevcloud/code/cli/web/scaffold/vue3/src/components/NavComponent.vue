@@ -12,14 +12,15 @@
           @mouseleave="y.emit($el, 'y-mouseleave', $event, myValue, item)"
           @blur="y.emit($el, 'y-blur', $event, myValue, item)"
           @focus="y.emit($el, 'y-focus', $event, myValue, item)">
-            <a :class="[itemCss,index == myValueIndex ? checkedItemCss : '']" :style="`${itemStyle};${index==myValueIndex ? checkedItemStyle : ''}`" href="javascript:;">{{ getItemTitle(item) }}</a>
+            <a :class="[itemCss,index == myValueIndex ? checkedItemCss : '']" :style="`${itemStyle};${index==myValueIndex ? checkedItemStyle : ''}`" href="javascript:;">{{ valueList.getItemTitle(item) }}</a>
           </div>
         </template>
     </div>
 </template>
 <script lang="ts" setup>
 import y from '@/lib/ydecloud'
-import {ref, watch, onMounted} from 'vue'
+import ValueList from './ValueList'
+import {ref, watch, onMounted,defineExpose} from 'vue'
 const { iterateIndex, itemStyle, checkedItemStyle, itemCss, checkedItemCss, attrs, css, style, items } = defineProps({
 // 该组件被迭代时的索引
 iterateIndex: Number,
@@ -43,46 +44,40 @@ items:{
     type:[Array<string|number>, Array<{ [key: string]: string | number | boolean | undefined }>]
 },
 })
-const model = defineModel()
+const model = defineModel<any>()
 const myValue = ref<string>('')
 const myValueTitle = ref<string>('')
 const myValueIndex = ref<number>(-1)
-const emit = defineEmits(['blur','change','click','dblclick','focus','input','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
+const emit = defineEmits(['change'])
+const valueList = new ValueList(items)
+let needEmitChange = true
 
-watch(myValue, (n, old) => {
-  emit('change',n, old)
+defineExpose({initModelFromXInput})
+// 由x-input指令调用
+function initModelFromXInput(n: any){
   model.value = n
+}
+watch(myValue, (n, old) => {
+  model.value = n
+  if (!needEmitChange) {
+    needEmitChange = true
+    return
+  }
+  emit('change',n, old)
 })
-function getDefaultValue(){
-    const item = items.find((item) => typeof item === 'object' && item.checked)
-    return String((typeof item === 'object' ? (item.value || item.name) : item) || '')
-}
-function getItemTitle(item: string|number|{ [key: string]: string | number | boolean | undefined }) {
-  return String(typeof item === 'object' ? (item.name || item.value) : item)
-}
 function updateValue(index: number, item: string|number|{ [key: string]: string | number | boolean | undefined }) {
-  myValue.value = String(typeof item === 'object' ? (item.value || item.name || index) : item)
   myValueIndex.value = index
-  myValueTitle.value = String(typeof item === 'object' ? (item.name || item.value) : item)
+  myValue.value = valueList.getItemValue(index, item)
+  myValueTitle.value = valueList.getItemTitle(item)
 }
 onMounted(() => {
-  const defValue = getDefaultValue()
-  myValue.value = defValue ? String(defValue) : ''
-  myValueIndex.value = items.findIndex((item) => {
-    const isObject = typeof item === 'object'
-    if (isObject){
-      return item.value === defValue || item.name === defValue
-    }
-    return item === defValue
-  })
-  const item = items.find((item) => {
-    const isObject = typeof item === 'object'
-    if (isObject){
-      return item.value === defValue || item.name === defValue
-    }
-    return item === defValue
-  })
-  myValueTitle.value = String(typeof item === 'object' ? (item.name || item.value) : item || '')
+  needEmitChange = model.value === undefined
+  const defValue = !valueList.isEmpty(model.value) ? model.value : valueList.getDefaultValue()
+  myValue.value = defValue || ''
+  myValueIndex.value = valueList.getItemIndexByValue(defValue)
+  if (myValueIndex.value !== -1){
+    myValueTitle.value = valueList.getItemTitle(items[myValueIndex.value])
+  }
 })
 </script>
   

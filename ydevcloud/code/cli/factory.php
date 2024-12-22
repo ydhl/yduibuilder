@@ -117,6 +117,9 @@ abstract class Base_Factory{
     protected function output($string, $type='normal'){
         $wrap = $string;
         switch ($type){
+            case 'primary':
+                $wrap = "<div class='text-primary'>{$string}</div>";
+                break;
             case 'error':
                 $wrap = "<div class='text-danger'>{$string}</div>";
                 break;

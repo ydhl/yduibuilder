@@ -15,14 +15,15 @@
               @blur="y.emit($el, 'y-blur', $event, myValue, item)"
               @focus="y.emit($el, 'y-focus', $event, myValue, item)" 
                 class="form-check-input mt-0" v-attr="formAttrs" :value="index" :checked="index === myValueIndex">
-              <label @click.stop :for="getItemId(index)">{{ getMenuTitle(item) }}</label>
+              <label @click.stop :for="getItemId(index)">{{ valueList.getItemTitle(item) }}</label>
             </div>
         </template>
     </div>
 </template>
 <script lang="ts" setup>
 import y from '@/lib/ydecloud'
-import {ref, watch, onMounted, computed} from 'vue'
+import ValueList from './ValueList'
+import {ref, watch, onMounted, computed, defineExpose} from 'vue'
 const { iterateIndex, parentIterateIndex, attrs, formAttrs, css, style, items } = defineProps({
 // 该组件被迭代时的索引
 iterateIndex: Number,
@@ -39,50 +40,43 @@ items:{
     type:[Array<string|number>, Array<{ [key: string]: string | number | boolean | undefined }>]
 },
 })
-const emit = defineEmits(['blur','change','click','dblclick','focus','input','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
-const model = defineModel()
+const emit = defineEmits(['change'])
+const model = defineModel<any>()
 const myValue = ref<string>('')
 const myValueTitle = ref<string>('')
 const myValueIndex = ref<number>(-1)
 const uuid = computed(() => attrs?.['data-uiid'])
+const valueList = new ValueList(items)
+let needEmitChange = true
 
-watch(myValue, (n, old) => {
-  emit('change', n, old)
+defineExpose({initModelFromXInput})
+// 由x-input指令调用
+function initModelFromXInput(n: any){
   model.value = n
+}
+watch(myValue, (n, old) => {
+  model.value = n
+  if (!needEmitChange) {
+    needEmitChange = true
+    return
+  }
+  emit('change', n, old)
 })
 function getItemId(index: number){
   return uuid.value + '-' + (iterateIndex||parentIterateIndex||"") + '-' + index
 }
-function getDefaultValue(){
-    const item = items.find((item) => typeof item === 'object' && item.checked)
-    return String((typeof item === 'object' ? (item.value || item.name) : item) || '')
-}
-function getMenuTitle(menu: string|number|{ [key: string]: string | number | boolean | undefined }) {
-  return String(typeof menu === 'object' ? (menu.name || menu.value) : menu)
-}
-function updateValue(index: number, menu: string|number|{ [key: string]: string | number | boolean | undefined }) {
-  myValue.value = String(typeof menu === 'object' ? (menu.value || menu.name || index) : menu)
+function updateValue(index: number, item: string|number|{ [key: string]: string | number | boolean | undefined }) {
   myValueIndex.value = index
-  myValueTitle.value = String(typeof menu === 'object' ? (menu.name || menu.value) : menu)
+  myValue.value = valueList.getItemValue(index, item)
+  myValueTitle.value = valueList.getItemTitle(item)
 }
 onMounted(() => {
-  const defValue = getDefaultValue()
-  myValue.value = defValue ? String(defValue) : ''
-  myValueIndex.value = items.findIndex((item) => {
-    const isObject = typeof item === 'object'
-    if (isObject){
-      return item.value === defValue || item.name === defValue
-    }
-    return item === defValue
-  })
-  const item = items.find((item) => {
-    const isObject = typeof item === 'object'
-    if (isObject){
-      return item.value === defValue || item.name === defValue
-    }
-    return item === defValue
-  })
-  myValueTitle.value = String(typeof item === 'object' ? (item.name || item.value) : item || '')
+  const defValue = !valueList.isEmpty(model.value) ? model.value : valueList.getDefaultValue()
+  myValue.value = defValue || ''
+  myValueIndex.value = valueList.getItemIndexByValue(defValue)
+  if (myValueIndex.value !== -1){
+    myValueTitle.value = valueList.getItemTitle(items[myValueIndex.value])
+  }
 })
 </script>
   

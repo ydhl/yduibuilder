@@ -49,7 +49,7 @@ showControl: Boolean,
 itemCount: Number,
 defaultActiveIndex: Number
 })
-const emit = defineEmits(['blur','change','click','dblclick','focus','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
+const emit = defineEmits(['change'])
 const activeIndex = ref<number>(defaultActiveIndex || 0)
 const uuid = computed(() => attrs?.['data-uiid'])
 watch(activeIndex, (n, old) => {

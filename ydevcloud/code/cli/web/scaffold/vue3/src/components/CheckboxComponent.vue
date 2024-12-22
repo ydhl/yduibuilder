@@ -12,18 +12,19 @@
               @mousemove="y.emit($el, 'y-mousemove', $event, myValues, item)"
               @mouseenter="y.emit($el, 'y-mouseenter', $event, myValues, item)"
               @mouseleave="y.emit($el, 'y-mouseleave', $event, myValues, item)">
-              <input :id="getItemId(index)" type="checkbox" :value="getItemValue(index, item)"
+              <input :id="getItemId(index)" type="checkbox" :value="valueList.getItemValue(index, item)"
               @blur="y.emit($el, 'y-blur', $event, myValues, item)"
               @focus="y.emit($el, 'y-focus', $event, myValues, item)" 
                 class="form-check-input mt-0" v-attr="formAttrs" :checked="myValueIndexs.indexOf(index) !== -1">
-              <label @click.stop :for="getItemId(index)">{{ getItemTitle(item) }}</label>
+              <label @click.stop :for="getItemId(index)">{{ valueList.getItemTitle(item) }}</label>
             </div>
         </template>
     </div>
 </template>
 <script lang="ts" setup>
 import y from '@/lib/ydecloud'
-import {ref, onMounted, watch, computed} from 'vue'
+import ValueList from './ValueList'
+import {ref, onMounted, watch, computed,defineExpose} from 'vue'
 const { iterateIndex, parentIterateIndex, attrs, formAttrs, css, style, items } = defineProps({
 // 该组件被迭代时的索引
 iterateIndex: Number,
@@ -40,23 +41,23 @@ items:{
     type:[Array<string|number>, Array<{ [key: string]: string | number | boolean | undefined }>]
 },
 })
-const model = defineModel()
+const valueList = new ValueList(items)
+const model = defineModel<any>()
 const myValues = ref<Array<string>>([])
 let modelIsArray = false
 const myValueIndexs = ref<Array<number>>([])
-const emit = defineEmits(['blur','change','click','dblclick','focus','input','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
+const emit = defineEmits(['change'])
 const uuid = computed(() => attrs?.['data-uiid'])
+let needEmitChange = true
+
+defineExpose({initModelFromXInput})
+// 由x-input指令调用
+function initModelFromXInput(n: any){
+  model.value = n
+}
+
 function getItemId(index: number){
   return uuid.value + '-' + (iterateIndex||parentIterateIndex||"") + '-' + index
-}
-function getDefaultValues(){
-  const checkedItems = items.filter((item) => typeof item === 'object' && item.checked)
-  const checkedValues: Array<string> = []
-  for(const item of checkedItems){
-    const i = item as { [key: string]: string }
-    checkedValues.push(i.value || i.name)
-  }
-  return checkedValues
 }
 function updateChecked(index: number){
   if(modelIsArray){
@@ -72,37 +73,42 @@ function updateChecked(index: number){
   const values = []
   for(const index of myValueIndexs.value){
     const item = items[index]
-    const value = String(typeof item === 'object' ? (item.value || item.name || index) : item)
+    let value
+    if (typeof item === 'object') {
+      value = String(item.value !== undefined ? item.value : (item.name || index))
+    }else{
+      value = String(item)
+    }
     values.push(value)
   }
   myValues.value = values
   model.value = modelIsArray ? values : values?.[0]
 }
-function getItemTitle(item: string|number|{ [key: string]: string | number | boolean | undefined }) {
-  return String(typeof item === 'object' ? (item.name || item.value) : item)
-}
-function getItemValue(index: number, item: string|number|{ [key: string]: string | number | boolean | undefined }) {
-  return String(typeof item === 'object' ? (item.value || item.name || index) : item)
-}
 watch(model, (n, old) => {
+  if (!needEmitChange) {
+    needEmitChange = true
+    return
+  }
   emit('change', n, old)
 })
 onMounted(() => {
+  needEmitChange = model.value === undefined
   modelIsArray = model.value==undefined || Array.isArray(model.value)
-  const defValues = getDefaultValues()
-  for(let index=0; index<items.length; index++){
-    const item = items[index]
-    const isObject = typeof item === 'object'
-    if (isObject){
-      if(defValues.findIndex((def) => item.value === def || item.name === def) !== -1){
-        myValueIndexs.value.push(index)
-      }
-    }else{
-      if (defValues.findIndex((def) => item === def) !== -1){
-        myValueIndexs.value.push(index)
-      }
-    }
+
+  let defValues
+  if (!valueList.isEmpty(model.value)){
+    defValues = modelIsArray ? model.value : [model.value]
+  }else{
+    defValues = valueList.getDefaultValues()
   }
+  if (!defValues || defValues.length === 0) return
+
+  for(let i=0; i < items.length; i++){
+    const item: any = items[i]
+    const value = valueList.getItemValue(i, item)
+    if (defValues.indexOf(value) !== -1)  myValueIndexs.value.push(i)
+  }
+
   if (modelIsArray){
     myValues.value = defValues
     model.value = defValues

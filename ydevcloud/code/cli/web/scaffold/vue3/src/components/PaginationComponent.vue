@@ -34,7 +34,7 @@
 </template>
 <script lang="ts" setup>
 import y from '@/lib/ydecloud'
-import {ref, watch, computed} from 'vue'
+import {ref, watch, computed, defineExpose} from 'vue'
 const { iterateIndex, total, attrs, css, activeCss, boundData, activeLinkCss, linkCss, style, activeLinkStyle, linkStyle } = defineProps({
 // 该组件被迭代时的索引
 iterateIndex: Number,
@@ -55,15 +55,15 @@ css: {
 total: Number,
 style: String
 })
-const emit = defineEmits(['blur','change','click','dblclick','focus','input','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
-const model = defineModel<number>()
+const emit = defineEmits(['change'])
+const model = defineModel<number|string>()
 const currPage = ref(1)
 const pageSize = ref(10)
 const myValue = ref(model.value || 1)
 const pageList = computed(() => {
   const pages = [];
   const maxPage = Math.ceil((total||0) / pageSize.value)
-  let startPage = myValue.value || 1;
+  let startPage = Number(myValue.value || 1);
   startPage = Math.max(startPage - 2, 1);
   const endPage = Math.min(startPage + 9, maxPage);
   if (endPage - startPage < 10){
@@ -75,6 +75,11 @@ const pageList = computed(() => {
   return pages;
 })
 
+defineExpose({initModelFromXInput})
+// 由x-input指令调用
+function initModelFromXInput(n: any){
+  model.value = n
+}
 
 watch(currPage, (n, old) => {
   emit('change', n, old)

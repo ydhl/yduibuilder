@@ -164,26 +164,35 @@ export default router
         // 编译ui文件
         $this->zip->addEmptyDir("src/assets/img");
         $router = [];
+        $fileTree = [];
         $hasIndexHtml = false;
         foreach ($this->project->get_modules() as $module) {
-            foreach ($module->get_pages('') as $index => $page) {
-                if ($page->id == $this->project->home_page_id){
-                    $hasIndexHtml = true;
+            $this->server->push($this->output(sprintf(__('compile module %s'), $module->name)));
+            $moduleName = $module->name.($module->folder ?"($module->folder)": '');
+            $fileTree[$moduleName] = [];
+            foreach ($module->get_functions() as $function){
+                $this->server->push($this->output(sprintf(__('compile function %s'), $function->name), 'secondary'));
+                $fileTree[$moduleName][$function->name] = [];
+                foreach ($function->get_pages('') as $index => $page) {
+                    if ($page->id == $this->project->home_page_id){
+                        $hasIndexHtml = true;
+                    }
+
+                    $page_file = $page->get_save_path('vue');
+                    $page_url = $page->id == $this->project->home_page_id ? '/' : ($page->url?:"/page{$page->id}");
+                    $this->server->push($this->output(sprintf(__('compile page %s => %s(%s)'), $page->name, $page_file, $page_url),'success'));
+
+                    // 弹窗页面、组件页面不输出路由
+                    if (!in_array(strtolower($page->page_type), ['popup', 'component'])){
+                        $router[$page_file] = ['url'=>$page_url, 'name'=>$page->name];
+                        $fileTree[$moduleName][$function->name][] = $page_file;
+                    }
+
+                    $ydhttp = new YDHttp();
+                    $ydhttp->request_header = ['token:' . $this->token];
+                    $this->zip->addFromString('src/'.$page_file, $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid)."\r\n");// 行未加个空行
+                    $this->extractImage(json_decode(html_entity_decode($page->config), true), 'src/assets/img');
                 }
-
-                $page_file = $page->get_save_path('vue');
-                $page_url = $page->id == $this->project->home_page_id ? '/' : ($page->url?:"/page{$page->id}");
-                $this->server->push($this->output(sprintf(__('compile page %s => %s(%s)'), $page->name, $page_file, $page_url),'success'));
-
-                // 弹窗页面、组件页面不输出路由
-                if (!in_array(strtolower($page->page_type), ['popup', 'component'])){
-                    $router[$page_file] = ['url'=>$page_url, 'name'=>$page->name];
-                }
-
-                $ydhttp = new YDHttp();
-                $ydhttp->request_header = ['token:' . $this->token];
-                $this->zip->addFromString('src/'.$page_file, $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid)."\r\n");// 行未加个空行
-                $this->extractImage(json_decode(html_entity_decode($page->config), true), 'src/assets/img');
             }
         }
         foreach (Page_Model::from()->where('is_deleted = 0 and module_id is null and project_id=:pid')
@@ -200,7 +209,7 @@ export default router
 
         if (!$hasIndexHtml){
             $this->server->push(__('generating index page'));
-            $this->zip->addFromString('src/views/Index.vue', $this->generateIndex($router));
+            $this->zip->addFromString('src/views/Index.vue', $this->generateIndex($fileTree, $router));
             $router['views/Index.vue'] = ['name'=>__('Index page'),'url'=>"/"];
         }
 
@@ -209,20 +218,27 @@ export default router
 
         $this->server->push(sprintf(__('compiled use : %s, you can <ol><li>npm install: install all need node modules</li><li>npm run dev: start the vue serve</li><li>npm run build: build the dist files</li></ol>'), 'Vue 3.5(Typescript, JSX, Vue Router, Pinia, ESLint, Prettier, Vue DevTools 7)'));
     }
-    private function generateIndex($files) {
-    $project_setting = $this->project->get_setting();
-    $uiFrameworkClass = $project_setting['ui'].'_install';
+    private function generateIndex($fileTree, $files) {
     ob_start();
 ?>
 <template>
-  <ol>
-    <?php
-        foreach ($files as $file=> $info){
-            list('url'=>$url, 'name'=>$name) = $info;
-            echo "    <li><a href='{$url}'>{$file} ({$name})</a></li>";
+<ul>
+<?php
+foreach ($fileTree as $moduleName => $functions){
+    echo "<li>{$moduleName}<ul>".PHP_EOL;
+    foreach ($functions as $functionName => $fileNames){
+        echo "<li>{$functionName}".PHP_EOL;
+        echo "<ol>".PHP_EOL;
+        foreach ($fileNames as $file){
+            list('url'=>$url, 'name'=>$name) = $files[$file];
+            echo "<li><a href='{$url}'>".basename($file)." ({$name})</a></li>".PHP_EOL;
         }
-    ?>
-    </ol>
+        echo "</ol></li>".PHP_EOL;
+    }
+    echo "</ul></li>".PHP_EOL;
+}
+?>
+</ul>
 </template>
 <?php
     return ob_get_clean();

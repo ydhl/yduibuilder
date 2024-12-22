@@ -1,5 +1,6 @@
 <?php
 use function yangzie\__;
+use app\project\Page_Model;
 include_once 'factory.php';
 
 class web_html5 extends Base_Factory{
@@ -13,7 +14,7 @@ class web_html5 extends Base_Factory{
         $this->addScaffoldFiles($path, "vendor/iconfont/");
     }
 
-    private function generateIndex($files) {
+    private function generateIndex($fileTree, $files) {
         $project_setting = $this->project->get_setting();
         ob_start();
 ?>
@@ -27,14 +28,23 @@ class web_html5 extends Base_Factory{
             <title><?= $this->project->name?></title>
         </head>
         <body>
-        <ol style="position: fixed; left:0; top:0px;width: 300px;bottom:0px;text-overflow: ellipsis;overflow: auto">
+        <ul style="position: fixed; left:0; top:0px;width: 300px;bottom:0px;text-overflow: ellipsis;overflow: auto">
         <?php
-            foreach ($files as $file=>$info){
-                list('url'=>$url, 'name'=>$name) = $info;
-                echo "<li><a target='preview' href='{$url}'>{$file} ({$name})</a></li>";
+        foreach ($fileTree as $moduleName => $functions){
+            echo "<li>{$moduleName}<ul>".PHP_EOL;
+            foreach ($functions as $functionName => $fileNames){
+                echo "<li>{$functionName}".PHP_EOL;
+                echo "<ol>".PHP_EOL;
+                foreach ($fileNames as $file){
+                    list('url'=>$url, 'name'=>$name) = $files[$file];
+                    echo "<li><a target='preview' href='{$url}'>{$file} ({$name})</a></li>".PHP_EOL;
+                }
+                echo "</ol></li>".PHP_EOL;
             }
+            echo "</ul></li>".PHP_EOL;
+        }
         ?>
-        </ol>
+        </ul>
         <iframe name="preview" src="about:blank" style="position: fixed; left:300px; top:0px; right:0px;bottom:0px;width: calc(100% - 300px);height: 100%" frameborder="0"></iframe>
         </body>
         </html>
@@ -63,24 +73,47 @@ class web_html5 extends Base_Factory{
         $this->zip->addEmptyDir('assets/css');
         $this->zip->addEmptyDir('popup');
 
-        // 编译popup,ui组件文件
-        $pages = [];
-        foreach(\app\project\Page_Model::from('p')
-            ->left_join(\app\project\Module_Model::CLASS_NAME,'m','p.module_id=m.id')
-            ->where("p.is_deleted=0 and p.project_id=:pid")
-            ->select([':pid'=>$this->project->id]) as $item){
-            if ($item['m']) $item['p']->set_module($item['m']);
-            $pages[] = $item['p'];
+        $files = [];
+        foreach ($this->project->get_modules() as $module) {
+            $this->server->push($this->output(sprintf(__('compile module %s'), $module->name)));
+            $moduleName = $module->name.($module->folder ?"($module->folder)": '');
+            $fileTree[$moduleName] = [];
+            foreach ($module->get_functions() as $function) {
+                $this->server->push($this->output(sprintf(__('compile function %s'), $function->name), 'secondary'));
+                $fileTree[$moduleName][$function->name] = [];
+                foreach ($function->get_pages('') as $index => $page) {
+                    $page_file = $page->get_save_path('html');
+                    $this->server->push($this->output(sprintf(__('compile %s %s => %s'), $page->page_type, $page->name, $page_file),'success'));
+                    if ($page->page_type == 'page') {
+                        $pageName = basename($page_file);
+                        $files[$pageName] = ['url' => $page_file, 'name' => $page->name];
+                        $fileTree[$moduleName][$function->name][] = $pageName;
+                    }
+                    $this->extractImage(json_decode(html_entity_decode($page->config), true));
+
+                    $ydhttp = new YDHttp();
+                    $ydhttp->request_header = ['token:' . $this->token];
+                    $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid . '?code_type=html');
+                    $this->zip->addFromString($page_file, $htmlContent);
+
+                    $assetFileName = $page->get_export_file_name('html');
+                    foreach (['css'=>"assets/css/{$assetFileName}.css", 'js'=>"assets/js/{$assetFileName}.js"] as $code_type=>$assetFileName) {
+                        $this->server->push($this->output(sprintf(__('compile %s %s => %s'), $code_type, $page->name, $assetFileName), 'primary'));
+
+                        $ydhttp = new YDHttp();
+                        $ydhttp->request_header = ['token:' . $this->token];
+                        $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid . '?mode=compile&code_type='.$code_type);
+                        $this->zip->addFromString($assetFileName, $htmlContent);
+                    }
+                }
+            }
         }
 
         $this->server->push(sprintf(__('generate popup/component/subpage...')));
-        foreach ($pages as $page) {
+        foreach (Page_Model::from()->where('is_deleted = 0 and module_id is null and project_id=:pid')
+                     ->select([':pid'=>$this->project->id]) as $page) {
             $page_file = $page->get_save_path('html');
-            $this->server->push(sprintf(__('%s compile popup page %s => %s%s'), "<strong>", $page->name, $page_file, "</strong>"));
-            if ($page->page_type == 'page') {
-                $pageName = basename($page_file);
-                $files[$pageName] = ['url' => $page_file, 'name' => $page->name];
-            }
+            $this->server->push($this->output(sprintf(__('compile %s %s => %s'), $page->page_type, $page->name, $page_file),'success'));
             $this->extractImage(json_decode(html_entity_decode($page->config), true));
 
             $ydhttp = new YDHttp();
@@ -88,14 +121,13 @@ class web_html5 extends Base_Factory{
             $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid . '?code_type=html');
             $this->zip->addFromString($page_file, $htmlContent);
 
-
             $assetFileName = $page->get_export_file_name('html');
             foreach (['css'=>"assets/css/{$assetFileName}.css", 'js'=>"assets/js/{$assetFileName}.js"] as $code_type=>$assetFileName) {
-                $this->server->push(sprintf(__('%scompile %s %s => %s%s'), "<strong>", $code_type, $page->name, $assetFileName, "</strong>"));
+                $this->server->push($this->output(sprintf(__('compile %s %s => %s'), $code_type, $page->name, $assetFileName), 'primary'));
 
                 $ydhttp = new YDHttp();
                 $ydhttp->request_header = ['token:' . $this->token];
-                $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid . '?mode=compile&code_type='.$code_type);
+                $htmlContent = $ydhttp->get(SITE_URI . 'code/page/' . $page->uuid . '?mode=compile&subpage=1&code_type='.$code_type);
                 $this->zip->addFromString($assetFileName, $htmlContent);
             }
         }
@@ -111,6 +143,6 @@ class web_html5 extends Base_Factory{
         $this->exportIcon();
 
         $this->server->push(__('generating index page'));
-        $this->zip->addFromString('index.html', $this->generateIndex($files));
+        $this->zip->addFromString('index.html', $this->generateIndex($fileTree, $files));
     }
 }

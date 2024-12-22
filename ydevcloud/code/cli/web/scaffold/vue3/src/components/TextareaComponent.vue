@@ -1,6 +1,6 @@
 <template>
-  <div style="position: relative;" data-root :data-index="iterateIndex">
-    <textarea v-attr="attrs" :class="css" :style="[textareaStyle, style]" v-model="myValue"
+  <div style="position: relative;" v-attr="attrs" data-root :data-index="iterateIndex">
+    <textarea :class="css" :style="[textareaStyle, style]" v-model="myValue"
       @blur="y.emit($el, 'y-blur', $event, myValue, boundData)"
       @click="y.emit($el, 'y-click', $event, myValue, boundData)"
       @dblclick="y.emit($el, 'y-dblclick', $event, myValue, boundData)"
@@ -27,7 +27,7 @@
 </template>
 <script lang="ts" setup>
 import y from '@/lib/ydecloud'
-import {ref,computed, watch, onMounted} from 'vue'
+import {ref,computed, watch, onMounted,nextTick, defineExpose} from 'vue'
 const { iterateIndex, color, autoRow, foregroundCss, wordCountVisible, clearButtonVisible, defaultValue, maxLength, attrs, css, style } = defineProps({
   // 该组件被迭代时的索引
   iterateIndex: Number,
@@ -56,8 +56,8 @@ const { iterateIndex, color, autoRow, foregroundCss, wordCountVisible, clearButt
     type: [Object , String]
   }
 })
-const emit = defineEmits(['blur','change','click','dblclick','focus','input','keyup','keydown','keypress','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
-const model = defineModel<string>()
+const emit = defineEmits(['change'])
+const model = defineModel<any>()
 const myValue = ref<string>('')
 const hasAction = computed(() => wordCountVisible || clearButtonVisible ? true : false)
 const actionStyle = computed(() => 'position:absolute;right:10px;top:0px;height:100%;align-items:center;display:flex;gap:10px;' + (color ? 'color:'+color : ''))
@@ -65,21 +65,38 @@ const actionClass = computed(() => (!color && foregroundCss) ? foregroundCss : n
 const textareaStyle = computed(() => {
   return autoRow ? 'resize: none' : ''
 })
+let needSyncModel = true
 watch(myValue, (n, old) => {
   emit('change', n, old)
-  model.value = n
+  if (needSyncModel){
+    model.value = n
+  }
 })
 
+defineExpose({initModelFromXInput})
+// 由x-input指令调用
+function initModelFromXInput(n: any){
+  model.value = n
+}
+// 外面改变了model
+watch(model, (n) => {
+  needSyncModel = false
+  myValue.value = n
+  nextTick(() => {
+    needSyncModel = true
+  })
+})
 function clear() {
   myValue.value = ''
 }
 onMounted(() => {
-  // 如果默认有值，则用默认的值
-  if (defaultValue){
-    model.value = String(defaultValue)
-    myValue.value = String(defaultValue)
+  // 如果绑定的输入数据有值，则用之，否则用默认值
+  if (model.value === undefined || !String(model.value)){
+    if (defaultValue){
+      myValue.value = String(defaultValue)
+    }
   }else{
-    myValue.value = model.value||''
+    myValue.value = model.value
   }
 })
 </script>

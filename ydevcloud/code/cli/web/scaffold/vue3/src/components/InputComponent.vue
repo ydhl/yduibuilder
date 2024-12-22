@@ -1,9 +1,9 @@
 <template>
-  <div style="position: relative;" data-root :data-index="iterateIndex">
+  <div v-attr="attrs" style="position: relative;" data-root :data-index="iterateIndex">
     <template v-if="iconOnLeft">
       <div :class="icon" style="position:absolute;left:10px;top:0px;height:100%;align-items:center;display:flex;"></div>
     </template>
-    <input v-attr="attrs"
+    <input
       @blur="y.emit($el, 'y-blur', $event, myValue, boundData)"
       @click="y.emit($el, 'y-click', $event, myValue, boundData)"
       @dblclick="y.emit($el, 'y-dblclick', $event, myValue, boundData)"
@@ -31,7 +31,7 @@
 </template>
 <script lang="ts" setup>
 
-import {ref,computed, watch, onMounted, nextTick} from 'vue'
+import {ref,computed, watch, onMounted, nextTick,defineExpose} from 'vue'
 import y from '@/lib/ydecloud'
 const { iterateIndex, icon, iconPosition, color, foregroundCss, boundData, wordCountVisible, clearButtonVisible, defaultValue, maxLength, attrs, css, style } = defineProps({
   // 该组件被迭代时的索引
@@ -66,7 +66,7 @@ const { iterateIndex, icon, iconPosition, color, foregroundCss, boundData, wordC
 })
 let needSyncModel = true
 const model = defineModel<any>()
-const emit = defineEmits(['blur','change','click','dblclick','focus','input','keyup','keydown','keypress','mousedown','mouseup','mouseover','mouseout','mousemove','mouseenter','mouseleave'])
+const emit = defineEmits(['change'])
 const myValue = ref<string>('')
 const hasAction = computed(() => icon || wordCountVisible || clearButtonVisible ? true : false)
 const iconOnRight = computed(() => iconPosition == 'right' || iconPosition == 'bottom')
@@ -77,6 +77,12 @@ const inputStyle = computed(() => {
   if (!iconPosition) return ''
   return ['bottom','right'].indexOf(iconPosition) !== -1 ? 'padding-right: 60px;' : 'padding-left: 30px;'
 })
+
+defineExpose({initModelFromXInput})
+// 由x-input指令调用
+function initModelFromXInput(n: any){
+  model.value = n
+}
 watch(myValue, (n, old) => {
   emit('change', n, old)
   if (needSyncModel){
@@ -84,6 +90,7 @@ watch(myValue, (n, old) => {
   }
 })
 
+// 外面改变了model
 watch(model, (n) => {
   needSyncModel = false
   myValue.value = n
@@ -95,11 +102,13 @@ watch(model, (n) => {
 function clear() {
   myValue.value = ''
 }
+
 onMounted(() => {
-  // 如果默认有值，则用默认的值
-  if (defaultValue){
-    model.value = defaultValue
-    myValue.value = String(defaultValue)
+  // 如果绑定的输入数据有值，则用之，否则用默认值
+  if (model.value === undefined || !String(model.value)){
+    if (defaultValue){
+      myValue.value = String(defaultValue)
+    }
   }else{
     myValue.value = model.value
   }
